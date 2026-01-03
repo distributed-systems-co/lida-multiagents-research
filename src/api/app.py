@@ -9,12 +9,15 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .models import (
     SpawnAgentRequest,
     ChatMessageRequest,
+    StreamingChatRequest,
+    SignatureRequest,
+    ExecuteSignatureRequest,
     SendMessageRequest,
     CreateDatasetRequest,
     AddDataRequest,
@@ -270,6 +273,168 @@ def create_app(
         store = app.state.dataset_store
         history = store.get_chat_history(agent_id, limit)
         return {"agent_id": agent_id, "messages": history}
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Streaming LLM routes
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @app.post("/api/chat/stream")
+    async def stream_chat(request: StreamingChatRequest):
+        """Stream a chat response from an agent using LLM."""
+        try:
+            from ..llm import OpenRouterClient, SignatureBuilder, DSPyModule
+
+            orchestrator = app.state.orchestrator
+            if not orchestrator or not orchestrator.supervisor:
+                raise HTTPException(400, "Orchestrator not initialized")
+
+            agents = orchestrator.supervisor._agents
+            if request.agent_id not in agents:
+                raise HTTPException(404, f"Agent {request.agent_id} not found")
+
+            state = agents[request.agent_id]
+            agent = state.agent
+
+            # Build persona-specific signature
+            persona_prompt = getattr(agent, 'persona_prompt', None) or f"You are {request.agent_id}"
+
+            sig = (
+                SignatureBuilder("PersonaChat")
+                .describe(f"You are embodying this persona:\n{persona_prompt[:2000]}")
+                .input("message", "User message to respond to")
+                .output("response", "Your response as this persona")
+                .build()
+            )
+
+            client = OpenRouterClient()
+            module = DSPyModule(sig, client=client, model=request.model or "anthropic/claude-3.5-sonnet")
+
+            async def generate():
+                async for chunk in module.stream(message=request.message):
+                    yield f"data: {chunk}\n\n"
+                yield "data: [DONE]\n\n"
+
+            return StreamingResponse(
+                generate(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                },
+            )
+
+        except ImportError:
+            raise HTTPException(500, "LLM module not available. Install httpx.")
+        except Exception as e:
+            logger.error(f"Stream chat error: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.post("/api/signatures")
+    async def create_signature(request: SignatureRequest):
+        """Create a dynamic signature for structured LLM calls."""
+        try:
+            from ..llm import SignatureBuilder, Field
+
+            builder = SignatureBuilder(request.name)
+            if request.description:
+                builder.describe(request.description)
+            if request.instructions:
+                builder.instruct(request.instructions)
+
+            for inp in request.inputs:
+                builder.input(
+                    name=inp.get("name", "input"),
+                    description=inp.get("description", ""),
+                    field_type=inp.get("type", "str"),
+                    required=inp.get("required", True),
+                )
+
+            for out in request.outputs:
+                builder.output(
+                    name=out.get("name", "output"),
+                    description=out.get("description", ""),
+                    field_type=out.get("type", "str"),
+                    required=out.get("required", True),
+                )
+
+            sig = builder.build()
+
+            # Store in app state
+            if not hasattr(app.state, 'signatures'):
+                app.state.signatures = {}
+            app.state.signatures[request.name] = sig
+
+            return {
+                "name": sig.name,
+                "description": sig.description,
+                "input_schema": sig.input_schema(),
+                "output_schema": sig.output_schema(),
+                "system_prompt": sig.to_system_prompt(),
+            }
+
+        except Exception as e:
+            raise HTTPException(400, str(e))
+
+    @app.get("/api/signatures")
+    async def list_signatures():
+        """List available signatures."""
+        from ..llm.signatures import SIGNATURES
+
+        predefined = list(SIGNATURES.keys())
+        custom = list(getattr(app.state, 'signatures', {}).keys())
+
+        return {
+            "predefined": predefined,
+            "custom": custom,
+        }
+
+    @app.post("/api/signatures/execute")
+    async def execute_signature(request: ExecuteSignatureRequest):
+        """Execute a signature with given inputs."""
+        try:
+            from ..llm import DSPyModule, get_signature
+
+            # Try custom signature first
+            custom_sigs = getattr(app.state, 'signatures', {})
+            if request.signature_name in custom_sigs:
+                sig = custom_sigs[request.signature_name]
+            else:
+                sig = get_signature(request.signature_name)
+
+            module = DSPyModule(sig, model=request.model or "anthropic/claude-3.5-sonnet")
+
+            if request.stream:
+                async def generate():
+                    async for chunk in module.stream(**request.inputs):
+                        yield f"data: {chunk}\n\n"
+                    yield "data: [DONE]\n\n"
+
+                return StreamingResponse(
+                    generate(),
+                    media_type="text/event-stream",
+                )
+
+            result = await module(**request.inputs)
+
+            return {
+                "signature": request.signature_name,
+                "outputs": result.outputs,
+                "raw_response": result.raw_response,
+                "success": result.success,
+                "error": result.error,
+            }
+
+        except ValueError as e:
+            raise HTTPException(404, str(e))
+        except Exception as e:
+            logger.error(f"Signature execution error: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.get("/api/llm/models")
+    async def list_models():
+        """List available LLM models."""
+        from ..llm.openrouter import MODELS
+        return {"models": MODELS}
 
     # ─────────────────────────────────────────────────────────────────────────
     # Message routes

@@ -33,6 +33,34 @@ class SpawnAgentRequest(BaseModel):
 class ChatMessageRequest(BaseModel):
     agent_id: str
     message: str
+    stream: bool = False
+    model: Optional[str] = None  # Override default model
+    use_llm: bool = True  # Whether to use LLM for response
+
+
+class StreamingChatRequest(BaseModel):
+    agent_id: str
+    message: str
+    model: Optional[str] = None
+    temperature: float = 0.7
+    max_tokens: int = 4096
+
+
+class SignatureRequest(BaseModel):
+    """Create a dynamic signature for structured LLM calls."""
+    name: str
+    description: Optional[str] = None
+    instructions: Optional[str] = None
+    inputs: list[dict] = Field(default_factory=list)  # [{name, description, type, required}]
+    outputs: list[dict] = Field(default_factory=list)
+
+
+class ExecuteSignatureRequest(BaseModel):
+    """Execute a signature with inputs."""
+    signature_name: str  # Predefined or custom signature
+    inputs: dict
+    model: Optional[str] = None
+    stream: bool = False
 
 
 class SendMessageRequest(BaseModel):

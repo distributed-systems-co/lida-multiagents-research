@@ -1,0 +1,34 @@
+name: "World Example — Euclidean Lattice"
+version: "1.4.2"
+cosmology: euclidean
+dims: 3
+lattice: cubic
+dt: 0.001
+bc: [periodic, reflective]
+invariants: [energy, momentum]
+rng:
+  alg: xoshiro
+  seed: 424242
+noise:
+  type: gaussian
+  sigma: 0.01
+resources:
+  energy: 250.0
+  memory: 2147483648
+telos: [robustness, knowledge]
+g_weights:
+  w_h: 2.0
+  w_f: 1.0
+  w_l: 1.5
+  w_r: 1.0
+  w_s: 0.5
+  w_k: 1.2
+  w_b: 0.7
+psi_min: 0.02
+kill_criteria: [psi_breach, metric_critical, audit_fail]
+lawset: 1.4.2
+units: si
+snapshot_cadence: 1d
+region_bbox:
+  sw: { lon: -122.42, lat: 37.77 }
+  ne: { lon: -122.40, lat: 37.78 }

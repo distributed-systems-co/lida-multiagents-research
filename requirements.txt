@@ -18,6 +18,8 @@ asyncio-throttle>=1.0.0
 # Optional: LLM integration
 anthropic>=0.18.0
 openai>=1.0.0
+httpx>=0.27.0
+dspy-ai>=2.4.0
 
 # Development
 pytest>=7.0.0

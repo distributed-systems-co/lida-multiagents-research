@@ -198,6 +198,96 @@ class ServerOrchestrator:
 
         logger.info("Shutdown complete")
 
+    async def start_interactions(self):
+        """Start background agent interactions."""
+        asyncio.create_task(self._interaction_loop())
+        asyncio.create_task(self._work_generation_loop())
+        logger.info("Agent interactions started")
+
+    async def _interaction_loop(self):
+        """Periodic discussions between personas."""
+        import random
+        await asyncio.sleep(5)  # Initial delay
+
+        topics = [
+            "the nature of consciousness",
+            "economic inequality",
+            "artificial intelligence ethics",
+            "climate change solutions",
+            "the future of work",
+            "cultural preservation",
+            "scientific methodology",
+            "mathematical beauty",
+            "social media impact",
+            "space exploration",
+        ]
+
+        while True:
+            try:
+                agents = self.supervisor._agents
+                personas = [aid for aid, s in agents.items() if s.agent_type == "persona"]
+
+                if len(personas) >= 2:
+                    # Pick 2-3 random personas to discuss
+                    participants = random.sample(personas, min(3, len(personas)))
+                    topic = random.choice(topics)
+
+                    # First persona initiates
+                    initiator = agents[participants[0]].agent
+                    for other in participants[1:]:
+                        await initiator.send(
+                            other,
+                            MessageType.REQUEST,
+                            {"action": "query", "query": f"What are your thoughts on {topic}?"},
+                        )
+                        self.stats["messages_sent"] += 1
+                        self.stats["direct_messages"] += 1
+
+                    logger.info(f"Discussion initiated: {participants} on '{topic}'")
+
+            except Exception as e:
+                logger.error(f"Interaction loop error: {e}")
+
+            await asyncio.sleep(random.uniform(8, 15))  # Random interval
+
+    async def _work_generation_loop(self):
+        """Generate work tasks for workers."""
+        import random
+        await asyncio.sleep(8)
+
+        work_types = ["compute", "io", "general"]
+        task_templates = [
+            {"type": "analyze", "subject": "market trends"},
+            {"type": "research", "topic": "emerging technologies"},
+            {"type": "analyze", "subject": "user behavior"},
+            {"type": "research", "topic": "competitive landscape"},
+            {"type": "analyze", "subject": "performance metrics"},
+        ]
+
+        while True:
+            try:
+                agents = self.supervisor._agents
+                workers = [aid for aid, s in agents.items() if s.agent_type == "worker"]
+                demiurge = agents.get("demiurge-prime")
+
+                if workers and demiurge:
+                    worker_id = random.choice(workers)
+                    task = random.choice(task_templates).copy()
+                    task["id"] = f"task-{random.randint(1000, 9999)}"
+
+                    await demiurge.agent.send(
+                        worker_id,
+                        MessageType.DELEGATE,
+                        {"task": task},
+                    )
+                    self.stats["messages_sent"] += 1
+                    logger.info(f"Delegated {task['type']} to {worker_id}")
+
+            except Exception as e:
+                logger.error(f"Work generation error: {e}")
+
+            await asyncio.sleep(random.uniform(5, 10))
+
 
 async def run_server(
     host: str = "0.0.0.0",
@@ -215,6 +305,9 @@ async def run_server(
     # Setup and spawn agents
     await orchestrator.setup()
     await orchestrator.spawn_agents()
+
+    # Start background agent interactions
+    await orchestrator.start_interactions()
 
     # Create FastAPI app
     app = create_app(orchestrator=orchestrator)

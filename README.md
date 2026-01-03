@@ -1,1 +1,141 @@
-# lida-multiagents-research
+# LIDA Multi-Agent Research
+
+Multi-agent system with Redis pub/sub messaging, inbound/outbound mailbox dynamics, and demiurge orchestration.
+
+## Quick Start
+
+```bash
+# Start Redis
+docker-compose up -d redis
+
+# Install dependencies
+pip install -e ".[dev]"
+
+# Run simulation
+python run_simulation.py
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Message Broker                            │
+│                    (Redis Pub/Sub + Streams)                     │
+└─────────────┬───────────────────────────────────┬───────────────┘
+              │                                   │
+              ▼                                   ▼
+┌─────────────────────────┐         ┌─────────────────────────┐
+│     Demiurge Agent      │         │    Persona Agent (N)    │
+│  ┌───────────────────┐  │         │  ┌───────────────────┐  │
+│  │  Inbound Mailbox  │◄─┼─────────┼──│  Inbound Mailbox  │  │
+│  │  (priority queue) │  │         │  │  (priority queue) │  │
+│  └───────────────────┘  │         │  └───────────────────┘  │
+│  ┌───────────────────┐  │         │  ┌───────────────────┐  │
+│  │ Outbound Mailbox  │──┼─────────┼─▶│ Outbound Mailbox  │  │
+│  │  (rate limited)   │  │         │  │  (rate limited)   │  │
+│  └───────────────────┘  │         │  └───────────────────┘  │
+│  ┌───────────────────┐  │         │  ┌───────────────────┐  │
+│  │   World State     │  │         │  │  Knowledge Base   │  │
+│  │   (S,L,M,O,A,V,R) │  │         │  │   + Beliefs       │  │
+│  └───────────────────┘  │         │  └───────────────────┘  │
+└─────────────────────────┘         └─────────────────────────┘
+```
+
+## Components
+
+### Messaging System (`src/messaging/`)
+
+- **Message**: Core message type with priority, TTL, correlation tracking
+- **InboundMailbox**: Priority queue with filtering, backpressure, dead letters
+- **OutboundMailbox**: Rate-limited sending with batching and ACK tracking
+- **MessageBroker**: Redis-backed routing, pub/sub, persistence
+
+### Agents (`src/agents/`)
+
+- **DemiurgeAgent**: Orchestrator implementing the craftsman-intelligence pattern
+- **PersonaAgent**: Domain expert agents instantiated from 920 system prompts
+
+## Message Types
+
+| Type | Description |
+|------|-------------|
+| DIRECT | Point-to-point |
+| BROADCAST | To all agents |
+| MULTICAST | To topic subscribers |
+| REQUEST/RESPONSE | RPC-style |
+| PROPOSE/VOTE/COMMIT | Consensus |
+| SPAWN/TERMINATE | Lifecycle |
+
+## Usage
+
+### Basic Agent Communication
+
+```python
+# Send direct message
+await agent.send(
+    recipient_id="other_agent",
+    msg_type=MessageType.DIRECT,
+    payload={"key": "value"},
+)
+
+# Broadcast to all
+await agent.broadcast(
+    MessageType.BROADCAST,
+    {"announcement": "Hello world"},
+)
+
+# Request/Response
+response = await agent.request(
+    "target_agent",
+    {"action": "query", "query": "status"},
+    timeout=30.0,
+)
+
+# Pub/Sub
+await agent.subscribe("topic:events")
+await agent.publish("topic:events", {"event": "something_happened"})
+```
+
+### Spawning Agents
+
+```python
+registry = AgentRegistry(broker)
+registry.register_type("demiurge", DemiurgeAgent)
+registry.register_type("persona", PersonaAgent)
+
+# Spawn with config
+agent = await registry.spawn(
+    "persona",
+    AgentConfig(agent_id="expert_1"),
+    persona_prompt="You are an expert in...",
+)
+```
+
+## File Structure
+
+```
+lida-multiagents-research/
+├── src/
+│   ├── messaging/
+│   │   ├── __init__.py
+│   │   ├── messages.py      # Message, Envelope, MessageType
+│   │   ├── mailbox.py       # Inbound/Outbound mailboxes
+│   │   ├── broker.py        # Redis message broker
+│   │   └── agent.py         # Base Agent class, Registry
+│   └── agents/
+│       ├── __init__.py
+│       ├── demiurge.py      # Demiurge orchestrator
+│       └── persona.py       # Persona agents
+├── demiurge.prompts/        # Demiurge system components
+├── populations.prompts/     # 920 persona prompts
+├── specs/                   # Schemas and specs
+├── tools/                   # Validation tools
+├── tests/                   # Test suite
+├── run_simulation.py        # Main runner
+├── docker-compose.yml       # Redis setup
+└── requirements.txt
+```
+
+## License
+
+MIT

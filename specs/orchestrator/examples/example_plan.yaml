@@ -1,0 +1,46 @@
+id: rev-growth-q1
+label: "Revenue Growth Q1 — Elasticity, Pricing, Retention"
+timescales:
+  T0: "Strategic (quarterly)"
+  T1: "Tactical (weekly)"
+  T2: "Realtime (minute/hour)"
+dag:
+  nodes:
+    - { id: act_price_test, kind: action, lag: "PT0S..P14D", guards: [g_approval, g_margin], note: "Geo split price A/B" }
+    - { id: med_demand, kind: mediator, lag: "PT0S..P7D", note: "Demand response" }
+    - { id: out_revenue, kind: outcome, lag: "PT0S..P30D", note: "Revenue impact" }
+    - { id: act_save_offers, kind: action, lag: "PT0S..P30D", guards: [g_approval, g_ethics], note: "Retention offers" }
+    - { id: med_churn, kind: mediator, lag: "PT0S..P30D" }
+    - { id: out_margin, kind: outcome, lag: "PT0S..P30D" }
+  edges:
+    - { from: act_price_test, to: med_demand, lag: "PT24H" }
+    - { from: med_demand, to: out_revenue, lag: "P3D" }
+    - { from: act_save_offers, to: med_churn, lag: "P7D" }
+    - { from: med_churn, to: out_margin, lag: "P14D" }
+guards:
+  - { id: g_approval, type: approval, expr: "pricing_cab>=2", owner: "pricing_cab" }
+  - { id: g_margin, type: invariant, expr: "contribution_margin>=0.35" }
+  - { id: g_ethics, type: invariant, expr: "no_dark_patterns && opt_out_available" }
+milestones:
+  - id: m1_design
+    at: "2026-01-07T16:00:00Z"
+    gate:
+      approvals: ["pricing_cab", "ethics_board"]
+  - id: m2_launch
+    at: "2026-01-15T16:00:00Z"
+    gate:
+      approvals: ["ops", "finance"]
+      kill_criteria: ["guardrail_breach", "complaint_spike"]
+  - id: m3_review
+    at: "2026-02-15T16:00:00Z"
+budgets:
+  compute: { T1: 120.0, T2: 30.0 }
+  memory: { T1: 32.0, T2: 8.0 }
+  energy: { T1: 10.0, T2: 2.0 }
+observability:
+  topics: ["chronicle.write", "metrics.publish"]
+  correlation: "propagate-correlation-id"
+approvals:
+  pricing_cab: ["act_price_test", "act_save_offers"]
+  ethics_board: ["act_save_offers"]
+
