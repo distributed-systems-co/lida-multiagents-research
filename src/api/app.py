@@ -437,6 +437,179 @@ def create_app(
         return {"models": MODELS}
 
     # ─────────────────────────────────────────────────────────────────────────
+    # Cognitive Agent routes
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @app.get("/api/cognitive/behaviors")
+    async def list_cognitive_behaviors():
+        """List available cognitive behaviors."""
+        try:
+            from ..llm import list_behaviors
+            return {"behaviors": list_behaviors()}
+        except ImportError:
+            return {"behaviors": [], "error": "LLM module not available"}
+
+    @app.post("/api/cognitive/reason")
+    async def cognitive_reason(
+        task: str = Query(..., description="Task to reason about"),
+        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+        behaviors: Optional[str] = Query(None, description="Comma-separated behaviors to use"),
+    ):
+        """Execute cognitive reasoning on a task."""
+        try:
+            from ..llm import create_cognitive_agent
+
+            behavior_list = behaviors.split(",") if behaviors else None
+            agent = create_cognitive_agent(model=model, behaviors=behavior_list)
+            result = await agent.reason(task)
+
+            return {
+                "task": result["task"],
+                "trace": result["trace"],
+                "synthesis": result["synthesis"],
+                "context_summary": result["context_summary"],
+            }
+
+        except ImportError:
+            raise HTTPException(500, "LLM module not available")
+        except Exception as e:
+            logger.error(f"Cognitive reason error: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.post("/api/cognitive/reason/stream")
+    async def cognitive_reason_stream(
+        task: str = Query(..., description="Task to reason about"),
+        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+    ):
+        """Stream cognitive reasoning process."""
+        try:
+            from ..llm import create_cognitive_agent
+            import json
+
+            agent = create_cognitive_agent(model=model)
+
+            async def generate():
+                async for event in agent.stream_reason(task):
+                    yield f"data: {json.dumps(event)}\n\n"
+                yield "data: [DONE]\n\n"
+
+            return StreamingResponse(
+                generate(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                },
+            )
+
+        except ImportError:
+            raise HTTPException(500, "LLM module not available")
+        except Exception as e:
+            logger.error(f"Cognitive stream error: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.post("/api/cognitive/quick")
+    async def cognitive_quick(
+        task: str = Query(..., description="Task to reason about"),
+        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+    ):
+        """Quick reasoning without full behavior execution."""
+        try:
+            from ..llm import create_cognitive_agent
+
+            agent = create_cognitive_agent(model=model)
+            result = await agent.quick_reason(task)
+
+            return {"task": task, "result": result}
+
+        except ImportError:
+            raise HTTPException(500, "LLM module not available")
+        except Exception as e:
+            logger.error(f"Quick reason error: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.post("/api/cognitive/behavior/{behavior_name}")
+    async def execute_behavior(
+        behavior_name: str,
+        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+        task: str = Query(None, description="Task for context"),
+        claim: str = Query(None, description="Claim to verify (for verification)"),
+        observation: str = Query(None, description="Observation (for hypothesis)"),
+        goal: str = Query(None, description="Goal (for backward chaining)"),
+    ):
+        """Execute a specific cognitive behavior."""
+        try:
+            from ..llm import get_behavior, AgentContext
+
+            behavior = get_behavior(behavior_name, model=model)
+            context = AgentContext(task=task or "")
+            context.start_trace(task or "behavior execution")
+
+            # Build kwargs based on behavior type
+            kwargs = {}
+            if behavior_name == "verification" and claim:
+                kwargs["claim"] = claim
+            elif behavior_name == "hypothesis_generation" and observation:
+                kwargs["observation"] = observation
+            elif behavior_name == "backward_chaining" and goal:
+                kwargs["goal"] = goal
+            elif task:
+                kwargs["task"] = task
+
+            result = await behavior.execute(context, **kwargs)
+
+            return {
+                "behavior": behavior_name,
+                "result": result,
+                "trace": context.current_trace.to_dict() if context.current_trace else None,
+            }
+
+        except ValueError as e:
+            raise HTTPException(404, str(e))
+        except ImportError:
+            raise HTTPException(500, "LLM module not available")
+        except Exception as e:
+            logger.error(f"Behavior execution error: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.get("/api/cognitive/plans")
+    async def list_execution_plans(depth: int = Query(2, ge=1, le=3)):
+        """List possible execution plans for cognitive reasoning."""
+        try:
+            from ..llm import CartesianProductPlanner
+
+            planner = CartesianProductPlanner()
+            plans = planner.generate_plans(depth)
+
+            return {
+                "plans": [
+                    {
+                        "name": p.name,
+                        "description": p.description,
+                        "steps": [s.behavior for s in p.steps],
+                    }
+                    for p in plans
+                ],
+                "conditional_plans": [
+                    {
+                        "name": p.name,
+                        "steps": [
+                            {
+                                "behavior": s.behavior,
+                                "condition": s.condition,
+                                "fallback": s.fallback,
+                            }
+                            for s in p.steps
+                        ],
+                    }
+                    for p in planner.generate_conditional_plans()
+                ],
+            }
+
+        except ImportError:
+            raise HTTPException(500, "LLM module not available")
+
+    # ─────────────────────────────────────────────────────────────────────────
     # Message routes
     # ─────────────────────────────────────────────────────────────────────────
 
