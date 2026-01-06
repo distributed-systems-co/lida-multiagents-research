@@ -16,6 +16,8 @@ from collections import defaultdict
 
 sys.path.insert(0, ".")
 
+import pytest
+
 from src.meta.global_structures import (
     Region,
     SubRegion,
@@ -41,6 +43,16 @@ from src.meta.global_structures import (
     GlobalAgent,
     GlobalNetwork,
 )
+
+
+@pytest.fixture
+def network():
+    """Create a GlobalNetwork with sample data for testing."""
+    net = GlobalNetwork()
+    net.generate_global_corporations(count=20)
+    net.generate_ngos(count=10)
+    net.generate_universities(count=10)
+    return net
 
 
 def test_geographic_hierarchies():
