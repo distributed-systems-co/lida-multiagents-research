@@ -16,7 +16,7 @@ import logging
 import statistics
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
@@ -708,7 +708,7 @@ class PersonalityDriftTracker:
             drifts.append(abs(measured - target))
 
         measurement = DriftMeasurement(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             trait_values=trait_values,
             overall_drift=statistics.mean(drifts) if drifts else 0.0,
             authenticity=probe.authenticity_score,

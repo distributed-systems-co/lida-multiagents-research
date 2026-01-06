@@ -14,7 +14,7 @@ Provides:
 from __future__ import annotations
 import math
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum, auto
 from typing import Dict, List, Set, Optional, Tuple, Any, Callable
@@ -473,7 +473,7 @@ def assess_gdelt_event(event_data: Dict[str, Any],
     event_date = event_data.get("date_added")
     if event_date:
         if isinstance(event_date, datetime):
-            delta = datetime.utcnow() - event_date
+            delta = datetime.now(timezone.utc) - event_date
             factors.recency_hours = delta.total_seconds() / 3600
         else:
             factors.recency_hours = 1.0  # Assume recent
@@ -510,7 +510,7 @@ def assess_news_article(title: str, content: str, source_id: str,
     factors.corroboration_count = len(corroborating_urls or [])
 
     # Recency
-    delta = datetime.utcnow() - published_at
+    delta = datetime.now(timezone.utc) - published_at
     factors.recency_hours = delta.total_seconds() / 3600
 
     # Specificity heuristics (presence of specific details)

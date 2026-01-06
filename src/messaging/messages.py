@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import uuid
 from dataclasses import dataclass, field, asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Optional
 
@@ -53,7 +53,7 @@ class Message:
 
     # Auto-generated
     msg_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     # Optional metadata
     priority: Priority = Priority.NORMAL

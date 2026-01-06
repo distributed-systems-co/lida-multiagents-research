@@ -16,7 +16,7 @@ import json
 import random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
@@ -120,7 +120,7 @@ class MarketDataLookup(BaseTool):
         # Simulated data - in production, integrate with real API
         data = {
             "company": company,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "data": {}
         }
 
@@ -184,7 +184,7 @@ class ValuationCalculator(BaseTool):
         result = {
             "method": method,
             "inputs": params,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         if method == "dcf":
@@ -269,7 +269,7 @@ class CompetitiveLandscape(BaseTool):
             "company": company,
             "industry": industry,
             "analysis_type": analysis_type,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         if analysis_type == "positioning":
@@ -347,7 +347,7 @@ class TrendAnalyzer(BaseTool):
                 ])
                 for _ in range(2)
             ],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -423,7 +423,7 @@ class RiskAssessment(BaseTool):
                 "Engage regulatory counsel",
                 "Stress test financial models"
             ],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -491,7 +491,7 @@ class ComplianceChecker(BaseTool):
                 "Prepare comprehensive filings",
                 "Consider timing implications"
             ],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -561,7 +561,7 @@ class HistoricalFailures(BaseTool):
                 "Lack of cultural alignment",
                 "Regulatory uncertainty"
             ],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -631,7 +631,7 @@ class PartnershipFinder(BaseTool):
                 "Competitive process",
                 "Informal collaboration first"
             ]),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -682,7 +682,7 @@ class InnovationTracker(BaseTool):
             "key_players": [f"Innovator {i}" for i in range(1, 6)],
             "adoption_curve": random.choice(["Early adoption", "Rapid growth", "Mainstream"]),
             "investment_opportunities": random.randint(3, 10),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -753,7 +753,7 @@ class SynergyCalculator(BaseTool):
             "Successful integration execution",
             "No major regulatory blocks"
         ]
-        result["timestamp"] = datetime.utcnow().isoformat()
+        result["timestamp"] = datetime.now(timezone.utc).isoformat()
 
         return result
 
@@ -815,7 +815,7 @@ class TechnicalDeepDive(BaseTool):
                 "Talent retention",
                 "Technical obsolescence"
             ], 2),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -863,7 +863,7 @@ class PatentAnalysis(BaseTool):
             "litigation_risk": random.choice(["Low", "Medium", "High"]),
             "licensing_opportunities": random.randint(0, 15),
             "freedom_to_operate": random.choice(["Clear", "Some concerns", "Significant concerns"]),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -919,7 +919,7 @@ class IndustryBenchmark(BaseTool):
                 "strengths": random.sample(["Innovation", "Efficiency", "Scale", "Talent"], 2),
                 "opportunities": random.sample(["Market expansion", "Cost optimization", "Product development"], 2)
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -995,7 +995,7 @@ class ContrarianAnalysis(BaseTool):
                 "Significantly reduce scope",
                 "Delay until risks clarify"
             ]),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -1055,7 +1055,7 @@ class AssumptionChallenger(BaseTool):
                 "Phase implementation",
                 "Create early warning indicators"
             ],
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 
@@ -1118,7 +1118,7 @@ class WeaknessDetector(BaseTool):
                 "Competitive wins declining"
             ],
             "mitigation_priority": random.choice(["Urgent", "High", "Medium"]),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
 

@@ -17,7 +17,7 @@ import numpy as np
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Callable, Set
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 import asyncio
 from collections import defaultdict
 
@@ -226,7 +226,7 @@ class EmergenceDetector:
     def record_state(self, agents: List[Agent], metadata: Optional[Dict] = None):
         """Record current swarm state."""
         state = {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "num_agents": len(agents),
             "positions": np.array([a.position for a in agents]),
             "velocities": np.array([a.velocity for a in agents]),
@@ -419,7 +419,7 @@ class CollectiveIntelligence:
 
         # Record decision
         self.decision_history.append({
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "num_agents": len(agents),
             "options": options,
             "winner": winner,

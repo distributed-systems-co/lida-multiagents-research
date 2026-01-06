@@ -14,7 +14,7 @@ import logging
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set
 
@@ -233,7 +233,7 @@ class TimelineStore:
         event = TimelineEvent(
             event_id=str(uuid.uuid4()),
             event_type=event_type,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             agent_id=agent_id,
             severity=severity,
             title=title,
@@ -265,7 +265,7 @@ class TimelineStore:
 
     async def _cleanup(self):
         """Remove old events."""
-        cutoff = datetime.utcnow() - timedelta(hours=self.retention_hours)
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=self.retention_hours)
 
         # Remove old events
         self._events = [e for e in self._events if e.timestamp > cutoff]
@@ -443,11 +443,11 @@ class TimelineTracker:
         self.event: Optional[TimelineEvent] = None
 
     async def __aenter__(self) -> "TimelineTracker":
-        self.start_time = datetime.utcnow()
+        self.start_time = datetime.now(timezone.utc)
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        duration_ms = (datetime.utcnow() - self.start_time).total_seconds() * 1000
+        duration_ms = (datetime.now(timezone.utc) - self.start_time).total_seconds() * 1000
 
         severity = EventSeverity.ERROR if exc_type else EventSeverity.INFO
         description = str(exc_val) if exc_val else ""

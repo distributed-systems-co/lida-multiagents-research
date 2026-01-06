@@ -3,7 +3,7 @@ import asyncio
 import json
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Callable, Optional, Any, TYPE_CHECKING
 
 import redis.asyncio as redis
@@ -93,7 +93,7 @@ class MessageBroker:
             "agent_id": agent.agent_id,
             "agent_type": agent.agent_type,
             "status": "online",
-            "registered_at": datetime.utcnow().isoformat(),
+            "registered_at": datetime.now(timezone.utc).isoformat(),
         })
         await self._redis.expire(agent_key, 300)  # 5 min TTL, refresh with heartbeat
 
@@ -283,5 +283,5 @@ class MessageBroker:
     async def send_heartbeat(self, agent_id: str):
         """Refresh agent registration TTL."""
         agent_key = f"{self.config.channel_prefix}:registry:{agent_id}"
-        await self._redis.hset(agent_key, "last_heartbeat", datetime.utcnow().isoformat())
+        await self._redis.hset(agent_key, "last_heartbeat", datetime.now(timezone.utc).isoformat())
         await self._redis.expire(agent_key, 300)

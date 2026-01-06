@@ -19,7 +19,7 @@ import random
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
@@ -217,7 +217,7 @@ class EventStream:
             event = RealTimeEvent(
                 event_id=str(gdelt_data.get("GLOBALEVENTID", uuid.uuid4())),
                 source="gdelt",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 headline=f"{gdelt_data.get('Actor1Name', 'Unknown')} - {gdelt_data.get('Actor2Name', 'Unknown')}",
                 companies_mentioned=[
                     gdelt_data.get("Actor1Name", ""),
@@ -404,7 +404,7 @@ class PredictionEngine:
         return Prediction(
             prediction_id=str(uuid.uuid4()),
             prediction_type=PredictionType.ACQUISITION,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             target_company=company.name,
             target_sector=company.sector,
             description=f"{company.name} likely to be acquired",
@@ -438,7 +438,7 @@ class PredictionEngine:
         return Prediction(
             prediction_id=str(uuid.uuid4()),
             prediction_type=PredictionType.IPO,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             target_company=company.name,
             target_sector=company.sector,
             description=f"{company.name} likely to IPO",
@@ -460,12 +460,12 @@ class PredictionEngine:
 
         # Check if company is due for funding
         if company.last_funding_date:
-            months_since_funding = (datetime.utcnow() - company.last_funding_date).days / 30
+            months_since_funding = (datetime.now(timezone.utc) - company.last_funding_date).days / 30
             if months_since_funding > 18:
                 return Prediction(
                     prediction_id=str(uuid.uuid4()),
                     prediction_type=PredictionType.FUNDING_ROUND,
-                    timestamp=datetime.utcnow(),
+                    timestamp=datetime.now(timezone.utc),
                     target_company=company.name,
                     target_sector=company.sector,
                     description=f"{company.name} due for new funding round",
@@ -510,7 +510,7 @@ class PredictionEngine:
                 pred.is_resolved = True
                 pred.actual_outcome = actual_outcome
                 pred.was_correct = was_correct
-                pred.resolution_date = datetime.utcnow()
+                pred.resolution_date = datetime.now(timezone.utc)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -860,7 +860,7 @@ class EventSimulator:
             event = RealTimeEvent(
                 event_id=str(uuid.uuid4()),
                 source="simulator",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 headline=event_data["headline"],
                 companies_mentioned=event_data["companies"],
                 event_type=event_data["event_type"],
@@ -931,7 +931,7 @@ class RealTimeQuorumSystem:
         event = RealTimeEvent(
             event_id=str(uuid.uuid4()),
             source="manual",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             headline=headline,
             companies_mentioned=companies,
             event_type=event_type,

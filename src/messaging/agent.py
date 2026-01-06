@@ -4,7 +4,7 @@ import logging
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Callable, Optional, Any
 
@@ -64,7 +64,7 @@ class Agent(ABC):
         # Lifecycle
         self._running = False
         self._tasks: list[asyncio.Task] = []
-        self._created_at = datetime.utcnow()
+        self._created_at = datetime.now(timezone.utc)
 
         # Register default message handlers
         self._register_default_handlers()
@@ -82,7 +82,7 @@ class Agent(ABC):
         await self.send(
             msg.sender_id,
             MessageType.ACK,
-            {"status": self.status.value, "timestamp": datetime.utcnow().isoformat()},
+            {"status": self.status.value, "timestamp": datetime.now(timezone.utc).isoformat()},
             correlation_id=msg.msg_id,
         )
 
@@ -215,8 +215,8 @@ class Agent(ABC):
         )
 
         # Wait for response with matching correlation_id
-        start = datetime.utcnow()
-        while (datetime.utcnow() - start).total_seconds() < timeout:
+        start = datetime.now(timezone.utc)
+        while (datetime.now(timezone.utc) - start).total_seconds() < timeout:
             envelope = await self.inbound.receive(timeout=0.1)
             if envelope:
                 msg = envelope.message

@@ -13,7 +13,7 @@ import json
 import time
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, Dict, List, Any, Callable, AsyncIterator
 
@@ -57,7 +57,7 @@ class ConversationContext:
             "id": str(uuid.uuid4()),
             "agent_id": agent_id,
             "content": content,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "turn": self.turn_count,
         }
         self.messages.append(msg)
@@ -127,7 +127,7 @@ class PersonalityAgent:
             raise RuntimeError("Not connected to Redis")
 
         message["sender"] = self.agent_id
-        message["timestamp"] = datetime.utcnow().isoformat()
+        message["timestamp"] = datetime.now(timezone.utc).isoformat()
         await self._redis_client.publish(channel, json.dumps(message))
 
     async def unsubscribe(self, channel: str):
@@ -241,7 +241,7 @@ class AgentNetwork:
             metadata={
                 "personality": personality_key,
                 "role": role.value,
-                "spawned_at": datetime.utcnow().isoformat(),
+                "spawned_at": datetime.now(timezone.utc).isoformat(),
             },
         )
         temporal.add_node(node)
@@ -280,7 +280,7 @@ class AgentNetwork:
             metadata={
                 "topic": topic,
                 "participants": agent_ids,
-                "started_at": datetime.utcnow().isoformat(),
+                "started_at": datetime.now(timezone.utc).isoformat(),
             },
         )
         temporal.add_node(node)
@@ -402,7 +402,7 @@ Respond directly in 2-3 sentences. Be true to your personality."""
 
         # Mark conversation complete
         context.metadata["completed"] = True
-        context.metadata["ended_at"] = datetime.utcnow().isoformat()
+        context.metadata["ended_at"] = datetime.now(timezone.utc).isoformat()
 
         temporal = get_temporal_graph()
         event = TemporalEvent(

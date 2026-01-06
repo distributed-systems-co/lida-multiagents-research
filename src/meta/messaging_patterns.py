@@ -17,7 +17,7 @@ import uuid
 import random
 import time
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import (
@@ -218,7 +218,7 @@ class Message:
         """Check if message has expired."""
         if self.ttl is None:
             return False
-        elapsed = (datetime.utcnow() - self.timestamp).total_seconds()
+        elapsed = (datetime.now(timezone.utc) - self.timestamp).total_seconds()
         return elapsed > self.ttl
 
 
@@ -1092,12 +1092,12 @@ class MessagingNetwork:
         key = f"{sender}:{recipient}"
 
         if key not in self._token_buckets:
-            self._token_buckets[key] = (rate, rate, datetime.utcnow())
+            self._token_buckets[key] = (rate, rate, datetime.now(timezone.utc))
 
         tokens, max_tokens, last_update = self._token_buckets[key]
 
         # Refill tokens
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         elapsed = (now - last_update).total_seconds()
         tokens = min(max_tokens, tokens + elapsed * rate)
 
@@ -1149,13 +1149,13 @@ class MessagingNetwork:
             recipients=[recipient],
             content=content,
             pattern=MessagePattern.WINDOW,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         ))
 
         # Check if window has elapsed
         if self._windows[key]:
             first_ts = self._windows[key][0].timestamp
-            elapsed_ms = (datetime.utcnow() - first_ts).total_seconds() * 1000
+            elapsed_ms = (datetime.now(timezone.utc) - first_ts).total_seconds() * 1000
 
             if elapsed_ms >= window_ms:
                 messages = self._windows[key]
@@ -1254,11 +1254,11 @@ class MessagingNetwork:
                 agent = self.agents[recipient]
                 await agent.inbox.put(msg)
                 agent.messages_received += 1
-                agent.last_active = datetime.utcnow()
+                agent.last_active = datetime.now(timezone.utc)
 
         if msg.sender in self.agents:
             self.agents[msg.sender].messages_sent += 1
-            self.agents[msg.sender].last_active = datetime.utcnow()
+            self.agents[msg.sender].last_active = datetime.now(timezone.utc)
 
     async def _send_to_many(self, sender: str, recipients: List[str],
                             content: Any, pattern: MessagePattern) -> List[Message]:

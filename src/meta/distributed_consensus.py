@@ -17,7 +17,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 
 logger = logging.getLogger(__name__)
@@ -106,7 +106,7 @@ class RaftNode:
         # Timing
         self.election_timeout_range = election_timeout_range
         self.heartbeat_interval = heartbeat_interval
-        self.last_heartbeat = datetime.utcnow()
+        self.last_heartbeat = datetime.now(timezone.utc)
         self.election_timeout = self._random_election_timeout()
 
         # Message queue
@@ -166,13 +166,13 @@ class RaftNode:
         while self._running:
             await asyncio.sleep(0.01)  # Check every 10ms
 
-            time_since_heartbeat = (datetime.utcnow() - self.last_heartbeat).total_seconds()
+            time_since_heartbeat = (datetime.now(timezone.utc) - self.last_heartbeat).total_seconds()
 
             if self.state == NodeState.LEADER:
                 # Send periodic heartbeats
                 if time_since_heartbeat >= self.heartbeat_interval:
                     await self._send_heartbeats()
-                    self.last_heartbeat = datetime.utcnow()
+                    self.last_heartbeat = datetime.now(timezone.utc)
 
             elif self.state in (NodeState.FOLLOWER, NodeState.CANDIDATE):
                 # Check election timeout
@@ -207,7 +207,7 @@ class RaftNode:
         self.current_term += 1
         self.voted_for = self.node_id
         self.election_timeout = self._random_election_timeout()
-        self.last_heartbeat = datetime.utcnow()
+        self.last_heartbeat = datetime.now(timezone.utc)
 
         # Vote for self
         votes_received = 1
@@ -254,7 +254,7 @@ class RaftNode:
             if candidate_log_ok:
                 vote_granted = True
                 self.voted_for = payload["candidate_id"]
-                self.last_heartbeat = datetime.utcnow()  # Reset election timeout
+                self.last_heartbeat = datetime.now(timezone.utc)  # Reset election timeout
 
         # Send vote response
         vote_msg = ConsensusMessage(
@@ -338,7 +338,7 @@ class RaftNode:
         success = False
 
         # Reset election timeout (got message from leader)
-        self.last_heartbeat = datetime.utcnow()
+        self.last_heartbeat = datetime.now(timezone.utc)
         self.leader_id = payload["leader_id"]
 
         # Check log consistency

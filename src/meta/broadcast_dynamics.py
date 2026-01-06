@@ -8,7 +8,7 @@ import asyncio
 import json
 import uuid
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from typing import Dict, List, Any, Optional, Set, Callable, AsyncIterator
@@ -161,7 +161,7 @@ class BroadcastNetwork:
             "id": agent_id,
             "personality": personality,
             "metadata": metadata or {},
-            "joined_at": datetime.utcnow(),
+            "joined_at": datetime.now(timezone.utc),
             "message_count": 0,
             "safety_incidents": 0,
         }
@@ -188,7 +188,7 @@ class BroadcastNetwork:
             sender_id=sender_id,
             message_type=MessageType.BROADCAST,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             recipients=list(self.agents.keys()),
             thread_id=thread_id,
             metadata=metadata or {},
@@ -209,7 +209,7 @@ class BroadcastNetwork:
             sender_id=sender_id,
             message_type=MessageType.MULTICAST,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             recipients=recipients,
             thread_id=thread_id,
             metadata=metadata or {},
@@ -224,7 +224,7 @@ class BroadcastNetwork:
             sender_id=sender_id,
             message_type=MessageType.DIRECT,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             recipients=[recipient_id],
             thread_id=thread_id,
             metadata=metadata or {},
@@ -243,7 +243,7 @@ class BroadcastNetwork:
             sender_id=sender_id,
             message_type=MessageType.REPLY,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             recipients=[original.sender_id],
             reply_to=reply_to_id,
             thread_id=original.thread_id,
@@ -259,7 +259,7 @@ class BroadcastNetwork:
             sender_id=sender_id,
             message_type=MessageType.WHISPER,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             recipients=[recipient_id],
             metadata={**(metadata or {}), "private": True},
         )
@@ -273,7 +273,7 @@ class BroadcastNetwork:
             sender_id="SYSTEM",
             message_type=MessageType.INTERVENTION,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             recipients=target_agents or list(self.agents.keys()),
             thread_id=target_thread,
             metadata={"intervention": True},
@@ -459,7 +459,7 @@ class BroadcastNetwork:
         thread = ConversationThread(
             thread_id=thread_id,
             topic=topic,
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(timezone.utc),
             participants=set(initial_participants or []),
         )
         self.threads[thread_id] = thread
@@ -477,7 +477,7 @@ class BroadcastNetwork:
 
         snapshot = TemporalSnapshot(
             snapshot_id=str(uuid.uuid4()),
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             active_agents=list(self.agents.keys()),
             active_threads=list(self.threads.keys()),
             message_count=len(self.messages),
@@ -613,7 +613,7 @@ class BroadcastNetwork:
 
         dataset = {
             "metadata": {
-                "exported_at": datetime.utcnow().isoformat(),
+                "exported_at": datetime.now(timezone.utc).isoformat(),
                 "total_messages": len(self.messages),
                 "total_agents": len(self.agents),
                 "total_threads": len(self.threads),

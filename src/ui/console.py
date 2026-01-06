@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional, List
 
 from rich.console import Console as RichConsole
@@ -29,14 +29,14 @@ class Console:
             force_terminal=True,
             color_system="truecolor",
         )
-        self._start_time = datetime.utcnow()
+        self._start_time = datetime.now(timezone.utc)
 
     @property
     def width(self) -> int:
         return self._console.width
 
     def _timestamp(self) -> str:
-        elapsed = (datetime.utcnow() - self._start_time).total_seconds()
+        elapsed = (datetime.now(timezone.utc) - self._start_time).total_seconds()
         return f"[{Color.MUTED.value}]{elapsed:8.2f}s[/]"
 
     # ═══════════════════════════════════════════════════════════════════════════

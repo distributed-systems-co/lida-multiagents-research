@@ -15,7 +15,7 @@ import hashlib
 import logging
 import numpy as np
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 from enum import Enum
 import json
@@ -108,7 +108,7 @@ class MemoryTrace:
         BaseLevel = ln(sum(t_i^-d)) where t_i is time since access i, d is decay
         """
         if current_time is None:
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
 
         # Base-level activation (recency and frequency)
         time_since_creation = (current_time - self.created_at).total_seconds() / 86400  # days
@@ -139,7 +139,7 @@ class MemoryTrace:
 
     def access(self):
         """Record memory access."""
-        self.last_accessed = datetime.utcnow()
+        self.last_accessed = datetime.now(timezone.utc)
         self.access_count += 1
 
     def to_dict(self) -> dict:
@@ -434,7 +434,7 @@ class SemanticMemory:
         self._cache: Dict[str, MemoryTrace] = {}
 
         # Consolidation state
-        self._last_consolidation = datetime.utcnow()
+        self._last_consolidation = datetime.now(timezone.utc)
         self._consolidation_task: Optional[asyncio.Task] = None
 
     async def store(
@@ -463,8 +463,8 @@ class SemanticMemory:
             embedding=embedding,
             memory_type=memory_type,
             importance=importance,
-            created_at=datetime.utcnow(),
-            last_accessed=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            last_accessed=datetime.now(timezone.utc),
             tags=tags or set(),
             metadata=metadata or {},
             modality=modality,
@@ -519,7 +519,7 @@ class SemanticMemory:
         results = await self.vector_store.search(query_embedding, k=k*2, filter_dict=filter_dict)
 
         # Compute combined scores (similarity + activation)
-        current_time = datetime.utcnow()
+        current_time = datetime.now(timezone.utc)
         scored_results = []
 
         for trace, similarity in results:
@@ -602,7 +602,7 @@ class SemanticMemory:
 
         # This would retrieve all memories and consolidate based on strategy
         # For now, just update consolidation timestamp
-        self._last_consolidation = datetime.utcnow()
+        self._last_consolidation = datetime.now(timezone.utc)
 
         # In a full implementation:
         # 1. Retrieve memories based on strategy criteria
@@ -614,7 +614,7 @@ class SemanticMemory:
         """Remove low-activation memories."""
         # Get all cached memories
         to_forget = []
-        current_time = datetime.utcnow()
+        current_time = datetime.now(timezone.utc)
 
         for trace in self._cache.values():
             if trace.should_forget(self.forget_threshold, current_time):

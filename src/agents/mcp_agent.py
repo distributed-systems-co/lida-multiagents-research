@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 from ..messaging import Agent, AgentConfig, MessageBroker, Message, MessageType, Priority
@@ -57,7 +57,7 @@ class MCPExecutionResult:
         self.result = result
         self.error = error
         self.duration = duration
-        self.timestamp = datetime.utcnow()
+        self.timestamp = datetime.now(timezone.utc)
 
     def to_dict(self) -> dict:
         return {
@@ -250,7 +250,7 @@ class MCPAgent(Agent):
         Returns:
             MCPExecutionResult with the tool output
         """
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
 
         # Find server from bindings if not specified
         if not server_id:
@@ -293,7 +293,7 @@ class MCPAgent(Agent):
         # Execute the tool with timeline tracking
         try:
             result = await connection.call_tool(tool_name, arguments)
-            duration = (datetime.utcnow() - start_time).total_seconds()
+            duration = (datetime.now(timezone.utc) - start_time).total_seconds()
 
             # Check for JSON-RPC error
             if "error" in result:
@@ -331,7 +331,7 @@ class MCPAgent(Agent):
                     duration_ms=duration * 1000,
                 )
         except Exception as e:
-            duration = (datetime.utcnow() - start_time).total_seconds()
+            duration = (datetime.now(timezone.utc) - start_time).total_seconds()
             exec_result = MCPExecutionResult(
                 tool_name=tool_name,
                 server_id=server_id,
@@ -643,7 +643,7 @@ class MCPAgent(Agent):
         temp = temperature if temperature is not None else self._model_config.temperature
         tokens = max_tokens if max_tokens is not None else self._model_config.max_tokens
 
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
 
         # Record LLM request
         await self._timeline.record(
@@ -666,7 +666,7 @@ class MCPAgent(Agent):
                 stream=False,
             )
 
-            duration = (datetime.utcnow() - start_time).total_seconds()
+            duration = (datetime.now(timezone.utc) - start_time).total_seconds()
 
             # Record LLM response
             await self._timeline.record(
@@ -683,7 +683,7 @@ class MCPAgent(Agent):
             return result
 
         except Exception as e:
-            duration = (datetime.utcnow() - start_time).total_seconds()
+            duration = (datetime.now(timezone.utc) - start_time).total_seconds()
 
             # Record error
             await self._timeline.record(
@@ -744,7 +744,7 @@ class MCPAgent(Agent):
             metadata={"model": model},
         )
 
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         try:
             stream = await self._llm_client.complete(
                 messages=messages,
@@ -756,7 +756,7 @@ class MCPAgent(Agent):
             async for chunk in stream:
                 yield chunk
 
-            duration = (datetime.utcnow() - start_time).total_seconds()
+            duration = (datetime.now(timezone.utc) - start_time).total_seconds()
 
             # Record stream end
             await self._timeline.record(

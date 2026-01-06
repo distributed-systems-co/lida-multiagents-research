@@ -376,8 +376,6 @@ def test_full_global_network():
         if count > 0:
             print(f"  {alignment}: {count}")
 
-    return network
-
 
 def test_tag_based_queries(network: GlobalNetwork):
     """Test tag-based filtering and queries."""

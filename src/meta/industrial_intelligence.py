@@ -18,7 +18,7 @@ import logging
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
@@ -396,7 +396,7 @@ class EmotionalQuorum:
         deliberation = QuorumDeliberation(
             deliberation_id=str(uuid.uuid4()),
             event=event,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         # Simulate agent opinions based on event type and context
@@ -804,7 +804,7 @@ class IndustrialRegistry:
         event = IndustrialEvent(
             event_id=str(uuid.uuid4()),
             event_type=event_type,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             primary_company=primary_company,
             secondary_company=secondary_company,
             sector=sector,

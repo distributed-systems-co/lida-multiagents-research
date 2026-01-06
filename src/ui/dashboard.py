@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Callable
 
 from rich.console import Console, Group
@@ -26,7 +26,7 @@ class Dashboard:
         self.theme = theme or Theme.dark()
         self.refresh_rate = refresh_rate
         self._console = Console(force_terminal=True, color_system="truecolor")
-        self._start_time = datetime.utcnow()
+        self._start_time = datetime.now(timezone.utc)
         self._running = False
 
         # State
@@ -38,7 +38,7 @@ class Dashboard:
         self._max_message_lines = 10
 
     def _elapsed(self) -> str:
-        elapsed = (datetime.utcnow() - self._start_time).total_seconds()
+        elapsed = (datetime.now(timezone.utc) - self._start_time).total_seconds()
         hours, rem = divmod(int(elapsed), 3600)
         mins, secs = divmod(rem, 60)
         return f"{hours:02d}:{mins:02d}:{secs:02d}"
@@ -52,7 +52,7 @@ class Dashboard:
         self._agents[agent_id] = {
             **self._agents.get(agent_id, {}),
             **data,
-            "last_update": datetime.utcnow(),
+            "last_update": datetime.now(timezone.utc),
         }
 
     def remove_agent(self, agent_id: str):
@@ -63,7 +63,7 @@ class Dashboard:
         """Add message to log."""
         self._messages.append({
             **msg,
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
         })
         # Keep only recent messages
         if len(self._messages) > self._max_message_lines * 2:
@@ -73,7 +73,7 @@ class Dashboard:
         """Add event to log."""
         self._events.append({
             **event,
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
         })
         # Keep only recent events
         if len(self._events) > self._max_log_lines * 2:
@@ -158,7 +158,7 @@ class Dashboard:
         lines = []
 
         for msg in self._messages[-self._max_message_lines:]:
-            ts = msg.get("timestamp", datetime.utcnow())
+            ts = msg.get("timestamp", datetime.now(timezone.utc))
             elapsed = (ts - self._start_time).total_seconds()
 
             msg_type = msg.get("type", "direct")
@@ -202,7 +202,7 @@ class Dashboard:
         lines = []
 
         for event in self._events[-self._max_log_lines:]:
-            ts = event.get("timestamp", datetime.utcnow())
+            ts = event.get("timestamp", datetime.now(timezone.utc))
             elapsed = (ts - self._start_time).total_seconds()
 
             level = event.get("level", "info")
@@ -315,7 +315,7 @@ class Dashboard:
         footer.append("Ctrl+C", style=f"bold {Color.WARNING.value}")
         footer.append(" to stop ", style=Color.MUTED.value)
         footer.append("│", style=Color.BORDER.value)
-        footer.append(f" {datetime.utcnow().strftime('%H:%M:%S')} UTC ", style=Color.MUTED.value)
+        footer.append(f" {datetime.now(timezone.utc).strftime('%H:%M:%S')} UTC ", style=Color.MUTED.value)
 
         layout["footer"].update(Panel(footer, box=box.SIMPLE, border_style=Color.BORDER.value))
 

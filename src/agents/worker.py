@@ -4,7 +4,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 
 from ..messaging import Agent, AgentConfig, MessageBroker, Message, MessageType, Priority
@@ -173,7 +173,7 @@ class WorkerAgent(Agent):
         self._active_tasks[task_id] = {
             "task": task,
             "requester": msg.sender_id,
-            "started_at": datetime.utcnow(),
+            "started_at": datetime.now(timezone.utc),
         }
 
         # ACK receipt
@@ -204,7 +204,7 @@ class WorkerAgent(Agent):
             result = await self._do_work(work_type, task, duration)
 
             # Update stats
-            elapsed = (datetime.utcnow() - task_info["started_at"]).total_seconds()
+            elapsed = (datetime.now(timezone.utc) - task_info["started_at"]).total_seconds()
             self._total_executed += 1
             self._total_time += elapsed
 
@@ -265,7 +265,7 @@ class WorkerAgent(Agent):
             return
 
         task_info = self._active_tasks.pop(task_id)
-        elapsed = (datetime.utcnow() - task_info["started_at"]).total_seconds()
+        elapsed = (datetime.now(timezone.utc) - task_info["started_at"]).total_seconds()
 
         self._failed_tasks.append({
             "task_id": task_id,

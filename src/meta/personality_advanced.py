@@ -19,7 +19,7 @@ import hashlib
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
@@ -119,7 +119,7 @@ class EmotionalDynamics:
 
         # Record event
         self.emotional_history.append({
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "emotion": emotion.value,
             "intensity": intensity,
             "result": self.emotions[emotion],
@@ -300,14 +300,14 @@ class MemorySystem:
     ) -> Memory:
         """Encode a new memory."""
         memory_id = hashlib.sha256(
-            f"{content}{datetime.utcnow().isoformat()}".encode()
+            f"{content}{datetime.now(timezone.utc).isoformat()}".encode()
         ).hexdigest()[:12]
 
         memory = Memory(
             memory_id=memory_id,
             memory_type=memory_type,
             content=content,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             importance=importance,
             emotional_valence=emotional_valence,
             emotional_intensity=emotional_intensity,
@@ -336,7 +336,7 @@ class MemorySystem:
         min_salience: float = 0.1,
     ) -> List[Memory]:
         """Recall memories based on query and filters."""
-        current_time = datetime.utcnow()
+        current_time = datetime.now(timezone.utc)
         candidates = []
 
         # Filter by type if specified
@@ -421,7 +421,7 @@ class MemorySystem:
 
     def _consolidate(self):
         """Remove low-salience memories to make room."""
-        current_time = datetime.utcnow()
+        current_time = datetime.now(timezone.utc)
         saliences = [
             (mid, m.calculate_salience(current_time))
             for mid, m in self.memories.items()
@@ -499,7 +499,7 @@ class Relationship:
     ):
         """Update relationship based on interaction."""
         self.interaction_count += 1
-        self.last_interaction = datetime.utcnow()
+        self.last_interaction = datetime.now(timezone.utc)
 
         if valence > 0:
             self.positive_interactions += 1
@@ -516,7 +516,7 @@ class Relationship:
         # Record significant events
         if significance > 0.5:
             self.significant_events.append({
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "valence": valence,
                 "significance": significance,
                 "description": event_description,
@@ -837,7 +837,7 @@ class NarrativeIdentity:
     ):
         """Add a defining moment to the narrative."""
         self.defining_moments.append({
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "description": description,
             "significance": significance,
             "lesson": lesson_learned,

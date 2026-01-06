@@ -3111,7 +3111,7 @@ def create_app(
         from ..meta.timeline import get_timeline_store
 
         store = get_timeline_store()
-        since = datetime.utcnow() - timedelta(hours=since_hours)
+        since = datetime.now(timezone.utc) - timedelta(hours=since_hours)
         stats = await store.get_stats(since=since, agent_id=agent_id)
         return stats.to_dict()
 

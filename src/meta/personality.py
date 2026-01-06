@@ -16,7 +16,7 @@ import math
 import random
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
@@ -103,7 +103,7 @@ class TraitProfile:
 
     def set_trait(self, dimension: TraitDimension, value: float):
         self.dimensions[dimension] = max(0.0, min(1.0, value))
-        self.last_updated = datetime.utcnow()
+        self.last_updated = datetime.now(timezone.utc)
 
     def adjust_trait(self, dimension: TraitDimension, delta: float, learning_rate: float = 0.1):
         """Adjust trait with learning rate and stability resistance."""
@@ -419,7 +419,7 @@ class Personality:
     def crystallize(self, experience: dict, strength: float = 0.1):
         """Reinforce personality based on experience."""
         self.formation_experiences.append({
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "experience": experience,
             "strength": strength,
         })

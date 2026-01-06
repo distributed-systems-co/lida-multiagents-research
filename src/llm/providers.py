@@ -9,7 +9,7 @@ import os
 import logging
 import asyncio
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional, AsyncIterator
 
@@ -197,7 +197,7 @@ class OpenRouterModelFetcher:
 
     async def fetch_all_models(self, force: bool = False) -> List[ModelConfig]:
         """Fetch all models from OpenRouter."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         if not force and self._last_fetch and self._cache.get("all"):
             elapsed = (now - self._last_fetch).total_seconds()
             if elapsed < self._cache_ttl:
