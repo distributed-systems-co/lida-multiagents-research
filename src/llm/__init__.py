@@ -47,6 +47,19 @@ from .cognitive_agent import (
     reason,
     quick_reason,
 )
+from .providers import (
+    ProviderType,
+    ModelCapability,
+    ModelConfig,
+    ProviderConfig,
+    AgentModelConfig,
+    OpenRouterModelFetcher,
+    ModelRegistry,
+    UnifiedLLMClient,
+    get_model_registry,
+    get_unified_client,
+    fetch_latest_models,
+)
 
 __all__ = [
     # OpenRouter client
@@ -92,4 +105,16 @@ __all__ = [
     "create_cognitive_agent",
     "reason",
     "quick_reason",
+    # Model providers
+    "ProviderType",
+    "ModelCapability",
+    "ModelConfig",
+    "ProviderConfig",
+    "AgentModelConfig",
+    "OpenRouterModelFetcher",
+    "ModelRegistry",
+    "UnifiedLLMClient",
+    "get_model_registry",
+    "get_unified_client",
+    "fetch_latest_models",
 ]

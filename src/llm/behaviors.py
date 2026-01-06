@@ -459,9 +459,13 @@ class HypothesisGenerationModule(BehaviorModule):
             # Add to context
             for hyp in hypotheses:
                 if isinstance(hyp, dict):
+                    try:
+                        conf = float(hyp.get("plausibility", 0.5))
+                    except (ValueError, TypeError):
+                        conf = 0.5
                     context.add_hypothesis(
                         hyp.get("content", str(hyp)),
-                        confidence=hyp.get("plausibility", 0.5),
+                        confidence=conf,
                     )
                 else:
                     context.add_hypothesis(str(hyp))

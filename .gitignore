@@ -1,7 +1,6 @@
-__pycache__/
+.gdelt_cache/
+.intel_data/
 *.pyc
-*.pyo
-data/
-.env
-*.db
+__pycache__/
+.chroma_db/
 .DS_Store

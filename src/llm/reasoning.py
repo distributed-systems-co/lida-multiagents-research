@@ -201,7 +201,11 @@ class ReasoningTrace:
         lines = [f"# Reasoning Trace: {self.trace_id[:8]}"]
         lines.append(f"\n**Task:** {self.task}")
         lines.append(f"**Status:** {'✅ Success' if self.success else '❌ Failed'}")
-        lines.append(f"**Confidence:** {self.total_confidence:.1%}")
+        try:
+            conf = float(self.total_confidence)
+        except (ValueError, TypeError):
+            conf = 0.0
+        lines.append(f"**Confidence:** {conf:.1%}")
         lines.append(f"\n## Steps ({len(self.steps)})")
 
         for i, step in enumerate(self.steps, 1):
@@ -215,7 +219,11 @@ class ReasoningTrace:
             }.get(step.status, "•")
 
             lines.append(f"\n### {i}. {status_icon} {step.step_type.value.title()}")
-            lines.append(f"**ID:** `{step.step_id}` | **Confidence:** {step.confidence:.1%}")
+            try:
+                step_conf = float(step.confidence)
+            except (ValueError, TypeError):
+                step_conf = 0.0
+            lines.append(f"**ID:** `{step.step_id}` | **Confidence:** {step_conf:.1%}")
             lines.append(f"\n{step.content}")
 
             if step.metadata:
@@ -272,9 +280,13 @@ class AgentContext:
 
     def add_hypothesis(self, content: str, confidence: float = 0.5, **metadata):
         """Add a hypothesis."""
+        try:
+            conf = float(confidence)
+        except (ValueError, TypeError):
+            conf = 0.5
         self.hypotheses.append({
             "content": content,
-            "confidence": confidence,
+            "confidence": conf,
             "timestamp": datetime.now().isoformat(),
             "verified": False,
             **metadata,
@@ -282,9 +294,13 @@ class AgentContext:
 
     def add_conclusion(self, content: str, confidence: float = 0.8, **metadata):
         """Add a conclusion."""
+        try:
+            conf = float(confidence)
+        except (ValueError, TypeError):
+            conf = 0.8
         self.conclusions.append({
             "content": content,
-            "confidence": confidence,
+            "confidence": conf,
             "timestamp": datetime.now().isoformat(),
             **metadata,
         })
@@ -332,7 +348,11 @@ class AgentContext:
             lines.append("\n## Current Hypotheses")
             for hyp in self.hypotheses:
                 verified = "✓" if hyp.get("verified") else "?"
-                lines.append(f"- [{verified}] {hyp['content']} (confidence: {hyp['confidence']:.0%})")
+                try:
+                    conf = float(hyp.get('confidence', 0.5))
+                except (ValueError, TypeError):
+                    conf = 0.5
+                lines.append(f"- [{verified}] {hyp['content']} (confidence: {conf:.0%})")
 
         if self.conclusions:
             lines.append("\n## Established Conclusions")
