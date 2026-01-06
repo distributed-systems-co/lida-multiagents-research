@@ -15,18 +15,39 @@ logger = logging.getLogger(__name__)
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-# Popular models on OpenRouter
+# Popular models on OpenRouter (Jan 2026)
 MODELS = {
-    "claude-3.5-sonnet": "anthropic/claude-3.5-sonnet",
-    "claude-3-opus": "anthropic/claude-3-opus",
+    # Anthropic
+    "claude-opus-4.5": "anthropic/claude-opus-4.5",
+    "claude-sonnet-4.5": "anthropic/claude-sonnet-4.5",
+    "claude-3.5-haiku": "anthropic/claude-3.5-haiku",
+    # OpenAI
+    "gpt-5.2-pro": "openai/gpt-5.2-pro",
+    "gpt-5.1": "openai/gpt-5.1",
     "gpt-4o": "openai/gpt-4o",
     "gpt-4o-mini": "openai/gpt-4o-mini",
-    "llama-3.1-70b": "meta-llama/llama-3.1-70b-instruct",
+    "o3": "openai/o3",
+    "o1": "openai/o1",
+    # Google
+    "gemini-3-pro": "google/gemini-3-pro-preview",
+    "gemini-2.5-pro": "google/gemini-2.5-pro",
+    "gemini-2.5-flash": "google/gemini-2.5-flash",
+    "gemini-2.0-flash": "google/gemini-2.0-flash-001",
+    # Meta Llama
+    "llama-3.3-70b": "meta-llama/llama-3.3-70b-instruct",
     "llama-3.1-405b": "meta-llama/llama-3.1-405b-instruct",
+    # DeepSeek
+    "deepseek-v3.2": "deepseek/deepseek-v3.2",
+    "deepseek-r1": "deepseek/deepseek-r1",
+    "deepseek-chat": "deepseek/deepseek-chat-v3",
+    # Qwen
+    "qwen3-235b": "qwen/qwen3-235b-a22b",
+    "qwen3-32b": "qwen/qwen3-32b",
+    "qwen-max": "qwen/qwen-max",
+    # Mistral
+    "mistral-large": "mistralai/mistral-large-2411",
+    "mistral-nemo": "mistralai/mistral-nemo",
     "mixtral-8x22b": "mistralai/mixtral-8x22b-instruct",
-    "gemini-pro": "google/gemini-pro-1.5",
-    "qwen-72b": "qwen/qwen-2.5-72b-instruct",
-    "deepseek-v3": "deepseek/deepseek-chat",
 }
 
 
@@ -64,7 +85,7 @@ class OpenRouterClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        default_model: str = "anthropic/claude-3.5-sonnet",
+        default_model: str = "anthropic/claude-sonnet-4.5",
         base_url: str = OPENROUTER_BASE_URL,
         timeout: float = 120.0,
         site_url: Optional[str] = None,
@@ -291,7 +312,7 @@ def get_client() -> OpenRouterClient:
 
 async def stream_chat(
     messages: list[dict],
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
     **kwargs,
 ) -> AsyncIterator[str]:
     """Convenience function for streaming chat."""
@@ -302,7 +323,7 @@ async def stream_chat(
 
 async def chat(
     messages: list[dict],
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
     **kwargs,
 ) -> str:
     """Convenience function for non-streaming chat."""
