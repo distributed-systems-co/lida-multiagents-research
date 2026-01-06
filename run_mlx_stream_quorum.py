@@ -202,9 +202,10 @@ Give your analysis in 2-3 sentences. State your stance and key reasoning."""
             line_width = 60
 
             async for token in self.stream_agent_response(agent, event_headline, event_type, value):
-                # Clean token
-                token = token.replace("<|", "").replace("|>", "").replace("</s>", "")
-                if not token:
+                # Clean token - remove all control tokens
+                token = re.sub(r'<\|[^|]*\|>', '', token)
+                token = token.replace("</s>", "")
+                if not token or not token.strip():
                     continue
 
                 full_response += token

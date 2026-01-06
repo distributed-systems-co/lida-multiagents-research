@@ -25,7 +25,7 @@ class BehaviorModule(ABC):
     def __init__(
         self,
         client: Optional[OpenRouterClient] = None,
-        model: str = "anthropic/claude-3.5-sonnet",
+        model: str = "anthropic/claude-sonnet-4.5",
     ):
         self.client = client or get_client()
         self.model = model
@@ -585,7 +585,7 @@ BEHAVIORS = {
 def get_behavior(
     name: str,
     client: Optional[OpenRouterClient] = None,
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
 ) -> BehaviorModule:
     """Get a behavior module by name."""
     if name not in BEHAVIORS:

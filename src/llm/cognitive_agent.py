@@ -140,7 +140,7 @@ class CognitiveAgent:
     def __init__(
         self,
         client: Optional[OpenRouterClient] = None,
-        model: str = "anthropic/claude-3.5-sonnet",
+        model: str = "anthropic/claude-sonnet-4.5",
         behaviors: list[str] = None,
         max_iterations: int = 10,
         max_backtracks: int = 3,
@@ -480,7 +480,7 @@ class CognitiveAgent:
 
 # Factory function
 def create_cognitive_agent(
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
     behaviors: list[str] = None,
     **kwargs,
 ) -> CognitiveAgent:
@@ -493,13 +493,13 @@ def create_cognitive_agent(
 
 
 # Convenience functions
-async def reason(task: str, model: str = "anthropic/claude-3.5-sonnet") -> dict:
+async def reason(task: str, model: str = "anthropic/claude-sonnet-4.5") -> dict:
     """Quick reasoning with default agent."""
     agent = create_cognitive_agent(model=model)
     return await agent.reason(task)
 
 
-async def quick_reason(task: str, model: str = "anthropic/claude-3.5-sonnet") -> str:
+async def quick_reason(task: str, model: str = "anthropic/claude-sonnet-4.5") -> str:
     """Very quick reasoning without behaviors."""
     agent = create_cognitive_agent(model=model)
     return await agent.quick_reason(task)

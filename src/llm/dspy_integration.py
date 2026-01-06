@@ -52,7 +52,7 @@ class DSPyModule:
         self,
         signature: DynamicSignature | str,
         client: Optional[OpenRouterClient] = None,
-        model: str = "anthropic/claude-3.5-sonnet",
+        model: str = "anthropic/claude-sonnet-4.5",
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ):
@@ -292,7 +292,7 @@ async def stream_predict(
 # Agent-specific modules
 def create_persona_module(
     persona_prompt: str,
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
 ) -> DSPyModule:
     """Create a module for a persona agent."""
     sig = (
@@ -313,7 +313,7 @@ def create_persona_module(
 
 def create_analysis_module(
     perspective: str,
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
 ) -> DSPyModule:
     """Create a module for analysis from a specific perspective."""
     sig = (
@@ -331,7 +331,7 @@ def create_analysis_module(
 
 def create_debate_module(
     position: str,
-    model: str = "anthropic/claude-3.5-sonnet",
+    model: str = "anthropic/claude-sonnet-4.5",
 ) -> DSPyModule:
     """Create a module for debate participation."""
     sig = (

@@ -307,7 +307,7 @@ def create_app(
             )
 
             client = OpenRouterClient()
-            module = DSPyModule(sig, client=client, model=request.model or "anthropic/claude-3.5-sonnet")
+            module = DSPyModule(sig, client=client, model=request.model or "anthropic/claude-sonnet-4.5")
 
             async def generate():
                 async for chunk in module.stream(message=request.message):
@@ -401,7 +401,7 @@ def create_app(
             else:
                 sig = get_signature(request.signature_name)
 
-            module = DSPyModule(sig, model=request.model or "anthropic/claude-3.5-sonnet")
+            module = DSPyModule(sig, model=request.model or "anthropic/claude-sonnet-4.5")
 
             if request.stream:
                 async def generate():
@@ -452,7 +452,7 @@ def create_app(
     @app.post("/api/cognitive/reason")
     async def cognitive_reason(
         task: str = Query(..., description="Task to reason about"),
-        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+        model: str = Query("anthropic/claude-sonnet-4.5", description="Model to use"),
         behaviors: Optional[str] = Query(None, description="Comma-separated behaviors to use"),
     ):
         """Execute cognitive reasoning on a task."""
@@ -479,7 +479,7 @@ def create_app(
     @app.post("/api/cognitive/reason/stream")
     async def cognitive_reason_stream(
         task: str = Query(..., description="Task to reason about"),
-        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+        model: str = Query("anthropic/claude-sonnet-4.5", description="Model to use"),
     ):
         """Stream cognitive reasoning process."""
         try:
@@ -511,7 +511,7 @@ def create_app(
     @app.post("/api/cognitive/quick")
     async def cognitive_quick(
         task: str = Query(..., description="Task to reason about"),
-        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+        model: str = Query("anthropic/claude-sonnet-4.5", description="Model to use"),
     ):
         """Quick reasoning without full behavior execution."""
         try:
@@ -531,7 +531,7 @@ def create_app(
     @app.post("/api/cognitive/behavior/{behavior_name}")
     async def execute_behavior(
         behavior_name: str,
-        model: str = Query("anthropic/claude-3.5-sonnet", description="Model to use"),
+        model: str = Query("anthropic/claude-sonnet-4.5", description="Model to use"),
         task: str = Query(None, description="Task for context"),
         claim: str = Query(None, description="Claim to verify (for verification)"),
         observation: str = Query(None, description="Observation (for hypothesis)"),
@@ -3314,7 +3314,7 @@ def create_app(
 
     @app.post("/api/llm/complete")
     async def llm_complete(
-        model_id: str = Query("claude-3.5-sonnet"),
+        model_id: str = Query("claude-sonnet-4.5"),
         temperature: float = Query(0.7, ge=0.0, le=2.0),
         max_tokens: int = Query(4096, ge=1, le=16384),
         messages: list = Body(..., description="Chat messages"),
@@ -3337,7 +3337,7 @@ def create_app(
 
     @app.post("/api/llm/stream")
     async def llm_stream(
-        model_id: str = Query("claude-3.5-sonnet"),
+        model_id: str = Query("claude-sonnet-4.5"),
         temperature: float = Query(0.7, ge=0.0, le=2.0),
         max_tokens: int = Query(4096, ge=1, le=16384),
         messages: list = Body(..., description="Chat messages"),
