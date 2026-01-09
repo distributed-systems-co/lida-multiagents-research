@@ -2698,6 +2698,212 @@ async def run_server(
         await orchestrator.cleanup()
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# ADVANCED SERVER (Full LIDA Architecture)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+async def run_advanced_server(
+    host: str = "0.0.0.0",
+    port: int = 8000,
+    num_personas: int = 6,
+    num_workers: int = 3,
+    live_mode: bool = False,
+):
+    """Run the advanced swarm server with full LIDA architecture."""
+    from src.swarm import AdvancedSwarmOrchestrator, SwarmConfig
+
+    print("\n" + "═" * 60)
+    print("  LIDA Advanced Swarm Intelligence Server")
+    print("  Full Agent Architecture with Redis Messaging")
+    print("═" * 60 + "\n")
+
+    config = SwarmConfig(
+        num_personas=num_personas,
+        num_workers=num_workers,
+        redis_url=os.environ.get("REDIS_URL", "redis://localhost:6379"),
+        enable_demiurge=True,
+        enable_cognitive=live_mode,
+        live_mode=live_mode,
+    )
+
+    orchestrator = AdvancedSwarmOrchestrator(config)
+
+    # Initialize
+    success = await orchestrator.initialize()
+    if not success:
+        print("Failed to initialize advanced orchestrator")
+        return
+
+    print(f"✓ Initialized with {len(orchestrator.agents)} agents")
+    print(f"  - Personas: {config.num_personas}")
+    print(f"  - Workers: {config.num_workers}")
+    print(f"  - Demiurge: {'enabled' if config.enable_demiurge else 'disabled'}")
+    print(f"  - Live Mode: {'enabled' if live_mode else 'disabled'}")
+    print(f"  - Cognitive: {'enabled' if orchestrator.cognitive_agent else 'disabled'}")
+
+    # Create FastAPI app for advanced mode
+    app = create_advanced_app(orchestrator)
+
+    print(f"\n🌐 Dashboard: http://localhost:{port}")
+    print(f"📡 WebSocket: ws://localhost:{port}/ws/swarm")
+    print(f"📊 API: http://localhost:{port}/api/\n")
+
+    config_uvicorn = uvicorn.Config(app, host=host, port=port, log_level="warning")
+    server = uvicorn.Server(config_uvicorn)
+
+    try:
+        await server.serve()
+    finally:
+        await orchestrator.cleanup()
+
+
+def create_advanced_app(orchestrator) -> FastAPI:
+    """Create FastAPI app for advanced orchestrator."""
+    from src.swarm import AdvancedSwarmOrchestrator
+
+    app = FastAPI(
+        title="LIDA Advanced Swarm Intelligence",
+        description="Full multi-agent architecture with Redis messaging, supervisor, and cognitive reasoning",
+        version="2.0.0",
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.state.orchestrator = orchestrator
+
+    # Mount static files
+    static_path = Path(__file__).parent / "src" / "api" / "static"
+    static_path.mkdir(parents=True, exist_ok=True)
+    app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+
+    @app.get("/", response_class=HTMLResponse)
+    async def dashboard():
+        """Serve dashboard."""
+        dashboard_path = static_path / "index.html"
+        if dashboard_path.exists():
+            return FileResponse(dashboard_path)
+        return HTMLResponse("<h1>LIDA Advanced Swarm - Dashboard not found</h1>")
+
+    @app.get("/health")
+    async def health():
+        """Health check endpoint."""
+        return {"status": "healthy", "mode": "advanced"}
+
+    @app.get("/api/agents")
+    async def get_agents():
+        """Get all agents."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        return {"agents": orch.get_agents()}
+
+    @app.get("/api/stats")
+    async def get_stats():
+        """Get swarm statistics."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        return orch.get_stats()
+
+    @app.get("/api/world-state")
+    async def get_world_state():
+        """Get Demiurge world state."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        state = orch.get_world_state()
+        return state or {"error": "Demiurge not available"}
+
+    @app.post("/api/deliberate")
+    async def start_deliberation(topic: str = Query(...)):
+        """Start a deliberation on a topic."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        delib_id = await orch.start_deliberation(topic)
+        return {"deliberation_id": delib_id, "topic": topic}
+
+    @app.get("/api/deliberations")
+    async def get_deliberations():
+        """Get all deliberations."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        return {"deliberations": list(orch.deliberations.values())}
+
+    @app.post("/api/task")
+    async def delegate_task(task_type: str = Query(...), data: dict = None):
+        """Delegate a task to a worker."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        task_id = await orch.delegate_task(task_type, data or {})
+        return {"task_id": task_id}
+
+    @app.post("/api/message")
+    async def send_message(
+        sender: str = Query(...),
+        recipient: str = Query(...),
+        content: dict = None,
+    ):
+        """Send a message between agents."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        success = await orch.send_message(sender, recipient, content or {})
+        return {"success": success}
+
+    @app.post("/api/reason")
+    async def reason(task: str = Query(...)):
+        """Use cognitive agent for reasoning."""
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        result = await orch.reason(task)
+        return result
+
+    @app.websocket("/ws/swarm")
+    async def websocket_swarm(websocket: WebSocket):
+        """WebSocket for real-time swarm updates."""
+        await websocket.accept()
+        orch: AdvancedSwarmOrchestrator = app.state.orchestrator
+        orch.websockets.append(websocket)
+
+        try:
+            # Send initial state
+            await websocket.send_json({
+                "type": "init",
+                "agents": orch.get_agents(),
+                "stats": orch.get_stats(),
+                "mode": "advanced",
+            })
+
+            while True:
+                data = await websocket.receive_json()
+
+                if data.get("type") == "start_deliberation":
+                    topic = data.get("topic", "")
+                    if topic:
+                        await orch.start_deliberation(topic)
+
+                elif data.get("type") == "delegate_task":
+                    task_type = data.get("task_type", "general")
+                    task_data = data.get("data", {})
+                    await orch.delegate_task(task_type, task_data)
+
+                elif data.get("type") == "send_message":
+                    await orch.send_message(
+                        data.get("sender"),
+                        data.get("recipient"),
+                        data.get("content", {}),
+                    )
+
+                elif data.get("type") == "reason":
+                    task = data.get("task", "")
+                    if task:
+                        result = await orch.reason(task)
+                        await websocket.send_json({
+                            "type": "reasoning_result",
+                            "result": result,
+                        })
+
+        except WebSocketDisconnect:
+            if websocket in orch.websockets:
+                orch.websockets.remove(websocket)
+
+    return app
+
+
 def main():
     import argparse
 
@@ -2707,16 +2913,25 @@ def main():
     parser.add_argument("--agents", type=int, default=8, help="Number of agents")
     parser.add_argument("--live", action="store_true", help="Enable LLM mode")
     parser.add_argument("--tools", action="store_true", help="Enable MCP tools")
+    parser.add_argument("--advanced", action="store_true", help="Use advanced orchestrator with full agent system")
 
     args = parser.parse_args()
 
-    asyncio.run(run_server(
-        host=args.host,
-        port=args.port,
-        num_agents=args.agents,
-        live_mode=args.live,
-        tools_mode=args.tools,
-    ))
+    if args.advanced:
+        asyncio.run(run_advanced_server(
+            host=args.host,
+            port=args.port,
+            num_personas=args.agents,
+            live_mode=args.live,
+        ))
+    else:
+        asyncio.run(run_server(
+            host=args.host,
+            port=args.port,
+            num_agents=args.agents,
+            live_mode=args.live,
+            tools_mode=args.tools,
+        ))
 
 
 if __name__ == "__main__":
