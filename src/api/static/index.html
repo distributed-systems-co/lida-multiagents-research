@@ -802,6 +802,9 @@
                 <span class="px-2 py-1 rounded text-xs font-medium" :class="'phase-' + deliberation.phase.replace(/[^a-z]/g, '')">
                     {{ deliberation.phase }}
                 </span>
+                <span v-if="deliberation.round > 0" class="px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                    Round {{ deliberation.round }}/{{ deliberation.max_rounds }}
+                </span>
             </div>
         </div>
 
@@ -1851,7 +1854,9 @@ createApp({
         const deliberation = ref({
             active: false,
             phase: '',
-            topic: ''
+            topic: '',
+            round: 0,
+            max_rounds: 5
         });
         const topicInput = ref('');
 
@@ -2136,7 +2141,9 @@ createApp({
                     deliberation.value = {
                         active: data.active,
                         phase: data.phase,
-                        topic: data.topic
+                        topic: data.topic,
+                        round: data.round || 0,
+                        max_rounds: data.max_rounds || 5
                     };
                     break;
 

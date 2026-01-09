@@ -288,7 +288,7 @@ class Persuader:
 
     # Multi-round dialogue
     private_conversations: Dict[str, List[dict]] = field(default_factory=dict)
-    max_rounds_per_agent: int = 5
+    max_rounds_per_agent: int = field(default_factory=lambda: int(os.getenv("MAX_ROUNDS", "5")))
 
     # Tactic tracking
     tactics_used: Dict[str, int] = field(default_factory=dict)
@@ -484,6 +484,8 @@ class SwarmOrchestrator:
         # Deliberation state
         self.current_topic = ""
         self.phase = ""
+        self.current_round = 0
+        self.max_rounds = int(os.getenv("MAX_ROUNDS", "5"))
         self.consensus: Dict[str, int] = {}
         self.deliberation_active = False
         self.paused = False  # Pause control
@@ -661,6 +663,8 @@ class SwarmOrchestrator:
             "active": self.deliberation_active,
             "phase": self.phase,
             "topic": self.current_topic,
+            "round": self.current_round,
+            "max_rounds": self.max_rounds,
         })
 
     async def broadcast_consensus(self):
@@ -1629,6 +1633,7 @@ Your confidence should change based on argument quality:
         self.current_topic = topic
         self.deliberation_active = True
         self.consensus = {}
+        self.current_round = 0
         agents = list(self.agents.values())
 
         await self.broadcast_deliberation()
@@ -1706,7 +1711,10 @@ Be specific about your confidence level."""
         self.phase = "🔄 debating"
         await self.broadcast_deliberation()
 
-        for _ in range(5):
+        for round_num in range(self.max_rounds):
+            self.current_round = round_num + 1
+            await self.broadcast_deliberation()
+
             a1 = random.choice(agents)
             a2 = random.choice([a for a in agents if a.id != a1.id])
 
