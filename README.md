@@ -2,17 +2,100 @@
 
 Multi-agent system with Redis pub/sub messaging, inbound/outbound mailbox dynamics, and demiurge orchestration.
 
-## Quick Start
+## Prerequisites
+
+- Python 3.10+
+- Docker and Docker Compose
+- (Optional) OpenRouter API key for LLM features
+
+## Setup Guide
+
+### Local Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/your-username/lida-multiagents-research.git
+cd lida-multiagents-research
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -e ".[dev]"      # Development (includes testing, linting)
+pip install -e ".[llm]"      # LLM support (Anthropic, OpenAI)
+pip install -e ".[dev,llm]"  # Both
+
 # Start Redis
 docker-compose up -d redis
 
-# Install dependencies
-pip install -e ".[dev]"
-
 # Run simulation
 python run_simulation.py
+```
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+REDIS_URL=redis://localhost:6379
+OPENROUTER_API_KEY=your_api_key_here  # Optional, for LLM features
+```
+
+## Docker
+
+### Build and Run with Docker
+
+```bash
+# Build the image
+docker build -t lida-multiagents .
+
+# Run the container
+docker run -p 8000:8000 -e REDIS_URL=redis://host.docker.internal:6379 lida-multiagents
+```
+
+### Docker Compose (Recommended)
+
+Run the full stack with Redis and monitoring:
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop all services
+docker-compose down
+```
+
+Available services:
+| Service | Port | Description |
+|---------|------|-------------|
+| app | 8000 | Main FastAPI application |
+| redis | 6379 | Redis message broker |
+| redis-commander | 8081 | Redis web UI for debugging |
+
+### Development with Docker
+
+Mount local code for hot-reloading:
+
+```bash
+docker-compose up -d
+# Code changes are reflected automatically via volume mount
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src
+
+# Run specific test file
+pytest tests/test_messaging.py
 ```
 
 ## Architecture
