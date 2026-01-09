@@ -42,3 +42,47 @@ models:
       provider: "mistral"
       tier: "balanced"
       cost_per_1k: 0.002
+
+# Personas with budget models
+personas:
+  - id: "scientist"
+    name: "Dr. Elena Chen"
+    role: "AI Safety Researcher"
+    model: "deepseek/deepseek-chat"
+    personality: "analytical"
+    initial_position: "UNDECIDED"
+
+  - id: "ethicist"
+    name: "Prof. Marcus Webb"
+    role: "Technology Ethicist"
+    model: "meta-llama/llama-3.3-70b-instruct"
+    personality: "empathetic"
+    initial_position: "AGAINST"
+
+  - id: "engineer"
+    name: "Sarah Kim"
+    role: "Senior ML Engineer"
+    model: "qwen/qwen-2.5-72b-instruct"
+    personality: "pragmatic"
+    initial_position: "FOR"
+
+  - id: "policy"
+    name: "Director James Liu"
+    role: "Policy Advisor"
+    model: "deepseek/deepseek-chat"
+    personality: "assertive"
+    initial_position: "UNDECIDED"
+
+  - id: "startup"
+    name: "Alex Rivera"
+    role: "AI Startup Founder"
+    model: "meta-llama/llama-3.3-70b-instruct"
+    personality: "creative"
+    initial_position: "FOR"
+
+  - id: "journalist"
+    name: "Maya Patel"
+    role: "Tech Journalist"
+    model: "mistralai/mistral-large-2411"
+    personality: "skeptical"
+    initial_position: "AGAINST"
