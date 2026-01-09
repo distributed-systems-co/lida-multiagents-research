@@ -85,6 +85,99 @@ docker-compose up -d
 # Code changes are reflected automatically via volume mount
 ```
 
+## Running the App (For David & Linh)
+
+### Quick Start (Simplest Way)
+
+```bash
+# 1. Start everything with Docker Compose
+docker-compose up --build
+
+# 2. Open browser to http://localhost:12345
+```
+
+That's it! The swarm dashboard will show agents deliberating.
+
+### Server Modes
+
+| Mode | Command | What it does |
+|------|---------|--------------|
+| **Basic** | `docker-compose up` | Simple swarm with simulated responses |
+| **Live** | `docker run lida-multiagents server-live` | Real LLM calls via OpenRouter |
+| **Advanced** | `docker run lida-multiagents server-advanced` | Full architecture (Demiurge + Workers + Personas) |
+| **Advanced Live** | `docker run lida-multiagents server-advanced-live` | Full architecture + real LLM |
+
+### Running with Workers (Recommended for Demos)
+
+Workers handle background tasks like computation, I/O, and analysis.
+
+```bash
+# Option 1: Using Docker entrypoint
+docker run -p 12345:12345 \
+  -e REDIS_URL=redis://host.docker.internal:6379 \
+  -e OPENROUTER_API_KEY=$OPENROUTER_API_KEY \
+  -e SWARM_AGENTS=8 \
+  lida-multiagents server-advanced-live
+
+# Option 2: Direct Python (for development)
+python run_swarm_server.py --advanced --live --agents 8 --port 12345
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENROUTER_API_KEY` | - | Required for live LLM mode |
+| `REDIS_URL` | `redis://localhost:6379` | Redis connection |
+| `PORT` | `12345` | Server port |
+| `SWARM_AGENTS` | `6` | Number of persona agents |
+| `LOG_LEVEL` | `info` | Logging verbosity |
+
+### API Endpoints (for testing)
+
+Once running, you can hit these endpoints:
+
+```bash
+# Health check
+curl http://localhost:12345/health
+
+# Get all agents
+curl http://localhost:12345/api/agents
+
+# Get stats
+curl http://localhost:12345/api/stats
+
+# Start a deliberation
+curl -X POST "http://localhost:12345/api/deliberate?topic=Should%20AI%20have%20rights"
+
+# Delegate a task to workers
+curl -X POST "http://localhost:12345/api/task?task_type=compute"
+
+# Get Demiurge world state (advanced mode only)
+curl http://localhost:12345/api/world-state
+```
+
+### WebSocket (Real-time Updates)
+
+Connect to `ws://localhost:12345/ws/swarm` for live updates:
+
+```javascript
+const ws = new WebSocket('ws://localhost:12345/ws/swarm');
+ws.onmessage = (event) => console.log(JSON.parse(event.data));
+
+// Start a deliberation
+ws.send(JSON.stringify({type: 'start_deliberation', topic: 'AI Safety'}));
+```
+
+### What Each Agent Type Does
+
+| Agent | Role |
+|-------|------|
+| **Demiurge** | Orchestrator - manages world state, enforces governance directives |
+| **Persona** | Domain experts - have beliefs, knowledge bases, personalities |
+| **Worker** | Task executors - handle compute, I/O, analysis tasks |
+| **Cognitive** | Reasoning engine - multi-step problem solving (live mode only) |
+
 ## Running Tests
 
 ```bash
