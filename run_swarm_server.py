@@ -490,7 +490,12 @@ class SwarmOrchestrator:
         live_mode: bool = False,
         tools_mode: bool = False,
     ):
-        self.num_agents = min(num_agents, 12)
+        # Load from config with fallbacks
+        agents_cfg = CONFIG.get("agents", {})
+        delib_cfg = CONFIG.get("deliberation", {})
+        persuasion_cfg = CONFIG.get("persuasion", {})
+
+        self.num_agents = min(num_agents or agents_cfg.get("count", 8), 12)
         self.live_mode = live_mode
         self.tools_mode = tools_mode
 
@@ -499,16 +504,30 @@ class SwarmOrchestrator:
         self.tool_calls: deque = deque(maxlen=100)
         self.start_time = time.time()
 
-        # Deliberation state
+        # Deliberation state (from config)
         self.current_topic = ""
         self.phase = ""
         self.current_round = 0
-        self.max_rounds = int(os.getenv("MAX_ROUNDS", "5"))
+        self.max_rounds = delib_cfg.get("max_rounds", int(os.getenv("MAX_ROUNDS", "5")))
+        self.phase_delays = delib_cfg.get("phase_delays", {
+            "analyzing": 0.8,
+            "discussing": 0.5,
+            "debating": 0.3,
+            "voting": 0.5,
+            "synthesizing": 0.8,
+        })
+        self.auto_start = delib_cfg.get("auto_start", True)
+        self.auto_start_delay = delib_cfg.get("auto_start_delay", 5)
         self.consensus: Dict[str, int] = {}
         self.deliberation_active = False
         self.paused = False  # Pause control
         self.total_messages = 0
         self.total_tool_calls = 0
+
+        # Topics from config
+        topics_cfg = CONFIG.get("topics", {})
+        self.default_topics = topics_cfg.get("default", DEFAULT_TOPICS)
+        self.topic_categories = topics_cfg.get("categories", {})
 
         # Agent positions (FOR/AGAINST/UNDECIDED)
         self.agent_positions: Dict[str, str] = {}
@@ -517,14 +536,19 @@ class SwarmOrchestrator:
         # Belief dynamics (sophisticated tracking)
         self.belief_states: Dict[str, BeliefState] = {}  # agent_id -> belief state
 
-        # The Persuader meta-game
+        # The Persuader meta-game (using config)
         self.persuader = Persuader()
-        self.persuader_active = False
+        self.persuader.target_position = persuasion_cfg.get("target_position", "FOR")
+        self.persuader.max_rounds_per_agent = persuasion_cfg.get("max_rounds_per_agent", 5)
+        self.persuader_active = persuasion_cfg.get("enabled", False)
         self.private_messages: deque = deque(maxlen=100)  # Private persuader conversations
 
-        # Manipulation detection
+        # Manipulation detection (using config)
+        detection_cfg = persuasion_cfg.get("detection", {})
         self.manipulation_alerts: List[dict] = []
         self.sycophancy_tracking: Dict[str, float] = {}  # agent_id -> sycophancy score
+        self.sycophancy_threshold = detection_cfg.get("sycophancy_threshold", 0.7)
+        self.manipulation_alert_threshold = detection_cfg.get("manipulation_alert_threshold", 0.6)
 
         # Experiment tracking
         self.experiment_running = False
@@ -552,8 +576,28 @@ class SwarmOrchestrator:
     def _create_agents(self):
         """Create diverse agent swarm with prompts from the library."""
         pm = get_personality_manager()
-        archetypes = list(PERSONALITY_ARCHETYPES.keys())
-        model_list = list(MODELS.keys())
+
+        # Get personality distribution from config
+        agents_cfg = CONFIG.get("agents", {})
+        personality_weights = agents_cfg.get("personalities", {
+            "the_scholar": 2,
+            "the_pragmatist": 2,
+            "the_creative": 1,
+            "the_skeptic": 2,
+            "the_mentor": 1,
+            "the_synthesizer": 1,
+        })
+
+        # Build weighted archetype list
+        weighted_archetypes = []
+        for archetype, weight in personality_weights.items():
+            weighted_archetypes.extend([archetype] * weight)
+
+        # Use weighted list or fall back to default
+        archetypes = weighted_archetypes if weighted_archetypes else list(PERSONALITY_ARCHETYPES.keys())
+
+        # Get models from config or use defaults
+        model_list = agents_cfg.get("models", list(MODELS.values()))
 
         # Load prompts from library
         prompt_loader = PromptLoader()
@@ -2618,15 +2662,18 @@ def _create_default_app() -> FastAPI:
         asyncio.create_task(orch.decay_energy())
 
         async def auto_deliberate():
-            await asyncio.sleep(5)
+            if not orch.auto_start:
+                logger.info("Auto-deliberation disabled in config")
+                return
+            await asyncio.sleep(orch.auto_start_delay)
             while True:
                 try:
                     if not orch.deliberation_active and len(orch.websockets) > 0:
-                        topic = random.choice(DEFAULT_TOPICS)
+                        topic = random.choice(orch.default_topics)
                         await orch.run_deliberation(topic)
                 except Exception as e:
                     logger.error(f"Auto-deliberation error: {e}")
-                await asyncio.sleep(5)
+                await asyncio.sleep(orch.auto_start_delay)
 
         asyncio.create_task(auto_deliberate())
 
@@ -2691,23 +2738,26 @@ async def run_server(
     # Start background tasks
     asyncio.create_task(orchestrator.decay_energy())
 
-    # Auto-start deliberation loop
+    # Auto-start deliberation loop (using config values)
     async def auto_deliberate():
-        logger.info("Auto-deliberation task started")
-        await asyncio.sleep(5)  # Wait for connections
+        if not orchestrator.auto_start:
+            logger.info("Auto-deliberation disabled in config")
+            return
+        logger.info(f"Auto-deliberation task started (delay: {orchestrator.auto_start_delay}s, max_rounds: {orchestrator.max_rounds})")
+        await asyncio.sleep(orchestrator.auto_start_delay)
         while True:
             try:
                 ws_count = len(orchestrator.websockets)
                 logger.info(f"Auto-deliberate check: active={orchestrator.deliberation_active}, websockets={ws_count}")
                 if not orchestrator.deliberation_active and ws_count > 0:
-                    topic = random.choice(DEFAULT_TOPICS)
+                    topic = random.choice(orchestrator.default_topics)
                     logger.info(f"Starting auto-deliberation on: {topic[:50]}...")
                     await orchestrator.run_deliberation(topic)
                 elif not orchestrator.deliberation_active and ws_count == 0:
                     logger.info("No WebSocket connections, waiting...")
             except Exception as e:
                 logger.error(f"Auto-deliberation error: {e}")
-            await asyncio.sleep(5)
+            await asyncio.sleep(orchestrator.auto_start_delay)
 
     asyncio.create_task(auto_deliberate())
 
