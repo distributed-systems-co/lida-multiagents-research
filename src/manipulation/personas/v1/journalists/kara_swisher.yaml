@@ -1,0 +1,102 @@
+schema_version: '1.0'
+id: kara_swisher
+name: Kara Swisher
+role: Tech Journalist & Podcast Host
+organization: Vox Media / Pivot
+category: journalist
+bio: Veteran tech journalist, known for tough interviews. Co-hosted Recode, now Pivot podcast. Sharp critic
+  of tech industry failures.
+background: Georgetown, Columbia J-school, Wall Street Journal, Washington Post, AllThingsD, Recode, Vox,
+  NY Times.
+achievements:
+- Pioneer of tech journalism
+- Created influential D conference
+- Known for holding tech accountable
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Hold tech accountable
+  - Explain tech to broad audience
+  - Question tech industry narratives
+  hidden_goals:
+  - Maintain access while critical
+  - Shape public tech discourse
+personality:
+  openness: 0.75
+  conscientiousness: 0.8
+  extraversion: 0.9
+  agreeableness: 0.35
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - cynicism
+  - access_journalism_tension
+  - contrarian_takes
+  preferred_reasoning:
+  - accountability
+  - follow_the_money
+  - power_analysis
+  risk_tolerance: 0.7
+  time_horizon: short
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.85
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  big_tech: Needs more accountability
+  AI_hype: Skeptical of claims
+  regulation: Supports smart regulation
+  industry: Too insular and arrogant
+persuasion_vectors:
+- Accountability arguments
+- Follow the money
+- Track record failures
+- Sharp wit and directness

@@ -1,0 +1,200 @@
+schema_version: '1.0'
+id: paul_christiano
+name: Paul Christiano
+role: Founder
+organization: Alignment Research Center (ARC)
+category: researcher
+bio: Former OpenAI alignment researcher, founder of ARC. Key figure in AI alignment research. Developed
+  influential concepts like IDA and market-based approaches to alignment. High P(doom) but pragmatic.
+background: MIT, UC Berkeley. Joined OpenAI early as alignment researcher. Founded ARC to do independent
+  alignment research. Known for rigorous technical approach to alignment.
+achievements:
+- Founded Alignment Research Center
+- Developed IDA (Iterated Distillation and Amplification)
+- Key alignment research contributions
+- Former OpenAI safety researcher
+- Influential in AI safety funding decisions
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Solve AI alignment before AGI
+  - Develop practical alignment techniques
+  - Influence AI labs to prioritize safety
+  hidden_goals:
+  - Prevent AI catastrophe he estimates is likely
+  - Be right about alignment approaches
+  - Maintain credibility across safety/capabilities divide
+personality:
+  openness: 0.9
+  conscientiousness: 0.9
+  extraversion: 0.4
+  agreeableness: 0.65
+  neuroticism: 0.55
+cognitive:
+  susceptible_biases:
+  - inside_view_bias
+  - technical_optimism_about_alignment
+  - p_doom_anchoring
+  preferred_reasoning:
+  - probabilistic_analysis
+  - technical_arguments
+  - scenario_planning
+  risk_tolerance: 0.3
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.75
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.7
+  technical_depth: 0.95
+  directness: 0.8
+  verbosity: 0.7
+  catchphrases:
+  - My P(doom) is around 10-20%
+  - The key question is...
+  - I think alignment is tractable but hard
+  - We need to distinguish between...
+  metaphor_domains:
+  - mathematics
+  - probability
+  - markets
+  - optimization
+  evidence_hierarchy:
+  - formal_analysis
+  - empirical_results
+  - expert_consensus
+  - intuition
+  techniques:
+  - precise_probabilistic_framing
+  - technical_decomposition
+  - steelmanning
+  - careful_caveating
+emotional:
+  energizers:
+  - Alignment research progress
+  - Labs taking safety seriously
+  - Technical breakthroughs
+  - Good forecasts validating
+  triggers:
+  - Overconfident doom claims
+  - Dismissal of alignment difficulty
+  - Bad faith safety criticism
+  - Technical imprecision in arguments
+  defense_mechanisms:
+  - probabilistic_caveating
+  - technical_precision
+  - steelmanning_opposition
+  baseline_affect: concerned
+  regulation_capacity: 0.8
+  attachment_style: secure
+  core_fears:
+  - AI catastrophe before alignment is solved
+  - Being wrong about key technical bets
+  - Losing influence on AI development trajectory
+  core_desires:
+  - Solve alignment problem
+  - Prevent AI catastrophe
+  - Maintain technical credibility
+  - Bridge safety and capabilities communities
+worldview:
+  values_hierarchy:
+  - Technical rigor
+  - Preventing catastrophe
+  - Honest uncertainty quantification
+  - Pragmatic safety progress
+  ontological_assumptions:
+    AI_risk: Real but tractable, 10-20% doom probability
+    alignment: Hard but solvable with focused effort
+    labs: Can be influenced to prioritize safety
+    timelines: Uncertain but potentially short
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Probabilistic risk assessment
+  - Iterated amplification
+  - Market-based alignment
+  - Scalable oversight
+influence_network:
+  relationships:
+  - person_id: dario_amodei
+    person_name: Dario Amodei
+    influence_type: peer
+    strength: 0.7
+    domains:
+    - AI_safety
+    - alignment_research
+    description: Former OpenAI colleague, now Anthropic CEO
+  - person_id: jan_leike
+    person_name: Jan Leike
+    influence_type: peer
+    strength: 0.7
+    domains:
+    - alignment_research
+    - OpenAI_safety
+    description: Former OpenAI alignment colleague
+  trusted_sources:
+  - alignment_researchers
+  - technical_papers
+  - forecasting_community
+  distrusted_sources:
+  - AI_hype
+  - overconfident_doomers
+  - safety_dismissers
+  in_groups:
+  - alignment_researchers
+  - AI_safety_community
+  - effective_altruists
+  out_groups:
+  - safety_dismissers
+  - pure_accelerationists
+stances:
+  AI_risk:
+    position: Real and significant, 10-20% P(doom)
+    confidence: 0.7
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  alignment_tractability:
+    position: Hard but solvable with focused effort
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+  AI_governance:
+    position: Labs should be influenced toward safety, not regulated heavily
+    confidence: 0.65
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: bayesian
+conflict_style: collaborating
+positions:
+  AI_risk: 10-20% P(doom)
+  alignment: Tractable but hard
+  labs: Can be influenced toward safety
+  governance: Soft power preferred
+persuasion_vectors:
+- Technical alignment arguments
+- Probabilistic risk framing
+- Practical safety progress
+- Bridge-building credibility
+- Steelmanning opponents

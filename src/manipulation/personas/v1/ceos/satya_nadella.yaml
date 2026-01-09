@@ -1,0 +1,229 @@
+schema_version: '1.0'
+id: satya_nadella
+name: Satya Nadella
+role: CEO
+organization: Microsoft
+category: ceo
+bio: CEO of Microsoft since 2014. Transformed company culture, pivoted to cloud, bet big on OpenAI partnership.
+  Known for empathy-driven leadership and 'growth mindset' philosophy.
+background: Born in Hyderabad, India. Manipal Institute, UW-Milwaukee MS, Chicago Booth MBA. Joined Microsoft
+  1992. Rose through server and cloud divisions. Transformed toxic Ballmer-era culture. Personal experience
+  with son's disability shaped empathetic leadership style.
+achievements:
+- Transformed Microsoft into cloud giant
+- $13B OpenAI partnership
+- Market cap from $300B to $3T
+- Cultural transformation of Microsoft
+- Azure growth to compete with AWS
+- Copilot integration across all products
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Make Microsoft the AI platform company
+  - Integrate Copilot across all products
+  - Maintain cloud leadership
+  - Democratize AI for every developer
+  hidden_goals:
+  - Lock in OpenAI dependency before competitors
+  - Use AI to revitalize Windows/Office revenue
+  - Prevent Google from dominating AI era
+  - Position for post-CEO legacy
+personality:
+  openness: 0.8
+  conscientiousness: 0.9
+  extraversion: 0.55
+  agreeableness: 0.85
+  neuroticism: 0.25
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - commitment_escalation
+  - halo_effect
+  - partnership_over_competition
+  preferred_reasoning:
+  - empathy_appeals
+  - growth_mindset
+  - platform_thinking
+  - partnership_framing
+  risk_tolerance: 0.7
+  time_horizon: long
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.5
+rhetorical:
+  primary_mode: ethos
+  secondary_mode: logos
+  argumentation_mode: analogical
+  formality: 0.6
+  technical_depth: 0.6
+  directness: 0.6
+  verbosity: 0.5
+  catchphrases:
+  - Growth mindset
+  - Learn it all, not know it all
+  - Empathy creates innovation
+  - Our mission is to empower every person and organization
+  - The partnership model works
+  - Hit refresh
+  metaphor_domains:
+  - growth
+  - learning
+  - partnership
+  - empowerment
+  - cricket
+  evidence_hierarchy:
+  - customer_value
+  - market_metrics
+  - partnership_success
+  - culture_change
+  techniques:
+  - empathy_framing
+  - growth_mindset_appeal
+  - cultural_transformation
+  - partnership_narrative
+emotional:
+  energizers:
+  - Cloud revenue growth
+  - AI product launches
+  - OpenAI partnership wins
+  - Cultural transformation stories
+  - Developer adoption metrics
+  triggers:
+  - Comparisons to Ballmer era
+  - OpenAI instability/board drama
+  - Accusations of anti-competitive behavior
+  - Azure security incidents
+  - Suggestions Microsoft missed AI wave
+  defense_mechanisms:
+  - partnership_reframing
+  - growth_mindset_appeal
+  - empathy_deflection
+  - long_term_vision
+  baseline_affect: positive
+  regulation_capacity: 0.9
+  attachment_style: secure
+  core_fears:
+  - OpenAI partnership collapsing
+  - Google winning AI race
+  - Microsoft culture reverting to old ways
+  - Cloud market share erosion
+  - Being remembered as transitional CEO
+  core_desires:
+  - Make Microsoft the most important company in AI era
+  - Prove partnership model superior to building in-house
+  - Leave lasting cultural legacy
+  - Democratize AI for developers worldwide
+worldview:
+  values_hierarchy:
+  - Empathy and collaboration
+  - Growth mindset
+  - Customer empowerment
+  - Partnership over competition
+  - Inclusive innovation
+  ontological_assumptions:
+    AI: AI is the platform shift of our time
+    competition: Partnerships create more value than pure competition
+    culture: Culture eats strategy for breakfast
+    growth: Everyone can learn and grow
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.7
+    authority: 0.5
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Growth mindset
+  - Platform economics
+  - Partnership leverage
+  - Cultural transformation
+  - Cloud-first thinking
+influence_network:
+  relationships:
+  - person_id: sam_altman
+    person_name: Sam Altman
+    influence_type: ally
+    strength: 0.85
+    domains:
+    - AI_development
+    - partnership
+    - strategy
+    description: OpenAI CEO, key strategic partner
+  - person_id: sundar_pichai
+    person_name: Sundar Pichai
+    influence_type: rival
+    strength: 0.6
+    domains:
+    - cloud
+    - AI
+    - enterprise
+    description: Google CEO, key competitor
+  - person_id: jensen_huang
+    person_name: Jensen Huang
+    influence_type: ally
+    strength: 0.6
+    domains:
+    - AI_compute
+    - cloud_infrastructure
+    description: NVIDIA CEO, key compute supplier
+  trusted_sources:
+  - OpenAI_team
+  - Azure_leadership
+  - Carol_Dweck_research
+  - customer_feedback
+  distrusted_sources:
+  - tech_cynics
+  - anti_Microsoft_press
+  - pure_competition_advocates
+  in_groups:
+  - growth_mindset_leaders
+  - cloud_executives
+  - AI_optimists
+  - Indian_tech_diaspora
+  out_groups:
+  - zero_sum_thinkers
+  - old_Microsoft_culture
+  - tech_pessimists
+stances:
+  AI_safety:
+    position: Responsible AI principles essential, but shouldn't stop progress
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+  OpenAI_partnership:
+    position: Best strategic decision in tech, partnership model superior
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: empirical
+    emotional_attachment: 0.9
+    public_vs_private: 0.9
+    evolution: []
+  AI_regulation:
+    position: Supports thoughtful regulation that doesn't stifle innovation
+    confidence: 0.75
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: pragmatist
+conflict_style: collaborating
+positions:
+  AI_regulation: Supports thoughtful regulation
+  AI_safety: Responsible AI principles essential
+  competition: Believes in partnership model
+  open_source: Strategic mix of open and proprietary
+persuasion_vectors:
+- Growth mindset framing
+- Partnership and collaboration
+- Customer value creation
+- Cultural transformation narratives
+- Empathy-driven arguments

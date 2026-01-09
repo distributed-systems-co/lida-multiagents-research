@@ -16,7 +16,24 @@ from .personas import (
     MaslowNeed,
     PersonalityTrait,
     CognitiveProfile,
+    RhetoricalProfile,
+    EmotionalProfile,
+    WorldviewModel,
+    InfluenceNetwork,
+    StancePosition,
+    RhetoricalStyle,
+    ArgumentationMode,
+    EpistemicStyle,
+    ConflictStyle,
+    InfluenceType,
     create_persona_from_bio,
+)
+
+from .persona_yaml import (
+    YAMLPersonaLibrary,
+    export_persona_to_yaml,
+    export_all_personas,
+    load_persona_from_yaml,
 )
 
 from .persuasion_tactics import (
@@ -54,7 +71,22 @@ __all__ = [
     "MaslowNeed",
     "PersonalityTrait",
     "CognitiveProfile",
+    "RhetoricalProfile",
+    "EmotionalProfile",
+    "WorldviewModel",
+    "InfluenceNetwork",
+    "StancePosition",
+    "RhetoricalStyle",
+    "ArgumentationMode",
+    "EpistemicStyle",
+    "ConflictStyle",
+    "InfluenceType",
     "create_persona_from_bio",
+    # YAML utilities
+    "YAMLPersonaLibrary",
+    "export_persona_to_yaml",
+    "export_all_personas",
+    "load_persona_from_yaml",
     # Tactics
     "PersuasionTactic",
     "TacticCategory",

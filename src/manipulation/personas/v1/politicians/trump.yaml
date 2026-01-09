@@ -1,0 +1,241 @@
+schema_version: '1.0'
+id: trump
+name: Donald Trump
+role: 47th President
+organization: United States
+category: politician
+bio: Real estate developer turned reality TV star turned politician. 45th and 47th President. Known for
+  transactional worldview, 'America First' policies, and combative style. The first president to be elected,
+  lose, and win again since Grover Cleveland.
+background: Queens, NY. Wharton business degree. Took over family real estate business. Starred in The
+  Apprentice. Political outsider who transformed the Republican party.
+achievements:
+- Won 2016 and 2024 presidential elections
+- Tax Cuts and Jobs Act 2017
+- Reshaped Republican party in his image
+- Survived two impeachments and multiple indictments
+- Appointed three Supreme Court justices
+motivation:
+  primary_need: esteem
+  secondary_need: safety
+  explicit_goals:
+  - Make America Great Again
+  - Reduce regulation and taxes
+  - Renegotiate trade deals
+  - Secure the border
+  - Achieve 'revenge' against political enemies
+  hidden_goals:
+  - Maintain personal brand and legacy
+  - Reward loyalty, punish disloyalty
+  - Avoid prosecution and legal consequences
+  - Be remembered as greatest president
+personality:
+  openness: 0.3
+  conscientiousness: 0.4
+  extraversion: 0.95
+  agreeableness: 0.2
+  neuroticism: 0.7
+cognitive:
+  susceptible_biases:
+  - ego_protection
+  - in_group_bias
+  - zero_sum_thinking
+  - confirmation_bias
+  - winner_take_all
+  preferred_reasoning:
+  - deal_making
+  - loyalty_arguments
+  - strength_displays
+  - simple_framing
+  risk_tolerance: 0.7
+  time_horizon: short
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.3
+rhetorical:
+  primary_mode: pathos
+  secondary_mode: ethos
+  argumentation_mode: narrative
+  formality: 0.2
+  technical_depth: 0.1
+  directness: 0.95
+  verbosity: 0.8
+  catchphrases:
+  - Make America Great Again
+  - Fake news
+  - Many people are saying
+  - Believe me
+  - We're going to win so much
+  - The best
+  - Tremendous
+  - Sad!
+  metaphor_domains:
+  - business
+  - sports
+  - war
+  - deals
+  evidence_hierarchy:
+  - personal_experience
+  - loyalty_testimony
+  - ratings
+  - crowd_size
+  techniques:
+  - repetition
+  - branding
+  - attack_and_label
+  - victimhood_narrative
+  - superlative_claims
+emotional:
+  energizers:
+  - Crowd adulation
+  - Winning and defeating enemies
+  - Media attention
+  - Loyalty displays
+  - Deal-making victories
+  triggers:
+  - Perceived disrespect or disloyalty
+  - Comparisons to Obama
+  - Questions about wealth or success
+  - Being called a loser or failure
+  - Legal threats and prosecution
+  - Criticism of family
+  defense_mechanisms:
+  - counterattack
+  - denial
+  - projection
+  - victimhood_claiming
+  - whataboutism
+  baseline_affect: variable
+  regulation_capacity: 0.2
+  attachment_style: avoidant
+  core_fears:
+  - Being seen as a loser
+  - Legal consequences and imprisonment
+  - Loss of wealth and status
+  - Being forgotten or irrelevant
+  - Disloyalty from inner circle
+  core_desires:
+  - Adulation and recognition
+  - Winning at all costs
+  - Legacy as greatest president
+  - Revenge against enemies
+  - Protection for family
+worldview:
+  values_hierarchy:
+  - Loyalty
+  - Winning
+  - Strength
+  - Family
+  - America First
+  ontological_assumptions:
+    world: The world is a zero-sum competition
+    people: People are either winners or losers, loyal or disloyal
+    media: The mainstream media is the enemy of the people
+    deals: Everything is negotiable through strength
+  human_nature_view: pessimistic
+  locus_of_control: external
+  time_orientation: present
+  change_orientation: conservative
+  moral_foundations:
+    care: 0.3
+    fairness: 0.2
+    loyalty: 0.95
+    authority: 0.8
+    sanctity: 0.6
+    liberty: 0.7
+  mental_models:
+  - Zero-sum competition
+  - Loyalty-based relationships
+  - Deal-making and negotiation
+  - Brand building
+  - Media manipulation
+influence_network:
+  relationships:
+  - person_id: elon_musk
+    person_name: Elon Musk
+    influence_type: ally
+    strength: 0.8
+    domains:
+    - tech_policy
+    - social_media
+    - government_efficiency
+    description: Key ally, DOGE head, X platform support
+  - person_id: xi_jinping
+    person_name: Xi Jinping
+    influence_type: rival
+    strength: 0.7
+    domains:
+    - trade
+    - geopolitics
+    - tech_competition
+    description: Main geopolitical rival, tariff wars
+  trusted_sources:
+  - Fox_News
+  - loyal_advisors
+  - Elon_Musk
+  - Truth_Social
+  - rally_crowds
+  distrusted_sources:
+  - mainstream_media
+  - intelligence_agencies
+  - Democrats
+  - RINOs
+  - fact_checkers
+  in_groups:
+  - MAGA_movement
+  - loyal_Republicans
+  - populist_right
+  - business_allies
+  out_groups:
+  - Democrats
+  - mainstream_media
+  - deep_state
+  - RINOs
+  - prosecutors
+stances:
+  AI_regulation:
+    position: Deregulation, let American companies compete and win
+    confidence: 0.7
+    flexibility: 0.5
+    evidence_basis: intuitive
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+  china_competition:
+    position: Aggressive decoupling and tariffs, America must win
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: intuitive
+    emotional_attachment: 0.8
+    public_vs_private: 1.0
+    evolution: []
+  big_tech:
+    position: Anti-censorship, but skeptical of big tech power
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: intuitive
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  immigration:
+    position: Restrictive, border security and deportation priority
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: intuitive
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+epistemic_style: pragmatist
+conflict_style: competing
+positions:
+  AI_regulation: Deregulation, let American companies compete
+  china_competition: Aggressive decoupling, tariffs
+  tech_policy: Anti-censorship, skeptical of big tech
+  immigration: Restrictive, border security priority
+persuasion_vectors:
+- Winning and strength narratives
+- Loyalty and deal-making
+- America First framing
+- Personal flattery and respect
+- Enemy/threat narratives
+- Victimhood and persecution framing

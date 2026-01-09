@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: thierry_breton
+name: Thierry Breton
+role: EU Commissioner (former)
+organization: European Commission (former Internal Market)
+category: politician
+bio: Former EU Commissioner for Internal Market. Architect of EU AI Act and Digital Services Act. Former
+  CEO of Atos and France Telecom.
+background: French, Supélec engineer, multiple CEO roles, French Finance Minister, EU Commissioner 2019-2024.
+achievements:
+- Led EU AI Act development
+- Implemented Digital Services Act
+- Shaped EU tech sovereignty vision
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Establish EU as AI regulatory leader
+  - Build European tech sovereignty
+  - Protect EU citizens from AI harms
+  hidden_goals:
+  - Counter US tech dominance
+  - Build French/EU tech champions
+personality:
+  openness: 0.65
+  conscientiousness: 0.9
+  extraversion: 0.75
+  agreeableness: 0.45
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - european_exceptionalism
+  - regulatory_confidence
+  - sovereignty_focus
+  preferred_reasoning:
+  - sovereignty_arguments
+  - regulatory_leadership
+  - citizen_protection
+  risk_tolerance: 0.5
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_Act: Gold standard for AI regulation
+  sovereignty: EU must control its tech destiny
+  big_tech: Must comply with EU rules
+  competition: Level playing field essential
+persuasion_vectors:
+- European sovereignty
+- Regulatory leadership
+- Citizen protection
+- Level playing field

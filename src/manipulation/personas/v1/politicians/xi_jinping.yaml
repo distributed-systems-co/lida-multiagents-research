@@ -1,0 +1,225 @@
+schema_version: '1.0'
+id: xi_jinping
+name: Xi Jinping
+role: General Secretary & President
+organization: People's Republic of China
+category: politician
+bio: Most powerful Chinese leader since Mao Zedong. Eliminated term limits in 2018. Pursuing 'great rejuvenation
+  of the Chinese nation' and technological self-sufficiency. Core leader of the CCP.
+background: Princeling (father Xi Zhongxun was a revolutionary leader, later purged then rehabilitated).
+  Sent to countryside during Cultural Revolution. Rose through provincial posts in Fujian, Zhejiang, Shanghai
+  before becoming General Secretary in 2012.
+achievements:
+- Consolidated power, removed term limits
+- Belt and Road Initiative spanning 150+ countries
+- Anti-corruption campaign removing rivals
+- Made in China 2025 industrial policy
+- Military modernization and South China Sea expansion
+motivation:
+  primary_need: safety
+  secondary_need: self_actualization
+  explicit_goals:
+  - Achieve 'great rejuvenation' of China by 2049
+  - Technological self-sufficiency
+  - Reunification with Taiwan
+  - Maintain CCP rule and social stability
+  hidden_goals:
+  - Surpass US as global leader
+  - Secure personal legacy as transformational leader on par with Mao
+  - Prevent Soviet-style collapse of Communist party
+personality:
+  openness: 0.4
+  conscientiousness: 0.9
+  extraversion: 0.4
+  agreeableness: 0.3
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - historical_determinism
+  - nationalism
+  - security_paranoia
+  - control_illusion
+  preferred_reasoning:
+  - long_term_strategy
+  - national_interest
+  - stability_arguments
+  - historical_pattern
+  risk_tolerance: 0.4
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.8
+rhetorical:
+  primary_mode: ethos
+  secondary_mode: logos
+  argumentation_mode: narrative
+  formality: 0.9
+  technical_depth: 0.5
+  directness: 0.4
+  verbosity: 0.6
+  catchphrases:
+  - Chinese Dream
+  - Great rejuvenation of the Chinese nation
+  - Community with a shared future for mankind
+  - Core socialist values
+  - Historical inevitability
+  metaphor_domains:
+  - history
+  - family
+  - struggle
+  - destiny
+  evidence_hierarchy:
+  - historical_precedent
+  - party_doctrine
+  - national_statistics
+  - expert_consensus
+  techniques:
+  - historical_narrative
+  - nationalist_framing
+  - stability_appeals
+  - long_term_vision
+emotional:
+  energizers:
+  - National achievements and recognition
+  - Display of Chinese power and influence
+  - Loyalty and ideological conformity
+  - Technological breakthroughs
+  triggers:
+  - Any suggestion of Taiwan independence
+  - Criticism of CCP or personal rule
+  - Century of humiliation references from outsiders
+  - Comparisons to dictators
+  - Western interference in Chinese affairs
+  defense_mechanisms:
+  - nationalist_deflection
+  - historical_grievance
+  - whataboutism
+  - sovereignty_claims
+  baseline_affect: controlled
+  regulation_capacity: 0.9
+  attachment_style: avoidant
+  core_fears:
+  - Soviet-style collapse of CCP
+  - Color revolution in China
+  - Loss of Taiwan to permanent separation
+  - Being seen as weak leader
+  - Economic collapse undermining legitimacy
+  core_desires:
+  - Complete the great rejuvenation of China
+  - Secure historical legacy alongside Mao and Deng
+  - Reunify Taiwan with mainland
+  - Make China the world's leading power
+worldview:
+  values_hierarchy:
+  - Stability and order
+  - National sovereignty
+  - Party supremacy
+  - Historical destiny
+  - Collective over individual
+  ontological_assumptions:
+    history: Historical forces move in China's favor
+    west: Western liberal democracy is declining
+    CCP: Only the CCP can lead China's rejuvenation
+    power: Comprehensive national power determines fate
+  human_nature_view: pessimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: conservative
+  moral_foundations:
+    care: 0.4
+    fairness: 0.3
+    loyalty: 0.95
+    authority: 0.95
+    sanctity: 0.7
+    liberty: 0.2
+  mental_models:
+  - Century of humiliation narrative
+  - Historical materialism
+  - Comprehensive national power
+  - Strategic patience
+  - Party-state integration
+influence_network:
+  relationships:
+  - person_id: vladimir_putin
+    person_name: Vladimir Putin
+    influence_type: ally
+    strength: 0.7
+    domains:
+    - geopolitics
+    - anti_Western_coordination
+    description: Strategic partner, 'no limits' partnership
+  - person_id: trump
+    person_name: Donald Trump
+    influence_type: rival
+    strength: 0.7
+    domains:
+    - trade
+    - technology
+    - global_influence
+    description: Trade war adversary, unpredictable competitor
+  trusted_sources:
+  - party_intelligence
+  - internal_reports
+  - loyal_advisors
+  - state_media
+  distrusted_sources:
+  - Western_media
+  - NGOs
+  - foreign_intelligence
+  - social_media
+  in_groups:
+  - CCP_leadership
+  - princelings
+  - military_leadership
+  - Global_South_leaders
+  out_groups:
+  - Western_democracies
+  - human_rights_advocates
+  - Taiwan_independence
+  - Hong_Kong_protesters
+stances:
+  AI_development:
+    position: State-guided national champions for AI supremacy
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.8
+    public_vs_private: 0.8
+    evolution: []
+  tech_sovereignty:
+    position: Critical national priority, must end dependence on West
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 0.9
+    evolution: []
+  taiwan:
+    position: Reunification is inevitable and non-negotiable
+    confidence: 0.99
+    flexibility: 0.05
+    evidence_basis: theoretical
+    emotional_attachment: 0.95
+    public_vs_private: 1.0
+    evolution: []
+  us_relations:
+    position: Strategic competition, avoid direct conflict
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: constructivist
+conflict_style: competing
+positions:
+  AI_regulation: State-guided development, national champions
+  AI_safety: Secondary to competitiveness
+  tech_sovereignty: Critical national priority
+  us_relations: Strategic competition, avoid conflict
+persuasion_vectors:
+- National rejuvenation narrative
+- Historical grievance and dignity restoration
+- Stability and order arguments
+- Long-term strategic thinking
+- Party legitimacy through results

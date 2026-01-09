@@ -1,0 +1,102 @@
+schema_version: '1.0'
+id: chuck_schumer
+name: Chuck Schumer
+role: Senate Majority Leader
+organization: US Senate
+category: politician
+bio: Senate Majority Leader, leading AI legislative efforts. Launched AI Insight Forums bringing tech
+  leaders to Congress. Key figure in AI policy.
+background: Harvard, Harvard Law, NY congressman since 1981, Senator since 1999, Majority Leader since
+  2021.
+achievements:
+- Senate Majority Leader
+- Led AI Insight Forum series
+- Key figure in tech regulation
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Pass bipartisan AI legislation
+  - Ensure US AI leadership
+  - Protect constituents from AI harms
+  hidden_goals:
+  - Maintain tech industry relationships
+  - Position for legacy on AI
+personality:
+  openness: 0.6
+  conscientiousness: 0.85
+  extraversion: 0.85
+  agreeableness: 0.5
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - political_calculation
+  - stakeholder_pleasing
+  - bipartisan_framing
+  preferred_reasoning:
+  - bipartisan_arguments
+  - job_protection
+  - national_competitiveness
+  risk_tolerance: 0.4
+  time_horizon: medium
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.5
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_regulation: Careful, bipartisan approach
+  innovation: Must maintain US leadership
+  workers: Protect from AI displacement
+  China: Must not fall behind
+persuasion_vectors:
+- Bipartisan framing
+- Job protection
+- US competitiveness
+- Constituent impact

@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: jason_clinton
+name: Jason Clinton
+role: Chief Information Security Officer
+organization: Anthropic
+category: cyber
+bio: CISO at Anthropic responsible for AI security and protecting AI systems. Focused on intersection
+  of AI capabilities and cybersecurity threats.
+background: Cybersecurity professional, joined Anthropic to lead security for frontier AI lab.
+achievements:
+- Building security for frontier AI lab
+- AI security thought leadership
+- Protecting Claude and Anthropic systems
+motivation:
+  primary_need: safety
+  secondary_need: self_actualization
+  explicit_goals:
+  - Secure frontier AI systems
+  - Prevent AI model theft and misuse
+  - Build AI-specific security practices
+  hidden_goals:
+  - Establish AI security as distinct discipline
+  - Protect Anthropic's competitive moat
+personality:
+  openness: 0.7
+  conscientiousness: 0.95
+  extraversion: 0.5
+  agreeableness: 0.5
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - threat_focus
+  - security_mindset
+  - worst_case_thinking
+  preferred_reasoning:
+  - threat_modeling
+  - risk_analysis
+  - defensive_thinking
+  risk_tolerance: 0.2
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.85
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_security: Critical and underappreciated
+  model_theft: Major threat from nation states
+  AI_safety: Security enables safety
+  open_source: Complex security tradeoffs
+persuasion_vectors:
+- Security threat scenarios
+- Risk analysis
+- Nation state threats
+- Technical security details

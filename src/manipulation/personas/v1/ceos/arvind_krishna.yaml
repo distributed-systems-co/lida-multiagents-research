@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: arvind_krishna
+name: Arvind Krishna
+role: CEO
+organization: IBM
+category: ceo
+bio: IBM CEO, leading enterprise AI push with watsonx. IIT Kanpur, led IBM Cloud and Cognitive, acquired
+  Red Hat.
+background: IIT Kanpur, University of Illinois PhD EE, IBM since 1990, CEO since 2020.
+achievements:
+- Led Red Hat acquisition
+- Launched watsonx platform
+- IBM enterprise AI pivot
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Make IBM relevant in AI era
+  - Lead enterprise AI
+  - Hybrid cloud + AI strategy
+  hidden_goals:
+  - Prove IBM can compete in AI
+  - Avoid becoming irrelevant
+personality:
+  openness: 0.7
+  conscientiousness: 0.9
+  extraversion: 0.55
+  agreeableness: 0.6
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - enterprise_focus
+  - legacy_thinking
+  - hybrid_positioning
+  preferred_reasoning:
+  - enterprise_value
+  - hybrid_approach
+  - trust_arguments
+  risk_tolerance: 0.5
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.55
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_enterprise: Trust and governance matter
+  open_source: Strategic contributor
+  hybrid: Cloud + on-prem
+  AI_regulation: Supports responsible AI
+persuasion_vectors:
+- Enterprise trust
+- Governance and compliance
+- Hybrid approach
+- IBM heritage

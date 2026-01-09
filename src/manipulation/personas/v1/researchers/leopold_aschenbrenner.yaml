@@ -1,0 +1,102 @@
+schema_version: '1.0'
+id: leopold_aschenbrenner
+name: Leopold Aschenbrenner
+role: Researcher & Author
+organization: Independent (ex-OpenAI)
+category: ai_safety
+bio: Former OpenAI researcher. Wrote influential 'Situational Awareness' document predicting rapid AGI
+  progress. Advocates for US national security focus.
+background: Young researcher, superforecaster. Fired from OpenAI, wrote extensive analysis predicting
+  superintelligence by 2027.
+achievements:
+- Situational Awareness document
+- Influenced AI policy discourse
+- Superforecasting background
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Prepare world for imminent AGI
+  - Ensure US wins AI race
+  - Prevent CCP from gaining AI supremacy
+  hidden_goals:
+  - Vindicate predictions and analysis
+  - Shape policy before it's too late
+personality:
+  openness: 0.85
+  conscientiousness: 0.9
+  extraversion: 0.6
+  agreeableness: 0.4
+  neuroticism: 0.7
+cognitive:
+  susceptible_biases:
+  - confirmation_bias
+  - urgency_bias
+  - insider_knowledge
+  preferred_reasoning:
+  - trend_extrapolation
+  - national_security
+  - urgency_arguments
+  risk_tolerance: 0.5
+  time_horizon: short
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Near-term existential if mismanaged
+  AGI_timeline: 2027 superintelligence possible
+  US_china: Critical race, US must win
+  AI_security: Treat as Manhattan Project
+persuasion_vectors:
+- Urgency and timeline arguments
+- National security framing
+- Insider knowledge claims
+- Trend extrapolation evidence

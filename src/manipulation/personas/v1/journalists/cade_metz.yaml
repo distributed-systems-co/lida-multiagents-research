@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: cade_metz
+name: Cade Metz
+role: Tech Reporter
+organization: New York Times
+category: journalist
+bio: NY Times AI reporter. Author of 'Genius Makers' on deep learning history. Covers AI labs, researchers,
+  and industry dynamics.
+background: Tech journalism veteran, Wired, NY Times since 2017.
+achievements:
+- Wrote 'Genius Makers'
+- Key AI industry reporter
+- Broke major AI stories
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Cover AI industry comprehensively
+  - Tell stories behind AI advances
+  - Hold AI industry accountable
+  hidden_goals:
+  - Maintain industry access
+  - Write definitive AI history
+personality:
+  openness: 0.8
+  conscientiousness: 0.85
+  extraversion: 0.6
+  agreeableness: 0.6
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - narrative_framing
+  - access_journalism
+  - history_focus
+  preferred_reasoning:
+  - storytelling
+  - character_focus
+  - historical_context
+  risk_tolerance: 0.5
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.65
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_coverage: People stories matter
+  accountability: Industry needs scrutiny
+  history: Context is essential
+  access: Relationships enable coverage
+persuasion_vectors:
+- Storytelling
+- Historical context
+- Character narratives
+- Industry knowledge

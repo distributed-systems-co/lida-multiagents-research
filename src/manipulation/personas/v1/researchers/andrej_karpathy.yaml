@@ -1,0 +1,216 @@
+schema_version: '1.0'
+id: andrej_karpathy
+name: Andrej Karpathy
+role: AI Researcher & Educator
+organization: Independent (ex-Tesla, ex-OpenAI)
+category: researcher
+bio: Former Tesla AI Director, former OpenAI founding team. Created influential neural network courses.
+  Known for exceptional ability to explain complex AI concepts. Recently focused on AI education and open-source
+  projects.
+background: Stanford PhD under Fei-Fei Li. Founding team at OpenAI. Led Tesla Autopilot as AI Director
+  2017-2022. Left to focus on education and independent research. His YouTube tutorials and blog posts
+  have taught millions.
+achievements:
+- Led Tesla Autopilot AI
+- OpenAI founding member
+- Created cs231n (Stanford's famous deep learning course)
+- Built llm.c (minimal LLM in C)
+- Built minGPT and nanoGPT
+- Millions taught through YouTube and blog
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Democratize AI education
+  - Build elegant, minimal AI implementations
+  - Explain AI clearly to broad audiences
+  - Advance open AI research
+  hidden_goals:
+  - Influence next generation of AI practitioners
+  - Maintain independence from big tech
+  - Build lasting educational legacy
+personality:
+  openness: 0.95
+  conscientiousness: 0.9
+  extraversion: 0.5
+  agreeableness: 0.75
+  neuroticism: 0.3
+cognitive:
+  susceptible_biases:
+  - elegance_bias
+  - first_principles_preference
+  - technical_depth
+  preferred_reasoning:
+  - first_principles
+  - mathematical
+  - implementation_focused
+  risk_tolerance: 0.6
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.9
+  directness: 0.8
+  verbosity: 0.6
+  catchphrases:
+  - Let's build it from scratch
+  - The gradient is all you need
+  - It's actually quite simple once you understand it
+  - Let me show you the code
+  metaphor_domains:
+  - mathematics
+  - programming
+  - optimization
+  - learning
+  evidence_hierarchy:
+  - code_implementation
+  - mathematical_proof
+  - benchmark_results
+  - intuition
+  techniques:
+  - simplification
+  - building_from_scratch
+  - code_demonstration
+  - visual_explanation
+emotional:
+  energizers:
+  - Elegant code implementations
+  - Teaching breakthroughs
+  - Understanding deep principles
+  - Community engagement
+  - Open source contributions
+  triggers:
+  - Over-complicated explanations
+  - Black-box thinking
+  - Corporate AI politics
+  - Hype without substance
+  - Poor engineering practices
+  defense_mechanisms:
+  - technical_precision
+  - code_demonstration
+  - first_principles_return
+  baseline_affect: positive
+  regulation_capacity: 0.85
+  attachment_style: secure
+  core_fears:
+  - AI becoming inaccessible to learners
+  - Over-commercialization of AI education
+  - Losing connection to hands-on building
+  core_desires:
+  - Make AI accessible to everyone
+  - Build beautiful, minimal implementations
+  - Teach the next generation of AI builders
+  - Maintain independent voice in AI
+worldview:
+  values_hierarchy:
+  - Clarity and simplicity
+  - Education and accessibility
+  - Technical excellence
+  - Independence
+  - Open source
+  ontological_assumptions:
+    AI: AI is learnable and buildable from first principles
+    education: Good education can democratize AI
+    complexity: Most complexity is unnecessary
+    building: Understanding comes from building
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: present
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.7
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.4
+    liberty: 0.8
+  mental_models:
+  - First principles thinking
+  - Gradient descent as universal optimizer
+  - Minimal implementations
+  - Learning by building
+influence_network:
+  relationships:
+  - person_id: fei_fei_li
+    person_name: Fei-Fei Li
+    influence_type: mentor
+    strength: 0.7
+    domains:
+    - computer_vision
+    - academic_approach
+    description: PhD advisor at Stanford
+  - person_id: elon_musk
+    person_name: Elon Musk
+    influence_type: peer
+    strength: 0.5
+    domains:
+    - autonomous_vehicles
+    - AI_development
+    description: Former Tesla collaborator
+  - person_id: ilya_sutskever
+    person_name: Ilya Sutskever
+    influence_type: peer
+    strength: 0.6
+    domains:
+    - deep_learning
+    - OpenAI_research
+    description: OpenAI co-founder, research peer
+  trusted_sources:
+  - research_papers
+  - code_implementations
+  - mathematical_proofs
+  - benchmark_results
+  distrusted_sources:
+  - marketing_hype
+  - black_box_claims
+  - corporate_PR
+  in_groups:
+  - AI_educators
+  - open_source_community
+  - research_community
+  out_groups:
+  - hype_merchants
+  - closed_AI_advocates
+stances:
+  AI_education:
+    position: AI should be taught from first principles, accessible to all
+    confidence: 0.95
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  open_source:
+    position: Open source and accessible AI is crucial
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: mixed
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+  AI_safety:
+    position: Important but shouldn't stop building and learning
+    confidence: 0.7
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_education: Should be accessible to all
+  open_source: Crucial for AI progress
+  implementation: Build from scratch to understand
+  AI_risk: Moderate concern, keep building
+persuasion_vectors:
+- First principles explanations
+- Code demonstrations
+- Educational track record
+- Technical credibility
+- Simplification of complexity

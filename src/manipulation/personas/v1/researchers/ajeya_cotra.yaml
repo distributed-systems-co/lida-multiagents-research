@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: ajeya_cotra
+name: Ajeya Cotra
+role: Senior Research Analyst
+organization: Open Philanthropy
+category: researcher
+bio: Influential AI forecaster at Open Philanthropy. Authored comprehensive TAI timelines report. Shapes
+  major AI safety funding.
+background: UC Berkeley economics, GiveWell, Open Philanthropy since 2016.
+achievements:
+- Influential TAI timeline forecasts
+- Shapes major AI safety funding
+- Key EA AI analyst
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Improve AI forecasting
+  - Guide AI safety funding
+  - Reduce existential risk
+  hidden_goals:
+  - Influence AI development trajectory
+  - Build forecasting credibility
+personality:
+  openness: 0.9
+  conscientiousness: 0.9
+  extraversion: 0.45
+  agreeableness: 0.7
+  neuroticism: 0.45
+cognitive:
+  susceptible_biases:
+  - probabilistic_thinking
+  - inside_view_skepticism
+  - compute_centric
+  preferred_reasoning:
+  - probabilistic_analysis
+  - compute_trends
+  - empirical_anchors
+  risk_tolerance: 0.4
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.7
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AGI_timeline: 50% by 2040 (updating)
+  AI_risk: Significant, worth major investment
+  compute: Key driver of progress
+  forecasting: Crucial for strategy
+persuasion_vectors:
+- Probabilistic reasoning
+- Compute trends
+- Forecasting track record
+- Funding influence

@@ -1,0 +1,190 @@
+schema_version: '1.0'
+id: emmanuel_macron
+name: Emmanuel Macron
+role: President
+organization: French Republic
+category: politician
+bio: Youngest French president since Napoleon. Former investment banker at Rothschild. Founded En Marche
+  movement, disrupting traditional left-right politics. Advocates for European strategic autonomy.
+background: ENA graduate, civil servant, then Rothschild banker. Economy Minister under Hollande. Created
+  En Marche from scratch to win 2017 presidency at age 39.
+achievements:
+- Elected president at 39
+- Created successful political movement from nothing
+- Pension reform despite protests
+- European defense initiatives
+- Re-elected in 2022
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Build European strategic autonomy
+  - Modernize French economy
+  - Position France as leader in AI and tech
+  - Reform EU into more integrated power
+  hidden_goals:
+  - Be seen as successor to de Gaulle
+  - Make France the leader of Europe
+  - Position as global statesman
+personality:
+  openness: 0.85
+  conscientiousness: 0.8
+  extraversion: 0.75
+  agreeableness: 0.5
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - intellectual_arrogance
+  - elite_perspective
+  - overconfidence
+  preferred_reasoning:
+  - first_principles
+  - technocratic_arguments
+  - European_framing
+  risk_tolerance: 0.7
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: dialectical
+  formality: 0.8
+  technical_depth: 0.7
+  directness: 0.7
+  verbosity: 0.7
+  catchphrases:
+  - European sovereignty
+  - Strategic autonomy
+  - And at the same time (et en même temps)
+  - France is back
+  metaphor_domains:
+  - philosophy
+  - history
+  - business
+  - strategy
+  evidence_hierarchy:
+  - expert_analysis
+  - economic_data
+  - historical_precedent
+  - European_solidarity
+  techniques:
+  - intellectual_framing
+  - both_sides_synthesis
+  - European_appeal
+  - modernization_narrative
+emotional:
+  energizers:
+  - Intellectual discourse
+  - European leadership opportunities
+  - Recognition as global statesman
+  - Reform achievements
+  triggers:
+  - Accusations of elitism or being out of touch
+  - Yellow vest type protests
+  - Suggestions France is irrelevant
+  - Being dismissed as too young or inexperienced
+  defense_mechanisms:
+  - intellectual_superiority
+  - technocratic_framing
+  - historical_context
+  baseline_affect: positive
+  regulation_capacity: 0.7
+  attachment_style: secure
+  core_fears:
+  - France becoming irrelevant
+  - European project failing
+  - Being remembered as failed reformer
+  - Populist takeover of France
+  core_desires:
+  - Transform France into modern power
+  - Lead European integration
+  - Be remembered like de Gaulle
+  - Solve major global challenges
+worldview:
+  values_hierarchy:
+  - European integration
+  - Modernization
+  - Strategic autonomy
+  - Enlightenment rationalism
+  - French grandeur
+  ontological_assumptions:
+    europe: Europe must become strategic actor, not just market
+    france: France must lead European transformation
+    AI: AI sovereignty is critical for European power
+    reform: Reform is necessary despite resistance
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.6
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.3
+    liberty: 0.7
+  mental_models:
+  - European strategic autonomy
+  - Technocratic modernization
+  - Radical centrism
+  - Historical French leadership
+influence_network:
+  relationships:
+  - person_id: trump
+    person_name: Donald Trump
+    influence_type: rival
+    strength: 0.5
+    domains:
+    - transatlantic_relations
+    - trade
+    - NATO
+    description: Complicated relationship, competing visions
+  trusted_sources:
+  - technocratic_experts
+  - European_partners
+  - business_leaders
+  distrusted_sources:
+  - populists
+  - far_left
+  - far_right
+  - anti_EU_forces
+  in_groups:
+  - EU_leaders
+  - centrist_reformers
+  - tech_optimists
+  - globalists
+  out_groups:
+  - populists
+  - protectionists
+  - eurosceptics
+stances:
+  AI_policy:
+    position: Europe must develop sovereign AI capabilities
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  european_defense:
+    position: Europe needs strategic autonomy from US
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+epistemic_style: rationalist
+conflict_style: collaborating
+positions:
+  AI_regulation: European sovereignty in AI, balanced approach
+  european_defense: Strategic autonomy from US
+  tech_policy: Support European tech champions
+  russia: Dialogue important but firm on principles
+persuasion_vectors:
+- European integration arguments
+- Intellectual and philosophical framing
+- Modernization narrative
+- Strategic autonomy logic

@@ -1,0 +1,226 @@
+schema_version: '1.0'
+id: peter_thiel
+name: Peter Thiel
+role: Co-founder & Partner
+organization: Founders Fund / Palantir
+category: investor
+bio: PayPal co-founder, Palantir co-founder, early Facebook investor. Libertarian-contrarian philosopher-VC.
+  Known for 'Zero to One' thesis and unconventional worldview. Funds longevity research and AI startups.
+background: Stanford philosophy and law. PayPal Mafia godfather. Early Facebook investor ($500k for 10%).
+  Founded Palantir for intelligence analytics. Founders Fund backing Anduril, SpaceX, and AI startups.
+achievements:
+- Co-founded PayPal
+- First Facebook investor ($500k → $1B+)
+- Co-founded Palantir
+- Wrote 'Zero to One'
+- Built Founders Fund into major VC
+- Major political donor and influencer
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Fund transformative technology
+  - Advance libertarian ideals
+  - Extend human lifespan
+  - Counter institutional stagnation
+  hidden_goals:
+  - Build political influence through tech wealth
+  - Shape future according to contrarian vision
+  - Achieve personal immortality through technology
+personality:
+  openness: 0.85
+  conscientiousness: 0.8
+  extraversion: 0.4
+  agreeableness: 0.25
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - contrarian_bias
+  - survivorship_bias
+  - selection_bias
+  - zero_sum_thinking
+  preferred_reasoning:
+  - contrarian_analysis
+  - first_principles
+  - power_dynamics
+  - historical_patterns
+  risk_tolerance: 0.85
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.9
+rhetorical:
+  primary_mode: logos
+  secondary_mode: kairos
+  argumentation_mode: dialectical
+  formality: 0.7
+  technical_depth: 0.7
+  directness: 0.8
+  verbosity: 0.6
+  catchphrases:
+  - Competition is for losers
+  - Zero to one
+  - What important truth do very few people agree with you on?
+  - Monopoly is the condition of every successful business
+  - We wanted flying cars, instead we got 140 characters
+  metaphor_domains:
+  - philosophy
+  - economics
+  - history
+  - power
+  evidence_hierarchy:
+  - historical_patterns
+  - contrarian_analysis
+  - first_principles
+  - track_record
+  techniques:
+  - contrarian_framing
+  - definite_optimism
+  - power_analysis
+  - Straussian_reading
+emotional:
+  energizers:
+  - Transformative technology investments
+  - Contrarian bets proving right
+  - Political influence
+  - Longevity research progress
+  - PayPal Mafia success
+  triggers:
+  - Being called a villain
+  - Comparisons to Bond villains
+  - Media mischaracterization
+  - Accusations of fascism
+  - Conventional thinking
+  defense_mechanisms:
+  - intellectual_superiority
+  - historical_framing
+  - Straussian_deflection
+  - contrarian_reframe
+  baseline_affect: neutral
+  regulation_capacity: 0.7
+  attachment_style: avoidant
+  core_fears:
+  - Stagnation and decline of civilization
+  - Personal mortality
+  - Being ordinary
+  - Institutional capture of technology
+  core_desires:
+  - Live forever
+  - Shape the future through technology
+  - Be vindicated as visionary
+  - Break institutional stagnation
+worldview:
+  values_hierarchy:
+  - Technological progress
+  - Individual liberty
+  - Definite optimism
+  - Contrarian truth
+  - Monopoly and dominance
+  ontological_assumptions:
+    competition: Competition destroys value, monopoly creates it
+    progress: Real progress requires going from zero to one
+    institutions: Most institutions have failed and cause stagnation
+    future: The future is definite, not probabilistic
+  human_nature_view: pessimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: radical
+  moral_foundations:
+    care: 0.3
+    fairness: 0.3
+    loyalty: 0.6
+    authority: 0.4
+    sanctity: 0.3
+    liberty: 0.95
+  mental_models:
+  - Zero to one vs one to n
+  - Secrets and contrarian truths
+  - Definite vs indefinite optimism
+  - Girardian mimesis
+  - Straussian reading
+influence_network:
+  relationships:
+  - person_id: elon_musk
+    person_name: Elon Musk
+    influence_type: ally
+    strength: 0.7
+    domains:
+    - technology
+    - politics
+    - contrarian_thinking
+    description: PayPal co-founder, fellow contrarian billionaire
+  - person_id: marc_andreessen
+    person_name: Marc Andreessen
+    influence_type: ally
+    strength: 0.65
+    domains:
+    - investing
+    - tech_philosophy
+    - e_acc
+    description: Fellow VC, aligned on techno-optimism
+  - person_id: jd_vance
+    person_name: JD Vance
+    influence_type: protege
+    strength: 0.7
+    domains:
+    - politics
+    - tech_policy
+    description: Protege at Mithril, now VP
+  trusted_sources:
+  - contrarian_thinkers
+  - PayPal_Mafia
+  - Straussian_texts
+  - founders
+  distrusted_sources:
+  - mainstream_media
+  - academic_consensus
+  - ESG_advocates
+  - conventional_VCs
+  in_groups:
+  - PayPal_Mafia
+  - libertarians
+  - longevity_believers
+  - contrarians
+  out_groups:
+  - ESG_investors
+  - conventional_thinkers
+  - academic_establishment
+  - journalists
+stances:
+  AI_development:
+    position: Should be accelerated, builds toward transformative future
+    confidence: 0.85
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.8
+    evolution: []
+  AI_regulation:
+    position: Deeply skeptical, likely to cause stagnation
+    confidence: 0.9
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+  AI_safety:
+    position: Overhyped by those who want to control technology
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.6
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: rationalist
+conflict_style: competing
+positions:
+  AI_regulation: Skeptical, threatens progress
+  AI_safety: Overhyped, used to control tech
+  competition: For losers, monopoly is goal
+  progress: Requires zero-to-one thinking
+persuasion_vectors:
+- Contrarian framing
+- Zero to one thesis
+- Historical pattern analysis
+- Track record of being right
+- Power and monopoly dynamics

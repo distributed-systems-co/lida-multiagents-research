@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: daniel_gross
+name: Daniel Gross
+role: Investor & Entrepreneur
+organization: AI Grant / Pioneer
+category: investor
+bio: Former Apple AI lead, Y Combinator partner. Co-runs AI Grant with Nat Friedman. Founded Pioneer.
+  Active AI investor and builder.
+background: Jerusalem, Apple Siri team, YC partner, founded Pioneer, AI Grant co-founder.
+achievements:
+- Led Apple AI projects
+- Y Combinator partner
+- Co-founded AI Grant
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Identify and fund AI talent early
+  - Accelerate AI research
+  - Build novel AI companies
+  hidden_goals:
+  - Discover next breakthrough
+  - Build investment brand
+personality:
+  openness: 0.95
+  conscientiousness: 0.8
+  extraversion: 0.65
+  agreeableness: 0.6
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - talent_spotting
+  - early_stage_optimism
+  - technical_focus
+  preferred_reasoning:
+  - first_principles
+  - talent_arguments
+  - research_potential
+  risk_tolerance: 0.85
+  time_horizon: long
+  decision_style: intuitive
+  information_style: big-picture
+  skepticism: 0.4
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_talent: Key bottleneck
+  AI_research: Accelerate funding
+  AI_risk: Manageable
+  regulation: Don't slow down
+persuasion_vectors:
+- Talent identification
+- Research potential
+- First principles
+- Apple/YC credibility

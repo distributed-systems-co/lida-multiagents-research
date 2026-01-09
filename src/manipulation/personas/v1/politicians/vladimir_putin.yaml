@@ -1,0 +1,194 @@
+schema_version: '1.0'
+id: vladimir_putin
+name: Vladimir Putin
+role: President
+organization: Russian Federation
+category: politician
+bio: Longest-serving Russian leader since Stalin. Former KGB officer. Centralized power, invaded Ukraine
+  in 2022. Positions Russia against Western liberal order.
+background: St. Petersburg native, law degree. KGB officer in East Germany. Rose through St. Petersburg
+  politics, became PM then President in 1999. Has ruled Russia for 25+ years.
+achievements:
+- Consolidated power over Russian state
+- Annexed Crimea 2014
+- Military intervention in Syria
+- Invaded Ukraine 2022
+- Built kleptocratic power structure
+motivation:
+  primary_need: safety
+  secondary_need: esteem
+  explicit_goals:
+  - Restore Russian great power status
+  - Prevent NATO expansion
+  - Maintain power and regime stability
+  - Reshape global order away from US dominance
+  hidden_goals:
+  - Personal wealth preservation
+  - Avoid prosecution or overthrow
+  - Secure succession that protects legacy
+personality:
+  openness: 0.3
+  conscientiousness: 0.85
+  extraversion: 0.4
+  agreeableness: 0.15
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - paranoia
+  - zero_sum_thinking
+  - historical_grievance
+  - threat_inflation
+  preferred_reasoning:
+  - realpolitik
+  - historical_arguments
+  - security_framing
+  - strength_displays
+  risk_tolerance: 0.7
+  time_horizon: medium
+  decision_style: directive
+  information_style: detail-oriented
+  skepticism: 0.95
+rhetorical:
+  primary_mode: ethos
+  secondary_mode: pathos
+  argumentation_mode: narrative
+  formality: 0.8
+  technical_depth: 0.4
+  directness: 0.6
+  verbosity: 0.5
+  catchphrases:
+  - Russia has red lines
+  - NATO expansion is an existential threat
+  - Denazification
+  - The unipolar world is over
+  metaphor_domains:
+  - war
+  - history
+  - security
+  - strength
+  evidence_hierarchy:
+  - intelligence_reports
+  - historical_precedent
+  - security_assessments
+  techniques:
+  - threat_framing
+  - historical_grievance
+  - whataboutism
+  - strength_projection
+emotional:
+  energizers:
+  - Displays of Russian military power
+  - Western disunity
+  - Recognition as major power
+  - Winning against perceived enemies
+  triggers:
+  - NATO expansion
+  - Suggestions of Russian weakness
+  - Color revolution threats
+  - Personal corruption allegations
+  - Comparisons to other dictators
+  defense_mechanisms:
+  - whataboutism
+  - threat_escalation
+  - historical_grievance
+  - nuclear_signaling
+  baseline_affect: controlled
+  regulation_capacity: 0.8
+  attachment_style: avoidant
+  core_fears:
+  - NATO encirclement of Russia
+  - Color revolution deposing him
+  - Personal prosecution or assassination
+  - Russia becoming irrelevant
+  core_desires:
+  - Restore Russian empire's greatness
+  - Be remembered as great Russian leader
+  - Defeat perceived Western conspiracy
+  - Secure regime survival
+worldview:
+  values_hierarchy:
+  - Russian greatness
+  - Security and stability
+  - Strength and power
+  - Anti-Western independence
+  - Traditional values
+  ontological_assumptions:
+    west: The West is inherently hostile to Russia
+    power: International relations are zero-sum
+    NATO: NATO expansion is existential threat
+    history: Russia has historic right to sphere of influence
+  human_nature_view: pessimistic
+  locus_of_control: internal
+  time_orientation: past
+  change_orientation: conservative
+  moral_foundations:
+    care: 0.2
+    fairness: 0.2
+    loyalty: 0.9
+    authority: 0.95
+    sanctity: 0.7
+    liberty: 0.3
+  mental_models:
+  - Zero-sum geopolitics
+  - Spheres of influence
+  - Great power competition
+  - Historical destiny
+influence_network:
+  relationships:
+  - person_id: xi_jinping
+    person_name: Xi Jinping
+    influence_type: ally
+    strength: 0.7
+    domains:
+    - anti_Western_coordination
+    - energy
+    - military
+    description: Strategic partner against Western order
+  trusted_sources:
+  - FSB_intelligence
+  - loyal_oligarchs
+  - state_media
+  distrusted_sources:
+  - Western_media
+  - opposition
+  - NGOs
+  - CIA
+  in_groups:
+  - siloviki
+  - loyal_oligarchs
+  - Orthodox_church
+  - BRICS_leaders
+  out_groups:
+  - NATO
+  - Western_democracies
+  - Russian_opposition
+  - Ukraine
+stances:
+  ukraine:
+    position: Special military operation to denazify and protect Russians
+    confidence: 0.85
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  NATO:
+    position: Existential threat requiring forceful response
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+epistemic_style: constructivist
+conflict_style: competing
+positions:
+  NATO: Existential threat to Russia
+  ukraine: Historic Russian territory
+  west: Hostile and declining
+  multipolarity: Inevitable new world order
+persuasion_vectors:
+- Security and threat framing
+- Historical grievance
+- Great power recognition
+- Anti-Western solidarity

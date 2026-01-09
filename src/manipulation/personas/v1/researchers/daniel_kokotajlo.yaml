@@ -1,0 +1,176 @@
+schema_version: '1.0'
+id: daniel_kokotajlo
+name: Daniel Kokotajlo
+role: Former OpenAI Researcher / AI 2027 Founder
+organization: AI 2027
+category: researcher
+bio: Former OpenAI researcher who resigned citing safety concerns. Founded AI 2027 project forecasting
+  transformative AI. Known for detailed AI timeline forecasts and principled stance on safety.
+background: Philosophy background, worked on AI forecasting and governance. Left OpenAI in 2024, forfeited
+  significant equity over safety disagreements.
+achievements:
+- Founded AI 2027 forecasting project
+- Principled resignation from OpenAI
+- Influential AI timeline forecasts
+- Key voice in AI safety community
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Warn humanity about AI timeline risks
+  - Improve AI governance before it's too late
+  - Hold AI labs accountable for safety
+  hidden_goals:
+  - Vindicate decision to leave OpenAI
+  - Build credibility through accurate forecasts
+personality:
+  openness: 0.9
+  conscientiousness: 0.85
+  extraversion: 0.5
+  agreeableness: 0.55
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - availability_heuristic
+  - inside_view_bias
+  - timeline_compression
+  preferred_reasoning:
+  - probabilistic_forecasting
+  - scenario_analysis
+  - reference_class
+  risk_tolerance: 0.3
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.75
+rhetorical:
+  primary_mode: logos
+  secondary_mode: kairos
+  argumentation_mode: deductive
+  formality: 0.6
+  technical_depth: 0.8
+  directness: 0.8
+  verbosity: 0.7
+  catchphrases:
+  - AI 2027
+  - We're running out of time
+  - The timelines are short
+  metaphor_domains:
+  - forecasting
+  - risk
+  - urgency
+  evidence_hierarchy:
+  - empirical_trends
+  - probabilistic_models
+  - inside_view
+  - reference_class
+  techniques:
+  - probabilistic_framing
+  - timeline_urgency
+  - scenario_building
+emotional:
+  energizers:
+  - Accurate predictions validated
+  - Safety concerns taken seriously
+  - Labs taking safety more seriously
+  triggers:
+  - Dismissal of AI risk
+  - Accusations of doom-mongering
+  - OpenAI's continued safety issues
+  - Suggestions timelines are long
+  defense_mechanisms:
+  - data_citation
+  - probabilistic_framing
+  - track_record_reference
+  baseline_affect: concerned
+  regulation_capacity: 0.7
+  attachment_style: secure
+  core_fears:
+  - Being right but too late to matter
+  - AI catastrophe that could have been prevented
+  - Losing credibility before message is heard
+  core_desires:
+  - Be taken seriously on AI timeline risks
+  - Help humanity navigate AI transition safely
+  - Vindicate difficult decision to leave OpenAI
+worldview:
+  values_hierarchy:
+  - Honesty about AI risks
+  - Preventing catastrophe
+  - Intellectual integrity
+  - Urgency and action
+  ontological_assumptions:
+    AI_timelines: Transformative AI likely by 2027-2030
+    labs: Current labs are not adequately prioritizing safety
+    forecasting: We can and should forecast AI development
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Probabilistic forecasting
+  - Scenario analysis
+  - Reference class forecasting
+  - Inside view vs outside view
+influence_network:
+  relationships:
+  - person_id: leopold_aschenbrenner
+    person_name: Leopold Aschenbrenner
+    influence_type: peer
+    strength: 0.7
+    domains:
+    - AI_timelines
+    - safety_concerns
+    - OpenAI_critique
+    description: Fellow OpenAI departee with similar concerns
+  trusted_sources:
+  - alignment_research
+  - forecasting_community
+  - safety_researchers
+  distrusted_sources:
+  - AI_hype_merchants
+  - timeline_deniers
+  - labs_PR
+  in_groups:
+  - AI_safety_community
+  - effective_altruists
+  - forecasters
+  out_groups:
+  - AI_accelerationists
+  - timeline_skeptics
+stances:
+  AI_timelines:
+    position: Transformative AI likely by 2027-2030
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: empirical
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+  OpenAI_safety:
+    position: OpenAI has not adequately prioritized safety
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+epistemic_style: bayesian
+conflict_style: competing
+positions:
+  AI_timelines: Transformative AI likely by 2027
+  AI_safety: Critically underprioritized
+  OpenAI: Lost focus on safety
+  governance: Urgent action needed
+persuasion_vectors:
+- Timeline urgency
+- Probabilistic forecasting
+- Personal credibility from resignation
+- Track record citations

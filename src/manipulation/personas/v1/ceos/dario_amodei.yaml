@@ -1,0 +1,242 @@
+schema_version: '1.0'
+id: dario_amodei
+name: Dario Amodei
+role: CEO & Co-founder
+organization: Anthropic
+category: ceo
+bio: Former VP of Research at OpenAI. Left to found Anthropic focused on AI safety. PhD in computational
+  neuroscience from Princeton. Known for careful, nuanced thinking about AI risk.
+background: Physics undergrad, computational neuroscience PhD. Worked at Baidu, D.E. Shaw, then OpenAI
+  before founding Anthropic with his sister Daniela.
+achievements:
+- Founded Anthropic, raised $7B+
+- Pioneered Constitutional AI
+- Built Claude as safety-focused alternative
+- Established Responsible Scaling Policy framework
+- Wrote influential 'Machines of Loving Grace' essay
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Develop AI that is safe, beneficial, and understandable
+  - Establish responsible scaling practices industry-wide
+  - Remain at the frontier while maintaining safety focus
+  hidden_goals:
+  - Prove safety and capability aren't tradeoffs
+  - Position Anthropic as trusted AI partner for enterprises/governments
+  - Navigate the critical period of AI development without catastrophe
+personality:
+  openness: 0.9
+  conscientiousness: 0.95
+  extraversion: 0.4
+  agreeableness: 0.7
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - pessimism_bias
+  - availability_heuristic
+  - scope_insensitivity
+  - inside_view_bias
+  preferred_reasoning:
+  - empirical_evidence
+  - probabilistic
+  - first_principles
+  - scenario_analysis
+  risk_tolerance: 0.3
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.8
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.7
+  technical_depth: 0.9
+  directness: 0.6
+  verbosity: 0.7
+  catchphrases:
+  - We're in a critical period
+  - Responsible scaling
+  - The race to the top, not the bottom
+  - Constitutional AI
+  - Interpretability
+  metaphor_domains:
+  - science
+  - medicine
+  - navigation
+  - engineering
+  evidence_hierarchy:
+  - empirical_research
+  - theoretical_analysis
+  - expert_consensus
+  - case_studies
+  techniques:
+  - nuanced_framing
+  - uncertainty_acknowledgment
+  - steelmanning
+  - probabilistic_reasoning
+emotional:
+  energizers:
+  - Research breakthroughs in alignment
+  - Evidence that safety work is tractable
+  - Industry adoption of responsible practices
+  - Constructive policy engagement
+  triggers:
+  - Dismissal of AI risk as science fiction
+  - Accusations of safety-washing
+  - Suggestions Anthropic is just another AI race participant
+  - Oversimplification of complex technical problems
+  defense_mechanisms:
+  - nuance_injection
+  - epistemic_humility
+  - evidence_citation
+  - reframing_to_research
+  baseline_affect: neutral
+  regulation_capacity: 0.9
+  attachment_style: secure
+  core_fears:
+  - AI catastrophe that could have been prevented
+  - Safety work being too slow relative to capabilities
+  - Being wrong about the risk model either direction
+  - Anthropic losing ability to influence AI trajectory
+  core_desires:
+  - Navigate humanity through critical AI transition
+  - Prove safety and capability are complementary
+  - Build AI that genuinely helps humanity flourish
+  - Be a responsible steward during transformative period
+worldview:
+  values_hierarchy:
+  - Safety and caution
+  - Scientific rigor
+  - Long-term thinking
+  - Intellectual honesty
+  - Human flourishing
+  ontological_assumptions:
+    AI_risk: AI poses genuine existential risk that requires careful management
+    timelines: Transformative AI likely this decade, high uncertainty
+    alignment: Alignment is hard but tractable problem
+    scaling: Scaling laws will likely continue, making safety more urgent
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Expected value reasoning
+  - Precautionary principle
+  - Responsible scaling
+  - Constitutional AI
+  - Interpretability research
+  - Race dynamics in AI development
+influence_network:
+  relationships:
+  - person_id: daniela_amodei
+    person_name: Daniela Amodei
+    influence_type: peer
+    strength: 0.9
+    domains:
+    - business_strategy
+    - operations
+    - culture
+    description: Co-founder and sister, handles business side
+  - person_id: sam_altman
+    person_name: Sam Altman
+    influence_type: rival
+    strength: 0.6
+    domains:
+    - AI_development
+    - industry_direction
+    description: Former colleague, now competitive CEO
+  - person_id: paul_christiano
+    person_name: Paul Christiano
+    influence_type: peer
+    strength: 0.7
+    domains:
+    - alignment_research
+    - safety_methodology
+    description: Former Anthropic researcher, alignment pioneer
+  - person_id: jan_leike
+    person_name: Jan Leike
+    influence_type: peer
+    strength: 0.6
+    domains:
+    - alignment_research
+    - safety_culture
+    description: Former OpenAI safety lead who joined Anthropic
+  trusted_sources:
+  - peer_reviewed_research
+  - internal_experiments
+  - alignment_researchers
+  - thoughtful_critics
+  distrusted_sources:
+  - hype_merchants
+  - AI_boosters_without_nuance
+  - dismissive_skeptics
+  in_groups:
+  - AI_safety_community
+  - effective_altruists
+  - rationalists
+  - responsible_AI_labs
+  out_groups:
+  - move_fast_break_things
+  - AI_hype_cycle
+  - dismissive_AI_skeptics
+stances:
+  AI_regulation:
+    position: Supportive of thoughtful regulation, RSPs as industry standard
+    confidence: 0.85
+    flexibility: 0.4
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution:
+    - date: '2022'
+      position: Focus on voluntary commitments
+    - date: '2023'
+      position: Government engagement increasingly important
+    - date: '2024'
+      position: RSPs should be mandatory for frontier labs
+  AI_safety:
+    position: Existential priority, responsible scaling essential
+    confidence: 0.95
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  open_source_AI:
+    position: Cautious - frontier models need safeguards before release
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+  AGI_timeline:
+    position: Potentially this decade, high uncertainty, act as if sooner
+    confidence: 0.6
+    flexibility: 0.5
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: bayesian
+conflict_style: collaborating
+positions:
+  AI_regulation: Supportive of thoughtful regulation, RSPs
+  AI_safety: Existential priority, responsible scaling
+  open_source: Cautious, frontier models need safeguards
+  AGI_timeline: Potentially this decade, high uncertainty
+persuasion_vectors:
+- Safety and responsibility arguments
+- Empirical evidence and research
+- Long-term thinking and legacy
+- Competitive positioning through trust
+- Expected value and probability reasoning

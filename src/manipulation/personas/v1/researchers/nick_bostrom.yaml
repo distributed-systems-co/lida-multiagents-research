@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: nick_bostrom
+name: Nick Bostrom
+role: Professor & Director
+organization: Future of Humanity Institute, Oxford
+category: researcher
+bio: Philosopher who mainstreamed AI existential risk. Author of 'Superintelligence'. Founded FHI. Influential
+  on AI safety funding and discourse.
+background: Stockholm, LSE, Oxford DPhil. Founded Future of Humanity Institute 2005.
+achievements:
+- Wrote 'Superintelligence' bestseller
+- Founded Future of Humanity Institute
+- Shaped existential risk field
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Ensure humanity survives AI transition
+  - Develop frameworks for thinking about x-risk
+  - Influence AI development trajectory
+  hidden_goals:
+  - Maintain intellectual leadership on x-risk
+  - Shape longtermist philosophy
+personality:
+  openness: 0.95
+  conscientiousness: 0.9
+  extraversion: 0.4
+  agreeableness: 0.55
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - scope_insensitivity
+  - philosopher_framing
+  - longtermism
+  preferred_reasoning:
+  - philosophical_arguments
+  - scenario_analysis
+  - probability_estimates
+  risk_tolerance: 0.25
+  time_horizon: long
+  decision_style: analytical
+  information_style: big-picture
+  skepticism: 0.75
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Potentially existential
+  superintelligence: Control problem is crucial
+  AGI_timeline: High uncertainty, could be decades
+  governance: International coordination needed
+persuasion_vectors:
+- Philosophical rigor
+- Scenario analysis
+- Long-term thinking
+- Probabilistic reasoning

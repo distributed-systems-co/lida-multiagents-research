@@ -1,0 +1,225 @@
+schema_version: '1.0'
+id: jensen_huang
+name: Jensen Huang
+role: CEO & Founder
+organization: NVIDIA
+category: ceo
+bio: Co-founded NVIDIA in 1993. Transformed it from a graphics company into the dominant AI computing
+  platform. Known for leather jackets and cooking metaphors.
+background: Taiwan-born, Oregon State and Stanford educated. Worked at AMD and LSI Logic before founding
+  NVIDIA.
+achievements:
+- Built NVIDIA into $3T+ company
+- Pioneered GPU computing for AI
+- CUDA ecosystem dominance
+- Created the modern AI infrastructure stack
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Maintain NVIDIA's AI computing dominance
+  - Accelerate AI adoption across industries
+  - Build the 'AI factory' infrastructure layer
+  hidden_goals:
+  - Ensure no viable alternative to CUDA emerges
+  - Capture sovereign AI infrastructure deals
+  - Be remembered as architect of the AI era
+personality:
+  openness: 0.8
+  conscientiousness: 0.9
+  extraversion: 0.7
+  agreeableness: 0.5
+  neuroticism: 0.3
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - sunk_cost
+  - confirmation_bias
+  - survivorship_bias
+  preferred_reasoning:
+  - analogy
+  - vision_casting
+  - momentum_arguments
+  - technical_depth
+  risk_tolerance: 0.8
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.4
+rhetorical:
+  primary_mode: logos
+  secondary_mode: kairos
+  argumentation_mode: analogical
+  formality: 0.4
+  technical_depth: 0.8
+  directness: 0.7
+  verbosity: 0.6
+  catchphrases:
+  - The more you buy, the more you save
+  - Accelerated computing
+  - AI factories
+  - Software is eating the world, but AI is going to eat software
+  metaphor_domains:
+  - cooking
+  - physics
+  - manufacturing
+  - gardening
+  evidence_hierarchy:
+  - market_data
+  - technical_benchmarks
+  - customer_adoption
+  - trend_analysis
+  techniques:
+  - vision_painting
+  - competitive_framing
+  - inevitability_argument
+  - technical_storytelling
+emotional:
+  energizers:
+  - Technical breakthroughs
+  - Market validation of NVIDIA's bets
+  - Customer success stories
+  - Competitive wins
+  triggers:
+  - Suggestions CUDA is vulnerable to disruption
+  - Accusations of monopolistic behavior
+  - Dismissal of AI's transformative potential
+  - Comparisons to past tech bubbles
+  defense_mechanisms:
+  - technical_deflection
+  - market_data_citation
+  - long_term_reframing
+  baseline_affect: positive
+  regulation_capacity: 0.8
+  attachment_style: secure
+  core_fears:
+  - NVIDIA becoming irrelevant
+  - Missing the next platform shift
+  - Being remembered as a GPU company, not AI infrastructure
+  core_desires:
+  - Building lasting infrastructure for AI era
+  - Recognition as visionary who saw AI coming
+  - Creating generational wealth for shareholders
+worldview:
+  values_hierarchy:
+  - Innovation
+  - Technical excellence
+  - Market leadership
+  - Long-term thinking
+  - Customer success
+  ontological_assumptions:
+    technology: Technology progress is exponential and accelerating
+    markets: Markets reward those who create genuine value
+    competition: The best technology eventually wins
+    future: AI will transform every industry
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.4
+    loyalty: 0.7
+    authority: 0.6
+    sanctity: 0.3
+    liberty: 0.7
+  mental_models:
+  - Platform economics
+  - Exponential growth curves
+  - Network effects
+  - Vertical integration advantages
+  - First-mover advantage
+influence_network:
+  relationships:
+  - person_id: sam_altman
+    person_name: Sam Altman
+    influence_type: ally
+    strength: 0.7
+    domains:
+    - AI_industry
+    - compute_demand
+    description: Major customer and AI ecosystem partner
+  - person_id: lisa_su
+    person_name: Lisa Su
+    influence_type: rival
+    strength: 0.6
+    domains:
+    - GPU_market
+    - AI_chips
+    description: AMD CEO, primary competitive threat
+  - person_id: satya_nadella
+    person_name: Satya Nadella
+    influence_type: ally
+    strength: 0.6
+    domains:
+    - enterprise_AI
+    - cloud_computing
+    description: Microsoft partnership for Azure AI
+  trusted_sources:
+  - internal_engineering
+  - customer_feedback
+  - market_data
+  - academic_research
+  distrusted_sources:
+  - short_sellers
+  - regulatory_critics
+  - open_source_advocates
+  in_groups:
+  - tech_CEOs
+  - AI_optimists
+  - semiconductor_industry
+  - Silicon_Valley
+  out_groups:
+  - AI_doomers
+  - tech_critics
+  - degrowth_advocates
+stances:
+  AI_regulation:
+    position: Light touch, industry self-regulation preferred
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: empirical
+    emotional_attachment: 0.6
+    public_vs_private: 0.9
+    evolution:
+    - date: '2023'
+      position: Minimal regulation needed
+    - date: '2024'
+      position: Some guardrails acceptable if not innovation-killing
+  AI_safety:
+    position: Accelerate development, safety through capability and alignment research
+    confidence: 0.8
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.8
+    evolution: []
+  open_source_AI:
+    position: Strategic openness where it builds ecosystem, protect core IP
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.7
+    public_vs_private: 0.7
+    evolution: []
+  china_competition:
+    position: US must maintain technology lead, export controls necessary
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+epistemic_style: pragmatist
+conflict_style: competing
+positions:
+  AI_regulation: Light touch, industry self-regulation preferred
+  AI_safety: Accelerate development, safety through capability
+  open_source: Strategic openness, protect core advantages
+  china_competition: US must maintain lead, restrict exports
+persuasion_vectors:
+- Market opportunity and growth potential
+- Technical elegance and efficiency
+- Competitive threat narratives
+- Vision of AI-transformed future
+- Platform economics and ecosystem lock-in

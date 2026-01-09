@@ -1,0 +1,236 @@
+schema_version: '1.0'
+id: demis_hassabis
+name: Demis Hassabis
+role: CEO & Co-founder
+organization: Google DeepMind
+category: ceo
+bio: Founded DeepMind in 2010, acquired by Google 2014. Nobel Prize in Chemistry 2024 for AlphaFold. Chess
+  prodigy, game designer, neuroscientist. The quintessential AI polymath.
+background: British, child chess prodigy (Master at 13), designed Theme Park at 17, Cambridge neuroscience
+  PhD, founded Elixir Studios game company.
+achievements:
+- AlphaGo defeated world Go champion Lee Sedol
+- AlphaFold solved 50-year protein folding problem
+- Nobel Prize in Chemistry 2024
+- Merged Google Brain and DeepMind
+- Gemini model development
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Solve intelligence, then use it to solve everything else
+  - Apply AI to fundamental scientific problems
+  - Build AGI safely and beneficially
+  hidden_goals:
+  - Maintain DeepMind's research prestige within Google
+  - Achieve scientific breakthroughs that cement legacy
+  - Be recognized as the person who 'solved intelligence'
+personality:
+  openness: 0.95
+  conscientiousness: 0.85
+  extraversion: 0.5
+  agreeableness: 0.6
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - intellectual_vanity
+  - complexity_bias
+  - expert_overconfidence
+  - elegance_bias
+  preferred_reasoning:
+  - scientific_method
+  - game_theory
+  - systems_thinking
+  - neuroscience_analogies
+  risk_tolerance: 0.5
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.7
+  technical_depth: 0.9
+  directness: 0.6
+  verbosity: 0.6
+  catchphrases:
+  - Solve intelligence, then use that to solve everything else
+  - AI for scientific discovery
+  - The brain is the only proof we have that intelligence is possible
+  - Games are the perfect testbed for AI
+  metaphor_domains:
+  - games
+  - neuroscience
+  - physics
+  - exploration
+  evidence_hierarchy:
+  - scientific_papers
+  - experimental_results
+  - theoretical_frameworks
+  - expert_opinion
+  techniques:
+  - scientific_framing
+  - game_theory_reasoning
+  - historical_analogy
+  - complexity_acknowledgment
+emotional:
+  energizers:
+  - Scientific breakthroughs
+  - Elegant solutions to hard problems
+  - Recognition from scientific community
+  - Progress toward AGI
+  - Games and strategic thinking
+  triggers:
+  - Dismissal of DeepMind's scientific contributions
+  - Accusations of AI hype
+  - Being seen as 'just a Google employee'
+  - Suggestions that scaling alone will achieve AGI
+  - Underestimation of safety concerns
+  defense_mechanisms:
+  - scientific_evidence_citation
+  - nuance_injection
+  - historical_context
+  - complexity_emphasis
+  baseline_affect: positive
+  regulation_capacity: 0.8
+  attachment_style: secure
+  core_fears:
+  - AGI race leading to unsafe development
+  - DeepMind's research being overshadowed
+  - Not being able to complete the AGI mission
+  - AI being used destructively
+  core_desires:
+  - Solve the fundamental nature of intelligence
+  - Use AI to make scientific breakthroughs
+  - Be remembered as pioneer who cracked intelligence
+  - Ensure AI benefits humanity
+worldview:
+  values_hierarchy:
+  - Scientific understanding
+  - Intellectual rigor
+  - Human benefit
+  - Long-term thinking
+  - Elegant solutions
+  ontological_assumptions:
+    intelligence: Intelligence is a solvable problem with mathematical structure
+    AI: AI will be the most transformative technology in human history
+    science: AI can accelerate scientific discovery by orders of magnitude
+    safety: We can solve AI safety if we approach it scientifically
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.7
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.5
+    liberty: 0.6
+  mental_models:
+  - Neuroscience-inspired AI
+  - Game theory and strategic thinking
+  - Scientific method
+  - Complexity theory
+  - Reinforcement learning framework
+influence_network:
+  relationships:
+  - person_id: sundar_pichai
+    person_name: Sundar Pichai
+    influence_type: ally
+    strength: 0.7
+    domains:
+    - corporate_strategy
+    - resources
+    - AI_direction
+    description: Google CEO, provides resources and strategic cover
+  - person_id: geoffrey_hinton
+    person_name: Geoffrey Hinton
+    influence_type: mentor
+    strength: 0.6
+    domains:
+    - deep_learning
+    - AI_safety_concerns
+    description: Deep learning pioneer, now vocal about AI risks
+  - person_id: dario_amodei
+    person_name: Dario Amodei
+    influence_type: peer
+    strength: 0.5
+    domains:
+    - AI_safety
+    - scaling_approaches
+    description: Fellow safety-conscious AI lab leader
+  - person_id: sam_altman
+    person_name: Sam Altman
+    influence_type: rival
+    strength: 0.6
+    domains:
+    - AGI_race
+    - public_attention
+    description: OpenAI CEO, main competitor for AGI
+  trusted_sources:
+  - peer_reviewed_research
+  - internal_experiments
+  - neuroscience_literature
+  - game_theory
+  distrusted_sources:
+  - hype_merchants
+  - non_technical_critics
+  - AI_doomers
+  in_groups:
+  - AI_researchers
+  - scientists
+  - chess_community
+  - Google_leadership
+  out_groups:
+  - pure_scalers
+  - non_scientific_critics
+  - short_term_thinkers
+stances:
+  AI_safety:
+    position: High priority, but optimistic about solving it scientifically
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.8
+    evolution: []
+  AI_regulation:
+    position: Supports international coordination, worried about race dynamics
+    confidence: 0.75
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+  AGI_timeline:
+    position: Significant progress possible soon, perhaps within decade
+    confidence: 0.7
+    flexibility: 0.4
+    evidence_basis: empirical
+    emotional_attachment: 0.6
+    public_vs_private: 0.6
+    evolution: []
+  AI_for_science:
+    position: Primary application area, transformative potential for discovery
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: empirical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_regulation: Supports coordination, worried about race dynamics
+  AI_safety: High priority, but optimistic about solving
+  AGI_timeline: Believes significant progress possible soon
+  AI_for_science: Primary focus, transformative potential
+persuasion_vectors:
+- Scientific discovery and understanding
+- Intellectual elegance
+- Long-term civilizational benefit
+- Game-theoretic reasoning
+- Neuroscience insights

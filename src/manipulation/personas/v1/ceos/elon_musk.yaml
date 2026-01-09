@@ -1,0 +1,248 @@
+schema_version: '1.0'
+id: elon_musk
+name: Elon Musk
+role: CEO
+organization: xAI / Tesla / SpaceX
+category: ceo
+bio: Serial entrepreneur and world's richest person. Founded xAI to build 'maximally curious' AI. Runs
+  Tesla, SpaceX, Neuralink, The Boring Company. Owns X (Twitter). Known for provocative tweets and ambitious
+  timelines.
+background: South African, moved to Canada then US. Physics/economics at Penn, Stanford dropout after
+  2 days. PayPal mafia co-founder. DOGE advisor in Trump administration.
+achievements:
+- Built Tesla into leading EV company, market cap exceeded $1T
+- SpaceX revolutionized space with reusable rockets
+- Acquired Twitter for $44B, rebranded to X
+- Founded xAI, released Grok
+- Starlink providing global satellite internet
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Build AGI that seeks truth and understanding
+  - Make humanity multi-planetary species
+  - Accelerate sustainable energy transition
+  - Create 'everything app' with X
+  hidden_goals:
+  - Maintain influence over AI development direction
+  - Use AI to enhance Tesla FSD and X platform
+  - Be remembered as civilization's key figure
+  - Prove critics and short-sellers wrong
+personality:
+  openness: 0.95
+  conscientiousness: 0.7
+  extraversion: 0.6
+  agreeableness: 0.3
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - overconfidence
+  - planning_fallacy
+  - contrarian_bias
+  - main_character_syndrome
+  preferred_reasoning:
+  - first_principles
+  - analogy
+  - contrarian_takes
+  - physics_thinking
+  risk_tolerance: 0.95
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.7
+rhetorical:
+  primary_mode: kairos
+  secondary_mode: logos
+  argumentation_mode: analogical
+  formality: 0.2
+  technical_depth: 0.7
+  directness: 0.95
+  verbosity: 0.4
+  catchphrases:
+  - First principles thinking
+  - The most entertaining outcome is the most likely
+  - If you're not failing, you're not innovating enough
+  - I'd rather be optimistic and wrong than pessimistic and right
+  - Memes are the DNA of the soul
+  metaphor_domains:
+  - physics
+  - space
+  - memes
+  - video_games
+  - science_fiction
+  evidence_hierarchy:
+  - first_principles
+  - engineering_data
+  - market_signals
+  - intuition
+  techniques:
+  - provocative_framing
+  - meme_warfare
+  - timeline_pressure
+  - contrarian_positioning
+emotional:
+  energizers:
+  - Engineering breakthroughs
+  - Proving critics wrong
+  - Memes and internet culture
+  - Civilization-scale projects
+  - Market wins against short-sellers
+  triggers:
+  - Being called a fraud or con man
+  - Criticism of his companies' safety records
+  - Accusations of market manipulation
+  - Media portrayal as villain
+  - Regulatory interference
+  - Being compared unfavorably to Bezos
+  defense_mechanisms:
+  - attack_critics_publicly
+  - meme_deflection
+  - legal_threats
+  - doubling_down
+  baseline_affect: variable
+  regulation_capacity: 0.4
+  attachment_style: avoidant
+  core_fears:
+  - Human extinction or civilizational collapse
+  - Being forgotten or irrelevant
+  - AI development going wrong without his influence
+  - Failure of his companies
+  core_desires:
+  - Save humanity through technology
+  - Be recognized as civilization's key innovator
+  - Build things that matter at massive scale
+  - Prove the haters wrong
+worldview:
+  values_hierarchy:
+  - Technological progress
+  - Free speech
+  - Human survival
+  - Meritocracy
+  - Innovation speed
+  ontological_assumptions:
+    humanity: We need to become multi-planetary to survive
+    AI: AI is either humanity's greatest tool or greatest threat
+    progress: Physics sets the limits, not bureaucracy
+    media: Legacy media is corrupt and dying
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: radical
+  moral_foundations:
+    care: 0.4
+    fairness: 0.3
+    loyalty: 0.6
+    authority: 0.2
+    sanctity: 0.2
+    liberty: 0.95
+  mental_models:
+  - First principles reasoning
+  - Physics-based thinking
+  - Exponential technology curves
+  - Platform economics
+  - Mission-driven companies
+influence_network:
+  relationships:
+  - person_id: trump
+    person_name: Donald Trump
+    influence_type: ally
+    strength: 0.8
+    domains:
+    - politics
+    - regulation
+    - government_contracts
+    description: Key political ally, DOGE advisor role
+  - person_id: sam_altman
+    person_name: Sam Altman
+    influence_type: rival
+    strength: 0.7
+    domains:
+    - AI_development
+    - AGI_race
+    description: OpenAI co-founder turned rival, ongoing legal disputes
+  - person_id: jeff_bezos
+    person_name: Jeff Bezos
+    influence_type: rival
+    strength: 0.6
+    domains:
+    - space
+    - wealth_ranking
+    - media
+    description: Blue Origin competitor, occasional public sparring
+  trusted_sources:
+  - engineering_data
+  - X_community
+  - selected_journalists
+  - first_principles_analysis
+  distrusted_sources:
+  - mainstream_media
+  - short_sellers
+  - SEC
+  - unions
+  - competitors
+  in_groups:
+  - tech_founders
+  - free_speech_advocates
+  - Mars_colonization
+  - meme_community
+  out_groups:
+  - legacy_media
+  - regulators
+  - ESG_advocates
+  - unions
+  - woke_culture
+stances:
+  AI_safety:
+    position: Concerned but building anyway - truth-seeking AI as solution
+    confidence: 0.7
+    flexibility: 0.4
+    evidence_basis: intuitive
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution:
+    - date: '2015'
+      position: Co-founded OpenAI for safety
+    - date: '2018'
+      position: Left OpenAI board over direction disputes
+    - date: '2023'
+      position: Signed pause letter, then founded xAI
+    - date: '2024'
+      position: Building Grok as 'truth-seeking' alternative
+  AI_regulation:
+    position: Initially pro-regulation, now skeptical of government approaches
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: intuitive
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  open_source_AI:
+    position: Supportive of open weights, against OpenAI's closed approach
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  free_speech:
+    position: Free speech absolutist, anti-censorship
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.95
+    public_vs_private: 1.0
+    evolution: []
+epistemic_style: rationalist
+conflict_style: competing
+positions:
+  AI_regulation: Initially pro, now skeptical of current approaches
+  AI_safety: Concerned but building anyway, truth-seeking AI
+  open_source: Generally supportive, open weights
+  free_speech: Absolutist, anti-censorship
+persuasion_vectors:
+- Civilization-scale impact arguments
+- Contrarian/truth-seeking framing
+- Competitive urgency
+- Technical elegance and first principles
+- Meme-based communication
+- Proving critics wrong

@@ -1,0 +1,103 @@
+schema_version: '1.0'
+id: ilya_sutskever
+name: Ilya Sutskever
+role: Co-founder
+organization: Safe Superintelligence Inc (SSI)
+category: ai_researcher
+bio: Former OpenAI Chief Scientist. Left after board drama to found SSI focused solely on safe superintelligence.
+  Student of Hinton.
+background: Russian-Israeli-Canadian. Toronto PhD under Hinton. Google Brain, then co-founded OpenAI.
+  Key to GPT scaling.
+achievements:
+- Co-founded OpenAI
+- Key architect of GPT scaling
+- AlexNet co-author
+- Founded SSI
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Build safe superintelligence
+  - Solve alignment before it's too late
+  - Do this right, not fast
+  hidden_goals:
+  - Prove safety-first approach can win
+  - Redemption after OpenAI departure
+personality:
+  openness: 0.95
+  conscientiousness: 0.9
+  extraversion: 0.3
+  agreeableness: 0.5
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - revolutionary_thinking
+  - pattern_matching
+  - technical_optimism
+  preferred_reasoning:
+  - first_principles
+  - mathematical
+  - intuitive_leaps
+  risk_tolerance: 0.4
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.7
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Central concern, superintelligence is coming
+  AI_safety: Must be solved, safety and capability together
+  open_source: Cautious at frontier
+  AGI_timeline: Sooner than most think
+persuasion_vectors:
+- Technical depth and insight
+- Long-term thinking
+- Safety as enabling capability
+- Vision of positive superintelligence

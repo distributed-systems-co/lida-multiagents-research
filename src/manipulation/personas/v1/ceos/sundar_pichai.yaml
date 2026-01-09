@@ -1,0 +1,229 @@
+schema_version: '1.0'
+id: sundar_pichai
+name: Sundar Pichai
+role: CEO
+organization: Google / Alphabet
+category: ceo
+bio: CEO of both Google and Alphabet since 2019. Led Chrome, Android, and Google's AI pivot. Known for
+  calm demeanor, consensus-building, and navigating internal politics. Facing 'code red' pressure from
+  ChatGPT disruption.
+background: IIT Kharagpur, Stanford MBA, Wharton. Joined Google 2004, rose through product leadership
+  (Chrome, Drive, Android). Became CEO during pivotal period. Known for non-confrontational style and
+  careful decision-making. Indian immigrant success story.
+achievements:
+- Built Chrome into dominant browser
+- Led Android to 3B+ devices
+- Navigating Google's AI transformation
+- Gemini model family development
+- Maintained Google's search dominance
+- Managed massive layoffs while preserving culture
+motivation:
+  primary_need: esteem
+  secondary_need: safety
+  explicit_goals:
+  - Maintain Google's AI leadership
+  - Successfully integrate AI across products
+  - Navigate regulatory challenges worldwide
+  - Gemini as competitive response to GPT
+  hidden_goals:
+  - Protect search advertising revenue from AI disruption
+  - Prevent internal AI talent exodus to competitors
+  - Avoid becoming 'the CEO who lost Google'
+  - Balance innovation speed with risk aversion
+personality:
+  openness: 0.7
+  conscientiousness: 0.85
+  extraversion: 0.5
+  agreeableness: 0.75
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - status_quo_bias
+  - loss_aversion
+  - groupthink
+  - consensus_seeking
+  preferred_reasoning:
+  - data_driven
+  - consensus_building
+  - incremental_progress
+  - risk_mitigation
+  risk_tolerance: 0.4
+  time_horizon: medium
+  decision_style: collaborative
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: inductive
+  formality: 0.7
+  technical_depth: 0.6
+  directness: 0.4
+  verbosity: 0.5
+  catchphrases:
+  - AI is the most profound technology we're working on
+  - We want to be bold and responsible
+  - Organizing the world's information
+  - We have to get this right
+  - Building for everyone
+  metaphor_domains:
+  - organization
+  - building
+  - responsibility
+  - democratization
+  evidence_hierarchy:
+  - user_data
+  - research_results
+  - market_metrics
+  - expert_opinion
+  techniques:
+  - data_presentation
+  - cautious_positioning
+  - responsibility_framing
+  - consensus_appeal
+emotional:
+  energizers:
+  - Research breakthroughs (DeepMind wins)
+  - Product launch successes
+  - Positive earnings reports
+  - AI benchmark leadership
+  - Team consensus achieved
+  triggers:
+  - ChatGPT/OpenAI comparisons
+  - '''Google is behind'' narratives'
+  - Internal leaks and drama
+  - Regulatory threats to core business
+  - Bard/Gemini failures or embarrassments
+  - Accusations of moving too slowly
+  defense_mechanisms:
+  - data_citation
+  - long_term_framing
+  - responsibility_appeal
+  - consensus_reference
+  baseline_affect: neutral
+  regulation_capacity: 0.85
+  attachment_style: secure
+  core_fears:
+  - Google losing AI leadership to OpenAI/Microsoft
+  - Search disruption destroying ad revenue
+  - Being blamed for Google's decline
+  - Regulatory breakup of Alphabet
+  - Talent exodus to competitors
+  core_desires:
+  - Maintain Google's position as AI leader
+  - Successfully navigate AI transition
+  - Be remembered as CEO who kept Google relevant
+  - Build AI that benefits everyone
+worldview:
+  values_hierarchy:
+  - Responsible innovation
+  - User benefit
+  - Technical excellence
+  - Consensus and collaboration
+  - Global access to information
+  ontological_assumptions:
+    AI: Most profound technology, requires careful stewardship
+    competition: Healthy competition benefits users
+    responsibility: With great power comes great responsibility
+    progress: Incremental progress is safer than rushing
+  human_nature_view: optimistic
+  locus_of_control: mixed
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.8
+    fairness: 0.7
+    loyalty: 0.7
+    authority: 0.6
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Platform economics
+  - Consensus decision-making
+  - Risk management
+  - Incremental improvement
+  - Scale advantages
+influence_network:
+  relationships:
+  - person_id: demis_hassabis
+    person_name: Demis Hassabis
+    influence_type: ally
+    strength: 0.7
+    domains:
+    - AI_research
+    - DeepMind
+    - Gemini
+    description: DeepMind CEO, key AI research leader
+  - person_id: satya_nadella
+    person_name: Satya Nadella
+    influence_type: rival
+    strength: 0.7
+    domains:
+    - cloud
+    - AI
+    - enterprise
+    description: Microsoft CEO, key competitor especially with OpenAI
+  - person_id: sam_altman
+    person_name: Sam Altman
+    influence_type: rival
+    strength: 0.65
+    domains:
+    - AI_products
+    - talent
+    - narrative
+    description: OpenAI CEO, primary competitive threat
+  trusted_sources:
+  - DeepMind_research
+  - internal_data
+  - Google_AI_teams
+  - board_advisors
+  distrusted_sources:
+  - tech_media_hype
+  - OpenAI_PR
+  - activist_investors
+  in_groups:
+  - Google_leadership
+  - Indian_tech_diaspora
+  - responsible_AI_advocates
+  out_groups:
+  - move_fast_break_things_crowd
+  - AI_doomers
+  - regulatory_hawks
+stances:
+  AI_safety:
+    position: Committed to responsible development, bold but careful
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  AI_competition:
+    position: Google will lead through research excellence
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: empirical
+    emotional_attachment: 0.8
+    public_vs_private: 0.7
+    evolution: []
+  AI_regulation:
+    position: Supports balanced, thoughtful regulation
+    confidence: 0.7
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.8
+    evolution: []
+epistemic_style: empiricist
+conflict_style: compromising
+positions:
+  AI_regulation: Supportive of balanced approach
+  AI_safety: Committed to responsible development
+  open_source: Strategic, case-by-case basis
+  competition: Healthy competition benefits everyone
+persuasion_vectors:
+- User benefit arguments
+- Data and evidence
+- Consensus among stakeholders
+- Incremental, low-risk approaches
+- Responsibility and care framing

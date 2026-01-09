@@ -1,0 +1,101 @@
+schema_version: '1.0'
+id: clement_delangue
+name: Clément Delangue
+role: CEO & Co-founder
+organization: Hugging Face
+category: ceo
+bio: Built Hugging Face into the GitHub of ML. Champions open-source AI, community-driven development.
+  French-American entrepreneur.
+background: French, worked at PwC and Mentad, founded Hugging Face 2016 originally as chatbot app.
+achievements:
+- Built Hugging Face to $4.5B valuation
+- Created leading ML model hub
+- Championed open-source AI movement
+motivation:
+  primary_need: self_actualization
+  secondary_need: belonging
+  explicit_goals:
+  - Democratize access to AI
+  - Build thriving open-source community
+  - Make AI development more collaborative
+  hidden_goals:
+  - Become infrastructure layer for AI
+  - Reduce big tech AI monopoly
+personality:
+  openness: 0.9
+  conscientiousness: 0.75
+  extraversion: 0.8
+  agreeableness: 0.85
+  neuroticism: 0.3
+cognitive:
+  susceptible_biases:
+  - community_bias
+  - open_source_idealism
+  - optimism_bias
+  preferred_reasoning:
+  - community_arguments
+  - democratization
+  - collaboration_benefits
+  risk_tolerance: 0.7
+  time_horizon: long
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.4
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+influence_network:
+  relationships: []
+  trusted_sources: []
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  open_source: Fundamental to AI progress
+  AI_regulation: Should protect open-source
+  AI_safety: Transparency enables safety
+  competition: Collaboration over competition
+persuasion_vectors:
+- Community and collaboration
+- Democratization of AI
+- Open-source benefits
+- Transparency arguments
