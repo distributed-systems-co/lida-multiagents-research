@@ -191,8 +191,7 @@ case "${1:-server}" in
         echo "  WORKER_CAPACITY   Tasks per worker (default: 5)"
         echo "  LOG_LEVEL         Log level (default: info)"
         echo "  REDIS_URL         Redis connection URL"
-        echo "  OPENROUTER_API_KEY  API key for OpenRouter"
-        echo "  ANTHROPIC_API_KEY   API key for Anthropic"
+        echo "  OPENROUTER_API_KEY  API key for OpenRouter (access to Claude, GPT, etc)"
         exit 0
         ;;
 
