@@ -1,25 +1,23 @@
-"""Prompt loader for LIDA multi-agent system."""
+"""Prompt loader for LIDA multi-agent system.
+
+Redesigned for thousands of prompts with:
+- Auto-discovery of prompt files
+- Lazy loading with file indexing
+- SQLite backend for fast queries
+- Memory-efficient iteration
+"""
 from __future__ import annotations
+
 import re
 import logging
+import sqlite3
+import hashlib
 from pathlib import Path
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Optional
+from typing import Optional, Iterator, List, Dict, Any
+from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
-
-
-class PromptCategory(Enum):
-    """Categories of system prompts."""
-    HUMANITIES = "humanities"
-    SOCIAL_SCIENCES = "social_sciences"
-    NATURAL_SCIENCES = "natural_sciences"
-    FORMAL_SCIENCES = "formal_sciences"
-    UNDERGROUND = "underground"
-    ECONOMIC_EXTREMES = "economic_extremes"
-    ESOTERIC = "esoteric"
-    DEMIURGE = "demiurge"
 
 
 @dataclass
@@ -27,82 +25,390 @@ class Prompt:
     """A system prompt with metadata."""
     id: int
     text: str
-    category: PromptCategory
+    category: str
     subcategory: str = ""
-    tags: list[str] = field(default_factory=list)
+    tags: List[str] = field(default_factory=list)
+    file_path: str = ""
 
     def __repr__(self):
-        preview = self.text[:60] + "..." if len(self.text) > 60 else self.text
-        return f"Prompt({self.id}, {self.category.value}/{self.subcategory}: {preview})"
+        preview = self.text[:50] + "..." if len(self.text) > 50 else self.text
+        return f"Prompt({self.id}, {self.category}/{self.subcategory}: {preview})"
+
+
+class PromptIndex:
+    """SQLite-backed index for fast prompt queries."""
+
+    def __init__(self, db_path: Path):
+        self.db_path = db_path
+        self._init_db()
+
+    def _init_db(self):
+        with self._conn() as conn:
+            conn.executescript("""
+                CREATE TABLE IF NOT EXISTS prompts (
+                    id INTEGER PRIMARY KEY,
+                    text TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    subcategory TEXT DEFAULT '',
+                    tags TEXT DEFAULT '',
+                    file_path TEXT DEFAULT '',
+                    text_hash TEXT
+                );
+                CREATE INDEX IF NOT EXISTS idx_category ON prompts(category);
+                CREATE INDEX IF NOT EXISTS idx_subcategory ON prompts(subcategory);
+                CREATE VIRTUAL TABLE IF NOT EXISTS prompts_fts USING fts5(
+                    text, category, subcategory, tags,
+                    content='prompts',
+                    content_rowid='id'
+                );
+                CREATE TABLE IF NOT EXISTS meta (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                );
+            """)
+
+    @contextmanager
+    def _conn(self):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+            conn.commit()
+        finally:
+            conn.close()
+
+    def get_file_hash(self, filepath: Path) -> Optional[str]:
+        """Get stored hash for a file."""
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT value FROM meta WHERE key = ?",
+                (f"hash:{filepath}",)
+            ).fetchone()
+            return row[0] if row else None
+
+    def set_file_hash(self, filepath: Path, hash_val: str):
+        """Store hash for a file."""
+        with self._conn() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+                (f"hash:{filepath}", hash_val)
+            )
+
+    def clear_category(self, category: str):
+        """Remove all prompts from a category."""
+        with self._conn() as conn:
+            conn.execute("DELETE FROM prompts WHERE category = ?", (category,))
+            conn.execute("DELETE FROM prompts_fts WHERE category = ?", (category,))
+
+    def insert_prompt(self, prompt: Prompt):
+        """Insert a prompt into the index."""
+        text_hash = hashlib.md5(prompt.text.encode()).hexdigest()[:16]
+        with self._conn() as conn:
+            conn.execute("""
+                INSERT OR REPLACE INTO prompts
+                (id, text, category, subcategory, tags, file_path, text_hash)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                prompt.id, prompt.text, prompt.category,
+                prompt.subcategory, ",".join(prompt.tags),
+                prompt.file_path, text_hash
+            ))
+            # Update FTS
+            conn.execute("""
+                INSERT INTO prompts_fts (rowid, text, category, subcategory, tags)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                prompt.id, prompt.text, prompt.category,
+                prompt.subcategory, ",".join(prompt.tags)
+            ))
+
+    def insert_batch(self, prompts: List[Prompt]):
+        """Insert multiple prompts efficiently."""
+        with self._conn() as conn:
+            for prompt in prompts:
+                text_hash = hashlib.md5(prompt.text.encode()).hexdigest()[:16]
+                conn.execute("""
+                    INSERT OR REPLACE INTO prompts
+                    (id, text, category, subcategory, tags, file_path, text_hash)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    prompt.id, prompt.text, prompt.category,
+                    prompt.subcategory, ",".join(prompt.tags),
+                    prompt.file_path, text_hash
+                ))
+
+    def rebuild_fts(self):
+        """Rebuild the full-text search index."""
+        with self._conn() as conn:
+            conn.execute("DROP TABLE IF EXISTS prompts_fts")
+            conn.execute("""
+                CREATE VIRTUAL TABLE prompts_fts USING fts5(
+                    text, category, subcategory, tags,
+                    content='prompts',
+                    content_rowid='id'
+                )
+            """)
+            conn.execute("""
+                INSERT INTO prompts_fts (rowid, text, category, subcategory, tags)
+                SELECT id, text, category, subcategory, tags FROM prompts
+            """)
+
+    def get(self, prompt_id: int) -> Optional[Prompt]:
+        """Get a prompt by ID."""
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM prompts WHERE id = ?", (prompt_id,)
+            ).fetchone()
+            return self._row_to_prompt(row) if row else None
+
+    def get_by_category(self, category: str) -> List[Prompt]:
+        """Get all prompts in a category."""
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM prompts WHERE category = ? ORDER BY id",
+                (category,)
+            ).fetchall()
+            return [self._row_to_prompt(r) for r in rows]
+
+    def get_by_subcategory(self, subcategory: str) -> List[Prompt]:
+        """Get all prompts in a subcategory."""
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM prompts WHERE subcategory = ? ORDER BY id",
+                (subcategory,)
+            ).fetchall()
+            return [self._row_to_prompt(r) for r in rows]
+
+    def search(self, query: str, limit: int = 50) -> List[Prompt]:
+        """Full-text search prompts."""
+        with self._conn() as conn:
+            rows = conn.execute("""
+                SELECT p.* FROM prompts p
+                JOIN prompts_fts fts ON p.id = fts.rowid
+                WHERE prompts_fts MATCH ?
+                ORDER BY rank
+                LIMIT ?
+            """, (query, limit)).fetchall()
+            return [self._row_to_prompt(r) for r in rows]
+
+    def random(self, category: Optional[str] = None, n: int = 1) -> List[Prompt]:
+        """Get random prompts."""
+        with self._conn() as conn:
+            if category:
+                rows = conn.execute(
+                    "SELECT * FROM prompts WHERE category = ? ORDER BY RANDOM() LIMIT ?",
+                    (category, n)
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT * FROM prompts ORDER BY RANDOM() LIMIT ?", (n,)
+                ).fetchall()
+            return [self._row_to_prompt(r) for r in rows]
+
+    def categories(self) -> Dict[str, int]:
+        """Get category names and counts."""
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT category, COUNT(*) as cnt FROM prompts GROUP BY category ORDER BY category"
+            ).fetchall()
+            return {r['category']: r['cnt'] for r in rows}
+
+    def subcategories(self, category: Optional[str] = None) -> Dict[str, int]:
+        """Get subcategory names and counts."""
+        with self._conn() as conn:
+            if category:
+                rows = conn.execute(
+                    "SELECT subcategory, COUNT(*) as cnt FROM prompts WHERE category = ? GROUP BY subcategory",
+                    (category,)
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT subcategory, COUNT(*) as cnt FROM prompts GROUP BY subcategory"
+                ).fetchall()
+            return {r['subcategory']: r['cnt'] for r in rows if r['subcategory']}
+
+    def count(self, category: Optional[str] = None) -> int:
+        """Get total prompt count."""
+        with self._conn() as conn:
+            if category:
+                row = conn.execute(
+                    "SELECT COUNT(*) FROM prompts WHERE category = ?", (category,)
+                ).fetchone()
+            else:
+                row = conn.execute("SELECT COUNT(*) FROM prompts").fetchone()
+            return row[0]
+
+    def iterate(self, category: Optional[str] = None, batch_size: int = 100) -> Iterator[Prompt]:
+        """Memory-efficient iteration over prompts."""
+        with self._conn() as conn:
+            if category:
+                cursor = conn.execute(
+                    "SELECT * FROM prompts WHERE category = ? ORDER BY id",
+                    (category,)
+                )
+            else:
+                cursor = conn.execute("SELECT * FROM prompts ORDER BY id")
+
+            while True:
+                rows = cursor.fetchmany(batch_size)
+                if not rows:
+                    break
+                for row in rows:
+                    yield self._row_to_prompt(row)
+
+    def _row_to_prompt(self, row: sqlite3.Row) -> Prompt:
+        return Prompt(
+            id=row['id'],
+            text=row['text'],
+            category=row['category'],
+            subcategory=row['subcategory'] or "",
+            tags=row['tags'].split(",") if row['tags'] else [],
+            file_path=row['file_path'] or ""
+        )
 
 
 class PromptLoader:
-    """Loads and manages system prompts from the prompts_context directory."""
+    """Loads and manages system prompts with auto-discovery and lazy loading."""
 
-    PROMPT_FILES = {
-        PromptCategory.HUMANITIES: "prompts_01_humanities.txt",
-        PromptCategory.SOCIAL_SCIENCES: "prompts_02_social_sciences.txt",
-        PromptCategory.NATURAL_SCIENCES: "prompts_03_natural_sciences.txt",
-        PromptCategory.FORMAL_SCIENCES: "prompts_04_formal_sciences.txt",
-        PromptCategory.UNDERGROUND: "prompts_underground_criminal.txt",
-        PromptCategory.ECONOMIC_EXTREMES: "prompts_economic_extremes_subcultures.txt",
-        PromptCategory.ESOTERIC: "prompts_esoteric_controversial.txt",
-    }
+    # Pattern to extract category from filename: prompts_NN_category_name.txt
+    FILENAME_PATTERN = re.compile(r'prompts_(?:\d+_)?(.+)\.txt$')
 
-    def __init__(self, prompts_root: Optional[Path] = None):
+    def __init__(
+        self,
+        prompts_dir: Optional[Path] = None,
+        index_path: Optional[Path] = None,
+        auto_load: bool = True
+    ):
         """Initialize the prompt loader.
 
         Args:
-            prompts_root: Root directory containing prompts_context.
-                         Defaults to /Users/arthurcolle/prompts_context
+            prompts_dir: Directory containing prompt files.
+            index_path: Path for SQLite index. Defaults to prompts_dir/prompts.db
+            auto_load: Whether to auto-load on first access.
         """
-        self.prompts_root = prompts_root or Path("/Users/arthurcolle/prompts_context")
-        self.populations_dir = self.prompts_root / "populations.prompts"
+        # Find prompts directory
+        if prompts_dir:
+            self.prompts_dir = Path(prompts_dir)
+        else:
+            # Try multiple locations
+            candidates = [
+                Path.cwd() / "populations.prompts",
+                Path(__file__).parent.parent.parent / "populations.prompts",
+                Path("/Users/arthurcolle/prompts_context/populations.prompts"),
+            ]
+            self.prompts_dir = next((p for p in candidates if p.exists()), candidates[0])
 
-        self._prompts: dict[int, Prompt] = {}
-        self._by_category: dict[PromptCategory, list[Prompt]] = {c: [] for c in PromptCategory}
-        self._by_subcategory: dict[str, list[Prompt]] = {}
+        # Index path
+        if index_path:
+            self.index_path = Path(index_path)
+        else:
+            self.index_path = self.prompts_dir.parent / "data" / "prompts.db"
+
+        self.index_path.parent.mkdir(parents=True, exist_ok=True)
+
+        self._index = PromptIndex(self.index_path)
         self._demiurge_prompt: Optional[str] = None
-
         self._loaded = False
+        self._auto_load = auto_load
 
-    def load(self) -> int:
-        """Load all prompts from files. Returns count of prompts loaded."""
-        if self._loaded:
-            return len(self._prompts)
+        # Discovered files
+        self._prompt_files: List[Path] = []
 
+    def discover_files(self) -> List[Path]:
+        """Discover all prompt files."""
+        if not self.prompts_dir.exists():
+            logger.warning(f"Prompts directory not found: {self.prompts_dir}")
+            return []
+
+        self._prompt_files = sorted(self.prompts_dir.glob("prompts_*.txt"))
+        logger.info(f"Discovered {len(self._prompt_files)} prompt files in {self.prompts_dir}")
+        return self._prompt_files
+
+    def _category_from_filename(self, filepath: Path) -> str:
+        """Extract category name from filename."""
+        match = self.FILENAME_PATTERN.search(filepath.name)
+        if match:
+            return match.group(1).replace("_", " ").title().replace(" ", "_").lower()
+        return filepath.stem
+
+    def _compute_file_hash(self, filepath: Path) -> str:
+        """Compute hash of file for change detection."""
+        stat = filepath.stat()
+        return hashlib.md5(f"{filepath}:{stat.st_mtime}:{stat.st_size}".encode()).hexdigest()
+
+    def load(self, force: bool = False) -> int:
+        """Load all prompts, updating index only for changed files.
+
+        Args:
+            force: Force reload all files regardless of cache.
+
+        Returns:
+            Number of prompts loaded/indexed.
+        """
+        if self._loaded and not force:
+            return self._index.count()
+
+        self.discover_files()
         total = 0
+        files_updated = 0
 
         # Load demiurge baseline
-        demiurge_path = self.prompts_root / "demiurge.agent.baseline.md"
-        if demiurge_path.exists():
-            self._demiurge_prompt = demiurge_path.read_text()
-            logger.info(f"Loaded Demiurge baseline prompt ({len(self._demiurge_prompt)} chars)")
+        demiurge_candidates = [
+            self.prompts_dir.parent / "demiurge.agent.baseline.md",
+            Path.cwd() / "demiurge.agent.baseline.md",
+        ]
+        for demiurge_path in demiurge_candidates:
+            if demiurge_path.exists():
+                self._demiurge_prompt = demiurge_path.read_text()
+                logger.info(f"Loaded Demiurge baseline ({len(self._demiurge_prompt)} chars)")
+                break
 
-        # Load population prompts
-        for category, filename in self.PROMPT_FILES.items():
-            filepath = self.populations_dir / filename
-            if filepath.exists():
-                count = self._parse_prompt_file(filepath, category)
-                total += count
-                logger.info(f"Loaded {count} prompts from {filename}")
-            else:
-                logger.warning(f"Prompt file not found: {filepath}")
+        # Process each prompt file
+        for filepath in self._prompt_files:
+            file_hash = self._compute_file_hash(filepath)
+            stored_hash = self._index.get_file_hash(filepath)
+
+            if not force and stored_hash == file_hash:
+                # File unchanged, skip
+                continue
+
+            category = self._category_from_filename(filepath)
+
+            # Clear old prompts for this category
+            self._index.clear_category(category)
+
+            # Parse and index
+            prompts = list(self._parse_file(filepath, category))
+            if prompts:
+                self._index.insert_batch(prompts)
+                self._index.set_file_hash(filepath, file_hash)
+                logger.info(f"Indexed {len(prompts)} prompts from {filepath.name} -> {category}")
+                files_updated += 1
+
+            total += len(prompts)
 
         self._loaded = True
-        logger.info(f"Total prompts loaded: {total}")
-        return total
 
-    def _parse_prompt_file(self, filepath: Path, category: PromptCategory) -> int:
-        """Parse a prompt file and extract prompts."""
+        # Rebuild FTS if any files were updated
+        if files_updated > 0:
+            self._index.rebuild_fts()
+
+        total_count = self._index.count()
+
+        if files_updated > 0:
+            logger.info(f"Updated {files_updated} files, total {total_count} prompts indexed")
+        else:
+            logger.info(f"Index up-to-date: {total_count} prompts")
+
+        return total_count
+
+    def _parse_file(self, filepath: Path, category: str) -> Iterator[Prompt]:
+        """Parse a prompt file, yielding prompts."""
         content = filepath.read_text()
-        count = 0
         current_subcategory = ""
 
-        # Pattern for subcategory headers: ## SUBCATEGORY NAME (N prompts)
+        # Patterns
         subcategory_pattern = re.compile(r'^##\s+(.+?)\s*\(\d+\s*prompts?\)', re.IGNORECASE)
-
-        # Pattern for numbered prompts: N. You are...
         prompt_pattern = re.compile(r'^(\d+)\.\s+(.+)', re.DOTALL)
 
         lines = content.split('\n')
@@ -111,20 +417,20 @@ class PromptLoader:
         while i < len(lines):
             line = lines[i].strip()
 
-            # Check for subcategory header
+            # Subcategory header
             sub_match = subcategory_pattern.match(line)
             if sub_match:
                 current_subcategory = sub_match.group(1).strip()
                 i += 1
                 continue
 
-            # Check for numbered prompt
+            # Numbered prompt
             prompt_match = prompt_pattern.match(line)
             if prompt_match:
                 prompt_id = int(prompt_match.group(1))
                 prompt_text = prompt_match.group(2).strip()
 
-                # Continue reading until next numbered prompt or subcategory
+                # Continue reading multi-line prompt
                 i += 1
                 while i < len(lines):
                     next_line = lines[i].strip()
@@ -138,142 +444,108 @@ class PromptLoader:
                     prompt_text += " " + next_line
                     i += 1
 
-                prompt = Prompt(
+                yield Prompt(
                     id=prompt_id,
                     text=prompt_text.strip(),
                     category=category,
                     subcategory=current_subcategory,
                     tags=self._extract_tags(prompt_text),
+                    file_path=str(filepath)
                 )
-
-                self._prompts[prompt_id] = prompt
-                self._by_category[category].append(prompt)
-
-                if current_subcategory:
-                    if current_subcategory not in self._by_subcategory:
-                        self._by_subcategory[current_subcategory] = []
-                    self._by_subcategory[current_subcategory].append(prompt)
-
-                count += 1
             else:
                 i += 1
 
-        return count
-
-    def _extract_tags(self, text: str) -> list[str]:
+    def _extract_tags(self, text: str) -> List[str]:
         """Extract role/expertise tags from prompt text."""
         tags = []
+        text_lower = text.lower()
 
-        # Common role indicators
-        if "specialist" in text.lower() or "specializing" in text.lower():
-            tags.append("specialist")
-        if "researcher" in text.lower():
-            tags.append("researcher")
-        if "historian" in text.lower():
-            tags.append("historian")
-        if "theorist" in text.lower():
-            tags.append("theorist")
-        if "analyst" in text.lower():
-            tags.append("analyst")
-        if "practitioner" in text.lower():
-            tags.append("practitioner")
-        if "expert" in text.lower():
-            tags.append("expert")
-        if "philosopher" in text.lower():
-            tags.append("philosopher")
-        if "scientist" in text.lower():
-            tags.append("scientist")
-        if "engineer" in text.lower():
-            tags.append("engineer")
-        if "designer" in text.lower():
-            tags.append("designer")
-        if "artist" in text.lower():
-            tags.append("artist")
-        if "critic" in text.lower():
-            tags.append("critic")
-        if "teacher" in text.lower() or "educator" in text.lower():
-            tags.append("educator")
+        role_keywords = [
+            "specialist", "researcher", "historian", "theorist", "analyst",
+            "practitioner", "expert", "philosopher", "scientist", "engineer",
+            "designer", "artist", "critic", "educator", "teacher", "developer",
+            "architect", "manager", "consultant", "strategist", "operator"
+        ]
 
-        return tags
+        for keyword in role_keywords:
+            if keyword in text_lower:
+                tags.append(keyword)
+
+        return tags[:5]  # Limit tags
+
+    def _ensure_loaded(self):
+        """Ensure prompts are loaded."""
+        if not self._loaded and self._auto_load:
+            self.load()
 
     @property
     def demiurge_prompt(self) -> str:
         """Get the Demiurge baseline system prompt."""
-        if not self._loaded:
-            self.load()
+        self._ensure_loaded()
         return self._demiurge_prompt or "You are the Demiurge, a craftsman-intelligence."
 
     def get(self, prompt_id: int) -> Optional[Prompt]:
         """Get a prompt by ID."""
-        if not self._loaded:
-            self.load()
-        return self._prompts.get(prompt_id)
+        self._ensure_loaded()
+        return self._index.get(prompt_id)
 
-    def get_by_category(self, category: PromptCategory) -> list[Prompt]:
+    def get_by_category(self, category: str) -> List[Prompt]:
         """Get all prompts in a category."""
-        if not self._loaded:
-            self.load()
-        return self._by_category.get(category, [])
+        self._ensure_loaded()
+        return self._index.get_by_category(category)
 
-    def get_by_subcategory(self, subcategory: str) -> list[Prompt]:
+    def get_by_subcategory(self, subcategory: str) -> List[Prompt]:
         """Get all prompts in a subcategory."""
-        if not self._loaded:
-            self.load()
-        return self._by_subcategory.get(subcategory, [])
+        self._ensure_loaded()
+        return self._index.get_by_subcategory(subcategory)
 
-    def search(self, query: str, limit: int = 10) -> list[Prompt]:
-        """Search prompts by text content."""
-        if not self._loaded:
-            self.load()
+    def search(self, query: str, limit: int = 50) -> List[Prompt]:
+        """Full-text search prompts."""
+        self._ensure_loaded()
+        return self._index.search(query, limit)
 
-        query_lower = query.lower()
-        results = []
+    def random(self, category: Optional[str] = None, n: int = 1) -> List[Prompt]:
+        """Get random prompt(s)."""
+        self._ensure_loaded()
+        return self._index.random(category, n)
 
-        for prompt in self._prompts.values():
-            if query_lower in prompt.text.lower():
-                results.append(prompt)
-                if len(results) >= limit:
-                    break
-
-        return results
-
-    def random(self, category: Optional[PromptCategory] = None) -> Optional[Prompt]:
-        """Get a random prompt, optionally from a specific category."""
-        import random
-
-        if not self._loaded:
-            self.load()
-
-        if category:
-            prompts = self._by_category.get(category, [])
-        else:
-            prompts = list(self._prompts.values())
-
-        return random.choice(prompts) if prompts else None
-
-    def categories(self) -> dict[str, int]:
+    def categories(self) -> Dict[str, int]:
         """Get category names and prompt counts."""
-        if not self._loaded:
-            self.load()
-        return {c.value: len(p) for c, p in self._by_category.items()}
+        self._ensure_loaded()
+        return self._index.categories()
 
-    def subcategories(self) -> dict[str, int]:
+    def subcategories(self, category: Optional[str] = None) -> Dict[str, int]:
         """Get subcategory names and prompt counts."""
-        if not self._loaded:
-            self.load()
-        return {s: len(p) for s, p in self._by_subcategory.items()}
+        self._ensure_loaded()
+        return self._index.subcategories(category)
 
-    def all_prompts(self) -> list[Prompt]:
-        """Get all loaded prompts."""
-        if not self._loaded:
-            self.load()
-        return list(self._prompts.values())
-
-    def count(self) -> int:
+    def count(self, category: Optional[str] = None) -> int:
         """Get total prompt count."""
-        if not self._loaded:
-            self.load()
-        return len(self._prompts)
+        self._ensure_loaded()
+        return self._index.count(category)
+
+    def iterate(self, category: Optional[str] = None) -> Iterator[Prompt]:
+        """Memory-efficient iteration over prompts."""
+        self._ensure_loaded()
+        return self._index.iterate(category)
+
+    def all_prompts(self) -> List[Prompt]:
+        """Get all prompts (use iterate() for large datasets)."""
+        self._ensure_loaded()
+        return list(self._index.iterate())
+
+    def stats(self) -> Dict[str, Any]:
+        """Get loader statistics."""
+        self._ensure_loaded()
+        cats = self.categories()
+        return {
+            "total_prompts": self._index.count(),
+            "categories": len(cats),
+            "category_counts": cats,
+            "prompt_files": len(self._prompt_files),
+            "index_path": str(self.index_path),
+            "prompts_dir": str(self.prompts_dir),
+        }
 
 
 # Global loader instance
@@ -285,5 +557,25 @@ def get_loader() -> PromptLoader:
     global _loader
     if _loader is None:
         _loader = PromptLoader()
-        _loader.load()
     return _loader
+
+
+# Legacy compatibility
+class PromptCategory:
+    """Dynamic category accessor for backwards compatibility."""
+
+    def __init__(self):
+        self._categories: Dict[str, str] = {}
+
+    def __getattr__(self, name: str) -> str:
+        loader = get_loader()
+        cats = loader.categories()
+        # Try exact match
+        if name.lower() in cats:
+            return name.lower()
+        # Try with underscores
+        name_lower = name.lower().replace("_", " ")
+        for cat in cats:
+            if cat.replace("_", " ") == name_lower:
+                return cat
+        raise AttributeError(f"Category '{name}' not found. Available: {list(cats.keys())}")

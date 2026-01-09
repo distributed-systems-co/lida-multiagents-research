@@ -174,6 +174,19 @@ class ToneRegister(str, Enum):
     MELANCHOLIC = "melancholic"
     SARCASTIC = "sarcastic"
     ENERGETIC = "energetic"
+    # Professional domain tones
+    ACADEMIC = "academic"
+    PRECISE = "precise"
+    TECHNICAL = "technical"
+    PRAGMATIC = "pragmatic"
+    DIRECT = "direct"
+    CALM = "calm"
+    HELPFUL = "helpful"
+    EXPRESSIVE = "expressive"
+    PASSIONATE = "passionate"
+    CONFIDENT = "confident"
+    ENCOURAGING = "encouraging"
+    MOTIVATIONAL = "motivational"
 
 
 class ResponseLength(str, Enum):

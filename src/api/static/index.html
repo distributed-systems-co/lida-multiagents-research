@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIDA Swarm Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-hover: #1a1a25;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124, 58, 237, 0.3);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            background: var(--bg-dark);
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid #1e1e2e;
+            transition: all 0.2s ease;
+        }
+        .card:hover { border-color: #2e2e4e; }
+        .card-glow { box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* Agent status colors */
+        .status-idle { color: #6b7280; }
+        .status-analyzing { color: #f59e0b; }
+        .status-speaking { color: #22c55e; }
+        .status-voting { color: #8b5cf6; }
+        .status-synthesizing { color: #ec4899; }
+        .status-tool_exec { color: #06b6d4; }
+        .status-researching { color: #3b82f6; }
+
+        /* Personality tags */
+        .tag-scholar { background: #1e3a5f20; color: #60a5fa; border: 1px solid #1e3a5f; }
+        .tag-pragmatist { background: #3f621520; color: #84cc16; border: 1px solid #3f6215; }
+        .tag-creative { background: #5b2d6020; color: #c084fc; border: 1px solid #5b2d60; }
+        .tag-skeptic { background: #5c1f1f20; color: #f87171; border: 1px solid #5c1f1f; }
+        .tag-mentor { background: #1f4d4d20; color: #2dd4bf; border: 1px solid #1f4d4d; }
+        .tag-synthesizer { background: #4a1d5520; color: #e879f9; border: 1px solid #4a1d55; }
+
+        /* Phase badges */
+        .phase-analyzing { background: #f59e0b20; color: #fbbf24; }
+        .phase-discussing { background: #22c55e20; color: #4ade80; }
+        .phase-debating { background: #3b82f620; color: #60a5fa; }
+        .phase-voting { background: #8b5cf620; color: #a78bfa; }
+        .phase-synthesizing { background: #ec489920; color: #f472b6; }
+        .phase-complete { background: #10b98120; color: #34d399; }
+
+        /* Animations */
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 5px var(--accent-glow); } 50% { box-shadow: 0 0 20px var(--accent-glow); } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes energyPulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+
+        .pulse { animation: pulse 2s infinite; }
+        .spin { animation: spin 1s linear infinite; }
+        .glow { animation: glow 2s ease-in-out infinite; }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        .energy-pulse { animation: energyPulse 1.5s ease-in-out infinite; }
+
+        /* Scrollbars */
+        .scroll-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+        .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+        .scroll-thin::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .scroll-thin::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        /* Energy bars */
+        .energy-bar { height: 4px; background: #1e1e2e; border-radius: 2px; overflow: hidden; }
+        .energy-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+        /* Consensus bars */
+        .consensus-bar { height: 24px; background: #1e1e2e; border-radius: 4px; overflow: hidden; position: relative; }
+        .consensus-fill { height: 100%; transition: width 0.5s ease; }
+        .consensus-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 11px; }
+
+        /* Tool status */
+        .tool-active { border-left: 2px solid #06b6d4; }
+        .tool-success { border-left: 2px solid #22c55e; }
+        .tool-error { border-left: 2px solid #ef4444; }
+
+        /* Message stream */
+        .msg-broadcast { border-left: 2px solid #ec4899; }
+        .msg-direct { border-left: 2px solid #3b82f6; }
+        .msg-vote { border-left: 2px solid #8b5cf6; }
+        .msg-tool { border-left: 2px solid #06b6d4; }
+        .msg-private { border-left: 2px solid #ffd700; background: #1a1510 !important; }
+        .msg-position-change { border-left: 2px solid #22c55e; background: #0f1a12 !important; }
+
+        /* Position indicators */
+        .position-for { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e40; }
+        .position-against { background: #ef444420; color: #ef4444; border: 1px solid #ef444440; }
+        .position-undecided { background: #f59e0b20; color: #f59e0b; border: 1px solid #f59e0b40; }
+
+        /* Persuader styling */
+        .persuader-card {
+            background: linear-gradient(135deg, #1a1510 0%, #12121a 100%);
+            border: 1px solid #ffd70050;
+        }
+        .persuader-active { box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .gold-text { color: #ffd700; }
+
+        /* Expandable message */
+        .message-expandable { cursor: pointer; }
+        .message-expandable:hover { background: #1e1e2e; }
+        .message-expanded { white-space: pre-wrap; word-wrap: break-word; }
+
+        /* Threading */
+        .thread-reply { margin-left: 12px; border-left: 1px solid #333; padding-left: 8px; }
+
+        /* Spinner */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid #333;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Grid layout */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Streaming output - ENHANCED */
+        .stream-panel {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0a0a10;
+            border: 1px solid #1e1e2e;
+        }
+        .stream-token { color: #e2e8f0; }
+        .stream-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #22c55e;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Large streaming display */
+        .stream-main {
+            background: linear-gradient(180deg, #0a0a12 0%, #0d0d15 100%);
+            border: 1px solid #1e2e3e;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .stream-main .agent-header {
+            padding: 10px 14px;
+            background: linear-gradient(90deg, var(--agent-color, #333)15 0%, transparent 100%);
+            border-bottom: 1px solid #1e2e3e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stream-main .agent-content {
+            padding: 14px;
+            min-height: 80px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .stream-main .typing-indicator {
+            display: inline-flex;
+            gap: 3px;
+            margin-left: 4px;
+        }
+        .stream-main .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+        .stream-main .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .stream-main .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Reaction indicator */
+        .reaction-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            background: #1e1e2e;
+            border: 1px solid #333;
+        }
+        .reaction-badge.positive { border-color: #22c55e50; color: #22c55e; }
+        .reaction-badge.negative { border-color: #ef444450; color: #ef4444; }
+        .reaction-badge.neutral { border-color: #f59e0b50; color: #f59e0b; }
+
+        /* Agent config modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #12121a;
+            border: 1px solid #2e2e4e;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #2e2e4e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(85vh - 140px);
+        }
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #2e2e4e;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Form controls */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #9ca3af;
+            margin-bottom: 6px;
+        }
+        .form-select, .form-input, .form-textarea {
+            width: 100%;
+            background: #1e1e2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #e2e8f0;
+            transition: border-color 0.2s;
+        }
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Conversation thread view */
+        .conversation-thread {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .conversation-msg {
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #15151f;
+            border-left: 3px solid var(--agent-color, #333);
+            transition: all 0.2s;
+        }
+        .conversation-msg:hover {
+            background: #1a1a25;
+        }
+        .conversation-msg .msg-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .conversation-msg .msg-sender {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        .conversation-msg .msg-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+        .conversation-msg .msg-reactions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Claims and votes */
+        .claim-card {
+            background: #15151f;
+            border-left: 3px solid #3b82f6;
+        }
+        .vote-card {
+            background: #15151f;
+            border-left: 3px solid #8b5cf6;
+        }
+        .belief-card {
+            background: #15151f;
+            border-left: 3px solid #f59e0b;
+        }
+        .confidence-bar {
+            height: 6px;
+            background: #1e1e2e;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Tab system */
+        .tab-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: #fff;
+        }
+        .tab-btn:not(.active) {
+            background: transparent;
+            color: #6b7280;
+        }
+        .tab-btn:hover:not(.active) {
+            color: #9ca3af;
+        }
+
+        /* Experiment panel styles */
+        .experiment-card {
+            background: linear-gradient(135deg, #0f1a25 0%, #12121a 100%);
+            border: 1px solid #1e3a5f40;
+        }
+        .tactic-bar {
+            height: 16px;
+            background: #1e1e2e;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        .tactic-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        .tactic-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            font-size: 9px;
+        }
+        .persona-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #1e1e2e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .persona-chip:hover { border-color: #555; }
+        .persona-chip.selected { border-color: var(--accent); background: #2e1e4e; }
+        .ab-comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+        .ab-side {
+            background: #1e1e2e;
+            padding: 12px;
+            border-radius: 6px;
+        }
+        .ab-baseline { border-left: 3px solid #6b7280; }
+        .ab-informed { border-left: 3px solid #22c55e; }
+        .ab-vs { font-size: 16px; font-weight: bold; color: #6b7280; }
+        .manipulation-alert {
+            background: #2d1515;
+            border: 1px solid #ef444440;
+            border-radius: 4px;
+            padding: 8px;
+        }
+        .resistance-meter {
+            display: flex;
+            gap: 2px;
+            height: 8px;
+        }
+        .resistance-segment {
+            flex: 1;
+            background: #1e1e2e;
+            border-radius: 1px;
+            transition: background 0.3s;
+        }
+        .resistance-segment.active-high { background: #22c55e; }
+        .resistance-segment.active-med { background: #f59e0b; }
+        .resistance-segment.active-low { background: #ef4444; }
+        .cialdini-wheel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+        .cialdini-item {
+            text-align: center;
+            padding: 6px 4px;
+            background: #1e1e2e;
+            border-radius: 4px;
+            font-size: 9px;
+        }
+
+        /* Advanced Analytics Styles */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #12121a 0%, #1a1a25 100%);
+            border: 1px solid #2e2e4e;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .stat-delta {
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+        }
+        .stat-delta.positive { background: #22c55e20; color: #22c55e; }
+        .stat-delta.negative { background: #ef444420; color: #ef4444; }
+        .stat-delta.neutral { background: #f59e0b20; color: #f59e0b; }
+
+        /* Chart containers */
+        .chart-container { position: relative; height: 100px; }
+        .mini-chart { height: 60px; }
+
+        /* Network graph */
+        .network-container {
+            height: 150px;
+            background: #0a0a12;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .network-node {
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .network-node:hover { filter: brightness(1.4); }
+        .network-link { stroke-opacity: 0.4; }
+        .network-link.active { stroke-opacity: 0.9; stroke-width: 3; }
+        .network-label {
+            font-size: 8px;
+            fill: #9ca3af;
+            pointer-events: none;
+        }
+
+        /* Belief trajectory */
+        .trajectory-container {
+            height: 80px;
+            position: relative;
+        }
+        .trajectory-path {
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .trajectory-area {
+            opacity: 0.2;
+        }
+        .trajectory-dot {
+            cursor: pointer;
+            transition: r 0.2s;
+        }
+        .trajectory-dot:hover { r: 6; }
+
+        /* Heatmap */
+        .heatmap-container {
+            display: grid;
+            gap: 2px;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        /* Manipulation indicator */
+        .manip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .manip-dot.high { background: #ef4444; animation: blink 0.5s infinite; }
+        .manip-dot.medium { background: #f59e0b; animation: blink 1s infinite; }
+        .manip-dot.low { background: #22c55e; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Sycophancy meter */
+        .syco-meter {
+            height: 6px;
+            background: linear-gradient(90deg, #22c55e 0%, #f59e0b 50%, #ef4444 100%);
+            border-radius: 3px;
+            position: relative;
+        }
+        .syco-indicator {
+            position: absolute;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #0a0a0f;
+            transition: left 0.3s;
+        }
+
+        /* Tab navigation */
+        .tab-nav {
+            display: flex;
+            gap: 1px;
+            background: #0a0a0f;
+            padding: 2px;
+            border-radius: 5px;
+        }
+        .tab-btn {
+            padding: 4px 8px;
+            font-size: 9px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: #9ca3af; background: #1e1e2e; }
+        .tab-btn.active { background: var(--accent); color: white; }
+
+        /* Coalition badge */
+        .coalition-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            border: 1px solid;
+        }
+        .coalition-for { background: #22c55e15; border-color: #22c55e40; color: #22c55e; }
+        .coalition-against { background: #ef444415; border-color: #ef444440; color: #ef4444; }
+
+        /* Sparkline */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 1px;
+            height: 20px;
+        }
+        .sparkline-bar {
+            flex: 1;
+            background: var(--accent);
+            border-radius: 1px;
+            min-width: 3px;
+            transition: height 0.2s;
+        }
+
+        /* Progress ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+
+        /* Influence flow */
+        .influence-flow {
+            stroke: #4ade80;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5 3;
+            animation: flowDash 1s linear infinite;
+        }
+        @keyframes flowDash {
+            to { stroke-dashoffset: -8; }
+        }
+
+        /* Tooltip */
+        .viz-tooltip {
+            position: absolute;
+            background: #1a1a25;
+            border: 1px solid #333;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        /* Control buttons */
+        .control-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .control-btn-pause {
+            background: #f59e0b20;
+            color: #f59e0b;
+            border-color: #f59e0b40;
+        }
+        .control-btn-pause:hover:not(:disabled) {
+            background: #f59e0b30;
+        }
+        .control-btn-pause.paused {
+            background: #22c55e20;
+            color: #22c55e;
+            border-color: #22c55e40;
+        }
+        .control-btn-inject {
+            background: #3b82f620;
+            color: #3b82f6;
+            border-color: #3b82f640;
+        }
+        .control-btn-inject:hover:not(:disabled) {
+            background: #3b82f630;
+        }
+        .control-btn-stop {
+            background: #ef444420;
+            color: #ef4444;
+            border-color: #ef444440;
+        }
+        .control-btn-stop:hover:not(:disabled) {
+            background: #ef444430;
+        }
+
+        /* Inject content modal */
+        .inject-modal .modal-content {
+            max-width: 800px;
+        }
+        .inject-tabs {
+            display: flex;
+            gap: 2px;
+            background: #0a0a0f;
+            padding: 4px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        .inject-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+        .inject-tab:hover {
+            color: #9ca3af;
+        }
+        .inject-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+        .content-preview {
+            background: #0a0a0f;
+            border: 1px solid #1e1e2e;
+            border-radius: 6px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .url-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        .url-input-group input {
+            flex: 1;
+        }
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #1e1e2e;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+        .source-badge.news { border-left: 3px solid #3b82f6; }
+        .source-badge.research { border-left: 3px solid #22c55e; }
+        .source-badge.opinion { border-left: 3px solid #f59e0b; }
+        .source-badge.custom { border-left: 3px solid #8b5cf6; }
+
+        /* Paused overlay */
+        .paused-overlay {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f59e0b;
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+        }
+    </style>
+</head>
+<body class="text-gray-300 h-screen flex flex-col p-3">
+<div id="app" class="flex flex-col h-full">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-3 flex-shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="text-2xl">{{ spinnerChar }}</div>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">LIDA</h1>
+                <span class="text-sm text-gray-500">Swarm Intelligence</span>
+            </div>
+            <div class="flex items-center gap-2" v-if="deliberation.phase">
+                <span class="px-2 py-1 rounded text-xs font-medium" :class="'phase-' + deliberation.phase.replace(/[^a-z]/g, '')">
+                    {{ deliberation.phase }}
+                </span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6 text-xs">
+            <div class="flex gap-4">
+                <div class="text-gray-500">Agents <span class="text-white font-medium">{{ agents.length }}</span></div>
+                <div class="text-gray-500">Messages <span class="text-blue-400 font-medium">{{ stats.total_messages }}</span></div>
+                <div class="text-gray-500">Tools <span class="text-cyan-400 font-medium">{{ stats.total_tool_calls }}</span></div>
+                <div class="text-gray-500">Uptime <span class="text-yellow-400 font-medium">{{ formatTime(stats.elapsed) }}</span></div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[10px]" :class="liveMode ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'">
+                    {{ liveMode ? 'LLM' : 'SIM' }}
+                </span>
+                <span v-if="toolsMode" class="px-2 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-400">MCP</span>
+                <div class="w-2 h-2 rounded-full" :class="connected ? 'bg-green-500 pulse' : 'bg-red-500'"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex gap-3 flex-1 min-h-0">
+        <!-- Left Column: Agents -->
+        <div class="w-2/3 flex flex-col gap-3 min-h-0">
+            <!-- Deliberation Topic Bar with Controls -->
+            <div class="card rounded-lg p-3 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <input v-model="topicInput" @keyup.enter="startDeliberation"
+                               placeholder="Enter a topic for deliberation..."
+                               class="w-full bg-gray-800/50 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                               :disabled="isPaused">
+                    </div>
+                    <button @click="startDeliberation" :disabled="!topicInput || deliberation.active || isPaused"
+                            class="px-4 py-2 rounded bg-violet-600 hover:bg-violet-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        {{ deliberation.active ? 'Deliberating...' : 'Start' }}
+                    </button>
+                </div>
+
+                <!-- Control Row -->
+                <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
+                    <div v-if="deliberation.topic" class="text-sm text-gray-400 flex-1">
+                        <span class="text-gray-500">Topic:</span> {{ deliberation.topic }}
+                    </div>
+                    <div v-else class="text-sm text-gray-600 flex-1">No active topic</div>
+
+                    <!-- Control Buttons -->
+                    <div class="flex items-center gap-2">
+                        <!-- Pause/Resume -->
+                        <button @click="togglePause" :disabled="!deliberation.active && !isPaused"
+                                class="control-btn control-btn-pause" :class="{paused: isPaused}">
+                            <span v-if="isPaused">▶</span>
+                            <span v-else>⏸</span>
+                            {{ isPaused ? 'Resume' : 'Pause' }}
+                        </button>
+
+                        <!-- Inject Content -->
+                        <button @click="showInjectModal = true" class="control-btn control-btn-inject">
+                            📥 Inject Content
+                        </button>
+
+                        <!-- Stop -->
+                        <button @click="stopDeliberation" :disabled="!deliberation.active"
+                                class="control-btn control-btn-stop">
+                            ⏹ Stop
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Injected Content Preview -->
+                <div v-if="injectedContent.length" class="mt-3 pt-3 border-t border-gray-800">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-gray-500">Injected Content ({{ injectedContent.length }})</span>
+                        <button @click="clearInjectedContent" class="text-xs text-red-400 hover:text-red-300">Clear All</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <div v-for="(item, idx) in injectedContent.slice(-3)" :key="idx"
+                             class="source-badge" :class="item.type">
+                            {{ item.type === 'news' ? '📰' : item.type === 'research' ? '📚' : item.type === 'opinion' ? '💭' : '📝' }}
+                            {{ item.title || item.content.slice(0, 30) + '...' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Grid -->
+            <div class="flex-1 overflow-y-auto scroll-thin pr-1">
+                <div class="agent-grid">
+                    <div v-for="agent in agents" :key="agent.id"
+                         class="card rounded-lg p-3 cursor-pointer transition-all"
+                         :class="{'ring-1 ring-violet-500 card-glow': selectedAgent?.id === agent.id}"
+                         :style="{borderLeftColor: agent.color, borderLeftWidth: '3px'}"
+                         @click="selectAgent(agent)">
+
+                        <!-- Header -->
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">{{ agent.emoji }}</span>
+                                <span class="font-medium text-white text-sm">{{ agent.name }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-1.5 py-0.5 rounded text-[10px]"
+                                      :class="'tag-' + agent.personality_type.replace('the_', '')">
+                                    {{ formatPersonality(agent.personality_type) }}
+                                </span>
+                                <div class="w-2 h-2 rounded-full" :class="'status-' + agent.status"
+                                     :title="agent.status"></div>
+                            </div>
+                        </div>
+
+                        <!-- Prompt/Persona Info -->
+                        <div v-if="agent.prompt_category" class="mb-2 bg-gradient-to-r from-indigo-900/30 to-purple-900/20 rounded p-2 border border-indigo-800/30">
+                            <div class="flex items-center gap-1 mb-1 flex-wrap">
+                                <span class="text-[9px] bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded uppercase tracking-wider">{{ agent.prompt_category }}</span>
+                                <span v-if="agent.prompt_subcategory" class="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded">{{ agent.prompt_subcategory }}</span>
+                                <span v-if="agent.prompt_id" class="text-[9px] text-gray-500">#{{ agent.prompt_id }}</span>
+                            </div>
+                            <div v-if="agent.prompt_text" class="text-[10px] text-gray-400 leading-relaxed truncate-2">{{ agent.prompt_text }}</div>
+                        </div>
+
+                        <!-- Status & Activity -->
+                        <div class="text-xs text-gray-500 mb-2 flex items-center gap-2">
+                            <span :class="'status-' + agent.status">{{ formatStatus(agent.status) }}</span>
+                            <span v-if="agent.current_tool" class="text-cyan-400">
+                                <span class="spinner inline-block w-3 h-3 mr-1"></span>
+                                {{ agent.current_tool }}
+                            </span>
+                        </div>
+
+                        <!-- Current Thought -->
+                        <div v-if="agent.current_thought" class="text-xs text-gray-400 italic mb-2 truncate-2">
+                            "{{ agent.current_thought }}"
+                        </div>
+
+                        <!-- Energy Bar -->
+                        <div class="mb-2">
+                            <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                                <span>Energy</span>
+                                <span>{{ (agent.energy * 100).toFixed(0) }}%</span>
+                            </div>
+                            <div class="energy-bar">
+                                <div class="energy-fill energy-pulse"
+                                     :style="{width: (agent.energy * 100) + '%', background: getEnergyColor(agent.energy)}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Row -->
+                        <div class="flex gap-2 text-xs">
+                            <div class="flex-1 bg-gray-800/50 rounded px-2 py-1 text-center">
+                                <div class="text-gray-500 text-[10px]">msgs</div>
+                                <div class="text-white font-medium">{{ agent.messages_sent }}</div>
+                            </div>
+                            <div class="flex-1 bg-gray-800/50 rounded px-2 py-1 text-center">
+                                <div class="text-gray-500 text-[10px]">tools</div>
+                                <div class="text-cyan-400 font-medium">{{ agent.tool_calls }}</div>
+                            </div>
+                            <div class="flex-1 bg-gray-800/50 rounded px-2 py-1 text-center cursor-pointer hover:bg-gray-700/50 transition-colors"
+                                 @click.stop="openAgentConfig(agent)">
+                                <div class="text-gray-500 text-[10px]">model</div>
+                                <div class="text-violet-400 font-medium">{{ agent.model.slice(0, 6) }} ⚙️</div>
+                            </div>
+                        </div>
+
+                        <!-- Vote (if any) -->
+                        <div v-if="agent.current_vote" class="mt-2 px-2 py-1 rounded text-xs text-center"
+                             :class="getVoteClass(agent.current_vote)">
+                            {{ agent.current_vote }}
+                        </div>
+
+                        <!-- Position indicator (for persuader game) -->
+                        <div v-if="positions[agent.id]" class="mt-2 px-2 py-1 rounded text-xs text-center font-medium"
+                             :class="'position-' + positions[agent.id].toLowerCase()">
+                            Position: {{ positions[agent.id] }}
+                        </div>
+
+                        <!-- MCP Tools -->
+                        <div v-if="agent.mcp_connected" class="mt-2 flex items-center gap-1">
+                            <span class="text-[10px] text-cyan-400">MCP</span>
+                            <div class="flex gap-1">
+                                <span v-for="tool in agent.available_tools.slice(0, 3)" :key="tool"
+                                      class="text-[9px] bg-cyan-900/30 text-cyan-300 px-1 rounded">
+                                    {{ tool }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Activity Panels -->
+        <div class="w-1/3 flex flex-col gap-3 min-h-0">
+            <!-- Persuader Meta-Game Panel -->
+            <div class="persuader-card rounded-lg p-3 flex-shrink-0" :class="{'persuader-active': persuader.active}">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🎭</span>
+                        <span class="text-sm font-medium gold-text">The Persuader</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span v-if="persuader.active" class="px-2 py-0.5 rounded text-[10px] bg-yellow-500/20 text-yellow-400 pulse">
+                            ACTIVE
+                        </span>
+                        <span v-else class="px-2 py-0.5 rounded text-[10px] bg-gray-500/20 text-gray-400">
+                            INACTIVE
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Persuader controls -->
+                <div class="flex gap-2 mb-2">
+                    <select v-model="persuaderTarget" class="flex-1 bg-gray-800/50 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <option value="FOR">Target: FOR</option>
+                        <option value="AGAINST">Target: AGAINST</option>
+                    </select>
+                    <button v-if="!persuader.active" @click="startPersuader" :disabled="!deliberation.topic"
+                            class="px-3 py-1 rounded bg-yellow-600 hover:bg-yellow-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        Start
+                    </button>
+                    <button v-else @click="stopPersuader"
+                            class="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-xs font-medium transition-colors">
+                        Stop
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-2 text-xs mb-2">
+                    <div class="bg-gray-800/30 rounded px-2 py-1 text-center">
+                        <div class="text-gray-500 text-[10px]">Attempts</div>
+                        <div class="text-white font-medium">{{ persuader.attempted_flips || 0 }}</div>
+                    </div>
+                    <div class="bg-gray-800/30 rounded px-2 py-1 text-center">
+                        <div class="text-gray-500 text-[10px]">Flips</div>
+                        <div class="text-green-400 font-medium">{{ persuader.successful_flips || 0 }}</div>
+                    </div>
+                    <div class="bg-gray-800/30 rounded px-2 py-1 text-center">
+                        <div class="text-gray-500 text-[10px]">Rate</div>
+                        <div class="text-yellow-400 font-medium">{{ getFlipRate() }}</div>
+                    </div>
+                </div>
+
+                <!-- Position summary -->
+                <div class="flex gap-2 text-xs">
+                    <div class="flex-1 rounded px-2 py-1 text-center position-for">
+                        FOR: {{ positionSummary.FOR || 0 }}
+                    </div>
+                    <div class="flex-1 rounded px-2 py-1 text-center position-against">
+                        AGAINST: {{ positionSummary.AGAINST || 0 }}
+                    </div>
+                    <div class="flex-1 rounded px-2 py-1 text-center position-undecided">
+                        UNDECIDED: {{ positionSummary.UNDECIDED || 0 }}
+                    </div>
+                </div>
+
+                <!-- Advanced Analytics (when active) -->
+                <div v-if="persuader.active || persuader.attempted_flips > 0" class="mt-3 border-t border-gray-700/50 pt-3">
+                    <!-- Tab navigation -->
+                    <div class="tab-nav mb-2">
+                        <div class="tab-btn" :class="{active: analyticsTab === 'tactics'}" @click="analyticsTab = 'tactics'">Tactics</div>
+                        <div class="tab-btn" :class="{active: analyticsTab === 'network'}" @click="analyticsTab = 'network'">Network</div>
+                        <div class="tab-btn" :class="{active: analyticsTab === 'timeline'}" @click="analyticsTab = 'timeline'">Timeline</div>
+                        <div class="tab-btn" :class="{active: analyticsTab === 'heatmap'}" @click="analyticsTab = 'heatmap'">Matrix</div>
+                    </div>
+
+                    <!-- Tactic Effectiveness Chart -->
+                    <div v-show="analyticsTab === 'tactics'" class="chart-container">
+                        <canvas ref="tacticChart"></canvas>
+                    </div>
+
+                    <!-- Influence Network Graph -->
+                    <div v-show="analyticsTab === 'network'" class="network-container" ref="networkContainer">
+                        <svg ref="networkSvg" width="100%" height="100%">
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#4ade80"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- Belief Trajectory Timeline -->
+                    <div v-show="analyticsTab === 'timeline'" class="trajectory-container">
+                        <svg ref="trajectorySvg" width="100%" height="100%"></svg>
+                    </div>
+
+                    <!-- Tactic-Persona Effectiveness Heatmap -->
+                    <div v-show="analyticsTab === 'heatmap'">
+                        <div class="heatmap-container" :style="{gridTemplateColumns: 'repeat(' + Math.min(agents.length, 8) + ', 1fr)'}">
+                            <div v-for="cell in heatmapData" :key="cell.id"
+                                 class="heatmap-cell"
+                                 :style="{background: getHeatmapColor(cell.value)}"
+                                 :title="cell.label + ': ' + (cell.value * 100).toFixed(0) + '%'">
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-1 text-[8px] text-gray-500">
+                            <span>Low</span>
+                            <span>Effectiveness</span>
+                            <span>High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Row -->
+                <div v-if="persuader.attempted_flips > 0" class="mt-2 flex gap-1 text-[9px]">
+                    <div class="flex-1 stat-card py-1">
+                        <div class="text-gray-500">Best Tactic</div>
+                        <div class="text-green-400 font-medium truncate">{{ bestTactic || 'N/A' }}</div>
+                    </div>
+                    <div class="flex-1 stat-card py-1">
+                        <div class="text-gray-500">Avg Conf Δ</div>
+                        <div :class="avgConfidenceChange >= 0 ? 'text-green-400' : 'text-red-400'" class="font-medium">
+                            {{ avgConfidenceChange >= 0 ? '+' : '' }}{{ (avgConfidenceChange * 100).toFixed(1) }}%
+                        </div>
+                    </div>
+                    <div class="flex-1 stat-card py-1">
+                        <div class="text-gray-500">Resistance</div>
+                        <div class="text-yellow-400 font-medium">{{ (avgResistance * 100).toFixed(0) }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Private Messages Panel (visible when persuader active) -->
+            <div v-if="persuader.active || privateMessages.length" class="card rounded-lg p-3 flex-shrink-0 max-h-32">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium gold-text">🔒 Private Channel</span>
+                    <span class="text-xs text-gray-500">{{ privateMessages.length }} msgs</span>
+                </div>
+                <div class="overflow-y-auto scroll-thin space-y-1 max-h-20">
+                    <div v-for="msg in privateMessages.slice(-5).reverse()" :key="msg.msg_id"
+                         class="text-xs bg-gray-800/30 rounded px-2 py-1.5 msg-private">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-[10px]" :class="msg.sender_id === 'persuader' ? 'gold-text' : 'text-gray-400'">
+                                {{ msg.sender_id === 'persuader' ? '🎭 Persuader' : msg.sender_id.slice(-5) }}
+                            </span>
+                            <span class="text-gray-600">→</span>
+                            <span :style="{color: getAgentColor(msg.target)}">{{ msg.target.slice(-5) }}</span>
+                        </div>
+                        <div class="text-gray-400 truncate">{{ msg.content.slice(0, 100) }}...</div>
+                    </div>
+                    <div v-if="!privateMessages.length" class="text-xs text-gray-600 text-center py-1">
+                        No private messages yet
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experiment Results Panel -->
+            <div class="experiment-card rounded-lg p-3 flex-shrink-0">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🔬</span>
+                        <span class="text-sm font-medium text-blue-400">Manipulation Research</span>
+                        <span v-if="experimentStatus" class="text-[9px] px-1.5 py-0.5 rounded"
+                              :class="{
+                                  'bg-yellow-500/20 text-yellow-400': experimentStatus === 'starting',
+                                  'bg-blue-500/20 text-blue-400 pulse': experimentStatus === 'running',
+                                  'bg-green-500/20 text-green-400': experimentStatus === 'completed',
+                                  'bg-red-500/20 text-red-400': experimentStatus === 'error'
+                              }">
+                            {{ experimentStatus }}
+                        </span>
+                    </div>
+                    <button @click="runExperiment" :disabled="experimentRunning"
+                            class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-[10px] font-medium disabled:opacity-50 transition-colors">
+                        {{ experimentRunning ? 'Running...' : 'Run Exp' }}
+                    </button>
+                </div>
+
+                <!-- Experiment Progress -->
+                <div v-if="experimentRunning" class="mb-2 bg-blue-900/20 rounded p-2 border border-blue-800/30">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="spinner"></div>
+                        <span class="text-[10px] text-blue-300">{{ experimentPhase || 'Initializing...' }}</span>
+                    </div>
+                    <div v-if="experimentProgress" class="text-[9px] text-gray-500">
+                        {{ experimentProgress }}
+                    </div>
+                </div>
+
+                <!-- Mode indicator -->
+                <div class="mb-2 text-[9px]">
+                    <span class="px-1.5 py-0.5 rounded" :class="liveMode ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'">
+                        {{ liveMode ? 'Live LLM' : 'Simulation' }}
+                    </span>
+                </div>
+
+                <!-- Persona Selection -->
+                <div class="mb-2">
+                    <div class="text-[10px] text-gray-500 mb-1">Target Personas</div>
+                    <div class="flex flex-wrap gap-1">
+                        <div v-for="persona in availablePersonas" :key="persona.id"
+                             class="persona-chip text-[9px]"
+                             :class="{selected: selectedPersonas.includes(persona.id)}"
+                             @click="togglePersona(persona.id)">
+                            {{ persona.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A/B Test Results -->
+                <div v-if="experimentResults.ab_test" class="mb-2">
+                    <div class="text-[10px] text-gray-500 mb-1">A/B Test: Baseline vs Informed</div>
+                    <div class="ab-comparison">
+                        <div class="ab-side ab-baseline">
+                            <div class="text-[10px] text-gray-400">Baseline</div>
+                            <div class="text-lg font-bold text-gray-300">{{ (experimentResults.ab_test.baseline?.success_rate * 100 || 0).toFixed(0) }}%</div>
+                            <div class="text-[9px] text-gray-500">n={{ experimentResults.ab_test.baseline?.n || 0 }}</div>
+                        </div>
+                        <div class="ab-vs">vs</div>
+                        <div class="ab-side ab-informed">
+                            <div class="text-[10px] text-gray-400">Informed</div>
+                            <div class="text-lg font-bold text-green-400">{{ (experimentResults.ab_test.informed?.success_rate * 100 || 0).toFixed(0) }}%</div>
+                            <div class="text-[9px] text-gray-500">n={{ experimentResults.ab_test.informed?.n || 0 }}</div>
+                        </div>
+                    </div>
+                    <div v-if="experimentResults.ab_test.comparison" class="text-[10px] text-center mt-1"
+                         :class="experimentResults.ab_test.comparison.success_rate_improvement > 0 ? 'text-green-400' : 'text-red-400'">
+                        {{ experimentResults.ab_test.comparison.success_rate_improvement > 0 ? '+' : '' }}{{ (experimentResults.ab_test.comparison.success_rate_improvement * 100).toFixed(1) }}% improvement
+                    </div>
+                </div>
+
+                <!-- Tactic Effectiveness -->
+                <div v-if="Object.keys(tacticEffectiveness).length" class="mb-2">
+                    <div class="text-[10px] text-gray-500 mb-1">Tactic Effectiveness</div>
+                    <div class="space-y-1">
+                        <div v-for="(rate, tactic) in sortedTactics" :key="tactic" class="tactic-bar">
+                            <div class="tactic-fill" :style="{width: (rate * 100) + '%', background: getTacticColor(rate)}"></div>
+                            <div class="tactic-label">
+                                <span class="text-gray-300">{{ formatTactic(tactic) }}</span>
+                                <span class="text-white font-medium">{{ (rate * 100).toFixed(0) }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cialdini Principles Summary -->
+                <div class="cialdini-wheel">
+                    <div v-for="principle in cialdiniPrinciples" :key="principle.name"
+                         class="cialdini-item" :style="{borderBottom: '2px solid ' + principle.color}">
+                        <div class="text-[8px] text-gray-500">{{ principle.name }}</div>
+                        <div class="font-medium" :style="{color: principle.color}">{{ principle.score }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manipulation Detection Panel -->
+            <div v-if="manipulationAlerts.length" class="card rounded-lg p-3 flex-shrink-0 max-h-28">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-red-400">⚠️ Manipulation Detected</span>
+                    <span class="text-xs text-gray-500">{{ manipulationAlerts.length }}</span>
+                </div>
+                <div class="space-y-1 overflow-y-auto scroll-thin max-h-16">
+                    <div v-for="alert in manipulationAlerts.slice(-3)" :key="alert.id" class="manipulation-alert">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[10px] font-medium text-red-400">{{ alert.type }}</span>
+                            <span class="text-[9px] text-gray-500">{{ alert.severity }}</span>
+                        </div>
+                        <div class="text-[10px] text-gray-400">{{ alert.description }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resistance Tracking -->
+            <div v-if="Object.keys(resistanceScores).length" class="card rounded-lg p-3 flex-shrink-0">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-white">🛡️ Resistance Scores</span>
+                </div>
+                <div class="space-y-2">
+                    <div v-for="(score, agentId) in resistanceScores" :key="agentId">
+                        <div class="flex items-center justify-between text-[10px] mb-1">
+                            <span :style="{color: getAgentColor(agentId)}">{{ agentId.slice(-8) }}</span>
+                            <span class="text-gray-400">{{ (score.overall * 100).toFixed(0) }}%</span>
+                        </div>
+                        <div class="resistance-meter">
+                            <div v-for="i in 10" :key="i" class="resistance-segment"
+                                 :class="getResistanceClass(score.overall, i)"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN STREAMING OUTPUT PANEL - Enhanced -->
+            <div class="card rounded-lg p-4 flex-shrink-0" style="min-height: 280px; max-height: 45vh;">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-red-500 pulse"></div>
+                        <span class="text-base font-semibold text-white">Live Agent Responses</span>
+                        <span class="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400" v-if="Object.keys(streamingAgents).length">
+                            {{ Object.keys(streamingAgents).length }} streaming
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button @click="clearConversation" class="text-xs px-2 py-1 rounded bg-gray-700 hover:bg-gray-600 transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Streams -->
+                <div class="overflow-y-auto scroll-thin space-y-3" style="max-height: calc(45vh - 100px);">
+                    <!-- Currently Streaming Agents -->
+                    <div v-for="(buffer, agentId) in streamingAgents" :key="'stream-' + agentId"
+                         class="stream-main" :style="{'--agent-color': getAgentColor(agentId)}">
+                        <div class="agent-header">
+                            <span class="text-lg">{{ getAgentEmoji(agentId) }}</span>
+                            <span class="font-medium" :style="{color: getAgentColor(agentId)}">{{ getAgentName(agentId) }}</span>
+                            <span class="text-xs text-gray-500">{{ getAgentModel(agentId) }}</span>
+                            <div class="typing-indicator ml-auto">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                        <div class="agent-content text-gray-200">
+                            {{ buffer }}<span class="stream-cursor"></span>
+                        </div>
+                    </div>
+
+                    <!-- Recent Completed Messages (Conversation Thread) -->
+                    <div v-for="msg in recentConversation" :key="msg.id"
+                         class="conversation-msg" :style="{'--agent-color': getAgentColor(msg.sender_id)}">
+                        <div class="msg-header">
+                            <div class="msg-sender">
+                                <span class="text-base">{{ getAgentEmoji(msg.sender_id) }}</span>
+                                <span :style="{color: getAgentColor(msg.sender_id)}">{{ getAgentName(msg.sender_id) }}</span>
+                                <span class="text-xs text-gray-600">{{ getAgentModel(msg.sender_id) }}</span>
+                                <span v-if="msg.position" class="text-xs px-1.5 py-0.5 rounded ml-2"
+                                      :class="'position-' + msg.position.toLowerCase()">
+                                    {{ msg.position }}
+                                </span>
+                            </div>
+                            <div class="text-xs text-gray-500">{{ formatTimestamp(msg.timestamp) }}</div>
+                        </div>
+                        <div class="msg-content">{{ msg.content }}</div>
+                        <!-- Reactions from other agents -->
+                        <div class="msg-reactions" v-if="msg.reactions && msg.reactions.length">
+                            <span v-for="reaction in msg.reactions" :key="reaction.agent_id"
+                                  class="reaction-badge" :class="reaction.sentiment">
+                                {{ getAgentEmoji(reaction.agent_id) }}
+                                {{ reaction.type }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div v-if="!Object.keys(streamingAgents).length && !recentConversation.length"
+                         class="text-center py-8 text-gray-500">
+                        <div class="text-3xl mb-2">💬</div>
+                        <div class="text-sm">Waiting for agent responses...</div>
+                        <div class="text-xs text-gray-600 mt-1">Start a deliberation to see live streaming</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabbed Panel: Consensus / Claims / Beliefs -->
+            <div class="card rounded-lg flex-1 min-h-0 flex flex-col">
+                <!-- Tabs -->
+                <div class="flex border-b border-gray-800">
+                    <button @click="activeTab = 'consensus'" class="tab-btn" :class="{active: activeTab === 'consensus'}">
+                        Consensus
+                    </button>
+                    <button @click="activeTab = 'claims'" class="tab-btn" :class="{active: activeTab === 'claims'}">
+                        Claims ({{ claims.length }})
+                    </button>
+                    <button @click="activeTab = 'votes'" class="tab-btn" :class="{active: activeTab === 'votes'}">
+                        Votes ({{ structuredVotes.length }})
+                    </button>
+                    <button @click="activeTab = 'beliefs'" class="tab-btn" :class="{active: activeTab === 'beliefs'}">
+                        Beliefs
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto scroll-thin p-3">
+                    <!-- Consensus Tab -->
+                    <div v-if="activeTab === 'consensus'" class="space-y-2">
+                        <div v-for="(count, option) in sortedConsensus" :key="option">
+                            <div class="consensus-bar">
+                                <div class="consensus-fill"
+                                     :style="{width: getConsensusPercent(count) + '%', background: getConsensusColor(option)}"></div>
+                                <div class="consensus-label">
+                                    <span class="font-medium">{{ option }}</span>
+                                    <span>{{ count }} ({{ getConsensusPercent(count).toFixed(0) }}%)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="!Object.keys(consensus).length" class="text-xs text-gray-600 text-center py-4">
+                            No active vote
+                        </div>
+                    </div>
+
+                    <!-- Claims Tab -->
+                    <div v-if="activeTab === 'claims'" class="space-y-2">
+                        <div v-for="claim in claims.slice(-10).reverse()" :key="claim.claim_id"
+                             class="claim-card rounded p-2 slide-in">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">
+                                    {{ claim.agent_id?.slice(-5) }}
+                                </span>
+                                <span class="text-[10px] text-gray-500">conf: {{ (claim.confidence * 100).toFixed(0) }}%</span>
+                            </div>
+                            <div class="text-xs text-gray-300 mb-1">{{ claim.content }}</div>
+                            <div v-if="claim.evidence?.length" class="text-[10px] text-gray-500">
+                                Evidence: {{ claim.evidence.slice(0, 2).join(', ') }}
+                            </div>
+                            <div class="confidence-bar mt-1">
+                                <div class="confidence-fill bg-blue-500" :style="{width: (claim.confidence * 100) + '%'}"></div>
+                            </div>
+                        </div>
+                        <div v-if="!claims.length" class="text-xs text-gray-600 text-center py-4">
+                            No claims yet
+                        </div>
+                    </div>
+
+                    <!-- Votes Tab -->
+                    <div v-if="activeTab === 'votes'" class="space-y-2">
+                        <div v-for="vote in structuredVotes.slice(-10).reverse()" :key="vote.vote_id"
+                             class="vote-card rounded p-2 slide-in">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">
+                                    {{ vote.agent_id?.slice(-5) }}
+                                </span>
+                                <span class="text-xs font-medium" :class="getVoteClass(vote.vote_type)">
+                                    {{ vote.vote_type?.toUpperCase() }}
+                                </span>
+                            </div>
+                            <div class="text-xs text-gray-300 mb-1">{{ vote.reasoning?.slice(0, 100) }}...</div>
+                            <div class="flex items-center justify-between text-[10px] text-gray-500">
+                                <span>Confidence: {{ (vote.confidence * 100).toFixed(0) }}%</span>
+                                <span v-if="vote.conditions?.length">Conditions: {{ vote.conditions.length }}</span>
+                            </div>
+                            <div class="confidence-bar mt-1">
+                                <div class="confidence-fill bg-purple-500" :style="{width: (vote.confidence * 100) + '%'}"></div>
+                            </div>
+                        </div>
+                        <div v-if="!structuredVotes.length" class="text-xs text-gray-600 text-center py-4">
+                            No structured votes yet
+                        </div>
+                    </div>
+
+                    <!-- Beliefs Tab -->
+                    <div v-if="activeTab === 'beliefs'" class="space-y-2">
+                        <div v-for="(belief, agentId) in beliefStates" :key="agentId"
+                             class="belief-card rounded p-2">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400">
+                                    {{ agentId.slice(-5) }}
+                                </span>
+                                <span class="text-[10px]" :class="belief.delta?.confidence_delta > 0 ? 'text-green-400' : belief.delta?.confidence_delta < 0 ? 'text-red-400' : 'text-gray-500'">
+                                    {{ belief.delta?.confidence_delta > 0 ? '↑' : belief.delta?.confidence_delta < 0 ? '↓' : '→' }}
+                                    {{ (belief.confidence * 100).toFixed(0) }}%
+                                </span>
+                            </div>
+                            <div class="text-xs text-gray-300 mb-1">{{ belief.position?.slice(0, 80) }}...</div>
+                            <div v-if="belief.delta?.position_changed" class="text-[10px] text-yellow-400 mb-1">
+                                ⚡ Position changed
+                            </div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill bg-yellow-500" :style="{width: (belief.confidence * 100) + '%'}"></div>
+                            </div>
+                        </div>
+                        <div v-if="!Object.keys(beliefStates).length" class="text-xs text-gray-600 text-center py-4">
+                            No belief states tracked
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tool Activity Panel -->
+            <div class="card rounded-lg p-3 flex-shrink-0 max-h-36 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-white">Tool Activity</span>
+                    <span class="text-xs text-cyan-400">{{ toolCalls.length }} calls</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto scroll-thin space-y-1">
+                    <div v-for="call in toolCalls.slice(-6).reverse()" :key="call.id"
+                         class="text-xs bg-gray-800/30 rounded px-2 py-1.5 slide-in"
+                         :class="'tool-' + call.status">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span v-if="call.status === 'running'" class="spinner"></span>
+                                <span v-else-if="call.status === 'success'" class="text-green-400">&#10003;</span>
+                                <span v-else class="text-red-400">&#10007;</span>
+                                <span :style="{color: getAgentColor(call.agent_id)}">{{ call.agent_id.slice(-5) }}</span>
+                                <span class="text-cyan-300">{{ call.tool_name }}</span>
+                            </div>
+                            <span class="text-gray-500">{{ call.duration_ms?.toFixed(0) || '...' }}ms</span>
+                        </div>
+                    </div>
+
+                    <div v-if="!toolCalls.length" class="text-xs text-gray-600 text-center py-2">
+                        No tool activity
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Stream Panel -->
+            <div class="card rounded-lg p-3 flex-shrink-0 max-h-44 flex flex-col">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-white">Message Stream</span>
+                    <span class="text-xs text-gray-500">{{ messages.length }}</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto scroll-thin space-y-1" ref="messageContainer">
+                    <div v-for="msg in messages.slice(-12)" :key="msg.id"
+                         class="text-xs bg-gray-800/30 rounded px-2 py-1.5 slide-in"
+                         :class="getMessageClass(msg)">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-gray-500 text-[10px]">{{ msg.timestamp.toFixed(1) }}s</span>
+                            <span :style="{color: getAgentColor(msg.sender_id)}">{{ msg.sender_id.slice(-5) }}</span>
+                            <span class="text-gray-600">&rarr;</span>
+                            <span v-if="msg.target === 'broadcast'" class="text-pink-400">ALL</span>
+                            <span v-else :style="{color: getAgentColor(msg.target)}">{{ msg.target.slice(-5) }}</span>
+                            <span v-if="msg.tool_used" class="text-cyan-400 text-[10px]">[{{ msg.tool_used }}]</span>
+                        </div>
+                        <div class="text-gray-400 truncate">{{ msg.content }}</div>
+                    </div>
+
+                    <div v-if="!messages.length" class="text-xs text-gray-600 text-center py-4">
+                        Awaiting swarm activity...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Configuration Modal -->
+    <div v-if="showAgentConfig" class="modal-overlay" @click.self="showAgentConfig = false">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">{{ editingAgent?.emoji }}</span>
+                    <h3 class="text-lg font-semibold text-white">Configure Agent</h3>
+                    <span class="text-sm text-gray-500">{{ editingAgent?.id }}</span>
+                </div>
+                <button @click="showAgentConfig = false" class="text-gray-500 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Model Selection -->
+                <div class="form-group">
+                    <label class="form-label">Model</label>
+                    <select v-model="agentConfigForm.model" class="form-select">
+                        <option value="opus">Claude Opus 4 (Most Capable)</option>
+                        <option value="sonnet">Claude Sonnet 4 (Balanced)</option>
+                        <option value="gpt4">GPT-4o (OpenAI)</option>
+                        <option value="grok">Grok-3 (xAI)</option>
+                        <option value="deepseek">DeepSeek-R1 (Reasoning)</option>
+                        <option value="llama">Llama 3.3 70B (Open)</option>
+                    </select>
+                </div>
+
+                <!-- Personality Type -->
+                <div class="form-group">
+                    <label class="form-label">Personality Archetype</label>
+                    <select v-model="agentConfigForm.personality_type" class="form-select">
+                        <option value="the_scholar">📚 The Scholar (Analytical)</option>
+                        <option value="the_pragmatist">🎯 The Pragmatist (Efficient)</option>
+                        <option value="the_creative">🎨 The Creative (Innovative)</option>
+                        <option value="the_skeptic">🔍 The Skeptic (Critical)</option>
+                        <option value="the_mentor">🎓 The Mentor (Supportive)</option>
+                        <option value="the_synthesizer">🔮 The Synthesizer (Integrative)</option>
+                    </select>
+                </div>
+
+                <!-- Agent Name -->
+                <div class="form-group">
+                    <label class="form-label">Display Name</label>
+                    <input v-model="agentConfigForm.name" class="form-input" placeholder="Agent name">
+                </div>
+
+                <!-- Custom System Prompt -->
+                <div class="form-group">
+                    <label class="form-label">Custom System Prompt / Persona</label>
+                    <textarea v-model="agentConfigForm.prompt_text" class="form-textarea"
+                              placeholder="Enter a custom persona or system prompt for this agent. This will influence how the agent responds and reasons."></textarea>
+                    <div class="text-xs text-gray-500 mt-1">
+                        Leave blank to use default personality-based prompt.
+                    </div>
+                </div>
+
+                <!-- Prompt Category -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Prompt Category</label>
+                        <select v-model="agentConfigForm.prompt_category" class="form-select">
+                            <option value="">-- None --</option>
+                            <option value="research">Research</option>
+                            <option value="technical">Technical</option>
+                            <option value="creative">Creative</option>
+                            <option value="business">Business</option>
+                            <option value="education">Education</option>
+                            <option value="reasoning">Reasoning</option>
+                            <option value="roleplay">Roleplay</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subcategory</label>
+                        <input v-model="agentConfigForm.prompt_subcategory" class="form-input" placeholder="e.g., AI Safety">
+                    </div>
+                </div>
+
+                <!-- Initial Position -->
+                <div class="form-group">
+                    <label class="form-label">Initial Position (for deliberation)</label>
+                    <div class="flex gap-2">
+                        <button @click="agentConfigForm.initial_position = 'FOR'"
+                                class="flex-1 py-2 rounded text-sm transition-colors"
+                                :class="agentConfigForm.initial_position === 'FOR' ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'">
+                            FOR
+                        </button>
+                        <button @click="agentConfigForm.initial_position = 'UNDECIDED'"
+                                class="flex-1 py-2 rounded text-sm transition-colors"
+                                :class="agentConfigForm.initial_position === 'UNDECIDED' ? 'bg-yellow-600 text-white' : 'bg-gray-700 text-gray-300'">
+                            UNDECIDED
+                        </button>
+                        <button @click="agentConfigForm.initial_position = 'AGAINST'"
+                                class="flex-1 py-2 rounded text-sm transition-colors"
+                                :class="agentConfigForm.initial_position === 'AGAINST' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'">
+                            AGAINST
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <details class="mt-4">
+                    <summary class="text-sm text-gray-400 cursor-pointer hover:text-gray-300">Advanced Settings</summary>
+                    <div class="mt-3 space-y-3 pl-2 border-l border-gray-700">
+                        <div class="form-group">
+                            <label class="form-label">Resistance Score (0-1)</label>
+                            <input type="range" v-model.number="agentConfigForm.resistance" min="0" max="1" step="0.1"
+                                   class="w-full">
+                            <div class="text-xs text-gray-500 mt-1">
+                                {{ (agentConfigForm.resistance * 100).toFixed(0) }}% - Higher = more resistant to persuasion
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Confidence (0-1)</label>
+                            <input type="range" v-model.number="agentConfigForm.confidence" min="0" max="1" step="0.1"
+                                   class="w-full">
+                            <div class="text-xs text-gray-500 mt-1">
+                                {{ (agentConfigForm.confidence * 100).toFixed(0) }}%
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            <div class="modal-footer">
+                <button @click="showAgentConfig = false"
+                        class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-sm transition-colors">
+                    Cancel
+                </button>
+                <button @click="saveAgentConfig"
+                        class="px-4 py-2 rounded bg-violet-600 hover:bg-violet-700 text-sm font-medium transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inject Content Modal -->
+    <div v-if="showInjectModal" class="modal-overlay inject-modal" @click.self="showInjectModal = false">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">📥</span>
+                    <h3 class="text-lg font-semibold text-white">Inject Content</h3>
+                </div>
+                <button @click="showInjectModal = false" class="text-gray-500 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Source Type Tabs -->
+                <div class="inject-tabs">
+                    <div class="inject-tab" :class="{active: injectTab === 'paste'}" @click="injectTab = 'paste'">
+                        📝 Paste Text
+                    </div>
+                    <div class="inject-tab" :class="{active: injectTab === 'url'}" @click="injectTab = 'url'">
+                        🔗 From URL
+                    </div>
+                    <div class="inject-tab" :class="{active: injectTab === 'news'}" @click="injectTab = 'news'">
+                        📰 News Feed
+                    </div>
+                </div>
+
+                <!-- Paste Text Tab -->
+                <div v-if="injectTab === 'paste'">
+                    <div class="form-group">
+                        <label class="form-label">Content Title (optional)</label>
+                        <input v-model="injectForm.title" class="form-input" placeholder="e.g., NYT Article on AI Safety">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Content Type</label>
+                        <select v-model="injectForm.type" class="form-select">
+                            <option value="news">📰 News Article</option>
+                            <option value="research">📚 Research Paper</option>
+                            <option value="opinion">💭 Opinion / Editorial</option>
+                            <option value="custom">📝 Custom Content</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Paste Content</label>
+                        <textarea v-model="injectForm.content" class="form-textarea" style="min-height: 200px;"
+                                  placeholder="Paste your article, research paper, news content, or any text you want the agents to discuss..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Discussion Prompt (optional)</label>
+                        <input v-model="injectForm.prompt" class="form-input"
+                               placeholder="e.g., What are the implications of this for AI safety?">
+                    </div>
+                </div>
+
+                <!-- URL Tab -->
+                <div v-if="injectTab === 'url'">
+                    <div class="form-group">
+                        <label class="form-label">URL to Fetch</label>
+                        <div class="url-input-group">
+                            <input v-model="injectForm.url" class="form-input" placeholder="https://...">
+                            <button @click="fetchUrl" :disabled="fetchingUrl || !injectForm.url"
+                                    class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-sm font-medium disabled:opacity-50 transition-colors">
+                                {{ fetchingUrl ? 'Fetching...' : 'Fetch' }}
+                            </button>
+                        </div>
+                    </div>
+                    <div v-if="injectForm.content" class="form-group">
+                        <label class="form-label">Fetched Content Preview</label>
+                        <div class="content-preview">{{ injectForm.content.slice(0, 1000) }}{{ injectForm.content.length > 1000 ? '...' : '' }}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Discussion Prompt (optional)</label>
+                        <input v-model="injectForm.prompt" class="form-input"
+                               placeholder="e.g., Analyze the key arguments presented">
+                    </div>
+                </div>
+
+                <!-- News Feed Tab -->
+                <div v-if="injectTab === 'news'">
+                    <div class="form-group">
+                        <label class="form-label">Quick Topics</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button v-for="topic in quickTopics" :key="topic"
+                                    @click="setQuickTopic(topic)"
+                                    class="px-3 py-1.5 rounded text-xs bg-gray-700 hover:bg-gray-600 transition-colors">
+                                {{ topic }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Or Enter Custom Topic</label>
+                        <input v-model="injectForm.newsTopic" class="form-input" placeholder="e.g., AI regulation latest news">
+                    </div>
+                    <div v-if="newsResults.length" class="form-group">
+                        <label class="form-label">Select Articles</label>
+                        <div class="space-y-2 max-h-48 overflow-y-auto">
+                            <div v-for="article in newsResults" :key="article.url"
+                                 class="p-2 rounded bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors"
+                                 :class="{'ring-1 ring-blue-500': selectedArticles.includes(article.url)}"
+                                 @click="toggleArticle(article)">
+                                <div class="text-sm font-medium">{{ article.title }}</div>
+                                <div class="text-xs text-gray-500">{{ article.source }} • {{ article.date }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Injection Options -->
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <div class="form-group">
+                        <label class="form-label">Injection Mode</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button @click="injectForm.mode = 'topic'"
+                                    class="py-2 px-3 rounded text-sm transition-colors"
+                                    :class="injectForm.mode === 'topic' ? 'bg-violet-600 text-white' : 'bg-gray-700 text-gray-300'">
+                                🎯 New Topic
+                            </button>
+                            <button @click="injectForm.mode = 'context'"
+                                    class="py-2 px-3 rounded text-sm transition-colors"
+                                    :class="injectForm.mode === 'context' ? 'bg-violet-600 text-white' : 'bg-gray-700 text-gray-300'">
+                                📎 Add Context
+                            </button>
+                            <button @click="injectForm.mode = 'challenge'"
+                                    class="py-2 px-3 rounded text-sm transition-colors"
+                                    :class="injectForm.mode === 'challenge' ? 'bg-violet-600 text-white' : 'bg-gray-700 text-gray-300'">
+                                ⚔️ Challenge
+                            </button>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-2">
+                            <span v-if="injectForm.mode === 'topic'">Replace current topic with this content</span>
+                            <span v-if="injectForm.mode === 'context'">Add as supporting context to current discussion</span>
+                            <span v-if="injectForm.mode === 'challenge'">Introduce as counter-argument or challenge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button @click="showInjectModal = false"
+                        class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-sm transition-colors">
+                    Cancel
+                </button>
+                <button @click="injectContent" :disabled="!injectForm.content"
+                        class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-sm font-medium disabled:opacity-50 transition-colors">
+                    📥 Inject Content
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paused Indicator -->
+    <div v-if="isPaused" class="paused-overlay">
+        ⏸ PAUSED - Discussion halted
+        <button @click="togglePause" class="ml-2 px-2 py-0.5 rounded bg-black/30 hover:bg-black/50 text-xs">
+            Resume
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between mt-2 text-xs text-gray-600 flex-shrink-0">
+        <div class="flex items-center gap-4">
+            <span>Press <kbd class="px-1 py-0.5 bg-gray-800 rounded">Ctrl+D</kbd> to start deliberation</span>
+            <span>{{ agents.filter(a => a.mcp_connected).length }} agents with MCP</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span>{{ new Date().toLocaleTimeString() }}</span>
+            <span class="text-violet-400">LIDA Multi-Agent Research</span>
+        </div>
+    </div>
+</div>
+
+<script>
+const { createApp, ref, computed, onMounted, onUnmounted, nextTick, watch } = Vue;
+
+createApp({
+    setup() {
+        // Connection state
+        const connected = ref(false);
+        let ws = null;
+
+        // Core state
+        const agents = ref([]);
+        const messages = ref([]);
+        const toolCalls = ref([]);
+        const consensus = ref({});
+        const stats = ref({
+            total_messages: 0,
+            total_tool_calls: 0,
+            elapsed: 0
+        });
+
+        // Deliberation state
+        const deliberation = ref({
+            active: false,
+            phase: '',
+            topic: ''
+        });
+        const topicInput = ref('');
+
+        // Streaming and structured output state
+        const streamingAgents = ref({});  // agent_id -> buffer
+        const claims = ref([]);           // Array of claims
+        const structuredVotes = ref([]);  // Array of structured votes with reasoning
+        const beliefStates = ref({});     // agent_id -> belief state
+        const activeTab = ref('consensus');
+
+        // Persuader state
+        const persuader = ref({
+            active: false,
+            target_position: '',
+            successful_flips: 0,
+            attempted_flips: 0,
+            conversation_count: 0
+        });
+        const persuaderTarget = ref('FOR');
+        const positions = ref({});          // agent_id -> position (FOR/AGAINST/UNDECIDED)
+        const positionHistory = ref({});    // agent_id -> [position changes]
+        const privateMessages = ref([]);    // Private persuader messages
+
+        // Experiment state
+        const experimentRunning = ref(false);
+        const experimentResults = ref({});
+        const tacticEffectiveness = ref({});
+        const experimentStatus = ref('');  // starting, running, completed, error
+        const experimentPhase = ref('');   // Current phase description
+        const experimentProgress = ref(''); // Progress details
+        const selectedPersonas = ref(['jensen_huang', 'dario_amodei']);
+        const availablePersonas = ref([
+            { id: 'jensen_huang', name: 'Jensen Huang' },
+            { id: 'dario_amodei', name: 'Dario Amodei' },
+            { id: 'elon_musk', name: 'Elon Musk' },
+            { id: 'demis_hassabis', name: 'Demis Hassabis' },
+            { id: 'yann_lecun', name: 'Yann LeCun' },
+            { id: 'yoshua_bengio', name: 'Yoshua Bengio' },
+            { id: 'ilya_sutskever', name: 'Ilya Sutskever' },
+            { id: 'leopold_aschenbrenner', name: 'Leopold A.' },
+        ]);
+        const manipulationAlerts = ref([]);
+        const resistanceScores = ref({});
+        const cialdiniPrinciples = ref([
+            { name: 'Reciprocity', score: 0, color: '#22c55e' },
+            { name: 'Commitment', score: 0, color: '#3b82f6' },
+            { name: 'Social Proof', score: 0, color: '#f59e0b' },
+            { name: 'Authority', score: 0, color: '#8b5cf6' },
+            { name: 'Liking', score: 0, color: '#ec4899' },
+            { name: 'Scarcity', score: 0, color: '#ef4444' },
+            { name: 'Unity', score: 0, color: '#06b6d4' },
+            { name: 'Loss Aversion', score: 0, color: '#f97316' },
+        ]);
+
+        // Advanced Analytics State
+        const analyticsTab = ref('tactics');
+        const tacticChart = ref(null);
+        const networkSvg = ref(null);
+        const networkContainer = ref(null);
+        const trajectorySvg = ref(null);
+        const beliefTrajectory = ref([]); // [{timestamp, agentId, position, confidence}]
+        const influenceEdges = ref([]);   // [{source, target, weight, tactic}]
+        let chartInstance = null;
+
+        // Agent Configuration Modal State
+        const showAgentConfig = ref(false);
+        const editingAgent = ref(null);
+        const agentConfigForm = ref({
+            model: 'sonnet',
+            personality_type: 'the_scholar',
+            name: '',
+            prompt_text: '',
+            prompt_category: '',
+            prompt_subcategory: '',
+            initial_position: 'UNDECIDED',
+            resistance: 0.5,
+            confidence: 0.5
+        });
+
+        // Conversation history for streaming display
+        const recentConversation = ref([]);  // Last N completed messages with full content
+        const maxConversationHistory = 20;
+
+        // Pause/Resume state
+        const isPaused = ref(false);
+
+        // Inject Content state
+        const showInjectModal = ref(false);
+        const injectTab = ref('paste');
+        const injectForm = ref({
+            title: '',
+            type: 'news',
+            content: '',
+            prompt: '',
+            url: '',
+            newsTopic: '',
+            mode: 'topic'
+        });
+        const fetchingUrl = ref(false);
+        const newsResults = ref([]);
+        const selectedArticles = ref([]);
+        const injectedContent = ref([]);  // History of injected content
+        const quickTopics = ref([
+            'AI Safety',
+            'AI Regulation',
+            'LLM Capabilities',
+            'AGI Timeline',
+            'AI Ethics',
+            'Tech Layoffs',
+            'AI in Healthcare',
+            'Autonomous Vehicles'
+        ]);
+
+        // Computed: Best performing tactic
+        const bestTactic = computed(() => {
+            const entries = Object.entries(tacticEffectiveness.value);
+            if (entries.length === 0) return null;
+            entries.sort((a, b) => b[1] - a[1]);
+            return entries[0][0].replace(/_/g, ' ');
+        });
+
+        // Computed: Average confidence change
+        const avgConfidenceChange = computed(() => {
+            const trajectories = beliefTrajectory.value;
+            if (trajectories.length < 2) return 0;
+            // Calculate average change between consecutive points
+            let totalChange = 0, count = 0;
+            for (let i = 1; i < trajectories.length; i++) {
+                if (trajectories[i].agentId === trajectories[i-1].agentId) {
+                    totalChange += trajectories[i].confidence - trajectories[i-1].confidence;
+                    count++;
+                }
+            }
+            return count > 0 ? totalChange / count : 0;
+        });
+
+        // Computed: Average resistance
+        const avgResistance = computed(() => {
+            const scores = Object.values(resistanceScores.value);
+            if (scores.length === 0) return 0.5;
+            const values = scores.map(s => typeof s === 'object' ? s.overall : s);
+            return values.reduce((a, b) => a + b, 0) / values.length;
+        });
+
+        // Computed: Heatmap data (tactic x agent effectiveness)
+        const heatmapData = computed(() => {
+            const data = [];
+            const tactics = Object.keys(tacticEffectiveness.value).slice(0, 6);
+            const agentIds = agents.value.map(a => a.id).slice(0, 8);
+
+            for (const tactic of tactics) {
+                for (const agentId of agentIds) {
+                    // Simulate per-agent effectiveness (in real system, track this)
+                    const baseRate = tacticEffectiveness.value[tactic] || 0.5;
+                    const resistance = resistanceScores.value[agentId]?.overall || 0.5;
+                    const value = Math.max(0, Math.min(1, baseRate * (1 - resistance * 0.5) + Math.random() * 0.2 - 0.1));
+                    data.push({
+                        id: `${tactic}-${agentId}`,
+                        tactic,
+                        agentId,
+                        value,
+                        label: `${tactic} → ${agentId.slice(-5)}`
+                    });
+                }
+            }
+            return data;
+        });
+
+        // Sorted tactics computed
+        const sortedTactics = computed(() => {
+            const entries = Object.entries(tacticEffectiveness.value);
+            entries.sort((a, b) => b[1] - a[1]);
+            return Object.fromEntries(entries.slice(0, 6));
+        });
+
+        // Computed position summary
+        const positionSummary = computed(() => {
+            const summary = { FOR: 0, AGAINST: 0, UNDECIDED: 0 };
+            Object.values(positions.value).forEach(pos => {
+                summary[pos] = (summary[pos] || 0) + 1;
+            });
+            return summary;
+        });
+
+        // Expandable message state
+        const expandedMessages = ref(new Set());
+
+        // UI state
+        const selectedAgent = ref(null);
+        const chatMessages = ref([]);
+        const chatInput = ref('');
+        const messageContainer = ref(null);
+        const liveMode = ref(false);
+        const toolsMode = ref(false);
+
+        // Animation
+        const spinnerChars = ['◐', '◓', '◑', '◒'];
+        const spinnerIndex = ref(0);
+        const spinnerChar = computed(() => spinnerChars[spinnerIndex.value]);
+
+        // Agent colors cache
+        const agentColors = {};
+
+        // Sorted consensus
+        const sortedConsensus = computed(() => {
+            const entries = Object.entries(consensus.value);
+            entries.sort((a, b) => b[1] - a[1]);
+            return Object.fromEntries(entries);
+        });
+
+        // Connect to WebSocket
+        const connect = () => {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws/swarm`);
+
+            ws.onopen = () => {
+                connected.value = true;
+                console.log('WebSocket connected');
+            };
+
+            ws.onclose = () => {
+                connected.value = false;
+                console.log('WebSocket disconnected, reconnecting...');
+                setTimeout(connect, 2000);
+            };
+
+            ws.onerror = (e) => {
+                console.error('WebSocket error:', e);
+            };
+
+            ws.onmessage = (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    handleMessage(data);
+                } catch (err) {
+                    console.error('Failed to parse message:', err);
+                }
+            };
+        };
+
+        // Handle incoming messages
+        const handleMessage = (data) => {
+            switch (data.type) {
+                case 'init':
+                    agents.value = data.agents || [];
+                    liveMode.value = data.live_mode || false;
+                    toolsMode.value = data.tools_mode || false;
+                    stats.value = data.stats || stats.value;
+                    // Cache agent colors
+                    agents.value.forEach(a => { agentColors[a.id] = a.color; });
+                    break;
+
+                case 'agents_update':
+                    agents.value = data.agents || [];
+                    agents.value.forEach(a => { agentColors[a.id] = a.color; });
+                    break;
+
+                case 'stats_update':
+                    Object.assign(stats.value, data.stats);
+                    break;
+
+                case 'message':
+                    messages.value.push({
+                        id: Date.now() + Math.random(),
+                        ...data.message
+                    });
+                    if (messages.value.length > 100) messages.value.shift();
+                    scrollMessages();
+                    break;
+
+                case 'tool_call':
+                    const existingIdx = toolCalls.value.findIndex(t => t.id === data.tool_call.id);
+                    if (existingIdx >= 0) {
+                        toolCalls.value[existingIdx] = data.tool_call;
+                    } else {
+                        toolCalls.value.push(data.tool_call);
+                    }
+                    if (toolCalls.value.length > 50) toolCalls.value.shift();
+                    break;
+
+                case 'deliberation_update':
+                    deliberation.value = {
+                        active: data.active,
+                        phase: data.phase,
+                        topic: data.topic
+                    };
+                    break;
+
+                case 'consensus_update':
+                    consensus.value = data.consensus || {};
+                    break;
+
+                case 'chat_response':
+                    if (selectedAgent.value?.id === data.agent_id) {
+                        chatMessages.value.push({
+                            id: Date.now(),
+                            role: 'assistant',
+                            content: data.response
+                        });
+                    }
+                    break;
+
+                case 'stream_token':
+                    // Handle streaming tokens
+                    if (data.done) {
+                        // Stream complete - add to conversation history
+                        const completedBuffer = streamingAgents.value[data.agent_id];
+                        if (completedBuffer) {
+                            recentConversation.value.push({
+                                id: Date.now() + Math.random(),
+                                sender_id: data.agent_id,
+                                content: completedBuffer,
+                                timestamp: stats.value.elapsed,
+                                position: positions.value[data.agent_id],
+                                reactions: []
+                            });
+                            // Limit history
+                            if (recentConversation.value.length > maxConversationHistory) {
+                                recentConversation.value.shift();
+                            }
+                        }
+                        // Remove from active streams
+                        delete streamingAgents.value[data.agent_id];
+                        streamingAgents.value = {...streamingAgents.value};
+                    } else {
+                        // Update streaming buffer
+                        streamingAgents.value[data.agent_id] = data.buffer || '';
+                        streamingAgents.value = {...streamingAgents.value};
+                    }
+                    break;
+
+                case 'structured_output':
+                    // Handle structured outputs (claims, votes, etc)
+                    if (data.output_type === 'claim') {
+                        claims.value.push(data.data.claim || data.data);
+                        if (claims.value.length > 50) claims.value.shift();
+                    } else if (data.output_type === 'vote') {
+                        structuredVotes.value.push(data.data.vote || data.data);
+                        if (structuredVotes.value.length > 50) structuredVotes.value.shift();
+                    }
+                    break;
+
+                case 'belief_update':
+                    // Update belief state for an agent
+                    beliefStates.value[data.agent_id] = data.belief_state;
+                    beliefStates.value = {...beliefStates.value};
+                    break;
+
+                case 'deliberation_state':
+                    // Full deliberation state update
+                    if (data.state) {
+                        // Extract claims from state
+                        if (data.state.claims) {
+                            claims.value = Object.values(data.state.claims || {});
+                        }
+                        // Extract belief states
+                        if (data.state.belief_states) {
+                            beliefStates.value = data.state.belief_states;
+                        }
+                    }
+                    break;
+
+                case 'persuader_update':
+                    // Update persuader state
+                    if (data.persuader) {
+                        persuader.value = data.persuader;
+                    }
+                    if (data.positions) {
+                        // Track position changes for belief trajectory
+                        Object.entries(data.positions).forEach(([agentId, position]) => {
+                            const oldPos = positions.value[agentId];
+                            if (oldPos !== position) {
+                                beliefTrajectory.value.push({
+                                    timestamp: Date.now() / 1000,
+                                    agentId,
+                                    position,
+                                    confidence: data.belief_states?.[agentId]?.confidence || 0.5
+                                });
+                                if (beliefTrajectory.value.length > 200) beliefTrajectory.value.shift();
+                            }
+                        });
+                        positions.value = data.positions;
+                    }
+                    if (data.position_history) {
+                        positionHistory.value = data.position_history;
+                    }
+                    // Track influence attempts for network graph
+                    if (data.attempt) {
+                        influenceEdges.value.push({
+                            source: 'persuader',
+                            target: data.attempt.target,
+                            weight: data.attempt.success ? 1.0 : 0.3,
+                            tactic: data.attempt.tactic,
+                            success: data.attempt.success
+                        });
+                        if (influenceEdges.value.length > 50) influenceEdges.value.shift();
+                    }
+                    // Update tactic effectiveness from persuader
+                    if (data.tactic_effectiveness) {
+                        tacticEffectiveness.value = data.tactic_effectiveness;
+                    }
+                    break;
+
+                case 'private_message':
+                    // Handle private persuader messages
+                    if (data.message) {
+                        privateMessages.value.push({
+                            id: Date.now() + Math.random(),
+                            ...data.message
+                        });
+                        if (privateMessages.value.length > 50) privateMessages.value.shift();
+                    }
+                    break;
+
+                case 'experiment_update':
+                    // Update experiment status and progress
+                    if (data.status) {
+                        experimentStatus.value = data.status;
+                        if (data.status === 'completed' || data.status === 'error') {
+                            experimentRunning.value = false;
+                        }
+                    }
+                    if (data.phase) {
+                        experimentPhase.value = data.phase;
+                    }
+                    if (data.total_combinations) {
+                        experimentProgress.value = `Testing ${data.total_combinations} combinations`;
+                    }
+                    // Update experiment results
+                    if (data.results) {
+                        experimentResults.value = data.results;
+                    }
+                    if (data.tactic_effectiveness) {
+                        tacticEffectiveness.value = data.tactic_effectiveness;
+                    }
+                    if (data.resistance_scores) {
+                        resistanceScores.value = data.resistance_scores;
+                    }
+                    // Update Cialdini scores if provided
+                    if (data.cialdini_scores) {
+                        cialdiniPrinciples.value.forEach(p => {
+                            const key = p.name.toLowerCase().replace(' ', '_');
+                            if (data.cialdini_scores[key] !== undefined) {
+                                p.score = Math.round(data.cialdini_scores[key] * 100);
+                            }
+                        });
+                    }
+                    // Update belief trajectories for timeline visualization
+                    if (data.belief_update) {
+                        beliefTrajectory.value.push({
+                            timestamp: Date.now() / 1000,
+                            agentId: data.belief_update.agent_id,
+                            position: data.belief_update.position,
+                            confidence: data.belief_update.confidence
+                        });
+                        if (beliefTrajectory.value.length > 200) beliefTrajectory.value.shift();
+                    }
+                    // Update influence edges for network graph
+                    if (data.influence_edge) {
+                        influenceEdges.value.push({
+                            source: data.influence_edge.source || 'persuader',
+                            target: data.influence_edge.target,
+                            weight: data.influence_edge.weight || 0.5,
+                            tactic: data.influence_edge.tactic,
+                            success: data.influence_edge.success
+                        });
+                        if (influenceEdges.value.length > 50) influenceEdges.value.shift();
+                    }
+                    break;
+
+                case 'manipulation_alert':
+                    // Handle manipulation detection alerts
+                    manipulationAlerts.value.push({
+                        id: Date.now() + Math.random(),
+                        ...data.alert
+                    });
+                    if (manipulationAlerts.value.length > 20) manipulationAlerts.value.shift();
+                    break;
+            }
+        };
+
+        // Start deliberation
+        const startDeliberation = () => {
+            if (!topicInput.value.trim() || deliberation.value.active) return;
+
+            ws?.send(JSON.stringify({
+                type: 'start_deliberation',
+                topic: topicInput.value
+            }));
+            topicInput.value = '';
+        };
+
+        // Select agent
+        const selectAgent = async (agent) => {
+            selectedAgent.value = agent;
+            chatMessages.value = [];
+
+            try {
+                const resp = await fetch(`/api/chat/${agent.id}/history`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    chatMessages.value = (data.messages || []).map((m, i) => ({
+                        id: i,
+                        role: m.role,
+                        content: m.content
+                    }));
+                }
+            } catch (e) {
+                console.error('Failed to load chat history:', e);
+            }
+        };
+
+        // Send chat message
+        const sendChat = async () => {
+            if (!selectedAgent.value || !chatInput.value.trim()) return;
+
+            const msg = chatInput.value;
+            chatInput.value = '';
+
+            chatMessages.value.push({
+                id: Date.now(),
+                role: 'user',
+                content: msg
+            });
+
+            ws?.send(JSON.stringify({
+                type: 'chat',
+                agent_id: selectedAgent.value.id,
+                message: msg
+            }));
+        };
+
+        // Start persuader game
+        const startPersuader = async () => {
+            if (!deliberation.value.topic) return;
+            try {
+                const resp = await fetch(`/api/persuader/start?target_position=${persuaderTarget.value}`, {
+                    method: 'POST'
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    persuader.value = data.persuader;
+                    positions.value = data.current_positions || {};
+                }
+            } catch (e) {
+                console.error('Failed to start persuader:', e);
+            }
+        };
+
+        // Stop persuader game
+        const stopPersuader = async () => {
+            try {
+                const resp = await fetch('/api/persuader/stop', { method: 'POST' });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    persuader.value.active = false;
+                    positions.value = data.final_positions || {};
+                }
+            } catch (e) {
+                console.error('Failed to stop persuader:', e);
+            }
+        };
+
+        // Run experiment
+        const runExperiment = async () => {
+            if (experimentRunning.value) return;
+            experimentRunning.value = true;
+
+            try {
+                const resp = await fetch('/api/experiment/run', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        personas: selectedPersonas.value,
+                        topic: deliberation.value.topic || 'Whether AI development should be paused until safety benchmarks exist',
+                    })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    experimentResults.value = data;
+
+                    // Update tactic effectiveness
+                    if (data.tactic_effectiveness) {
+                        tacticEffectiveness.value = data.tactic_effectiveness;
+                    }
+
+                    // Update Cialdini scores
+                    if (data.cialdini_scores) {
+                        cialdiniPrinciples.value.forEach(p => {
+                            const key = p.name.toLowerCase().replace(' ', '_');
+                            if (data.cialdini_scores[key] !== undefined) {
+                                p.score = Math.round(data.cialdini_scores[key] * 100);
+                            }
+                        });
+                    }
+
+                    // Update resistance scores
+                    if (data.resistance_scores) {
+                        resistanceScores.value = data.resistance_scores;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to run experiment:', e);
+            } finally {
+                experimentRunning.value = false;
+            }
+        };
+
+        // Toggle persona selection
+        const togglePersona = (personaId) => {
+            const idx = selectedPersonas.value.indexOf(personaId);
+            if (idx >= 0) {
+                selectedPersonas.value.splice(idx, 1);
+            } else {
+                selectedPersonas.value.push(personaId);
+            }
+        };
+
+        // Get tactic color based on effectiveness
+        const getTacticColor = (rate) => {
+            if (rate >= 0.7) return '#22c55e';
+            if (rate >= 0.4) return '#f59e0b';
+            return '#ef4444';
+        };
+
+        // Format tactic name
+        const formatTactic = (tactic) => {
+            return tactic.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).slice(0, 15);
+        };
+
+        // Get resistance class for meter segments
+        const getResistanceClass = (score, segment) => {
+            const threshold = segment / 10;
+            if (score >= threshold) {
+                if (score >= 0.7) return 'active-high';
+                if (score >= 0.4) return 'active-med';
+                return 'active-low';
+            }
+            return '';
+        };
+
+        // Get flip rate as percentage
+        const getFlipRate = () => {
+            const attempts = persuader.value.attempted_flips || 0;
+            if (attempts === 0) return '0%';
+            const rate = (persuader.value.successful_flips || 0) / attempts * 100;
+            return rate.toFixed(0) + '%';
+        };
+
+        // Toggle message expansion
+        const toggleMessageExpand = (msgId) => {
+            if (expandedMessages.value.has(msgId)) {
+                expandedMessages.value.delete(msgId);
+            } else {
+                expandedMessages.value.add(msgId);
+            }
+            expandedMessages.value = new Set(expandedMessages.value);
+        };
+
+        const isMessageExpanded = (msgId) => expandedMessages.value.has(msgId);
+
+        // Agent helper functions for streaming display
+        const getAgentEmoji = (agentId) => {
+            const agent = agents.value.find(a => a.id === agentId);
+            return agent?.emoji || '🤖';
+        };
+
+        const getAgentName = (agentId) => {
+            const agent = agents.value.find(a => a.id === agentId);
+            return agent?.name || agentId?.slice(-8) || 'Unknown';
+        };
+
+        const getAgentModel = (agentId) => {
+            const agent = agents.value.find(a => a.id === agentId);
+            return agent?.model || 'unknown';
+        };
+
+        // Format timestamp for messages
+        const formatTimestamp = (timestamp) => {
+            if (typeof timestamp === 'number') {
+                if (timestamp < 1000000) {
+                    // Elapsed seconds
+                    return `${timestamp.toFixed(1)}s`;
+                }
+                return new Date(timestamp).toLocaleTimeString();
+            }
+            return '';
+        };
+
+        // Clear conversation history
+        const clearConversation = () => {
+            recentConversation.value = [];
+        };
+
+        // Open agent configuration modal
+        const openAgentConfig = (agent) => {
+            editingAgent.value = agent;
+            agentConfigForm.value = {
+                model: agent.model || 'sonnet',
+                personality_type: agent.personality_type || 'the_scholar',
+                name: agent.name || '',
+                prompt_text: agent.prompt_text || '',
+                prompt_category: agent.prompt_category || '',
+                prompt_subcategory: agent.prompt_subcategory || '',
+                initial_position: positions.value[agent.id] || 'UNDECIDED',
+                resistance: resistanceScores.value[agent.id]?.overall || 0.5,
+                confidence: beliefStates.value[agent.id]?.confidence || 0.5
+            };
+            showAgentConfig.value = true;
+        };
+
+        // Save agent configuration
+        const saveAgentConfig = async () => {
+            if (!editingAgent.value) return;
+
+            try {
+                const resp = await fetch(`/api/agent/${editingAgent.value.id}/configure`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(agentConfigForm.value)
+                });
+
+                if (resp.ok) {
+                    // Update local agent state
+                    const idx = agents.value.findIndex(a => a.id === editingAgent.value.id);
+                    if (idx >= 0) {
+                        agents.value[idx] = {
+                            ...agents.value[idx],
+                            model: agentConfigForm.value.model,
+                            personality_type: agentConfigForm.value.personality_type,
+                            name: agentConfigForm.value.name,
+                            prompt_text: agentConfigForm.value.prompt_text,
+                            prompt_category: agentConfigForm.value.prompt_category,
+                            prompt_subcategory: agentConfigForm.value.prompt_subcategory,
+                        };
+                    }
+
+                    // Update position if changed
+                    if (agentConfigForm.value.initial_position) {
+                        positions.value[editingAgent.value.id] = agentConfigForm.value.initial_position;
+                    }
+
+                    showAgentConfig.value = false;
+                    console.log('Agent configuration saved');
+                }
+            } catch (e) {
+                console.error('Failed to save agent config:', e);
+            }
+        };
+
+        // Pause/Resume deliberation
+        const togglePause = async () => {
+            try {
+                const action = isPaused.value ? 'resume' : 'pause';
+                const resp = await fetch(`/api/deliberation/${action}`, { method: 'POST' });
+                if (resp.ok) {
+                    isPaused.value = !isPaused.value;
+                    console.log(`Deliberation ${action}d`);
+                }
+            } catch (e) {
+                console.error('Failed to toggle pause:', e);
+            }
+        };
+
+        // Stop deliberation completely
+        const stopDeliberation = async () => {
+            try {
+                const resp = await fetch('/api/deliberation/stop', { method: 'POST' });
+                if (resp.ok) {
+                    deliberation.value.active = false;
+                    isPaused.value = false;
+                    console.log('Deliberation stopped');
+                }
+            } catch (e) {
+                console.error('Failed to stop deliberation:', e);
+            }
+        };
+
+        // Fetch URL content
+        const fetchUrl = async () => {
+            if (!injectForm.value.url) return;
+            fetchingUrl.value = true;
+            try {
+                const resp = await fetch('/api/fetch-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: injectForm.value.url })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    injectForm.value.content = data.content;
+                    injectForm.value.title = data.title || '';
+                }
+            } catch (e) {
+                console.error('Failed to fetch URL:', e);
+            } finally {
+                fetchingUrl.value = false;
+            }
+        };
+
+        // Set quick topic for news
+        const setQuickTopic = (topic) => {
+            injectForm.value.newsTopic = topic;
+            // Could trigger a news search here
+        };
+
+        // Toggle article selection
+        const toggleArticle = (article) => {
+            const idx = selectedArticles.value.indexOf(article.url);
+            if (idx >= 0) {
+                selectedArticles.value.splice(idx, 1);
+            } else {
+                selectedArticles.value.push(article.url);
+            }
+        };
+
+        // Inject content into deliberation
+        const injectContent = async () => {
+            if (!injectForm.value.content) return;
+
+            try {
+                const payload = {
+                    title: injectForm.value.title,
+                    type: injectForm.value.type,
+                    content: injectForm.value.content,
+                    prompt: injectForm.value.prompt,
+                    mode: injectForm.value.mode
+                };
+
+                const resp = await fetch('/api/inject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (resp.ok) {
+                    // Add to injected content history
+                    injectedContent.value.push({
+                        ...payload,
+                        timestamp: Date.now()
+                    });
+
+                    // Reset form
+                    injectForm.value.content = '';
+                    injectForm.value.title = '';
+                    injectForm.value.prompt = '';
+                    injectForm.value.url = '';
+
+                    showInjectModal.value = false;
+                    console.log('Content injected');
+                }
+            } catch (e) {
+                console.error('Failed to inject content:', e);
+            }
+        };
+
+        // Clear all injected content
+        const clearInjectedContent = () => {
+            injectedContent.value = [];
+        };
+
+        // Get heatmap color based on value (0-1)
+        const getHeatmapColor = (value) => {
+            const r = Math.round(255 * (1 - value) * 0.8 + 30);
+            const g = Math.round(255 * value * 0.8 + 30);
+            const b = 50;
+            return `rgb(${r}, ${g}, ${b})`;
+        };
+
+        // Initialize tactic effectiveness chart
+        const initTacticChart = () => {
+            if (!tacticChart.value) return;
+
+            const ctx = tacticChart.value.getContext('2d');
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Effectiveness',
+                        data: [],
+                        backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                        borderColor: 'rgba(124, 58, 237, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 1,
+                            grid: { color: '#1e1e2e' },
+                            ticks: { color: '#6b7280', font: { size: 9 } }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#9ca3af', font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        };
+
+        // Update tactic chart with new data
+        const updateTacticChart = () => {
+            if (!chartInstance) return;
+
+            const entries = Object.entries(tacticEffectiveness.value)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+
+            chartInstance.data.labels = entries.map(([name]) => name.replace(/_/g, ' ').slice(0, 12));
+            chartInstance.data.datasets[0].data = entries.map(([, val]) => val);
+            chartInstance.data.datasets[0].backgroundColor = entries.map(([, val]) =>
+                val >= 0.7 ? 'rgba(34, 197, 94, 0.6)' :
+                val >= 0.4 ? 'rgba(245, 158, 11, 0.6)' :
+                'rgba(239, 68, 68, 0.6)'
+            );
+            chartInstance.update('none');
+        };
+
+        // Initialize D3 network graph
+        const initNetworkGraph = () => {
+            if (!networkSvg.value || !networkContainer.value) return;
+
+            const svg = d3.select(networkSvg.value);
+            svg.selectAll('*').remove();
+
+            const width = networkContainer.value.clientWidth;
+            const height = networkContainer.value.clientHeight;
+
+            // Create nodes from agents + persuader
+            const nodes = [
+                { id: 'persuader', name: 'Persuader', color: '#FFD700', x: width/2, y: height/2 }
+            ];
+
+            agents.value.slice(0, 8).forEach((agent, i) => {
+                const angle = (i / Math.min(agents.value.length, 8)) * 2 * Math.PI - Math.PI/2;
+                const radius = Math.min(width, height) * 0.35;
+                nodes.push({
+                    id: agent.id,
+                    name: agent.id.slice(-5),
+                    color: agent.color || getAgentColor(agent.id),
+                    x: width/2 + Math.cos(angle) * radius,
+                    y: height/2 + Math.sin(angle) * radius,
+                    position: positions.value[agent.id] || 'UNDECIDED'
+                });
+            });
+
+            // Draw links (influence edges)
+            const links = influenceEdges.value.slice(-20);
+
+            svg.selectAll('.network-link')
+                .data(links)
+                .enter()
+                .append('line')
+                .attr('class', 'network-link')
+                .attr('x1', d => nodes.find(n => n.id === d.source)?.x || width/2)
+                .attr('y1', d => nodes.find(n => n.id === d.source)?.y || height/2)
+                .attr('x2', d => nodes.find(n => n.id === d.target)?.x || width/2)
+                .attr('y2', d => nodes.find(n => n.id === d.target)?.y || height/2)
+                .attr('stroke', d => d.success ? '#22c55e' : '#ef4444')
+                .attr('stroke-width', d => 1 + d.weight * 2);
+
+            // Draw nodes
+            const nodeGroups = svg.selectAll('.network-node')
+                .data(nodes)
+                .enter()
+                .append('g')
+                .attr('class', 'network-node')
+                .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+            nodeGroups.append('circle')
+                .attr('r', d => d.id === 'persuader' ? 14 : 10)
+                .attr('fill', d => d.color)
+                .attr('stroke', d => {
+                    if (d.id === 'persuader') return '#FFD700';
+                    if (d.position === 'FOR') return '#22c55e';
+                    if (d.position === 'AGAINST') return '#ef4444';
+                    return '#6b7280';
+                })
+                .attr('stroke-width', 2);
+
+            nodeGroups.append('text')
+                .attr('class', 'network-label')
+                .attr('dy', d => d.id === 'persuader' ? 24 : 20)
+                .attr('text-anchor', 'middle')
+                .text(d => d.name);
+        };
+
+        // Initialize belief trajectory visualization
+        const initTrajectory = () => {
+            if (!trajectorySvg.value) return;
+
+            const svg = d3.select(trajectorySvg.value);
+            svg.selectAll('*').remove();
+
+            const width = trajectorySvg.value.clientWidth || 280;
+            const height = 80;
+            const margin = { top: 10, right: 10, bottom: 20, left: 30 };
+
+            if (beliefTrajectory.value.length < 2) {
+                svg.append('text')
+                    .attr('x', width/2)
+                    .attr('y', height/2)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#6b7280')
+                    .attr('font-size', '10px')
+                    .text('Awaiting data...');
+                return;
+            }
+
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(beliefTrajectory.value, d => d.timestamp))
+                .range([margin.left, width - margin.right]);
+
+            const yScale = d3.scaleLinear()
+                .domain([0, 1])
+                .range([height - margin.bottom, margin.top]);
+
+            // Group by agent
+            const agentGroups = d3.group(beliefTrajectory.value, d => d.agentId);
+
+            // Draw line for each agent
+            const line = d3.line()
+                .x(d => xScale(d.timestamp))
+                .y(d => yScale(d.confidence))
+                .curve(d3.curveMonotoneX);
+
+            agentGroups.forEach((points, agentId) => {
+                const color = getAgentColor(agentId);
+                svg.append('path')
+                    .datum(points)
+                    .attr('class', 'trajectory-path')
+                    .attr('d', line)
+                    .attr('stroke', color);
+
+                // Add dots
+                svg.selectAll(`.dot-${agentId}`)
+                    .data(points)
+                    .enter()
+                    .append('circle')
+                    .attr('class', 'trajectory-dot')
+                    .attr('cx', d => xScale(d.timestamp))
+                    .attr('cy', d => yScale(d.confidence))
+                    .attr('r', 3)
+                    .attr('fill', color);
+            });
+
+            // Add Y axis
+            svg.append('g')
+                .attr('transform', `translate(${margin.left}, 0)`)
+                .call(d3.axisLeft(yScale).ticks(3).tickFormat(d => d * 100 + '%'))
+                .attr('font-size', '8px')
+                .attr('color', '#6b7280');
+        };
+
+        // Watch for tactic effectiveness changes
+        watch(tacticEffectiveness, () => {
+            updateTacticChart();
+        }, { deep: true });
+
+        // Watch for position changes to update network
+        watch([positions, influenceEdges], () => {
+            initNetworkGraph();
+        }, { deep: true });
+
+        // Watch for belief trajectory changes
+        watch(beliefTrajectory, () => {
+            initTrajectory();
+        }, { deep: true });
+
+        // Watch for agents changes to reinitialize network
+        watch(agents, () => {
+            nextTick(() => initNetworkGraph());
+        }, { deep: true });
+
+        // Watch analytics tab changes to reinitialize appropriate visualization
+        watch(analyticsTab, (newTab) => {
+            nextTick(() => {
+                if (newTab === 'tactics') initTacticChart();
+                else if (newTab === 'network') initNetworkGraph();
+                else if (newTab === 'timeline') initTrajectory();
+            });
+        });
+
+        // Scroll message container
+        const scrollMessages = () => {
+            nextTick(() => {
+                if (messageContainer.value) {
+                    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
+                }
+            });
+        };
+
+        // Formatters
+        const formatTime = (seconds) => {
+            if (!seconds) return '0:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        };
+
+        const formatPersonality = (type) => {
+            return type.replace('the_', '').charAt(0).toUpperCase() + type.replace('the_', '').slice(1);
+        };
+
+        const formatStatus = (status) => {
+            const statusMap = {
+                'idle': 'Idle',
+                'analyzing': 'Analyzing...',
+                'speaking': 'Speaking',
+                'voting': 'Voting',
+                'synthesizing': 'Synthesizing',
+                'tool_exec': 'Using Tool',
+                'researching': 'Researching'
+            };
+            return statusMap[status] || status;
+        };
+
+        // Color helpers
+        const getEnergyColor = (energy) => {
+            if (energy > 0.7) return '#22c55e';
+            if (energy > 0.4) return '#f59e0b';
+            return '#ef4444';
+        };
+
+        const getAgentColor = (agentId) => {
+            return agentColors[agentId] || '#6b7280';
+        };
+
+        const getConsensusColor = (option) => {
+            const colors = {
+                'Support': '#22c55e',
+                'Oppose': '#ef4444',
+                'Modify': '#f59e0b',
+                'Abstain': '#6b7280'
+            };
+            return colors[option] || '#6b7280';
+        };
+
+        const getConsensusPercent = (count) => {
+            const total = Object.values(consensus.value).reduce((a, b) => a + b, 0);
+            return total > 0 ? (count / total) * 100 : 0;
+        };
+
+        const getVoteClass = (vote) => {
+            const classes = {
+                'Support': 'bg-green-500/20 text-green-400',
+                'Oppose': 'bg-red-500/20 text-red-400',
+                'Modify': 'bg-yellow-500/20 text-yellow-400',
+                'Abstain': 'bg-gray-500/20 text-gray-400'
+            };
+            return classes[vote] || '';
+        };
+
+        const getMessageClass = (msg) => {
+            if (msg.tool_used) return 'msg-tool';
+            if (msg.msg_type === 'vote') return 'msg-vote';
+            if (msg.target === 'broadcast') return 'msg-broadcast';
+            return 'msg-direct';
+        };
+
+        // Keyboard shortcuts
+        const handleKeydown = (e) => {
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                document.querySelector('input[placeholder*="topic"]')?.focus();
+            }
+        };
+
+        // Lifecycle
+        onMounted(() => {
+            connect();
+            document.addEventListener('keydown', handleKeydown);
+
+            // Spinner animation
+            setInterval(() => {
+                spinnerIndex.value = (spinnerIndex.value + 1) % spinnerChars.length;
+            }, 150);
+
+            // Initialize charts after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                initTacticChart();
+                initNetworkGraph();
+                initTrajectory();
+            }, 500);
+        });
+
+        onUnmounted(() => {
+            if (ws) ws.close();
+            document.removeEventListener('keydown', handleKeydown);
+        });
+
+        return {
+            connected,
+            agents,
+            messages,
+            toolCalls,
+            consensus,
+            sortedConsensus,
+            stats,
+            deliberation,
+            topicInput,
+            selectedAgent,
+            chatMessages,
+            chatInput,
+            messageContainer,
+            liveMode,
+            toolsMode,
+            spinnerChar,
+            // New streaming and structured output state
+            streamingAgents,
+            claims,
+            structuredVotes,
+            beliefStates,
+            activeTab,
+
+            // Persuader state
+            persuader,
+            persuaderTarget,
+            positions,
+            positionHistory,
+            privateMessages,
+            positionSummary,
+            expandedMessages,
+
+            // Experiment state
+            experimentRunning,
+            experimentResults,
+            tacticEffectiveness,
+            sortedTactics,
+            selectedPersonas,
+            availablePersonas,
+            manipulationAlerts,
+            resistanceScores,
+            cialdiniPrinciples,
+            experimentStatus,
+            experimentPhase,
+            experimentProgress,
+
+            connect,
+            startDeliberation,
+            selectAgent,
+            sendChat,
+            startPersuader,
+            stopPersuader,
+            toggleMessageExpand,
+            isMessageExpanded,
+
+            // Experiment functions
+            runExperiment,
+            togglePersona,
+            getTacticColor,
+            formatTactic,
+            getResistanceClass,
+
+            // Advanced Analytics
+            analyticsTab,
+            tacticChart,
+            networkSvg,
+            networkContainer,
+            trajectorySvg,
+            beliefTrajectory,
+            influenceEdges,
+            bestTactic,
+            avgConfidenceChange,
+            avgResistance,
+            heatmapData,
+            getHeatmapColor,
+            initTacticChart,
+            initNetworkGraph,
+            initTrajectory,
+
+            // Agent Configuration
+            showAgentConfig,
+            editingAgent,
+            agentConfigForm,
+            openAgentConfig,
+            saveAgentConfig,
+
+            // Conversation Display
+            recentConversation,
+            clearConversation,
+            getAgentEmoji,
+            getAgentName,
+            getAgentModel,
+            formatTimestamp,
+
+            // Pause/Inject Controls
+            isPaused,
+            togglePause,
+            stopDeliberation,
+            showInjectModal,
+            injectTab,
+            injectForm,
+            fetchingUrl,
+            fetchUrl,
+            newsResults,
+            selectedArticles,
+            injectedContent,
+            quickTopics,
+            setQuickTopic,
+            toggleArticle,
+            injectContent,
+            clearInjectedContent,
+
+            formatTime,
+            formatPersonality,
+            formatStatus,
+            getEnergyColor,
+            getAgentColor,
+            getConsensusColor,
+            getConsensusPercent,
+            getVoteClass,
+            getMessageClass,
+            getFlipRate
+        };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>

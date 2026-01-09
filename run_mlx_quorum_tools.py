@@ -206,7 +206,7 @@ class EnhancedMLXQuorum:
 
     def __init__(
         self,
-        model_path: str = "mlx-community/Josiefied-Qwen3-4B-abliterated-v1-4bit",  # Working Qwen3 model
+        model_path: str = "mlx-community/Qwen3-4B-Instruct-2507-gabliterated-4bit",  # Latest Qwen3 model
         max_tokens: int = 2048,  # Increased for function calling
         temperature: float = 0.7,
         max_tool_iterations: int = 2,  # Max rounds of tool calling
@@ -450,7 +450,7 @@ async def run_enhanced_quorum(
     print(" MLX QUORUM WITH FUNCTION CALLING")
     print(f"{'='*70}{Colors.ENDC}\n")
 
-    print(f"Model: mlx-community/Josiefied-Qwen3-4B (2048 tokens for tool use)")
+    print(f"Model: mlx-community/Qwen3-4B-Instruct-2507-gabliterated-4bit (2048 tokens)")
     print(f"Agents: {len(ENHANCED_AGENT_ROLES)}")
     print(f"Tools: {sum(len(r.tools) for r in ENHANCED_AGENT_ROLES)} total (2-4 per agent)")
     print()

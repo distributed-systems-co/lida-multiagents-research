@@ -107,10 +107,8 @@ class ServerOrchestrator:
 
         # Persona agents - each gets a unique prompt from the library
         # Spread prompts across different categories for diversity
-        from src.prompts import PromptCategory
-        all_prompts = self.prompt_loader.all_prompts()
-        active_categories = [c for c in PromptCategory if c != PromptCategory.DEMIURGE]
-        prompts_by_cat = {cat: self.prompt_loader.get_by_category(cat) for cat in active_categories}
+        all_categories = self.prompt_loader.categories()  # dict of {category: count}
+        prompts_by_cat = {cat: self.prompt_loader.get_by_category(cat) for cat in all_categories}
         # Filter to non-empty categories
         prompts_by_cat = {k: v for k, v in prompts_by_cat.items() if v}
         cat_list = list(prompts_by_cat.keys())
@@ -127,7 +125,7 @@ class ServerOrchestrator:
                 self.persona_prompts[agent_id] = {
                     "id": prompt.id,
                     "text": prompt.text,
-                    "category": prompt.category.value,
+                    "category": prompt.category,
                     "subcategory": prompt.subcategory,
                     "tags": prompt.tags,
                 }
@@ -142,7 +140,7 @@ class ServerOrchestrator:
                 kwargs={
                     "persona_prompt": prompt.text if prompt else None,
                     "prompt_id": prompt.id if prompt else None,
-                    "prompt_category": prompt.category.value if prompt else None,
+                    "prompt_category": prompt.category if prompt else None,
                     "prompt_subcategory": prompt.subcategory if prompt else None,
                 },
                 restart_policy=RestartPolicy.ON_FAILURE,

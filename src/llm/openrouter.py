@@ -17,37 +17,59 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Popular models on OpenRouter (Jan 2026)
 MODELS = {
-    # Anthropic
+    # Anthropic - Latest (use OpenRouter's short IDs)
+    "opus-4.5": "anthropic/claude-opus-4.5",
     "claude-opus-4.5": "anthropic/claude-opus-4.5",
-    "claude-sonnet-4.5": "anthropic/claude-sonnet-4.5",
+    "opus-4.1": "anthropic/claude-opus-4.1",
+    "opus-4": "anthropic/claude-opus-4",
+    "sonnet-4.5": "anthropic/claude-sonnet-4.5",
+    "sonnet-4": "anthropic/claude-sonnet-4",
+    "claude-sonnet-4": "anthropic/claude-sonnet-4",
+    "haiku-4.5": "anthropic/claude-haiku-4.5",
+    "claude-3.7-sonnet": "anthropic/claude-3.7-sonnet",
+    "claude-3.5-sonnet": "anthropic/claude-3.5-sonnet",
     "claude-3.5-haiku": "anthropic/claude-3.5-haiku",
-    # OpenAI
-    "gpt-5.2-pro": "openai/gpt-5.2-pro",
-    "gpt-5.1": "openai/gpt-5.1",
+    # OpenAI - Latest
+    "gpt-4.1": "openai/gpt-4.1",
+    "gpt-4.1-mini": "openai/gpt-4.1-mini",
+    "gpt-4.1-nano": "openai/gpt-4.1-nano",
     "gpt-4o": "openai/gpt-4o",
     "gpt-4o-mini": "openai/gpt-4o-mini",
     "o3": "openai/o3",
+    "o3-mini": "openai/o3-mini",
     "o1": "openai/o1",
-    # Google
-    "gemini-3-pro": "google/gemini-3-pro-preview",
-    "gemini-2.5-pro": "google/gemini-2.5-pro",
-    "gemini-2.5-flash": "google/gemini-2.5-flash",
+    "o1-mini": "openai/o1-mini",
+    # Google - Latest
+    "gemini-2.5-pro": "google/gemini-2.5-pro-preview-06-05",
+    "gemini-2.5-flash": "google/gemini-2.5-flash-preview-05-20",
     "gemini-2.0-flash": "google/gemini-2.0-flash-001",
-    # Meta Llama
+    "gemini-exp": "google/gemini-exp-1206",
+    # Meta Llama - Latest
+    "llama-4-maverick": "meta-llama/llama-4-maverick",
+    "llama-4-scout": "meta-llama/llama-4-scout",
     "llama-3.3-70b": "meta-llama/llama-3.3-70b-instruct",
     "llama-3.1-405b": "meta-llama/llama-3.1-405b-instruct",
-    # DeepSeek
-    "deepseek-v3.2": "deepseek/deepseek-v3.2",
+    # DeepSeek - Latest
     "deepseek-r1": "deepseek/deepseek-r1",
-    "deepseek-chat": "deepseek/deepseek-chat-v3",
-    # Qwen
+    "deepseek-v3": "deepseek/deepseek-chat-v3-0324",
+    "deepseek-chat": "deepseek/deepseek-chat",
+    # Qwen - Latest
     "qwen3-235b": "qwen/qwen3-235b-a22b",
     "qwen3-32b": "qwen/qwen3-32b",
+    "qwen3-30b": "qwen/qwen3-30b-a3b",
     "qwen-max": "qwen/qwen-max",
-    # Mistral
+    # Mistral - Latest
     "mistral-large": "mistralai/mistral-large-2411",
-    "mistral-nemo": "mistralai/mistral-nemo",
-    "mixtral-8x22b": "mistralai/mixtral-8x22b-instruct",
+    "mistral-medium": "mistralai/mistral-medium-3",
+    "codestral": "mistralai/codestral-2501",
+    # xAI - Latest
+    "grok-4": "x-ai/grok-4",
+    "grok-4-mini": "x-ai/grok-4-mini",
+    "grok-3": "x-ai/grok-3-beta",
+    "grok-3-mini": "x-ai/grok-3-mini-beta",
+    # Cohere
+    "command-r-plus": "cohere/command-r-plus-08-2024",
+    "command-r": "cohere/command-r-08-2024",
 }
 
 
