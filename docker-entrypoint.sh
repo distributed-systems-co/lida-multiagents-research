@@ -17,6 +17,9 @@ echo -e "${BLUE}═════════════════════�
 echo -e "${BLUE}  LIDA Multi-Agent Deliberation System${NC}"
 echo -e "${BLUE}════════════════════════════════════════════════════════════════${NC}"
 
+# Create necessary directories (needed when volume is mounted)
+mkdir -p /app/data /app/logs /app/experiment_results 2>/dev/null || true
+
 # Default values
 PORT=${PORT:-12345}
 HOST=${HOST:-0.0.0.0}
