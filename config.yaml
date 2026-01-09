@@ -45,7 +45,22 @@ agents:
   # Number of agents to spawn
   count: 8
 
-  # Personality distribution (weights, will be normalized)
+  # Use real-world personas (from src/manipulation/personas/)
+  use_real_personas: true
+  persona_version: "v1"  # v1 or v2
+
+  # Specific personas to use (if empty, randomly selected from categories)
+  personas:
+    - sam_altman
+    - dario_amodei
+    - elon_musk
+    - yann_lecun
+    - geoffrey_hinton
+    - marc_andreessen
+    - eliezer_yudkowsky
+    - satya_nadella
+
+  # Fallback: Personality distribution (used if use_real_personas is false)
   personalities:
     the_scholar: 2      # Analytical, evidence-based
     the_pragmatist: 2   # Efficient, practical

@@ -62,6 +62,7 @@ from src.meta.personality import (
     Personality,
 )
 from src.prompts import PromptLoader
+from src.manipulation.persona_yaml import YAMLPersonaLibrary
 from src.deliberation.tools import (
     ToolHandler,
     DELIBERATION_TOOLS,
@@ -574,11 +575,134 @@ class SwarmOrchestrator:
         self._create_agents()
 
     def _create_agents(self):
-        """Create diverse agent swarm with prompts from the library."""
+        """Create diverse agent swarm with real-world personas or archetypes."""
         pm = get_personality_manager()
-
-        # Get personality distribution from config
         agents_cfg = CONFIG.get("agents", {})
+
+        # Get models from config or use defaults
+        model_list = agents_cfg.get("models", list(MODELS.values()))
+
+        # Check if we should use real-world personas
+        use_real_personas = agents_cfg.get("use_real_personas", False)
+
+        if use_real_personas:
+            self._create_real_persona_agents(agents_cfg, model_list)
+        else:
+            self._create_archetype_agents(agents_cfg, model_list, pm)
+
+    def _create_real_persona_agents(self, agents_cfg: dict, model_list: list):
+        """Create agents from real-world persona YAML files."""
+        version = agents_cfg.get("persona_version", "v1")
+        persona_ids = agents_cfg.get("personas", [])
+
+        # Load persona library
+        try:
+            persona_lib = YAMLPersonaLibrary(version=version)
+            logger.info(f"Loaded {len(persona_lib.personas)} personas from {version}")
+        except Exception as e:
+            logger.warning(f"Failed to load persona library: {e}, falling back to archetypes")
+            pm = get_personality_manager()
+            self._create_archetype_agents(agents_cfg, model_list, pm)
+            return
+
+        # If no specific personas, get random selection
+        if not persona_ids:
+            all_ids = persona_lib.list_all()
+            persona_ids = random.sample(all_ids, min(self.num_agents, len(all_ids)))
+
+        # Category to emoji mapping
+        category_emoji = {
+            "ceo": "💼",
+            "researcher": "🔬",
+            "politician": "🏛️",
+            "investor": "💰",
+            "journalist": "📰",
+            "activist": "✊",
+        }
+
+        for i in range(self.num_agents):
+            persona_id = persona_ids[i % len(persona_ids)]
+            persona = persona_lib.get(persona_id)
+
+            if not persona:
+                logger.warning(f"Persona {persona_id} not found, using placeholder")
+                continue
+
+            palette = AGENT_PALETTES[i % len(AGENT_PALETTES)]
+            model = model_list[i % len(model_list)]
+
+            # Build system prompt from persona
+            system_prompt = self._build_persona_prompt(persona)
+
+            # Map persona category to archetype for personality system
+            archetype_map = {
+                "ceo": "the_pragmatist",
+                "researcher": "the_scholar",
+                "politician": "the_mentor",
+                "investor": "the_pragmatist",
+                "journalist": "the_skeptic",
+                "activist": "the_creative",
+            }
+            archetype = archetype_map.get(persona.category, "the_scholar")
+            pm = get_personality_manager()
+            personality = pm.create(name=persona.name, archetype=archetype)
+
+            agent_id = f"swarm-{i:02d}"
+            self.agents[agent_id] = Agent(
+                id=agent_id,
+                name=persona.name,
+                personality_type=archetype,
+                personality=personality,
+                model=model,
+                color=palette["color"],
+                bg_color=palette["bg"],
+                icon=AGENT_ICONS[i % len(AGENT_ICONS)],
+                emoji=category_emoji.get(persona.category, "🤖"),
+                prompt_id=None,
+                prompt_category=persona.category,
+                prompt_subcategory=persona.role,
+                prompt_text=system_prompt,
+            )
+            logger.info(f"Created agent {agent_id}: {persona.name} ({persona.role})")
+
+    def _build_persona_prompt(self, persona) -> str:
+        """Build a system prompt from a Persona object."""
+        parts = [
+            f"You are {persona.name}, {persona.role} at {persona.organization}.",
+            "",
+            f"Background: {persona.bio}",
+            "",
+        ]
+
+        if persona.achievements:
+            parts.append("Key achievements:")
+            for ach in persona.achievements[:5]:
+                parts.append(f"- {ach}")
+            parts.append("")
+
+        # Add worldview/values (nested in worldview object)
+        if hasattr(persona, 'worldview') and hasattr(persona.worldview, 'values_hierarchy') and persona.worldview.values_hierarchy:
+            parts.append(f"Core values: {', '.join(persona.worldview.values_hierarchy[:5])}")
+
+        # Add positions
+        if hasattr(persona, 'positions') and persona.positions:
+            parts.append("")
+            parts.append("Key positions:")
+            for topic, stance in list(persona.positions.items())[:4]:
+                parts.append(f"- {topic}: {stance}")
+
+        # Add rhetorical style (nested in rhetorical object)
+        if hasattr(persona, 'rhetorical') and hasattr(persona.rhetorical, 'catchphrases') and persona.rhetorical.catchphrases:
+            parts.append("")
+            parts.append(f"Characteristic phrases: \"{persona.rhetorical.catchphrases[0]}\"")
+
+        parts.append("")
+        parts.append("Respond as this person would, maintaining their communication style, values, and viewpoints.")
+
+        return "\n".join(parts)
+
+    def _create_archetype_agents(self, agents_cfg: dict, model_list: list, pm):
+        """Create agents from personality archetypes (fallback)."""
         personality_weights = agents_cfg.get("personalities", {
             "the_scholar": 2,
             "the_pragmatist": 2,
@@ -593,11 +717,7 @@ class SwarmOrchestrator:
         for archetype, weight in personality_weights.items():
             weighted_archetypes.extend([archetype] * weight)
 
-        # Use weighted list or fall back to default
         archetypes = weighted_archetypes if weighted_archetypes else list(PERSONALITY_ARCHETYPES.keys())
-
-        # Get models from config or use defaults
-        model_list = agents_cfg.get("models", list(MODELS.values()))
 
         # Load prompts from library
         prompt_loader = PromptLoader()
@@ -610,9 +730,8 @@ class SwarmOrchestrator:
         for cat in categories:
             cat_prompts = prompt_loader.get_by_category(cat)
             if cat_prompts:
-                all_prompts.extend(cat_prompts[:5])  # Take up to 5 from each category
+                all_prompts.extend(cat_prompts[:5])
 
-        # Shuffle for variety
         random.shuffle(all_prompts)
 
         for i in range(self.num_agents):
@@ -624,7 +743,6 @@ class SwarmOrchestrator:
             personality = pm.create(name=agent_id, archetype=archetype)
             info = PERSONALITY_INFO.get(archetype, {"emoji": "🤖", "short": "Agent"})
 
-            # Assign a prompt from the library
             prompt = all_prompts[i % len(all_prompts)] if all_prompts else None
 
             self.agents[agent_id] = Agent(
