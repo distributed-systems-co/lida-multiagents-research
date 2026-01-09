@@ -3,8 +3,9 @@ version: '3.8'
 services:
   app:
     build: .
+    command: ["uvicorn", "run_swarm_server:app", "--host", "0.0.0.0", "--port", "12345"]
     ports:
-      - "8000:8000"
+      - "12345:12345"
     volumes:
       - .:/app
     environment:

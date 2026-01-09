@@ -2564,6 +2564,58 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# GLOBAL APP FOR UVICORN
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _create_default_app() -> FastAPI:
+    """Create default app for uvicorn import."""
+    num_agents = int(os.environ.get("SWARM_AGENTS", "8"))
+    live_mode = os.environ.get("SWARM_LIVE", "").lower() in ("1", "true", "yes")
+    tools_mode = os.environ.get("SWARM_TOOLS", "").lower() in ("1", "true", "yes")
+
+    orchestrator = SwarmOrchestrator(
+        num_agents=num_agents,
+        live_mode=live_mode,
+        tools_mode=tools_mode,
+    )
+
+    app = create_app(orchestrator)
+
+    @app.on_event("startup")
+    async def startup():
+        """Initialize async components on startup."""
+        orch = app.state.orchestrator
+        if orch.live_mode:
+            await orch.init_llm()
+        if orch.tools_mode:
+            await orch.init_mcp()
+        asyncio.create_task(orch.decay_energy())
+
+        async def auto_deliberate():
+            await asyncio.sleep(5)
+            while True:
+                try:
+                    if not orch.deliberation_active and len(orch.websockets) > 0:
+                        topic = random.choice(DEFAULT_TOPICS)
+                        await orch.run_deliberation(topic)
+                except Exception as e:
+                    logger.error(f"Auto-deliberation error: {e}")
+                await asyncio.sleep(5)
+
+        asyncio.create_task(auto_deliberate())
+
+    @app.on_event("shutdown")
+    async def shutdown():
+        """Cleanup on shutdown."""
+        await app.state.orchestrator.cleanup()
+
+    return app
+
+# Global app instance for uvicorn
+app = _create_default_app()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════════
 

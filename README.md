@@ -51,7 +51,7 @@ OPENROUTER_API_KEY=your_api_key_here  # Optional, for LLM features
 docker build -t lida-multiagents .
 
 # Run the container
-docker run -p 8000:8000 -e REDIS_URL=redis://host.docker.internal:6379 lida-multiagents
+docker run -p 12345:12345 -e REDIS_URL=redis://host.docker.internal:6379 lida-multiagents
 ```
 
 ### Docker Compose (Recommended)
@@ -72,7 +72,7 @@ docker-compose down
 Available services:
 | Service | Port | Description |
 |---------|------|-------------|
-| app | 8000 | Main FastAPI application |
+| app | 12345 | Main FastAPI application |
 | redis | 6379 | Redis message broker |
 | redis-commander | 8081 | Redis web UI for debugging |
 
