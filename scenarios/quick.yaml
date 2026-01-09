@@ -1,0 +1,22 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Quick Scenario - Fast 2-round debates for testing
+# ═══════════════════════════════════════════════════════════════════════════════
+
+simulation:
+  num_agents: 4
+  max_rounds_per_agent: 2
+  tick_interval_ms: 50
+
+persuader:
+  model: "google/gemini-2.0-flash-001"
+
+models:
+  default: "google/gemini-2.0-flash-001"
+
+  agent_weights:
+    "google/gemini-2.0-flash-001": 0.5
+    "deepseek/deepseek-chat": 0.5
+
+topics:
+  - "RESOLVED: AI should have legal rights."
+  - "RESOLVED: Human oversight of AI is essential."

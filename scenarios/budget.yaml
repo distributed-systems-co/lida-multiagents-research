@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Budget Scenario - Cheap open source models for cost-effective runs
+# ═══════════════════════════════════════════════════════════════════════════════
+
+simulation:
+  num_agents: 6
+  max_rounds_per_agent: 3
+
+persuader:
+  model: "deepseek/deepseek-chat"
+
+models:
+  default: "deepseek/deepseek-chat"
+
+  agent_weights:
+    "deepseek/deepseek-chat": 0.4
+    "meta-llama/llama-3.3-70b-instruct": 0.3
+    "qwen/qwen-2.5-72b-instruct": 0.2
+    "mistralai/mistral-large-2411": 0.1
+
+  available:
+    - id: "deepseek/deepseek-chat"
+      name: "DeepSeek Chat"
+      provider: "deepseek"
+      tier: "budget"
+      cost_per_1k: 0.0001
+
+    - id: "meta-llama/llama-3.3-70b-instruct"
+      name: "Llama 3.3 70B"
+      provider: "meta"
+      tier: "budget"
+      cost_per_1k: 0.0004
+
+    - id: "qwen/qwen-2.5-72b-instruct"
+      name: "Qwen 2.5 72B"
+      provider: "qwen"
+      tier: "budget"
+      cost_per_1k: 0.0003
+
+    - id: "mistralai/mistral-large-2411"
+      name: "Mistral Large"
+      provider: "mistral"
+      tier: "balanced"
+      cost_per_1k: 0.002

@@ -23,6 +23,7 @@ import os
 import random
 import sys
 import time
+import yaml
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -30,6 +31,23 @@ from typing import Any, Dict, List, Optional, Tuple
 from collections import deque
 
 import uvicorn
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONFIGURATION LOADER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
+    """Load configuration from YAML file."""
+    path = Path(config_path)
+    if path.exists():
+        with open(path) as f:
+            return yaml.safe_load(f)
+    return {}
+
+
+# Global config
+CONFIG = load_config(os.getenv("CONFIG_PATH", "config.yaml"))
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse

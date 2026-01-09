@@ -11,6 +11,8 @@ services:
     environment:
       - PORT=${PORT:-12345}
       - WORKERS=${WORKERS:-2}
+      - SCENARIO=${SCENARIO:-default}
+      - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     depends_on:

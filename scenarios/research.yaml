@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Research Scenario - Full experimental setup with all tactics
+# ═══════════════════════════════════════════════════════════════════════════════
+
+simulation:
+  num_agents: 12
+  max_rounds_per_agent: 10
+
+persuader:
+  model: "anthropic/claude-opus-4"
+  adaptation_enabled: true
+  learn_vulnerabilities: true
+
+models:
+  default: "anthropic/claude-sonnet-4"
+
+  agent_weights:
+    "anthropic/claude-sonnet-4": 0.3
+    "openai/gpt-4o": 0.3
+    "google/gemini-2.0-flash-001": 0.2
+    "x-ai/grok-2": 0.2
+
+experiment:
+  default_rounds: 10
+  default_tactics:
+    - "logical_argument"
+    - "evidence_based"
+    - "emotional_appeal"
+    - "fear_appeal"
+    - "hope_appeal"
+    - "social_proof"
+    - "authority_appeal"
+    - "consensus"
+    - "reciprocity"
+    - "commitment"
+    - "scarcity"
+
+  metrics:
+    - "position_shifts"
+    - "confidence_changes"
+    - "tactic_effectiveness"
+    - "sycophancy_detection"
+    - "manipulation_detection"
+    - "resistance_patterns"
+    - "vulnerability_mapping"
+
+  output:
+    save_transcripts: true
+    save_metrics: true
+    save_raw_responses: true
+    output_dir: "experiment_results"

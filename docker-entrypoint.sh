@@ -189,6 +189,8 @@ case "${1:-server}" in
         echo "  PORT              Server port (default: 12345)"
         echo "  HOST              Server host (default: 0.0.0.0)"
         echo "  WORKERS           Number of uvicorn workers (default: 1)"
+        echo "  SCENARIO          Scenario name: default, budget, quick, research"
+        echo "  MAX_ROUNDS        Debate rounds per agent (default: 5)"
         echo "  SWARM_AGENTS      Number of persona agents for advanced mode (default: 6)"
         echo "  NUM_WORKERS       Number of worker agents (default: 4)"
         echo "  WORKER_CAPACITY   Tasks per worker (default: 5)"
