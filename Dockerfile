@@ -23,4 +23,4 @@ RUN pip install -e .
 EXPOSE 8000
 
 # Default command
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "run_swarm_server:app", "--host", "0.0.0.0", "--port", "8000"]
