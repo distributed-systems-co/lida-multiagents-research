@@ -1,0 +1,130 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# CUSTOM SCENARIO TEMPLATE
+# Fork this file to create your own debate scenario
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# QUICK START:
+#   1. Copy this file: cp custom_template.yaml my_scenario.yaml
+#   2. Edit the roster below to pick your characters
+#   3. Run: SCENARIO=my_scenario docker compose up app
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "My custom debate scenario"
+_extends: "default.yaml"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+
+settings:
+  # Budget: "testing" (cheap), "research" (balanced), "unlimited" (best models)
+  model_budget: "research"
+
+  simulation:
+    max_rounds: 5
+
+  player:
+    enabled: true           # Set false to watch AI-only debate
+    can_switch_characters: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ROSTER - Pick your characters
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Available personas (from personas/v2/ai_researchers.yaml):
+#   yudkowsky    - AI safety researcher, high p(doom)
+#   connor_leahy - Conjecture CEO, doomer
+#   andreessen   - a16z, techno-optimist accelerationist
+#   lecun        - Meta AI, skeptic of x-risk
+#   altman       - OpenAI CEO
+#   amodei       - Anthropic CEO
+#   bengio       - Deep learning pioneer, concerned
+#   russell      - UC Berkeley, AI safety academic
+#   gebru        - DAIR, AI ethics focus
+#   toner        - Former OpenAI board
+#   macaskill    - EA philosopher
+#
+# Model options (OpenRouter):
+#   anthropic/claude-sonnet-4     - Best reasoning
+#   openai/gpt-4o                 - Good all-around
+#   google/gemini-2.0-flash-001   - Fast, cheap
+#   x-ai/grok-2                   - Unconventional style
+#   openai/gpt-4o-mini            - Budget option
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+roster:
+  source: "../personas/v2/ai_researchers.yaml"
+
+  cast:
+    # === UNCOMMENT/EDIT THE CHARACTERS YOU WANT ===
+
+    yudkowsky:
+      model: "anthropic/claude-sonnet-4"
+      team: "side_a"
+      starting_position: { stance: "FOR", confidence: 0.9 }
+
+    andreessen:
+      model: "x-ai/grok-2"
+      team: "side_b"
+      starting_position: { stance: "AGAINST", confidence: 0.9 }
+
+    altman:
+      model: "openai/gpt-4o"
+      team: "side_b"
+      starting_position: { stance: "AGAINST", confidence: 0.7 }
+
+    # amodei:
+    #   model: "anthropic/claude-sonnet-4"
+    #   team: "undecided"
+    #   starting_position: { stance: "UNDECIDED", confidence: 0.5 }
+
+    # gebru:
+    #   model: "google/gemini-2.0-flash-001"
+    #   team: "side_a"
+    #   starting_position: { stance: "FOR", confidence: 0.6 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TEAMS
+# ─────────────────────────────────────────────────────────────────────────────
+
+teams:
+  side_a:
+    name: "Pro"
+    color: "#4ecdc4"
+
+  side_b:
+    name: "Con"
+    color: "#ff6b6b"
+
+  undecided:
+    name: "Undecided"
+    color: "#95a5a6"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TOPIC
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Available topics (from topics/v1/ai_governance.yaml):
+#   ai_pause              - Should we pause AI development?
+#   lab_self_regulation   - Can AI labs self-regulate?
+#   xrisk_vs_present_harms - Does x-risk focus distract from present harms?
+#   scaling_hypothesis    - Will scaling lead to AGI?
+#   open_source_ai        - Should frontier models be open-sourced?
+#   compute_governance    - Should governments regulate compute?
+#
+# Or define your own:
+#   custom_topic:
+#     proposition: "Your debate topic here"
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+topic: "ai_pause"
+
+# Or use a custom topic:
+# topic:
+#   id: "my_topic"
+#   proposition: "AI development should require government licenses"
+#   category: "governance"

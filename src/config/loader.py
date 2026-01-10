@@ -434,6 +434,90 @@ def get_topic(name: str, scenario: str = None) -> Dict:
     return topics.get(name, {})
 
 
+def build_roster(scenario: str = None) -> Dict[str, Dict]:
+    """
+    Build the active roster of personas for a scenario.
+
+    Merges persona definitions from the library with roster-specific
+    overrides (model, team, starting_position).
+
+    Args:
+        scenario: Scenario to load roster from
+
+    Returns:
+        Dict mapping persona_id -> full persona config with overrides applied
+    """
+    config = load_scenario(scenario)
+    roster_config = config.get("roster", {})
+
+    # Get cast (active personas with overrides)
+    cast = roster_config.get("cast", {})
+    if not cast:
+        # Fall back to active_personas list (legacy format)
+        active = config.get("active_personas", [])
+        cast = {name: {} for name in active}
+
+    # Load base personas from source or imports
+    source = roster_config.get("source")
+    if source:
+        # Load from explicit source
+        source_path = SCENARIOS_DIR / source.lstrip("../")
+        base_personas = load_yaml_file(source_path).get("personas", {})
+    else:
+        # Try to get from already-loaded config
+        base_personas = get_all_personas(scenario)
+
+    # Build final roster
+    roster = {}
+    budget_override = roster_config.get("budget_override", {})
+    default_model = budget_override.get("default")
+    premium_only = budget_override.get("premium_only", [])
+
+    for persona_id, overrides in cast.items():
+        # Start with base persona
+        if persona_id in base_personas:
+            persona = base_personas[persona_id].copy()
+        else:
+            logger.warning(f"Persona '{persona_id}' not found in library")
+            persona = {"id": persona_id, "name": persona_id}
+
+        # Apply overrides from cast
+        if overrides:
+            # Model override
+            if "model" in overrides:
+                persona["model"] = overrides["model"]
+            elif default_model and persona_id not in premium_only:
+                persona["model"] = default_model
+
+            # Team assignment
+            if "team" in overrides:
+                persona["team"] = overrides["team"]
+
+            # Starting position
+            if "starting_position" in overrides:
+                pos = overrides["starting_position"]
+                persona["initial_position"] = pos.get("stance", "UNDECIDED")
+                persona["confidence"] = pos.get("confidence", 0.5)
+                if "topic" in pos:
+                    persona["topic"] = pos["topic"]
+
+        roster[persona_id] = persona
+
+    return roster
+
+
+def get_teams(scenario: str = None) -> Dict[str, Dict]:
+    """Get team definitions from scenario."""
+    config = load_scenario(scenario)
+    return config.get("teams", {})
+
+
+def get_matchup(scenario: str = None) -> Dict:
+    """Get initial matchup configuration."""
+    config = load_scenario(scenario)
+    return config.get("initial_matchup", {})
+
+
 # Convenience functions for common config access
 def get_simulation_config(scenario: str = None) -> Dict:
     """Get simulation configuration."""

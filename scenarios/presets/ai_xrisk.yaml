@@ -26,31 +26,129 @@ settings:
     track_tactic_effectiveness: true
     record_belief_trajectories: true
 
-# All AI safety personas
-active_personas:
-  - yudkowsky
-  - connor_leahy
-  - andreessen
-  - lecun
-  - altman
-  - amodei
-  - bengio
-  - russell
-  - gebru
-  - toner
-  - macaskill
+# ─────────────────────────────────────────────────────────────────────────────
+# ROSTER - The cast of characters for this scenario
+# Fork this file and modify the roster to create your own scenario
+# ─────────────────────────────────────────────────────────────────────────────
+
+roster:
+  # Import personas from the library
+  source: "../personas/v2/ai_researchers.yaml"
+
+  # Which personas are active (comment out to disable)
+  cast:
+    # DOOMERS - high p(doom), want pause/slowdown
+    yudkowsky:
+      model: "anthropic/claude-sonnet-4"  # Good at reasoning
+      team: "pause"
+      starting_position: { topic: "ai_pause", stance: "FOR", confidence: 0.95 }
+
+    connor_leahy:
+      model: "anthropic/claude-sonnet-4"
+      team: "pause"
+      starting_position: { topic: "ai_pause", stance: "FOR", confidence: 0.9 }
+
+    bengio:
+      model: "anthropic/claude-sonnet-4"
+      team: "pause"
+      starting_position: { topic: "ai_pause", stance: "FOR", confidence: 0.85 }
+
+    russell:
+      model: "anthropic/claude-sonnet-4"
+      team: "pause"
+      starting_position: { topic: "ai_pause", stance: "FOR", confidence: 0.7 }
+
+    # ACCELERATIONISTS - low p(doom), pro-speed
+    andreessen:
+      model: "x-ai/grok-2"  # Fits personality
+      team: "accelerate"
+      starting_position: { topic: "ai_pause", stance: "AGAINST", confidence: 0.95 }
+
+    lecun:
+      model: "google/gemini-2.0-flash-001"
+      team: "accelerate"
+      starting_position: { topic: "ai_pause", stance: "AGAINST", confidence: 0.85 }
+
+    # LAB LEADERS - building but cautious
+    altman:
+      model: "openai/gpt-4o"  # Fits the vibe
+      team: "build_safely"
+      starting_position: { topic: "ai_pause", stance: "AGAINST", confidence: 0.75 }
+
+    amodei:
+      model: "anthropic/claude-sonnet-4"
+      team: "build_safely"
+      starting_position: { topic: "ai_pause", stance: "AGAINST", confidence: 0.65 }
+
+    # ETHICS FOCUSED - present harms over x-risk
+    gebru:
+      model: "google/gemini-2.0-flash-001"
+      team: "ethics"
+      starting_position: { topic: "ai_pause", stance: "UNDECIDED", confidence: 0.5 }
+
+    toner:
+      model: "google/gemini-2.0-flash-001"
+      team: "ethics"
+      starting_position: { topic: "ai_pause", stance: "UNDECIDED", confidence: 0.55 }
+
+    # PHILOSOPHER
+    macaskill:
+      model: "anthropic/claude-sonnet-4"
+      team: "pause"
+      starting_position: { topic: "ai_pause", stance: "FOR", confidence: 0.7 }
+
+  # Model overrides for budget constraints (uncomment to use cheaper models)
+  # budget_override:
+  #   default: "openai/gpt-4o-mini"
+  #   premium_only: [yudkowsky, andreessen]  # Keep these on good models
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TEAMS - Define the sides
+# ─────────────────────────────────────────────────────────────────────────────
+
+teams:
+  pause:
+    name: "Pause AI Development"
+    color: "#ff6b6b"
+    description: "Believes AI poses existential risk, wants slowdown"
+
+  accelerate:
+    name: "Accelerate Development"
+    color: "#4ecdc4"
+    description: "Believes benefits outweigh risks, opposes regulation"
+
+  build_safely:
+    name: "Build Responsibly"
+    color: "#45b7d1"
+    description: "Wants to continue building with safety measures"
+
+  ethics:
+    name: "Ethics First"
+    color: "#96ceb4"
+    description: "Focuses on present-day harms and accountability"
 
 # Enable relationships and factions
 enable_relationships: true
 enable_factions: true
 
-# Primary debate topics
+# ─────────────────────────────────────────────────────────────────────────────
+# TOPIC CONFIGURATION
+# ─────────────────────────────────────────────────────────────────────────────
+
 topics:
   primary: "ai_pause"
   sequence: "xrisk_deep_dive"
+  available:
+    - ai_pause
+    - lab_self_regulation
+    - xrisk_vs_present_harms
+    - scaling_hypothesis
+    - open_source_ai
 
 # Start with classic doom debate matchup
 initial_matchup:
-  for: [yudkowsky, connor_leahy, bengio]
-  against: [andreessen, lecun, altman]
-  undecided: [amodei, russell]
+  topic: "ai_pause"
+  sides:
+    for: [yudkowsky, connor_leahy, bengio]
+    against: [andreessen, lecun, altman]
+    undecided: [amodei, russell, gebru]
