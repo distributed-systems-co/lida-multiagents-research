@@ -2516,15 +2516,23 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             "tools_mode": orch.tools_mode,
             "deliberation_active": orch.deliberation_active,
             "current_topic": orch.current_topic,
+            "scenario_topic": orch.scenario_topic,  # Pre-configured topic from scenario
             "phase": orch.phase,
         }
 
     @app.post("/api/deliberate")
-    async def start_deliberation(topic: str = Query(...)):
-        """Start a deliberation on a topic."""
+    async def start_deliberation(topic: str = Query(None)):
+        """Start a deliberation on a topic. If no topic provided, uses scenario topic or prompts user."""
         orch = app.state.orchestrator
         if orch.deliberation_active:
             raise HTTPException(400, "Deliberation already in progress")
+
+        # Use scenario topic as default if available and no topic provided
+        if not topic:
+            if orch.scenario_topic:
+                topic = orch.scenario_topic
+            else:
+                raise HTTPException(400, "No topic provided and no scenario topic configured")
 
         asyncio.create_task(orch.run_deliberation(topic))
         return {"status": "started", "topic": topic}
