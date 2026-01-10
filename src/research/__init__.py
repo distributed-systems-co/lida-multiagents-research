@@ -15,8 +15,16 @@ from .hydrator import PersonaHydrator, ResearchContext, ResearchProgress
 from .queries import QueryGenerator, SearchQuery
 from .sources import SourceFetcher, SourceRanker, Source, ExtractedContent
 from .cache import ResearchCache
+from .deep_search import (
+    DeepSearchEngine,
+    IntelligenceDossier,
+    IntelligenceFragment,
+    IntelligenceType,
+    deep_research,
+)
 
 __all__ = [
+    # Original hydrator
     "PersonaHydrator",
     "ResearchContext",
     "ResearchProgress",
@@ -27,4 +35,10 @@ __all__ = [
     "Source",
     "ExtractedContent",
     "ResearchCache",
+    # Deep search
+    "DeepSearchEngine",
+    "IntelligenceDossier",
+    "IntelligenceFragment",
+    "IntelligenceType",
+    "deep_research",
 ]
