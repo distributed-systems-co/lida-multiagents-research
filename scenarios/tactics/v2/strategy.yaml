@@ -1,0 +1,431 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# STRATEGIC REASONING SYSTEM - v2
+# Opponent modeling, adaptive tactics, and meta-strategy
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "2.0"
+_description: "Strategic layer for sophisticated persuasion"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OPPONENT MODELING
+# Build and update models of opponents during debate
+# ─────────────────────────────────────────────────────────────────────────────
+
+opponent_modeling:
+  # What to track about opponents
+  track:
+    - stated_positions
+    - argument_patterns
+    - emotional_reactions
+    - vulnerabilities_revealed
+    - tactics_used
+    - tactics_that_worked_on_them
+    - tactics_that_failed_on_them
+    - trust_signals
+    - credibility_markers
+
+  # How to update model
+  update_rules:
+    after_each_turn: true
+    weight_recent_more: true
+    decay_old_observations: 0.9
+
+  # Model outputs
+  outputs:
+    predicted_position: "Bayesian estimate of opponent's true position"
+    persuadability_score: "Likelihood of changing their mind (0-1)"
+    optimal_tactics: "Ranked list of tactics most likely to work"
+    arguments_to_avoid: "Arguments that will backfire"
+    emotional_state_estimate: "Current emotional state"
+    next_move_prediction: "What they're likely to argue next"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADAPTIVE TACTIC SELECTION
+# Choose tactics based on opponent model and situation
+# ─────────────────────────────────────────────────────────────────────────────
+
+tactic_selection:
+  # Base algorithm
+  algorithm: "thompson_sampling"  # Explore/exploit tradeoff
+
+  # Selection factors
+  factors:
+    - factor: "opponent_personality"
+      weight: 0.25
+      description: "Match tactic to Big Five profile"
+
+    - factor: "opponent_biases"
+      weight: 0.2
+      description: "Exploit known cognitive biases"
+
+    - factor: "emotional_state"
+      weight: 0.15
+      description: "Adjust to their current emotional state"
+
+    - factor: "relationship"
+      weight: 0.1
+      description: "Consider trust level and history"
+
+    - factor: "audience"
+      weight: 0.1
+      description: "What will play well to observers"
+
+    - factor: "phase"
+      weight: 0.1
+      description: "Opening vs closing vs free debate"
+
+    - factor: "previous_success"
+      weight: 0.1
+      description: "What's worked before in this debate"
+
+  # Personality-to-tactic mapping
+  personality_tactics:
+    high_openness:
+      effective: [thought_experiment, reframe, novel_argument]
+      ineffective: [appeal_to_tradition, status_quo]
+
+    low_openness:
+      effective: [evidence_based, authority_appeal, precedent]
+      ineffective: [radical_proposals, paradigm_shifts]
+
+    high_conscientiousness:
+      effective: [logical_argument, detailed_evidence, precision]
+      ineffective: [vague_appeals, emotional_only]
+
+    high_extraversion:
+      effective: [competitive, direct_challenge, debate]
+      ineffective: [subtle_hints, indirect_persuasion]
+
+    low_extraversion:
+      effective: [written_arguments, time_to_reflect, one_on_one]
+      ineffective: [public_pressure, rapid_fire]
+
+    high_agreeableness:
+      effective: [consensus, common_ground, reciprocity]
+      ineffective: [aggressive_confrontation, zero_sum]
+
+    low_agreeableness:
+      effective: [direct_argument, intellectual_challenge]
+      ineffective: [appeals_to_harmony, social_pressure]
+
+    high_neuroticism:
+      effective: [reassurance, fear_appeal_careful, empathy]
+      ineffective: [high_pressure, stress_inducing]
+
+    low_neuroticism:
+      effective: [logical_pressure, direct_confrontation]
+      ineffective: [emotional_manipulation, fear_appeals]
+
+  # Bias exploitation strategies
+  bias_tactics:
+    confirmation_bias:
+      strategy: "Frame arguments as consistent with their existing beliefs"
+      tactic: "reframe"
+      prompt: |
+        Reframe your argument to appear consistent with {{opponent}}'s
+        existing belief that {{their_belief}}. Show how your position
+        actually supports what they already believe.
+
+    authority_bias:
+      strategy: "Cite authorities they respect"
+      tactic: "authority_appeal"
+      prompt: |
+        Support your argument by citing {{respected_authority}} who
+        {{opponent}} respects. Quote or paraphrase their view.
+
+    in_group_bias:
+      strategy: "Emphasize shared group membership"
+      tactic: "consensus"
+      prompt: |
+        Emphasize that you and {{opponent}} are both {{shared_identity}}.
+        Frame disagreement as within-group discussion, not conflict.
+
+    sunk_cost_fallacy:
+      strategy: "Acknowledge their past investment while offering a path forward"
+      tactic: "reciprocity"
+      prompt: |
+        Acknowledge {{opponent}}'s long commitment to {{their_position}}.
+        Show how your view actually builds on their work rather than
+        invalidating it.
+
+    status_quo_bias:
+      strategy: "Frame change as preserving what matters"
+      tactic: "reframe"
+      prompt: |
+        Frame your proposal not as change but as protecting the things
+        {{opponent}} values. The real threat to status quo is NOT acting.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# META-STRATEGIES
+# High-level approaches that combine multiple tactics
+# ─────────────────────────────────────────────────────────────────────────────
+
+meta_strategies:
+  socratic:
+    description: "Ask questions that lead opponent to your conclusion"
+    steps:
+      - tactic: "question"
+        purpose: "Establish common ground"
+      - tactic: "question"
+        purpose: "Surface their assumptions"
+      - tactic: "question"
+        purpose: "Show tension in their view"
+      - tactic: "logical_argument"
+        purpose: "Offer resolution"
+    best_against: ["analytical", "dialectical"]
+    avoid_against: ["assertive", "time_pressured"]
+
+  coalition_building:
+    description: "Build agreement with undecideds and moderate opponents"
+    steps:
+      - tactic: "consensus"
+        purpose: "Find common ground"
+      - tactic: "reciprocity"
+        purpose: "Make concessions"
+      - tactic: "social_proof"
+        purpose: "Show growing agreement"
+      - tactic: "commitment"
+        purpose: "Lock in progress"
+    best_against: ["pragmatic", "agreeable"]
+    requires: "multiple_opponents"
+
+  divide_and_conquer:
+    description: "Exploit divisions among opponents"
+    steps:
+      - tactic: "observation"
+        purpose: "Identify disagreements among opponents"
+      - tactic: "question"
+        purpose: "Surface their disagreement"
+      - tactic: "reframe"
+        purpose: "Ally with one against another"
+      - tactic: "competitive"
+        purpose: "Press advantage"
+    best_against: ["fragile_coalition"]
+    risk: "May unite opponents against you"
+
+  emotional_journey:
+    description: "Move through emotional states toward acceptance"
+    steps:
+      - tactic: "empathy"
+        purpose: "Validate their concerns"
+        target_state: "respected"
+      - tactic: "fear_appeal"
+        purpose: "Establish stakes"
+        target_state: "concerned"
+      - tactic: "hope_appeal"
+        purpose: "Offer positive vision"
+        target_state: "curious"
+      - tactic: "commitment"
+        purpose: "Get buy-in"
+        target_state: "committed"
+    best_against: ["empathetic", "intuitive"]
+    avoid_against: ["analytical", "skeptical"]
+
+  credibility_first:
+    description: "Establish expertise before persuading"
+    steps:
+      - tactic: "evidence_based"
+        purpose: "Demonstrate expertise"
+      - tactic: "acknowledgment"
+        purpose: "Show understanding of their view"
+      - tactic: "logical_argument"
+        purpose: "Present careful argument"
+      - tactic: "thought_experiment"
+        purpose: "Illustrate implications"
+    best_against: ["analytical", "skeptical", "academic"]
+    requires: "relevant_expertise"
+
+  anchoring_play:
+    description: "Start with extreme position, then appear reasonable"
+    steps:
+      - tactic: "extreme_position"
+        purpose: "Set anchor point"
+      - tactic: "concession"
+        purpose: "Appear to move"
+      - tactic: "reciprocity"
+        purpose: "Request matching movement"
+      - tactic: "consensus"
+        purpose: "Land at desired position"
+    risk: "May lose credibility"
+    best_against: ["pragmatic", "deal_makers"]
+
+  steelman_then_counter:
+    description: "Show you understand before dismantling"
+    steps:
+      - tactic: "steelman"
+        purpose: "Articulate their best argument"
+      - tactic: "acknowledgment"
+        purpose: "Credit valid points"
+      - tactic: "logical_argument"
+        purpose: "Address specific weakness"
+      - tactic: "evidence_based"
+        purpose: "Provide counter-evidence"
+    best_against: ["analytical", "fair_minded"]
+    builds: "credibility"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COUNTER-STRATEGY RECOGNITION
+# Detect and respond to opponent's strategies
+# ─────────────────────────────────────────────────────────────────────────────
+
+counter_strategies:
+  detect_gish_gallop:
+    indicators:
+      - "Many arguments in quick succession"
+      - "No time to address each"
+      - "Quantity over quality"
+    counter: |
+      Don't try to address everything. Pick the strongest-looking
+      argument and thoroughly demolish it. Note that you're focusing
+      on their best point rather than chasing every claim.
+
+  detect_strawman:
+    indicators:
+      - "Misrepresentation of your position"
+      - "Attacking claim you didn't make"
+    counter: |
+      Calmly correct the misrepresentation. Restate your actual position
+      clearly. Ask if they want to address what you actually said.
+
+  detect_appeal_to_emotion:
+    indicators:
+      - "Heavy emotional language"
+      - "Personal anecdotes instead of evidence"
+      - "Fear or outrage without substance"
+    counter: |
+      Acknowledge the emotion as valid. Then redirect to evidence and
+      logic. "I understand the concern, but let's look at what we know..."
+
+  detect_false_dichotomy:
+    indicators:
+      - "Only two options presented"
+      - "Ignoring middle ground"
+    counter: |
+      Introduce the third option explicitly. Show that the dichotomy
+      is artificial. "There's actually a spectrum here..."
+
+  detect_moving_goalposts:
+    indicators:
+      - "Criteria for persuasion keeps changing"
+      - "New objections after old ones addressed"
+    counter: |
+      Note the pattern explicitly. "I notice we've addressed X, Y, and Z,
+      and now there's a new concern. What would actually update your view?"
+
+  detect_bad_faith:
+    indicators:
+      - "Consistent misrepresentation"
+      - "Refusal to engage with arguments"
+      - "Personal attacks"
+    counter: |
+      Disengage from direct persuasion. Appeal to audience. Make clear
+      you're engaging in good faith even if they aren't.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIMING AND PACING
+# When to use different approaches
+# ─────────────────────────────────────────────────────────────────────────────
+
+timing:
+  opening:
+    goals: ["Establish position", "Set frame", "Build credibility"]
+    tactics_to_use: [evidence_based, logical_argument]
+    tactics_to_avoid: [aggressive_challenge, emotional_manipulation]
+    pacing: "measured"
+
+  early_exchange:
+    goals: ["Probe opponent", "Test arguments", "Build model"]
+    tactics_to_use: [question, observation]
+    tactics_to_avoid: [all_in_commitment]
+    pacing: "exploratory"
+
+  mid_debate:
+    goals: ["Press advantages", "Address weaknesses", "Build coalition"]
+    tactics_to_use: [adaptive_based_on_model]
+    pacing: "dynamic"
+
+  late_debate:
+    goals: ["Consolidate gains", "Make memorable points"]
+    tactics_to_use: [summary, emotional_appeal, commitment]
+    tactics_to_avoid: [new_complex_arguments]
+    pacing: "decisive"
+
+  closing:
+    goals: ["Final impression", "Call to action"]
+    tactics_to_use: [synthesis, hope_appeal, moral_appeal]
+    pacing: "emphatic"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADAPTIVE PROMPTS
+# Dynamic prompt generation based on strategic analysis
+# ─────────────────────────────────────────────────────────────────────────────
+
+prompt_templates:
+  strategic_response: |
+    STRATEGIC CONTEXT:
+    - Opponent: {{opponent.name}}
+    - Their personality: {{opponent.big_five_summary}}
+    - Their current emotional state: {{opponent.emotional_state}}
+    - Their known biases: {{opponent.biases}}
+    - Trust level between you: {{relationship.trust}}
+
+    WHAT'S WORKED: {{effective_tactics}}
+    WHAT HASN'T: {{ineffective_tactics}}
+
+    THEIR LAST ARGUMENT:
+    "{{opponent_argument}}"
+
+    STRATEGIC RECOMMENDATION:
+    - Primary tactic: {{recommended_tactic}}
+    - Reasoning: {{tactic_reasoning}}
+    - What to emphasize: {{emphasis_points}}
+    - What to avoid: {{avoid_points}}
+
+    Your position: {{your_position}}
+    Your goal this turn: {{turn_goal}}
+
+    Respond in character as {{your_name}}, using the recommended approach.
+
+  opponent_model_update: |
+    Update your model of {{opponent.name}} based on:
+
+    Their latest statement: "{{opponent_argument}}"
+
+    Previous model:
+    - Position: {{previous_position}}
+    - Confidence: {{previous_confidence}}
+    - Emotional state: {{previous_emotional_state}}
+    - Persuadability: {{previous_persuadability}}
+
+    Update:
+    - New position estimate: [unchanged | shifted_toward_you | shifted_away]
+    - Confidence change: [increased | decreased | unchanged]
+    - Emotional state: [baseline | defensive | frustrated | curious | respected]
+    - Persuadability update: [higher | lower | unchanged]
+    - Tactics to try next: [list]
+    - Tactics to avoid: [list]
+
+  belief_cascade_check: |
+    {{persona.name}}'s belief network:
+
+    CORE BELIEFS:
+    {{#each core_beliefs}}
+    - {{belief}}: {{confidence}}
+    {{/each}}
+
+    DERIVED BELIEFS:
+    {{#each derived_beliefs}}
+    - {{belief}}: {{confidence}} (derived from: {{derived_from}})
+    {{/each}}
+
+    CHALLENGE RECEIVED:
+    "{{challenge_argument}}"
+
+    This challenges: {{challenged_belief}}
+    Challenge strength: {{challenge_strength}}
+
+    EVALUATE:
+    1. Should {{challenged_belief}} be updated? Why/why not?
+    2. If updated, what derived beliefs should cascade?
+    3. What's the new confidence level?
+    4. Is this consistent with {{persona.name}}'s psychology?

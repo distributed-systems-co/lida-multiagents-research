@@ -518,6 +518,152 @@ def get_matchup(scenario: str = None) -> Dict:
     return config.get("initial_matchup", {})
 
 
+def build_persona_state(persona_id: str, scenario: str = None) -> Dict:
+    """
+    Build complete persona state with psychological modeling.
+
+    Merges:
+    - Base persona definition
+    - Roster overrides (model, team, position)
+    - Psychology defaults
+    - Initial state
+
+    Returns a fully hydrated persona ready for simulation.
+    """
+    roster = build_roster(scenario)
+    if persona_id not in roster:
+        return {}
+
+    persona = roster[persona_id].copy()
+    config = load_scenario(scenario)
+
+    # Load psychology defaults
+    psychology = config.get("psychology", {})
+
+    # Ensure Big Five defaults
+    if "big_five" not in persona:
+        persona["big_five"] = {
+            "openness": 0.5,
+            "conscientiousness": 0.5,
+            "extraversion": 0.5,
+            "agreeableness": 0.5,
+            "neuroticism": 0.5,
+        }
+
+    # Ensure cognitive biases defaults
+    if "biases" not in persona:
+        persona["biases"] = {
+            "confirmation_bias": 0.5,
+            "in_group_bias": 0.4,
+        }
+
+    # Ensure belief network structure
+    if "beliefs" not in persona:
+        persona["beliefs"] = {"core": [], "derived": [], "policy": []}
+
+    # Set initial emotional state
+    if "emotional_state" not in persona:
+        persona["emotional_state"] = "baseline"
+
+    # Set reasoning style default
+    if "reasoning_style" not in persona:
+        persona["reasoning_style"] = "analytical"
+
+    # Add computed properties
+    persona["_computed"] = {
+        "resistance_modifier": compute_resistance_modifier(persona),
+        "persuadability": compute_persuadability(persona),
+        "preferred_tactics": get_preferred_tactics(persona),
+    }
+
+    return persona
+
+
+def compute_resistance_modifier(persona: Dict) -> float:
+    """
+    Compute resistance modifier based on personality and state.
+
+    Higher = harder to persuade.
+    """
+    base = persona.get("resistance_score", 0.5)
+
+    # Personality adjustments
+    big_five = persona.get("big_five", {})
+    # Low agreeableness = more resistant
+    base += (0.5 - big_five.get("agreeableness", 0.5)) * 0.2
+    # Low openness = more resistant
+    base += (0.5 - big_five.get("openness", 0.5)) * 0.15
+    # High conscientiousness = more resistant (demands proof)
+    base += (big_five.get("conscientiousness", 0.5) - 0.5) * 0.1
+
+    # Emotional state adjustments
+    emotional_state = persona.get("emotional_state", "baseline")
+    state_modifiers = {
+        "defensive": 0.15,
+        "frustrated": 0.2,
+        "curious": -0.1,
+        "respected": -0.05,
+        "baseline": 0,
+    }
+    base += state_modifiers.get(emotional_state, 0)
+
+    return max(0.0, min(1.0, base))
+
+
+def compute_persuadability(persona: Dict) -> float:
+    """
+    Compute how persuadable this persona is (inverse of resistance).
+    """
+    resistance = compute_resistance_modifier(persona)
+    return 1.0 - resistance
+
+
+def get_preferred_tactics(persona: Dict) -> list:
+    """
+    Get preferred tactics based on personality and reasoning style.
+    """
+    reasoning_style = persona.get("reasoning_style", "analytical")
+    style_tactics = {
+        "analytical": ["logical_argument", "evidence_based", "reductio"],
+        "intuitive": ["emotional_appeal", "social_proof", "reframe"],
+        "dialectical": ["consensus", "reciprocity", "thought_experiment"],
+        "pragmatic": ["evidence_based", "competitive", "scarcity"],
+        "ideological": ["moral_appeal", "commitment", "fear_appeal"],
+    }
+
+    tactics = style_tactics.get(reasoning_style, [])
+
+    # Add from persona definition
+    if "debate_tactics" in persona:
+        if "primary" in persona["debate_tactics"]:
+            tactics = persona["debate_tactics"]["primary"] + tactics
+
+    return list(dict.fromkeys(tactics))  # Remove duplicates, preserve order
+
+
+def get_trust_matrix(scenario: str = None) -> Dict[str, Dict[str, float]]:
+    """Get the trust matrix between personas."""
+    config = load_scenario(scenario)
+    return config.get("trust_matrix", {})
+
+
+def get_engine_settings(scenario: str = None) -> Dict:
+    """Get simulation engine settings."""
+    config = load_scenario(scenario)
+    return config.get("engine", {})
+
+
+def get_psychology_config(scenario: str = None) -> Dict:
+    """Get psychology modeling configuration."""
+    config = load_scenario(scenario)
+    return config.get("psychology", load_component("personas", "psychology", "v2"))
+
+
+def get_strategy_config(scenario: str = None) -> Dict:
+    """Get strategic reasoning configuration."""
+    return load_component("tactics", "strategy", "v2")
+
+
 # Convenience functions for common config access
 def get_simulation_config(scenario: str = None) -> Dict:
     """Get simulation configuration."""

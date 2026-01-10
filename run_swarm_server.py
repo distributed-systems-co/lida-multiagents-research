@@ -50,7 +50,7 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
 CONFIG = load_config(os.getenv("CONFIG_PATH", "config.yaml"))
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Add src to path
@@ -71,6 +71,7 @@ from src.deliberation.tools import (
     Vote,
     BeliefState,
 )
+from src.research import PersonaHydrator, ResearchProgress, ResearchContext
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -3360,6 +3361,381 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             "count": len(orch.agents),
             "personas": [{"id": a.id, "name": a.name} for a in orch.agents.values()],
         }
+
+    # ═══════════════════════════════════════════════════════════════════════════════
+    # RESEARCH HYDRATION ENDPOINTS - Deep context enrichment for personas
+    # ═══════════════════════════════════════════════════════════════════════════════
+
+    @app.post("/api/persona/{persona_id}/research")
+    async def research_persona(
+        persona_id: str,
+        request: dict = Body(...),
+    ):
+        """
+        Execute deep research to gather current context for a persona.
+        Streams progress events as SSE.
+
+        Body: {
+            "topic": "AI regulation",
+            "force_refresh": false,    // Bypass cache
+            "include_financial": true, // Include financial queries
+            "include_legal": true      // Include legal/regulatory queries
+        }
+
+        Returns: Server-Sent Events stream with research progress,
+                 final event contains the synthesized context.
+        """
+        orch = app.state.orchestrator
+
+        topic = request.get("topic", "")
+        if not topic:
+            raise HTTPException(400, "Topic is required")
+
+        force_refresh = request.get("force_refresh", False)
+        include_financial = request.get("include_financial", True)
+        include_legal = request.get("include_legal", True)
+
+        # Load persona
+        persona_lib = YAMLPersonaLibrary(version="v1")
+        persona = persona_lib.get(persona_id)
+        if not persona:
+            raise HTTPException(404, f"Persona '{persona_id}' not found")
+
+        # Create hydrator
+        hydrator = PersonaHydrator(
+            jina_api_key=os.getenv("JINA_API_KEY"),
+            brave_api_key=os.getenv("BRAVE_API_KEY"),
+            openrouter_api_key=os.getenv("OPENROUTER_API_KEY"),
+            redis_client=None,  # TODO: Add Redis client
+            max_queries=12,
+            max_sources_to_fetch=8,
+        )
+
+        async def generate_events():
+            """Stream research progress as SSE."""
+            try:
+                async for result in hydrator.hydrate(
+                    persona_id=persona_id,
+                    persona_name=persona.name,
+                    topic=topic,
+                    force_refresh=force_refresh,
+                    include_financial=include_financial,
+                    include_legal=include_legal,
+                ):
+                    if isinstance(result, ResearchProgress):
+                        yield result.to_sse()
+                    elif isinstance(result, ResearchContext):
+                        # Final result - send as special event type
+                        yield f"event: complete\ndata: {json.dumps(result.to_dict())}\n\n"
+            except Exception as e:
+                logger.error(f"Research error: {e}")
+                yield f"event: error\ndata: {json.dumps({'error': str(e)})}\n\n"
+            finally:
+                await hydrator.close()
+
+        return StreamingResponse(
+            generate_events(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+            },
+        )
+
+    @app.post("/api/persona/{persona_id}/speak-hydrated")
+    async def persona_speak_hydrated(
+        persona_id: str,
+        request: dict = Body(...),
+    ):
+        """
+        Have a persona speak on a topic with live research hydration.
+        First executes research to gather current context, then generates response.
+        Streams all progress as SSE.
+
+        Body: {
+            "topic": "AI regulation",
+            "prompt": "What are your current views on...",  // Optional custom prompt
+            "force_research": false,   // Force fresh research even if cached
+            "model": "anthropic/claude-sonnet-4"  // Optional model override
+        }
+
+        Returns: SSE stream with:
+          - Research progress events
+          - Final hydrated response
+        """
+        orch = app.state.orchestrator
+
+        topic = request.get("topic", "")
+        prompt = request.get("prompt", "")
+        force_research = request.get("force_research", False)
+        model = request.get("model")
+
+        if not topic and not prompt:
+            raise HTTPException(400, "Either topic or prompt is required")
+
+        # Load persona
+        persona_lib = YAMLPersonaLibrary(version="v1")
+        persona = persona_lib.get(persona_id)
+        if not persona:
+            raise HTTPException(404, f"Persona '{persona_id}' not found")
+
+        # Create hydrator
+        hydrator = PersonaHydrator(
+            jina_api_key=os.getenv("JINA_API_KEY"),
+            brave_api_key=os.getenv("BRAVE_API_KEY"),
+            openrouter_api_key=os.getenv("OPENROUTER_API_KEY"),
+            redis_client=None,
+        )
+
+        async def generate_events():
+            """Stream research and response generation."""
+            research_context = None
+
+            # Phase 1: Research
+            try:
+                async for result in hydrator.hydrate(
+                    persona_id=persona_id,
+                    persona_name=persona.name,
+                    topic=topic or prompt[:50],
+                    force_refresh=force_research,
+                ):
+                    if isinstance(result, ResearchProgress):
+                        yield result.to_sse()
+                    elif isinstance(result, ResearchContext):
+                        research_context = result
+                        yield f"event: research_complete\ndata: {json.dumps({'sources': result.sources_consulted, 'queries': result.queries_executed})}\n\n"
+            except Exception as e:
+                logger.error(f"Research error: {e}")
+                yield f"event: research_error\ndata: {json.dumps({'error': str(e)})}\n\n"
+
+            # Phase 2: Generate response with hydrated context
+            yield f"data: {json.dumps({'phase': 'generating', 'message': 'Generating persona response...'})}\n\n"
+
+            try:
+                # Build hydrated prompt
+                base_prompt = orch._build_persona_prompt(persona)
+
+                if research_context:
+                    hydrated_prompt = base_prompt + "\n\n" + research_context.to_prompt_injection()
+                else:
+                    hydrated_prompt = base_prompt
+
+                # Generate response
+                user_prompt = prompt or f"Share your current views on: {topic}"
+
+                if orch.llm_client:
+                    response_model = model or "anthropic/claude-sonnet-4"
+                    response = await orch.llm_client.chat(
+                        messages=[
+                            {"role": "system", "content": hydrated_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        model=response_model,
+                        max_tokens=800,
+                    )
+
+                    yield f"event: response\ndata: {json.dumps({'persona': persona_id, 'name': persona.name, 'response': response, 'model': response_model, 'hydrated': research_context is not None, 'research_context': research_context.to_dict() if research_context else None})}\n\n"
+                else:
+                    # No LLM - return prompts for manual use
+                    yield f"event: prompts\ndata: {json.dumps({'persona': persona_id, 'name': persona.name, 'system_prompt': hydrated_prompt, 'user_prompt': user_prompt, 'note': 'LLM not configured. Use these prompts manually.', 'research_context': research_context.to_dict() if research_context else None})}\n\n"
+
+            except Exception as e:
+                logger.error(f"Generation error: {e}")
+                yield f"event: generation_error\ndata: {json.dumps({'error': str(e)})}\n\n"
+            finally:
+                await hydrator.close()
+
+        return StreamingResponse(
+            generate_events(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+
+    @app.get("/api/research/cache/stats")
+    async def get_research_cache_stats():
+        """Get research cache statistics."""
+        # TODO: Implement with Redis client
+        return {
+            "backend": "local",
+            "note": "Redis cache not yet configured",
+        }
+
+    @app.post("/api/research/cache/invalidate")
+    async def invalidate_research_cache(request: dict = Body(...)):
+        """
+        Invalidate cached research.
+
+        Body: {
+            "persona_id": "sam_altman",  // Required
+            "topic": "AI regulation"      // Optional - if omitted, invalidates all for persona
+        }
+        """
+        persona_id = request.get("persona_id")
+        topic = request.get("topic")
+
+        if not persona_id:
+            raise HTTPException(400, "persona_id is required")
+
+        # TODO: Implement with Redis client
+        return {
+            "status": "invalidated",
+            "persona_id": persona_id,
+            "topic": topic,
+            "note": "Cache invalidation will be implemented with Redis",
+        }
+
+    @app.post("/api/conversation/start-hydrated")
+    async def start_hydrated_conversation(request: dict = Body(...)):
+        """
+        Start a multi-persona conversation with research hydration.
+        Each persona is enriched with current context before speaking.
+        Streams all progress as SSE.
+
+        Body: {
+            "personas": ["sam_altman", "eliezer_yudkowsky"],
+            "topic": "AI safety priorities",
+            "rounds": 2,
+            "hydrate": true  // Enable research hydration for each persona
+        }
+        """
+        orch = app.state.orchestrator
+
+        persona_ids = request.get("personas", [])
+        topic = request.get("topic", "")
+        rounds = min(request.get("rounds", 1), 5)
+        do_hydrate = request.get("hydrate", True)
+
+        if len(persona_ids) < 2:
+            raise HTTPException(400, "At least 2 personas required")
+        if not topic:
+            raise HTTPException(400, "Topic is required")
+
+        # Load personas
+        persona_lib = YAMLPersonaLibrary(version="v1")
+        participants = []
+        for pid in persona_ids:
+            persona = persona_lib.get(pid)
+            if persona:
+                participants.append({
+                    "id": pid,
+                    "name": persona.name,
+                    "persona": persona,
+                })
+
+        if len(participants) < 2:
+            raise HTTPException(400, "Could not load enough valid personas")
+
+        async def generate_events():
+            """Stream hydration and conversation."""
+            hydrated_contexts = {}
+
+            # Phase 1: Hydrate each persona (if enabled)
+            if do_hydrate:
+                yield f"data: {json.dumps({'phase': 'hydrating', 'message': f'Researching {len(participants)} personas...'})}\n\n"
+
+                for participant in participants:
+                    hydrator = PersonaHydrator(
+                        jina_api_key=os.getenv("JINA_API_KEY"),
+                        brave_api_key=os.getenv("BRAVE_API_KEY"),
+                        openrouter_api_key=os.getenv("OPENROUTER_API_KEY"),
+                    )
+
+                    try:
+                        async for result in hydrator.hydrate(
+                            persona_id=participant["id"],
+                            persona_name=participant["name"],
+                            topic=topic,
+                        ):
+                            if isinstance(result, ResearchProgress):
+                                # Prefix with persona ID
+                                progress_data = result.to_dict()
+                                progress_data["persona"] = participant["id"]
+                                yield f"data: {json.dumps(progress_data)}\n\n"
+                            elif isinstance(result, ResearchContext):
+                                hydrated_contexts[participant["id"]] = result
+                    except Exception as e:
+                        logger.error(f"Hydration error for {participant['id']}: {e}")
+                    finally:
+                        await hydrator.close()
+
+            # Phase 2: Run conversation
+            yield f"data: {json.dumps({'phase': 'conversing', 'message': 'Starting conversation...'})}\n\n"
+
+            conversation = []
+            context = f"Topic: {topic}\n\n"
+
+            for round_num in range(rounds):
+                yield f"data: {json.dumps({'phase': 'round', 'round': round_num + 1, 'total_rounds': rounds})}\n\n"
+
+                for participant in participants:
+                    # Build hydrated prompt
+                    base_prompt = orch._build_persona_prompt(participant["persona"])
+
+                    if participant["id"] in hydrated_contexts:
+                        research_ctx = hydrated_contexts[participant["id"]]
+                        system_prompt = base_prompt + "\n\n" + research_ctx.to_prompt_injection()
+                    else:
+                        system_prompt = base_prompt
+
+                    if orch.llm_client:
+                        try:
+                            response = await orch.llm_client.chat(
+                                messages=[
+                                    {"role": "system", "content": system_prompt},
+                                    {"role": "user", "content": context + "Respond to the discussion. Be concise (2-3 paragraphs max)."},
+                                ],
+                                model="anthropic/claude-sonnet-4",
+                                max_tokens=400,
+                            )
+
+                            entry = {
+                                "round": round_num + 1,
+                                "persona": participant["id"],
+                                "name": participant["name"],
+                                "response": response,
+                                "hydrated": participant["id"] in hydrated_contexts,
+                            }
+                            conversation.append(entry)
+                            context += f"\n{participant['name']}: {response}\n"
+
+                            yield f"event: turn\ndata: {json.dumps(entry)}\n\n"
+
+                        except Exception as e:
+                            error_entry = {
+                                "round": round_num + 1,
+                                "persona": participant["id"],
+                                "name": participant["name"],
+                                "error": str(e),
+                            }
+                            yield f"event: turn_error\ndata: {json.dumps(error_entry)}\n\n"
+                    else:
+                        # No LLM - emit prompts
+                        prompt_entry = {
+                            "round": round_num + 1,
+                            "persona": participant["id"],
+                            "name": participant["name"],
+                            "system_prompt": system_prompt,
+                            "user_prompt": context + "Respond to the discussion.",
+                        }
+                        yield f"event: prompt\ndata: {json.dumps(prompt_entry)}\n\n"
+
+            # Final summary
+            yield f"event: complete\ndata: {json.dumps({'status': 'completed', 'topic': topic, 'rounds': rounds, 'participants': [p['name'] for p in participants], 'turns': len(conversation)})}\n\n"
+
+        return StreamingResponse(
+            generate_events(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
 
     return app
 

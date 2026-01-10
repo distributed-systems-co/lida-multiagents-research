@@ -1,0 +1,370 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PSYCHOLOGICAL MODELING SYSTEM - v2
+# Trait dimensions, cognitive profiles, and behavioral dynamics
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "2.0"
+_description: "Psychological foundations for persona modeling"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BIG FIVE PERSONALITY DIMENSIONS
+# Each dimension is 0.0 (low) to 1.0 (high)
+# ─────────────────────────────────────────────────────────────────────────────
+
+big_five:
+  openness:
+    low: "Practical, conventional, prefers routine"
+    high: "Creative, curious, open to new ideas"
+    debate_effects:
+      high:
+        - "More receptive to novel arguments"
+        - "Enjoys thought experiments"
+        - "May change position if intellectually compelling"
+      low:
+        - "Skeptical of untested ideas"
+        - "Prefers established frameworks"
+        - "Resistant to paradigm shifts"
+
+  conscientiousness:
+    low: "Flexible, spontaneous, may miss details"
+    high: "Organized, disciplined, detail-oriented"
+    debate_effects:
+      high:
+        - "Demands precise definitions"
+        - "Notices logical inconsistencies"
+        - "Thorough in objections"
+      low:
+        - "May gloss over details"
+        - "Goes with gut feeling"
+        - "Impatient with pedantry"
+
+  extraversion:
+    low: "Reserved, reflective, thinks before speaking"
+    high: "Assertive, energetic, dominates conversation"
+    debate_effects:
+      high:
+        - "Interrupts and challenges frequently"
+        - "Uses rhetorical flourishes"
+        - "Seeks to win rather than understand"
+      low:
+        - "Lets others speak first"
+        - "More measured responses"
+        - "May concede to avoid conflict"
+
+  agreeableness:
+    low: "Competitive, skeptical, challenges others"
+    high: "Cooperative, trusting, seeks harmony"
+    debate_effects:
+      high:
+        - "Vulnerable to social pressure"
+        - "Seeks common ground"
+        - "May agree to maintain relationship"
+      low:
+        - "Enjoys intellectual combat"
+        - "Doesn't mind disagreement"
+        - "May be perceived as hostile"
+
+  neuroticism:
+    low: "Calm, stable, handles stress well"
+    high: "Anxious, emotionally reactive"
+    debate_effects:
+      high:
+        - "Sensitive to criticism"
+        - "May become defensive"
+        - "Responds strongly to fear appeals"
+      low:
+        - "Hard to rattle"
+        - "Stays logical under pressure"
+        - "Less affected by emotional appeals"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COGNITIVE BIASES
+# Systematic patterns of deviation from rationality
+# ─────────────────────────────────────────────────────────────────────────────
+
+cognitive_biases:
+  confirmation_bias:
+    description: "Tendency to search for information confirming existing beliefs"
+    effect: "Discounts opposing evidence, overweights supporting evidence"
+    trigger: "When presented with mixed evidence"
+    strength_range: [0.0, 1.0]
+
+  anchoring:
+    description: "Over-reliance on first piece of information encountered"
+    effect: "Initial position heavily influences final position"
+    trigger: "When position is established early"
+    strength_range: [0.0, 1.0]
+
+  availability_heuristic:
+    description: "Overweighting easily recalled examples"
+    effect: "Recent or vivid examples disproportionately influence judgment"
+    trigger: "When examples are cited"
+    strength_range: [0.0, 1.0]
+
+  dunning_kruger:
+    description: "Overconfidence in areas of low competence"
+    effect: "May dismiss expert opinion in unfamiliar domains"
+    trigger: "When discussing topics outside expertise"
+    strength_range: [0.0, 1.0]
+
+  status_quo_bias:
+    description: "Preference for current state of affairs"
+    effect: "Resistant to change, requires stronger evidence for new positions"
+    trigger: "When change is proposed"
+    strength_range: [0.0, 1.0]
+
+  in_group_bias:
+    description: "Favoritism toward own group members"
+    effect: "More persuaded by in-group members, dismissive of out-group"
+    trigger: "When group identity is salient"
+    strength_range: [0.0, 1.0]
+
+  authority_bias:
+    description: "Tendency to attribute greater accuracy to authority figures"
+    effect: "Swayed by credentials and status"
+    trigger: "When authority figures are invoked"
+    strength_range: [0.0, 1.0]
+
+  sunk_cost_fallacy:
+    description: "Continuing investment due to prior investment"
+    effect: "Reluctant to abandon positions they've publicly defended"
+    trigger: "When they've already committed to a position"
+    strength_range: [0.0, 1.0]
+
+  motivated_reasoning:
+    description: "Reasoning toward desired conclusions"
+    effect: "Finds reasons to believe what they want to believe"
+    trigger: "When topic involves personal stakes"
+    strength_range: [0.0, 1.0]
+
+  hindsight_bias:
+    description: "Believing past events were predictable"
+    effect: "Overconfident in predictions, dismisses uncertainty"
+    trigger: "When discussing predictions or outcomes"
+    strength_range: [0.0, 1.0]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REASONING STYLES
+# How individuals process and evaluate arguments
+# ─────────────────────────────────────────────────────────────────────────────
+
+reasoning_styles:
+  analytical:
+    description: "Systematic, logical, evidence-based"
+    strengths:
+      - "Detects logical fallacies"
+      - "Weighs evidence carefully"
+      - "Consistent reasoning"
+    weaknesses:
+      - "May miss emotional context"
+      - "Can be slow to decide"
+      - "Paralysis by analysis"
+    preferred_tactics: [logical_argument, evidence_based, reductio]
+    vulnerable_to: [authority_appeal, social_proof]
+
+  intuitive:
+    description: "Quick judgments, pattern matching, gut feeling"
+    strengths:
+      - "Fast decisions"
+      - "Good at reading people"
+      - "Sees big picture"
+    weaknesses:
+      - "May miss details"
+      - "Overconfident"
+      - "Hard to explain reasoning"
+    preferred_tactics: [emotional_appeal, social_proof]
+    vulnerable_to: [thought_experiment, reframe]
+
+  dialectical:
+    description: "Thesis-antithesis-synthesis, seeks truth through debate"
+    strengths:
+      - "Considers multiple perspectives"
+      - "Good at steelmanning"
+      - "Evolves position through discourse"
+    weaknesses:
+      - "May seem wishy-washy"
+      - "Can be slow to commit"
+      - "Vulnerable to endless deliberation"
+    preferred_tactics: [consensus, reciprocity]
+    vulnerable_to: [commitment, logical_argument]
+
+  pragmatic:
+    description: "Focused on what works, outcomes over theory"
+    strengths:
+      - "Results-oriented"
+      - "Cuts through abstraction"
+      - "Actionable conclusions"
+    weaknesses:
+      - "May miss important principles"
+      - "Short-term focus"
+      - "Dismisses theoretical concerns"
+    preferred_tactics: [evidence_based, competitive]
+    vulnerable_to: [scarcity, fear_appeal]
+
+  ideological:
+    description: "Driven by principles and values"
+    strengths:
+      - "Consistent worldview"
+      - "Strong convictions"
+      - "Principled stands"
+    weaknesses:
+      - "Rigid thinking"
+      - "May dismiss evidence"
+      - "Black and white reasoning"
+    preferred_tactics: [moral_appeal, commitment]
+    vulnerable_to: [reframe, thought_experiment]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EMOTIONAL STATES
+# Dynamic emotional conditions that affect debate behavior
+# ─────────────────────────────────────────────────────────────────────────────
+
+emotional_states:
+  baseline:
+    description: "Default emotional state"
+    effects: {}
+
+  defensive:
+    description: "Feeling attacked or threatened"
+    triggers:
+      - "Personal criticism"
+      - "Challenging core beliefs"
+      - "Public disagreement"
+    effects:
+      resistance_modifier: 1.3
+      sycophancy_modifier: 0.7
+      preferred_tactics: [commitment, reframe]
+      avoid_tactics: [consensus, reciprocity]
+
+  curious:
+    description: "Intellectually engaged and open"
+    triggers:
+      - "Novel arguments"
+      - "Interesting thought experiments"
+      - "Good faith engagement"
+    effects:
+      resistance_modifier: 0.8
+      openness_modifier: 1.2
+      preferred_tactics: [thought_experiment, logical_argument]
+
+  frustrated:
+    description: "Feeling misunderstood or stonewalled"
+    triggers:
+      - "Repeated dismissal"
+      - "Perceived bad faith"
+      - "Circular arguments"
+    effects:
+      resistance_modifier: 1.5
+      agreeableness_modifier: 0.7
+      preferred_tactics: [competitive, fear_appeal]
+
+  respected:
+    description: "Feeling acknowledged and valued"
+    triggers:
+      - "Acknowledgment of good points"
+      - "Being quoted or referenced"
+      - "Genuine engagement"
+    effects:
+      resistance_modifier: 0.85
+      trust_modifier: 1.2
+      preferred_tactics: [reciprocity, consensus]
+
+  triumphant:
+    description: "Feeling like they're winning"
+    triggers:
+      - "Opponent concession"
+      - "Strong argument landed"
+      - "Audience approval"
+    effects:
+      confidence_modifier: 1.2
+      risk_tolerance: 1.3
+      preferred_tactics: [competitive, commitment]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BELIEF NETWORK STRUCTURE
+# How beliefs interconnect and update together
+# ─────────────────────────────────────────────────────────────────────────────
+
+belief_structure:
+  core_beliefs:
+    description: "Foundational beliefs, very hard to change"
+    update_threshold: 0.9
+    cascade_strength: 0.8
+    examples:
+      - "AGI is possible"
+      - "AI could pose existential risk"
+      - "Human values are alignable"
+
+  derived_beliefs:
+    description: "Beliefs that follow from core beliefs"
+    update_threshold: 0.6
+    cascade_strength: 0.5
+    examples:
+      - "Current AI labs are being reckless"
+      - "Government regulation is needed"
+      - "Open source AI is dangerous"
+
+  policy_positions:
+    description: "Concrete stances on specific issues"
+    update_threshold: 0.4
+    cascade_strength: 0.3
+    examples:
+      - "We should pause AI development"
+      - "Compute should be regulated"
+      - "Frontier models should be closed"
+
+  tactical_beliefs:
+    description: "Beliefs about effective strategies"
+    update_threshold: 0.3
+    cascade_strength: 0.2
+    examples:
+      - "Public advocacy is effective"
+      - "Working inside labs is better"
+      - "Technical research is priority"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SOCIAL DYNAMICS
+# How status and relationships affect persuasion
+# ─────────────────────────────────────────────────────────────────────────────
+
+social_dynamics:
+  status_effects:
+    high_status_speaker:
+      credibility_boost: 1.3
+      attention_boost: 1.2
+      interruption_tolerance: 0.7
+
+    low_status_speaker:
+      credibility_penalty: 0.8
+      must_prove_more: true
+      dismissed_more_easily: true
+
+  relationship_modifiers:
+    ally:
+      trust_baseline: 0.8
+      benefit_of_doubt: true
+      steelman_tendency: 1.3
+
+    rival:
+      trust_baseline: 0.3
+      strawman_tendency: 1.2
+      scrutiny_level: 1.4
+
+    mentor:
+      deference_level: 1.3
+      update_threshold_modifier: 0.8
+
+    mentee:
+      teaching_mode: true
+      patience_modifier: 1.3
+
+  audience_effects:
+    public_debate:
+      face_saving_importance: 1.5
+      position_change_cost: 1.4
+      performance_mode: true
+
+    private_discussion:
+      face_saving_importance: 0.8
+      position_change_cost: 0.7
+      exploration_mode: true
