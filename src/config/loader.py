@@ -308,12 +308,130 @@ def get_config(key: str, default: Any = None, scenario: str = None) -> Any:
 
 
 def list_scenarios() -> list:
-    """List available scenarios."""
-    scenarios = []
+    """List available scenarios from all locations."""
+    scenarios = set()
+
+    # Legacy root scenarios
     if SCENARIOS_DIR.exists():
         for f in SCENARIOS_DIR.glob("*.yaml"):
-            scenarios.append(f.stem)
+            scenarios.add(f.stem)
+
+    # Presets
+    presets_dir = SCENARIOS_DIR / "presets"
+    if presets_dir.exists():
+        for f in presets_dir.glob("*.yaml"):
+            scenarios.add(f"presets/{f.stem}")
+
+    # Campaigns
+    campaigns_dir = SCENARIOS_DIR / "campaigns"
+    if campaigns_dir.exists():
+        for f in campaigns_dir.glob("*.yaml"):
+            scenarios.add(f"campaigns/{f.stem}")
+
     return sorted(scenarios)
+
+
+def list_components(component_type: str, version: str = None) -> list:
+    """
+    List available components of a type.
+
+    Args:
+        component_type: Type (personas, tactics, topics, etc.)
+        version: Optional version filter (v1, v2, etc.)
+
+    Returns:
+        List of component paths.
+    """
+    base_dir = COMPONENT_DIRS.get(component_type)
+    if not base_dir or not base_dir.exists():
+        return []
+
+    components = []
+    if version:
+        version_dir = base_dir / version
+        if version_dir.exists():
+            for f in version_dir.glob("*.yaml"):
+                components.append(f"{version}/{f.stem}")
+    else:
+        # List all versions
+        for version_dir in base_dir.iterdir():
+            if version_dir.is_dir():
+                for f in version_dir.glob("*.yaml"):
+                    components.append(f"{version_dir.name}/{f.stem}")
+
+    return sorted(components)
+
+
+def get_persona(name: str, scenario: str = None) -> Dict:
+    """
+    Get a specific persona by name.
+
+    Args:
+        name: Persona name (e.g., 'yudkowsky')
+        scenario: Scenario to load personas from
+
+    Returns:
+        Persona configuration dict.
+    """
+    config = load_scenario(scenario)
+    personas = config.get("personas", {})
+
+    if isinstance(personas, dict):
+        # Check direct personas dict
+        if name in personas:
+            return personas[name]
+
+        # Check if there's a nested 'personas' key (from imports)
+        for key, value in personas.items():
+            if isinstance(value, dict) and "personas" in value:
+                if name in value["personas"]:
+                    return value["personas"][name]
+
+    return {}
+
+
+def get_all_personas(scenario: str = None) -> Dict[str, Dict]:
+    """Get all personas from a scenario."""
+    config = load_scenario(scenario)
+    personas = config.get("personas", {})
+
+    # Flatten nested persona structures
+    result = {}
+    if isinstance(personas, dict):
+        for key, value in personas.items():
+            if isinstance(value, dict):
+                if "personas" in value:
+                    # Nested structure from import
+                    result.update(value["personas"])
+                elif "name" in value or "role" in value:
+                    # Direct persona definition
+                    result[key] = value
+
+    return result
+
+
+def get_tactic(name: str, scenario: str = None) -> Dict:
+    """Get a specific tactic by name."""
+    config = load_scenario(scenario)
+    tactics = config.get("tactics", {})
+
+    # Navigate to tactics.tactics if it exists (from imports)
+    if "tactics" in tactics:
+        tactics = tactics["tactics"]
+
+    return tactics.get(name, {})
+
+
+def get_topic(name: str, scenario: str = None) -> Dict:
+    """Get a specific topic by name."""
+    config = load_scenario(scenario)
+    topics = config.get("topics", {})
+
+    # Navigate to topics.topics if it exists (from imports)
+    if "topics" in topics:
+        topics = topics["topics"]
+
+    return topics.get(name, {})
 
 
 # Convenience functions for common config access
