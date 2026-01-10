@@ -1,4 +1,91 @@
 services:
+  # Main API Server - Port 2040
+  # Research endpoints, persona interaction, non-streaming API
+  api:
+    build: .
+    command: ["server", "--role=api"]
+    ports:
+      - "${API_PORT:-2040}:${API_PORT:-2040}"
+    volumes:
+      - .:/app
+      - app_data:/app/data
+      - app_logs:/app/logs
+    environment:
+      - PORT=${API_PORT:-2040}
+      - SERVER_ROLE=api
+      - WORKERS=${API_WORKERS:-4}
+      - SCENARIO=${SCENARIO:-default}
+      - MAX_ROUNDS=${MAX_ROUNDS:-5}
+      - REDIS_URL=redis://redis:6379
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - JINA_API_KEY=${JINA_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - PARALLEL_API_KEY=${PARALLEL_API_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${API_PORT:-2040}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Streaming Server - Port 8787
+  # SSE streaming, WebSocket connections, real-time updates
+  streaming:
+    build: .
+    command: ["server", "--role=streaming"]
+    ports:
+      - "${STREAMING_PORT:-8787}:${STREAMING_PORT:-8787}"
+    volumes:
+      - .:/app
+      - app_data:/app/data
+      - app_logs:/app/logs
+    environment:
+      - PORT=${STREAMING_PORT:-8787}
+      - SERVER_ROLE=streaming
+      - WORKERS=${STREAMING_WORKERS:-2}
+      - REDIS_URL=redis://redis:6379
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - JINA_API_KEY=${JINA_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - PARALLEL_API_KEY=${PARALLEL_API_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${STREAMING_PORT:-8787}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Dashboard Server - Port 12345 (original)
+  # Web visualization and interactive dashboard
+  dashboard:
+    build: .
+    command: ["dashboard"]
+    ports:
+      - "${DASHBOARD_PORT:-12345}:${DASHBOARD_PORT:-12345}"
+    volumes:
+      - .:/app
+    environment:
+      - PORT=${DASHBOARD_PORT:-12345}
+      - SERVER_ROLE=dashboard
+      - REDIS_URL=redis://redis:6379
+      - API_URL=http://api:${API_PORT:-2040}
+      - STREAMING_URL=http://streaming:${STREAMING_PORT:-8787}
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    profiles:
+      - dashboard
+    restart: unless-stopped
+
+  # Legacy combined server (backward compatibility)
   app:
     build: .
     command: ["server"]
@@ -15,11 +102,17 @@ services:
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - JINA_API_KEY=${JINA_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - PARALLEL_API_KEY=${PARALLEL_API_KEY}
     depends_on:
       redis:
         condition: service_healthy
+    profiles:
+      - legacy
     restart: unless-stopped
 
+  # Redis message broker and cache
   redis:
     image: redis:7-alpine
     ports:
@@ -33,20 +126,7 @@ services:
       timeout: 3s
       retries: 5
 
-  dashboard:
-    build: .
-    command: ["dashboard"]
-    ports:
-      - "12345:12345"
-    environment:
-      - PORT=12345
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      redis:
-        condition: service_healthy
-    profiles:
-      - dashboard
-
+  # Background workers for compute-intensive tasks
   workers:
     build: .
     command: ["workers"]
@@ -55,13 +135,19 @@ services:
       - WORKER_CAPACITY=${WORKER_CAPACITY:-5}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - JINA_API_KEY=${JINA_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - PARALLEL_API_KEY=${PARALLEL_API_KEY}
     depends_on:
       redis:
         condition: service_healthy
     restart: unless-stopped
     deploy:
       replicas: ${WORKER_REPLICAS:-1}
+    profiles:
+      - workers
 
+  # Redis Commander for debugging
   redis-commander:
     image: rediscommander/redis-commander:latest
     environment:
@@ -70,8 +156,23 @@ services:
       - "8081:8081"
     depends_on:
       - redis
+    profiles:
+      - debug
 
 volumes:
   redis_data:
   app_data:
   app_logs:
+
+# Compose profiles:
+#   (default)    - api + streaming + redis (main deployment)
+#   dashboard    - includes web dashboard
+#   legacy       - old combined server on port 12345
+#   workers      - background task workers
+#   debug        - redis-commander for debugging
+#
+# Examples:
+#   docker-compose up                        # API (2040) + Streaming (8787) + Redis
+#   docker-compose --profile dashboard up    # + Dashboard (12345)
+#   docker-compose --profile workers up      # + Background workers
+#   docker-compose --profile legacy up       # Old combined server only

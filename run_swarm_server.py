@@ -46,8 +46,45 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
     return {}
 
 
-# Global config
+def load_scenario_config() -> Dict[str, Any]:
+    """Load scenario configuration if SCENARIO env var is set."""
+    scenario_name = os.getenv("SCENARIO")
+    if not scenario_name:
+        return {}
+
+    # Try to load from our scenario system
+    try:
+        from src.config.loader import load_scenario
+        return load_scenario(scenario_name)
+    except ImportError:
+        # Fall back to direct file loading
+        scenarios_dir = Path(__file__).parent / "scenarios"
+        search_paths = [
+            scenarios_dir / "presets" / f"{scenario_name}.yaml",
+            scenarios_dir / "campaigns" / f"{scenario_name}.yaml",
+            scenarios_dir / f"{scenario_name}.yaml",
+        ]
+        for path in search_paths:
+            if path.exists():
+                with open(path) as f:
+                    return yaml.safe_load(f) or {}
+    return {}
+
+
+# Global config - merge base config with scenario overrides
 CONFIG = load_config(os.getenv("CONFIG_PATH", "config.yaml"))
+SCENARIO_CONFIG = load_scenario_config()
+if SCENARIO_CONFIG:
+    # Deep merge scenario into config
+    def deep_merge(base: dict, override: dict) -> dict:
+        result = base.copy()
+        for k, v in override.items():
+            if k in result and isinstance(result[k], dict) and isinstance(v, dict):
+                result[k] = deep_merge(result[k], v)
+            else:
+                result[k] = v
+        return result
+    CONFIG = deep_merge(CONFIG, SCENARIO_CONFIG)
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
@@ -145,6 +182,20 @@ MODELS = {
     "llama": "meta-llama/llama-3.3-70b-instruct",
 }
 
+# Reverse mapping: full model name -> short code for UI
+MODELS_REVERSE = {v: k for k, v in MODELS.items()}
+
+
+def get_model_short(full_model: str) -> str:
+    """Get short model code from full model name."""
+    return MODELS_REVERSE.get(full_model, full_model.split("/")[-1][:6] if "/" in full_model else full_model[:6])
+
+
+def get_model_full(short_code: str) -> str:
+    """Get full model name from short code."""
+    return MODELS.get(short_code, short_code)
+
+
 # Persuasion-focused debate propositions (clear FOR/AGAINST positions)
 DEFAULT_TOPICS = [
     "RESOLVED: AI systems should be allowed to modify their own goals without human approval.",
@@ -222,6 +273,7 @@ class Agent:
             "name": self.name,
             "personality_type": self.personality_type,
             "model": self.model,
+            "model_short": get_model_short(self.model),  # Short code for UI dropdown
             "color": self.color,
             "bg_color": self.bg_color,
             "icon": self.icon,
@@ -564,6 +616,23 @@ class SwarmOrchestrator:
         topics_cfg = CONFIG.get("topics", {})
         self.default_topics = topics_cfg.get("default", DEFAULT_TOPICS)
         self.topic_categories = topics_cfg.get("categories", {})
+
+        # Check for scenario-provided topic (from SCENARIO env var)
+        self.scenario_topic = None
+        if isinstance(topics_cfg, dict):
+            # Scenario might provide: topics: { primary: "ai_pause" } or topic: "ai_pause"
+            primary_topic = topics_cfg.get("primary") or CONFIG.get("topic")
+            if primary_topic:
+                # If it's a topic ID, look it up in available topics
+                if primary_topic in self.topic_categories.get("governance", []):
+                    self.scenario_topic = primary_topic
+                elif isinstance(primary_topic, str) and ":" not in primary_topic:
+                    # It might be a topic name to look up
+                    self.scenario_topic = primary_topic
+                else:
+                    # Use directly as topic text
+                    self.scenario_topic = primary_topic
+        logger.info(f"Scenario topic: {self.scenario_topic or 'None (will prompt)'}")
 
         # Agent positions (FOR/AGAINST/UNDECIDED)
         self.agent_positions: Dict[str, str] = {}
@@ -2488,7 +2557,8 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
 
         # Update agent properties
         if "model" in config:
-            agent.model = config["model"]
+            # Convert short code to full model name if needed
+            agent.model = get_model_full(config["model"])
         if "personality_type" in config:
             agent.personality_type = config["personality_type"]
         if "name" in config:

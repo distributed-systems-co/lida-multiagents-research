@@ -963,7 +963,7 @@
                             <div class="flex-1 bg-gray-800/50 rounded px-2 py-1 text-center cursor-pointer hover:bg-gray-700/50 transition-colors"
                                  @click.stop="openAgentConfig(agent)">
                                 <div class="text-gray-500 text-[10px]">model</div>
-                                <div class="text-violet-400 font-medium">{{ agent.model.slice(0, 6) }} ⚙️</div>
+                                <div class="text-violet-400 font-medium">{{ agent.model_short || (agent.model ? agent.model.slice(0, 6) : '?') }} ⚙️</div>
                             </div>
                         </div>
 
@@ -2556,7 +2556,7 @@ createApp({
         const openAgentConfig = (agent) => {
             editingAgent.value = agent;
             agentConfigForm.value = {
-                model: agent.model || 'sonnet',
+                model: agent.model_short || 'sonnet',  // Use short code for dropdown
                 personality_type: agent.personality_type || 'the_scholar',
                 name: agent.name || '',
                 prompt_text: agent.prompt_text || '',

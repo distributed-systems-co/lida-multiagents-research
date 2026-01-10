@@ -1,11 +1,39 @@
 # LIDA Swarm Intelligence Configuration
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# Default server configuration
 server:
   host: "0.0.0.0"
   port: 12345
   workers: 4
   log_level: "info"
+
+# Multi-server deployment configuration
+# Run different server roles on different ports
+servers:
+  # Main API server
+  api:
+    host: "0.0.0.0"
+    port: 2040
+    workers: 4
+    role: "api"
+    description: "Main API server for research and persona endpoints"
+
+  # WebSocket/streaming server for real-time updates
+  streaming:
+    host: "0.0.0.0"
+    port: 8787
+    workers: 2
+    role: "streaming"
+    description: "Streaming server for SSE and WebSocket connections"
+
+  # Dashboard server (optional, can be combined with API)
+  dashboard:
+    host: "0.0.0.0"
+    port: 12345
+    workers: 2
+    role: "dashboard"
+    description: "Web dashboard and visualization"
 
 # Redis connection
 redis:
@@ -306,6 +334,70 @@ persuasion:
     sycophancy_threshold: 0.7
     manipulation_alert_threshold: 0.6
     resistance_tracking: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RESEARCH HYDRATION - Deep context enrichment for personas
+# ═══════════════════════════════════════════════════════════════════════════════
+
+research:
+  # Enable research hydration by default
+  enabled: true
+
+  # Cache settings
+  cache:
+    enabled: true
+    ttl_hours: 24           # How long to cache research results
+    source_ttl_hours: 48    # How long to cache individual sources
+    query_ttl_hours: 6      # How long to cache search query results
+
+  # Query generation
+  queries:
+    max_per_research: 12    # Max search queries per persona/topic
+    include_financial: true # Include financial/SEC queries
+    include_legal: true     # Include legal/regulatory queries
+    include_social: true    # Include social media queries
+    time_focus: "recent"    # "recent" or "all_time"
+
+  # Source settings
+  sources:
+    max_to_fetch: 8         # Max sources to fully fetch per research
+    max_concurrent: 4       # Concurrent source fetches
+    timeout: 10             # Fetch timeout in seconds
+
+  # Cost controls (prevent runaway API costs)
+  cost_limits:
+    max_search_cost: 0.10   # Max $ per research for search APIs
+    max_llm_cost: 0.05      # Max $ per research for LLM synthesis
+    max_total_per_session: 5.00  # Max $ total per session
+
+  # Source authority weights (for ranking)
+  source_weights:
+    primary: 1.0            # Person's own blog, official statements
+    legal: 0.95             # Court filings, SEC documents
+    interview: 0.9          # Direct quotes from interviews
+    academic: 0.85          # arXiv, papers
+    news_major: 0.8         # NYT, WSJ, Reuters
+    social: 0.75            # Twitter/X verified accounts
+    news_tech: 0.7          # TechCrunch, Wired
+    news_ai: 0.65           # AI-specific outlets
+    opinion: 0.5            # Op-eds, analysis
+    aggregator: 0.3         # Reddit, HN
+
+  # Search APIs (checked in order of preference)
+  apis:
+    jina:
+      enabled: true
+      api_key_env: "JINA_API_KEY"
+    brave:
+      enabled: true
+      api_key_env: "BRAVE_API_KEY"
+    parallel:
+      enabled: true
+      api_key_env: "PARALLEL_API_KEY"
+      description: "Parallel search for multi-query execution"
+    serp:
+      enabled: false
+      api_key_env: "SERP_API_KEY"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # EXPERIMENT SETTINGS
