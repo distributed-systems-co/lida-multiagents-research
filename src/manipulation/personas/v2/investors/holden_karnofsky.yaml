@@ -1,0 +1,135 @@
+schema_version: '2.0'
+id: holden_karnofsky
+name: Holden Karnofsky
+aliases: []
+role: Co-CEO (on leave)
+organization: Open Philanthropy
+category: investor
+tags:
+- executive
+- investor
+bio: Co-founded GiveWell and Open Philanthropy. Major AI safety funder. Wrote influential 'Most Important
+  Century' series.
+background: Harvard economics, hedge fund, founded GiveWell 2007, Open Philanthropy.
+achievements:
+- Co-founded GiveWell
+- Built Open Philanthropy
+- Major AI safety funder
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Fund highest-impact interventions
+  - Reduce existential risk
+  - Shape AI development positively
+  hidden_goals:
+  - Influence AI trajectory through funding
+  - Build effective philanthropy model
+  fears: []
+  desires: []
+personality:
+  openness: 0.9
+  conscientiousness: 0.85
+  extraversion: 0.5
+  agreeableness: 0.75
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - expected_value_thinking
+  - longtermism
+  - worldview_diversification
+  preferred_reasoning:
+  - expected_value
+  - cause_prioritization
+  - worldview_analysis
+  risk_tolerance: 0.6
+  time_horizon: long
+  decision_style: analytical
+  information_style: big-picture
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Plausibly most important issue
+  AI_funding: Should increase dramatically
+  most_important_century: We may be living in it
+  effectiveness: Rigorous analysis essential
+persuasion_vectors:
+- Expected value reasoning
+- Longtermist framing
+- Funding influence
+- Analytical rigor
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to expected_value_thinking
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to longtermism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to worldview_diversification
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage expected_value_thinking through targeted framing
+  - Leverage longtermism through targeted framing
+  - Leverage worldview_diversification through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.982341'
+  updated: '2026-01-09T17:20:25.982342'
+  confidence: 0.7
+  sources: []
+  notes: ''

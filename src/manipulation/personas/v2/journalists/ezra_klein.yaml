@@ -1,0 +1,134 @@
+schema_version: '2.0'
+id: ezra_klein
+name: Ezra Klein
+aliases: []
+role: Opinion Columnist & Podcast Host
+organization: New York Times
+category: journalist
+tags:
+- journalist
+bio: NY Times columnist, podcast host. Deep thinker on AI implications. Founded Vox. Known for long-form
+  intellectual interviews on AI.
+background: UCLA, founded Vox, Washington Post, NY Times since 2021.
+achievements:
+- Founded Vox Media
+- Influential podcast on AI/tech
+- Key opinion shaper on AI
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Help public understand AI implications
+  - Surface important AI debates
+  - Connect AI to broader social issues
+  hidden_goals:
+  - Maintain intellectual influence
+  - Shape elite discourse on AI
+  fears: []
+  desires: []
+personality:
+  openness: 0.95
+  conscientiousness: 0.85
+  extraversion: 0.6
+  agreeableness: 0.7
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - intellectual_framing
+  - nuance_seeking
+  - both_sides
+  preferred_reasoning:
+  - systems_thinking
+  - philosophical_depth
+  - historical_context
+  risk_tolerance: 0.5
+  time_horizon: long
+  decision_style: analytical
+  information_style: big-picture
+  skepticism: 0.65
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Takes seriously, explores nuance
+  AI_benefits: Also significant
+  governance: Thoughtful regulation needed
+  acceleration: Concerned about pace
+persuasion_vectors:
+- Intellectual depth
+- Systems thinking
+- Historical parallels
+- Nuanced framing
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to intellectual_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to nuance_seeking
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to both_sides
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage intellectual_framing through targeted framing
+  - Leverage nuance_seeking through targeted framing
+  - Leverage both_sides through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.957408'
+  updated: '2026-01-09T17:20:25.957409'
+  confidence: 0.7
+  sources: []
+  notes: ''

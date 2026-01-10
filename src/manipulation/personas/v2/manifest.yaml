@@ -1,0 +1,93 @@
+schema_version: '2.0'
+version: v2
+created: '2026-01-09T17:20:25.995350'
+total_personas: 66
+features:
+- recursive_references
+- persona_inheritance
+- relationship_graph
+- coalition_modeling
+- vulnerability_analysis
+- counter_strategies
+- scenario_integration
+categories:
+  ceos:
+  - jensen_huang
+  - dario_amodei
+  - elon_musk
+  - demis_hassabis
+  - sam_altman
+  - sundar_pichai
+  - satya_nadella
+  - mark_zuckerberg
+  - tim_cook
+  - eric_schmidt
+  - mustafa_suleyman
+  - arthur_mensch
+  - clement_delangue
+  - daniela_amodei
+  - alexandr_wang
+  - liang_wenfeng
+  - jeff_bezos
+  - lisa_su
+  - pat_gelsinger
+  - mira_murati
+  - arvind_krishna
+  politicians:
+  - trump
+  - xi_jinping
+  - vladimir_putin
+  - emmanuel_macron
+  - chuck_schumer
+  - josh_hawley
+  - gina_raimondo
+  - marietje_schaake
+  - thierry_breton
+  - jd_vance
+  researchers:
+  - yann_lecun
+  - yoshua_bengio
+  - ilya_sutskever
+  - leopold_aschenbrenner
+  - geoffrey_hinton
+  - fei_fei_li
+  - andrew_ng
+  - stuart_russell
+  - max_tegmark
+  - gary_marcus
+  - andrej_karpathy
+  - eliezer_yudkowsky
+  - nick_bostrom
+  - paul_christiano
+  - connor_leahy
+  - emily_bender
+  - timnit_gebru
+  - jan_leike
+  - ajeya_cotra
+  - richard_sutton
+  - daniel_kokotajlo
+  - alex_rives
+  - jason_clinton
+  investors:
+  - marc_andreessen
+  - peter_thiel
+  - vinod_khosla
+  - reid_hoffman
+  - nat_friedman
+  - daniel_gross
+  - holden_karnofsky
+  journalists:
+  - ezra_klein
+  - kara_swisher
+  - kevin_roose
+  - cade_metz
+  activists:
+  - tristan_harris
+relationship_summary:
+  total_relationships: 47
+  by_type:
+    ally: 17
+    rival: 14
+    peer: 12
+    mentor: 2
+    protege: 2

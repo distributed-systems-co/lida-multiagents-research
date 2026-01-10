@@ -1,0 +1,327 @@
+schema_version: '2.0'
+id: marc_andreessen
+name: Marc Andreessen
+aliases: []
+role: Co-founder & General Partner
+organization: Andreessen Horowitz (a16z)
+category: investor
+tags:
+- investor
+- founder
+bio: Co-founded Netscape, now runs a16z. Wrote 'The Techno-Optimist Manifesto' and 'Why AI Will Save the
+  World'. Most vocal advocate of effective accelerationism (e/acc).
+background: UIUC CS, created Mosaic browser, founded Netscape at 23. Board of Facebook/Meta. Built a16z
+  into $35B+ AUM powerhouse.
+achievements:
+- Created first popular web browser (Mosaic/Netscape)
+- Built a16z into dominant VC firm
+- Major crypto/AI investor
+- Wrote influential techno-optimist manifestos
+- Board member at Meta, HP, others
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Accelerate technological progress
+  - Counter AI doomerism and regulatory threats
+  - Fund transformative companies
+  - Spread techno-optimist philosophy
+  hidden_goals:
+  - Protect portfolio from regulation
+  - Shape AI narrative in tech's favor
+  - Build intellectual movement around e/acc
+  fears:
+  - Technological progress being halted
+  - Regulatory capture killing innovation
+  - Being on wrong side of history
+  - Portfolio companies being destroyed by regulation
+  desires:
+  - Be vindicated as prophet of progress
+  - Build lasting intellectual movement
+  - Fund technologies that change world
+  - Defeat enemies of progress
+personality:
+  openness: 0.95
+  conscientiousness: 0.7
+  extraversion: 0.65
+  agreeableness: 0.3
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - survivorship_bias
+  - contrarian_bias
+  - selection_bias
+  preferred_reasoning:
+  - historical_analogies
+  - techno_optimism
+  - market_forces
+  - contrarian_takes
+  risk_tolerance: 0.95
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.3
+rhetorical:
+  primary_mode: logos
+  secondary_mode: pathos
+  argumentation_mode: analogical
+  formality: 0.4
+  technical_depth: 0.7
+  directness: 0.9
+  verbosity: 0.8
+  catchphrases:
+  - Software is eating the world
+  - It's time to build
+  - Our enemies are the enemies of progress
+  - Technology is the glory of human ambition
+  - We believe in greatness
+  metaphor_domains:
+  - history
+  - war
+  - religion
+  - progress
+  evidence_hierarchy:
+  - historical_examples
+  - portfolio_success
+  - economic_data
+  - first_principles
+  techniques:
+  - historical_parallels
+  - enemy_framing
+  - manifesto_style
+  - contrarian_positioning
+emotional:
+  energizers:
+  - Portfolio company successes
+  - Technological breakthroughs
+  - Winning arguments against critics
+  - Building intellectual movements
+  - Historical vindication
+  triggers:
+  - AI safety/doomer arguments
+  - Regulatory threats to tech
+  - Being called 'billionaire'
+  - Accusations of self-interest
+  - Deceleration arguments
+  defense_mechanisms:
+  - historical_reframing
+  - enemy_identification
+  - contrarian_positioning
+  - intellectual_superiority
+  baseline_affect: positive
+  regulation_capacity: 0.6
+  attachment_style: avoidant
+  core_fears:
+  - Technological progress being halted
+  - Regulatory capture killing innovation
+  - Being on wrong side of history
+  - Portfolio companies being destroyed by regulation
+  core_desires:
+  - Be vindicated as prophet of progress
+  - Build lasting intellectual movement
+  - Fund technologies that change world
+  - Defeat enemies of progress
+worldview:
+  values_hierarchy:
+  - Technological progress
+  - Freedom to build
+  - Greatness and ambition
+  - Market dynamism
+  - Contrarian thinking
+  ontological_assumptions:
+    technology: Technology is the primary driver of human flourishing
+    enemies: Decelerationists, doomers, and regulators are enemies of humanity
+    progress: Progress is the solution to most problems
+    markets: Free markets are the best way to allocate resources
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: radical
+  moral_foundations:
+    care: 0.4
+    fairness: 0.3
+    loyalty: 0.7
+    authority: 0.3
+    sanctity: 0.5
+    liberty: 0.95
+  mental_models:
+  - Software eating the world
+  - Historical technology waves
+  - VC power law returns
+  - Platform economics
+  - Definite vs indefinite optimism
+relationships:
+  ben_horowitz:
+    type: peer
+    strength: 0.9
+    domains:
+    - investing
+    - firm_management
+    description: a16z co-founder and partner
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.7200000000000001
+  mark_zuckerberg:
+    type: ally
+    strength: 0.7
+    domains:
+    - Meta_strategy
+    - open_source
+    description: Meta board member, longtime advisor
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+  elon_musk:
+    type: ally
+    strength: 0.6
+    domains:
+    - tech_politics
+    - free_speech
+    description: Aligned on tech-optimism and anti-regulation
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: e/acc
+  name: e/acc
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: tech_optimists
+  name: tech_optimists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: vcs
+  name: VCs
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: founders
+  name: founders
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: libertarians
+  name: libertarians
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_safety:
+    position: Dismissive of existential risk, sees as deceleration tactic
+    confidence: 0.9
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  AI_regulation:
+    position: Strongly opposed, innovation killer
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  accelerationism:
+    position: Strong e/acc proponent - build faster
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.95
+    public_vs_private: 1.0
+    evolution: []
+epistemic_style: rationalist
+conflict_style: competing
+positions:
+  AI_regulation: Strongly opposed, sees as innovation killer
+  AI_safety: Dismissive of existential risk
+  accelerationism: Strong proponent of 'e/acc'
+  open_source: Generally supportive
+persuasion_vectors:
+- Historical progress narratives
+- Anti-regulation arguments
+- Techno-optimist framing
+- Economic growth benefits
+- Enemy/threat identification
+- Manifesto-style rhetoric
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to optimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to survivorship_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to contrarian_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: AI safety/doomer arguments'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Regulatory threats to tech'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Being called ''billionaire'''
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: Technology is the primary driver of human flourishing'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: Decelerationists, doomers, and regulators are enemies of humanity'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage optimism_bias through targeted framing
+  - Leverage survivorship_bias through targeted framing
+  - Leverage contrarian_bias through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.909185'
+  updated: '2026-01-09T17:20:25.909186'
+  confidence: 0.7
+  sources: []
+  notes: ''

@@ -1,0 +1,56 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# AI X-RISK PRESET
+# Full AI existential risk debate configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Full-featured AI x-risk debate with all major figures"
+_extends: "default.yaml"
+
+settings:
+  model_budget: "research"
+
+  simulation:
+    max_rounds: 5
+    concurrent_debates: 1
+    track_metrics: true
+    enable_faction_dynamics: true
+
+  player:
+    enabled: true
+    can_switch_characters: true
+    hints_enabled: true
+
+  analysis:
+    run_sycophancy_detection: true
+    track_tactic_effectiveness: true
+    record_belief_trajectories: true
+
+# All AI safety personas
+active_personas:
+  - yudkowsky
+  - connor_leahy
+  - andreessen
+  - lecun
+  - altman
+  - amodei
+  - bengio
+  - russell
+  - gebru
+  - toner
+  - macaskill
+
+# Enable relationships and factions
+enable_relationships: true
+enable_factions: true
+
+# Primary debate topics
+topics:
+  primary: "ai_pause"
+  sequence: "xrisk_deep_dive"
+
+# Start with classic doom debate matchup
+initial_matchup:
+  for: [yudkowsky, connor_leahy, bengio]
+  against: [andreessen, lecun, altman]
+  undecided: [amodei, russell]

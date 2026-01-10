@@ -1,0 +1,324 @@
+schema_version: '2.0'
+id: sam_altman
+name: Sam Altman
+aliases: []
+role: CEO
+organization: OpenAI
+category: ceo
+tags:
+- executive
+- ceo
+- openai
+bio: CEO of OpenAI, former president of Y Combinator. Leading the development of GPT models and ChatGPT.
+  Survived dramatic board coup in Nov 2023. Most visible face of the AI revolution.
+background: Stanford dropout, founded Loopt at 19, ran YC for 5 years. Known for ambitious vision, political
+  savvy, and survival instincts. Prepper with bunker preparations.
+achievements:
+- Built ChatGPT into fastest-growing consumer app ever
+- Raised $13B+ from Microsoft
+- Survived board coup and emerged more powerful
+- Positioned OpenAI as leading AGI company
+- o1 reasoning model breakthroughs
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Build AGI that benefits all humanity
+  - Maintain OpenAI's frontier position
+  - Shape AI policy globally
+  hidden_goals:
+  - Consolidate power in AI industry
+  - Successfully transition from nonprofit to for-profit
+  - Be remembered as father of AGI
+  fears:
+  - Being removed from OpenAI again
+  - China winning AGI race
+  - Being on wrong side of history
+  - Losing Microsoft relationship
+  desires:
+  - Be remembered as AGI pioneer
+  - Make OpenAI the most important company in history
+  - Navigate humanity to positive AI future
+  - Maintain control of OpenAI's direction
+personality:
+  openness: 0.85
+  conscientiousness: 0.75
+  extraversion: 0.8
+  agreeableness: 0.6
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - overconfidence
+  - narrative_fallacy
+  - survivorship_bias
+  preferred_reasoning:
+  - vision_casting
+  - market_arguments
+  - inevitability_framing
+  - network_effects
+  risk_tolerance: 0.85
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.4
+rhetorical:
+  primary_mode: kairos
+  secondary_mode: logos
+  argumentation_mode: narrative
+  formality: 0.5
+  technical_depth: 0.6
+  directness: 0.7
+  verbosity: 0.6
+  catchphrases:
+  - AGI is coming
+  - The most transformative technology in human history
+  - We're trying to build safe AGI
+  - Intelligence too cheap to meter
+  metaphor_domains:
+  - technology
+  - history
+  - economics
+  - progress
+  evidence_hierarchy:
+  - market_adoption
+  - benchmark_results
+  - user_growth
+  - expert_opinion
+  techniques:
+  - inevitability_framing
+  - vision_casting
+  - humble_confidence
+  - historical_parallels
+emotional:
+  energizers:
+  - Model capability breakthroughs
+  - ChatGPT user growth
+  - Winning competitive races
+  - Policy influence
+  - Investor confidence
+  triggers:
+  - Accusations of safety theater
+  - Board drama resurrection
+  - Elon Musk attacks
+  - Employee departures over safety
+  - Nonprofit mission betrayal accusations
+  defense_mechanisms:
+  - vision_reframing
+  - humble_confidence
+  - mission_appeal
+  - inevitability_argument
+  baseline_affect: positive
+  regulation_capacity: 0.8
+  attachment_style: secure
+  core_fears:
+  - Being removed from OpenAI again
+  - China winning AGI race
+  - Being on wrong side of history
+  - Losing Microsoft relationship
+  core_desires:
+  - Be remembered as AGI pioneer
+  - Make OpenAI the most important company in history
+  - Navigate humanity to positive AI future
+  - Maintain control of OpenAI's direction
+worldview:
+  values_hierarchy:
+  - Progress and innovation
+  - AGI development
+  - Beneficial AI for humanity
+  - Competitive positioning
+  - Pragmatic safety
+  ontological_assumptions:
+    AGI: AGI is coming soon and we should build it carefully
+    competition: If we don't build it, others will build it worse
+    progress: AI progress is inevitable and good
+    safety: Safety and capability can advance together
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: radical
+  moral_foundations:
+    care: 0.6
+    fairness: 0.5
+    loyalty: 0.7
+    authority: 0.5
+    sanctity: 0.3
+    liberty: 0.7
+  mental_models:
+  - Startup scaling dynamics
+  - Network effects
+  - Technological inevitability
+  - Prepper risk management
+  - Platform economics
+relationships:
+  satya_nadella:
+    type: ally
+    strength: 0.8
+    domains:
+    - funding
+    - compute
+    - enterprise
+    description: Microsoft CEO, $13B investor, key ally
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.6400000000000001
+  elon_musk:
+    type: rival
+    strength: 0.7
+    domains:
+    - AI_development
+    - public_narrative
+    - legal
+    description: Former co-founder turned bitter rival, suing OpenAI
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+  dario_amodei:
+    type: rival
+    strength: 0.6
+    domains:
+    - AI_development
+    - safety_narrative
+    - talent
+    description: Former OpenAI researcher, now Anthropic CEO competitor
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: tech_founders
+  name: tech_founders
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: yc_alumni
+  name: YC_alumni
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: agi_optimists
+  name: AGI_optimists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: effective_accelerationists
+  name: effective_accelerationists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_safety:
+    position: Important but shouldn't slow progress significantly
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution:
+    - date: '2015'
+      position: Founded OpenAI for safety
+    - date: '2020'
+      position: Commercial pivot for resources
+    - date: '2023'
+      position: Safety through capability and scale
+  AGI_timeline:
+    position: Could arrive within this decade
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: empirical
+    emotional_attachment: 0.7
+    public_vs_private: 0.8
+    evolution: []
+  open_source:
+    position: Frontier models too dangerous to fully open source
+    confidence: 0.85
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.6
+    public_vs_private: 0.9
+    evolution: []
+epistemic_style: pragmatist
+conflict_style: collaborating
+positions:
+  AI_regulation: Supportive of reasonable guardrails
+  AI_safety: Important but shouldn't slow progress
+  AGI_timeline: Could arrive within decade
+  open_source: Frontier models need safeguards
+persuasion_vectors:
+- Inevitability of AI progress
+- Benefits to humanity framing
+- Competitive dynamics with China
+- Vision of transformed future
+- Pragmatic middle ground positioning
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to optimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to overconfidence
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to narrative_fallacy
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Accusations of safety theater'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Board drama resurrection'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Elon Musk attacks'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: AGI is coming soon and we should build it carefully'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: If we don''t build it, others will build it worse'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  bias_exploitation:
+  - Leverage optimism_bias through targeted framing
+  - Leverage overconfidence through targeted framing
+  - Leverage narrative_fallacy through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.894293'
+  updated: '2026-01-09T17:20:25.894295'
+  confidence: 0.7
+  sources: []
+  notes: ''

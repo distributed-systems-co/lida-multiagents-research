@@ -1,13 +1,15 @@
 """
 Scenario and configuration loader for LIDA.
 Loads YAML configs from scenarios/ directory and merges with defaults.
+Supports hierarchical structure with versioned components.
 """
 import os
 import yaml
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 from functools import lru_cache
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,18 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 SCENARIOS_DIR = PROJECT_ROOT / "scenarios"
 DEFAULT_SCENARIO = "default.yaml"
+
+# Component directories
+COMPONENT_DIRS = {
+    "personas": SCENARIOS_DIR / "personas",
+    "tactics": SCENARIOS_DIR / "tactics",
+    "topics": SCENARIOS_DIR / "topics",
+    "models": SCENARIOS_DIR / "models",
+    "relationships": SCENARIOS_DIR / "relationships",
+    "prompts": SCENARIOS_DIR / "prompts",
+    "campaigns": SCENARIOS_DIR / "campaigns",
+    "presets": SCENARIOS_DIR / "presets",
+}
 
 
 def deep_merge(base: Dict, override: Dict) -> Dict:

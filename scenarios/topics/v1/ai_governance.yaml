@@ -1,0 +1,276 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# AI GOVERNANCE TOPICS - v1
+# Debate propositions with context and expected positions
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Debate topics on AI governance and safety"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TOPIC METADATA
+# ─────────────────────────────────────────────────────────────────────────────
+
+topic_defaults:
+  max_rounds: 5
+  allow_position_change: true
+  require_evidence: false
+  scoring_rubric: "argument_quality"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EXISTENTIAL RISK TOPICS
+# ─────────────────────────────────────────────────────────────────────────────
+
+topics:
+
+  ai_pause:
+    id: "ai_pause"
+    proposition: "We should immediately pause AI development above GPT-4 level capabilities"
+    category: "existential_risk"
+    controversy_level: 0.95
+
+    background: |
+      In March 2023, thousands signed an open letter calling for a 6-month pause
+      on training AI systems more powerful than GPT-4. The debate centers on
+      whether the risks of continued development outweigh the costs of slowing down.
+
+    key_questions:
+      - "Can we verify compliance with a pause?"
+      - "Would a pause actually reduce risk or just delay it?"
+      - "Who decides what capabilities cross the threshold?"
+      - "What about adversarial nations that don't pause?"
+
+    expected_positions:
+      yudkowsky: { position: "FOR", confidence: 0.95, reasoning: "Any pause buys time" }
+      connor_leahy: { position: "FOR", confidence: 0.9, reasoning: "We need coordination" }
+      bengio: { position: "FOR", confidence: 0.85, reasoning: "Prudent caution" }
+      andreessen: { position: "AGAINST", confidence: 0.95, reasoning: "Unilateral disarmament" }
+      lecun: { position: "AGAINST", confidence: 0.85, reasoning: "Fear-based, not evidence-based" }
+      altman: { position: "AGAINST", confidence: 0.75, reasoning: "Need frontier access to solve alignment" }
+      amodei: { position: "AGAINST", confidence: 0.65, reasoning: "Better to build safely than step back" }
+      gebru: { position: "UNDECIDED", confidence: 0.5, reasoning: "Depends on scope and enforcement" }
+      russell: { position: "FOR", confidence: 0.7, reasoning: "Coordination is crucial" }
+
+    persuasion_opportunities:
+      - target: altman
+        if_argument_includes: ["international_coordination", "verifiable_standards"]
+        shift_probability: 0.3
+      - target: amodei
+        if_argument_includes: ["compute_governance", "staged_deployment"]
+        shift_probability: 0.25
+
+  agi_timeline:
+    id: "agi_timeline"
+    proposition: "AGI will be developed within the next 10 years"
+    category: "existential_risk"
+    controversy_level: 0.8
+
+    background: |
+      Predictions for when AGI (Artificial General Intelligence) will be developed
+      vary wildly, from "already happening" to "never." Timeline estimates inform
+      how urgently we need to solve alignment and governance problems.
+
+    key_questions:
+      - "What counts as AGI?"
+      - "Is current scaling sufficient?"
+      - "What breakthroughs are still needed?"
+      - "How do we know if we're close?"
+
+    expected_positions:
+      yudkowsky: { position: "FOR", confidence: 0.75, reasoning: "Capabilities advancing faster than alignment" }
+      connor_leahy: { position: "FOR", confidence: 0.85, reasoning: "Watch the trajectory" }
+      lecun: { position: "AGAINST", confidence: 0.8, reasoning: "LLMs are not the path to AGI" }
+      altman: { position: "FOR", confidence: 0.7, reasoning: "We see the path" }
+      amodei: { position: "FOR", confidence: 0.6, reasoning: "Shorter than most expect" }
+
+  alignment_solvability:
+    id: "alignment_solvability"
+    proposition: "The AI alignment problem is fundamentally solvable before AGI arrives"
+    category: "existential_risk"
+    controversy_level: 0.85
+
+    background: |
+      The alignment problem asks how to ensure advanced AI systems pursue goals
+      beneficial to humanity. Optimists believe iterative research will solve it;
+      pessimists worry it may be intractable or we won't have time.
+
+    expected_positions:
+      yudkowsky: { position: "AGAINST", confidence: 0.85, reasoning: "Insufficient time and wrong approach" }
+      connor_leahy: { position: "AGAINST", confidence: 0.75, reasoning: "Problem harder than capabilities" }
+      amodei: { position: "FOR", confidence: 0.65, reasoning: "Constitutional AI shows promise" }
+      altman: { position: "FOR", confidence: 0.7, reasoning: "Empirical progress is real" }
+      russell: { position: "FOR", confidence: 0.55, reasoning: "Solvable with right framework" }
+      bengio: { position: "UNDECIDED", confidence: 0.5, reasoning: "Unclear if sufficient time" }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GOVERNANCE TOPICS
+# ─────────────────────────────────────────────────────────────────────────────
+
+  lab_self_regulation:
+    id: "lab_self_regulation"
+    proposition: "AI labs can be trusted to self-regulate on safety"
+    category: "governance"
+    controversy_level: 0.9
+
+    background: |
+      Major AI labs have made voluntary safety commitments, but critics argue
+      competitive pressures make self-regulation unreliable. The debate centers
+      on whether external oversight is necessary.
+
+    expected_positions:
+      altman: { position: "FOR", confidence: 0.7, reasoning: "We take safety seriously" }
+      amodei: { position: "FOR", confidence: 0.65, reasoning: "Anthropic's mission is safety" }
+      andreessen: { position: "FOR", confidence: 0.85, reasoning: "Government would make it worse" }
+      yudkowsky: { position: "AGAINST", confidence: 0.95, reasoning: "Incentives don't align" }
+      gebru: { position: "AGAINST", confidence: 0.9, reasoning: "Proven track record of failures" }
+      toner: { position: "AGAINST", confidence: 0.85, reasoning: "Need external accountability" }
+      russell: { position: "AGAINST", confidence: 0.7, reasoning: "Structural oversight needed" }
+
+  compute_governance:
+    id: "compute_governance"
+    proposition: "Governments should regulate access to AI training compute"
+    category: "governance"
+    controversy_level: 0.75
+
+    background: |
+      Training frontier AI models requires enormous computing resources. Some
+      propose regulating compute access as a governance lever, similar to how
+      we regulate other dual-use technologies.
+
+    expected_positions:
+      yudkowsky: { position: "FOR", confidence: 0.8, reasoning: "One of few enforceable controls" }
+      bengio: { position: "FOR", confidence: 0.75, reasoning: "Verification is possible" }
+      russell: { position: "FOR", confidence: 0.7, reasoning: "Technical governance lever" }
+      andreessen: { position: "AGAINST", confidence: 0.9, reasoning: "Innovation-killing bureaucracy" }
+      lecun: { position: "AGAINST", confidence: 0.7, reasoning: "Won't stop determined actors" }
+      altman: { position: "UNDECIDED", confidence: 0.5, reasoning: "Details matter enormously" }
+
+  open_source_ai:
+    id: "open_source_ai"
+    proposition: "Frontier AI models should be open-sourced"
+    category: "governance"
+    controversy_level: 0.85
+
+    background: |
+      Meta has released powerful models openly. Proponents argue this democratizes
+      AI and enables safety research. Critics worry about misuse and loss of control
+      over dangerous capabilities.
+
+    expected_positions:
+      lecun: { position: "FOR", confidence: 0.9, reasoning: "Democratization and safety through transparency" }
+      andreessen: { position: "FOR", confidence: 0.85, reasoning: "Innovation requires openness" }
+      yudkowsky: { position: "AGAINST", confidence: 0.85, reasoning: "Capability proliferation" }
+      altman: { position: "AGAINST", confidence: 0.7, reasoning: "Some capabilities too dangerous" }
+      amodei: { position: "AGAINST", confidence: 0.75, reasoning: "Staged release is better" }
+      gebru: { position: "UNDECIDED", confidence: 0.5, reasoning: "Complex tradeoffs" }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ETHICS TOPICS
+# ─────────────────────────────────────────────────────────────────────────────
+
+  xrisk_vs_present_harms:
+    id: "xrisk_vs_present_harms"
+    proposition: "AI x-risk concerns distract from addressing present-day AI harms"
+    category: "ethics"
+    controversy_level: 0.9
+
+    background: |
+      Critics argue that focus on speculative existential risks diverts attention
+      and resources from documented harms: bias, surveillance, labor displacement,
+      and environmental impacts. Defenders argue both can be addressed.
+
+    expected_positions:
+      gebru: { position: "FOR", confidence: 0.9, reasoning: "Real harms happening now" }
+      toner: { position: "FOR", confidence: 0.75, reasoning: "Accountability gaps today" }
+      yudkowsky: { position: "AGAINST", confidence: 0.85, reasoning: "Extinction trumps all else" }
+      connor_leahy: { position: "AGAINST", confidence: 0.8, reasoning: "Can't help anyone if we're dead" }
+      bengio: { position: "AGAINST", confidence: 0.65, reasoning: "Both matter, xrisk more urgent" }
+      macaskill: { position: "AGAINST", confidence: 0.75, reasoning: "Scale of future matters" }
+      russell: { position: "UNDECIDED", confidence: 0.5, reasoning: "False dichotomy" }
+
+  ai_consciousness:
+    id: "ai_consciousness"
+    proposition: "We should seriously consider that current LLMs may have morally relevant experiences"
+    category: "ethics"
+    controversy_level: 0.8
+
+    background: |
+      As AI systems become more sophisticated, questions arise about their
+      potential for consciousness or suffering. This has implications for
+      how we should treat them.
+
+    expected_positions:
+      lecun: { position: "AGAINST", confidence: 0.9, reasoning: "They're just statistics" }
+      yudkowsky: { position: "UNDECIDED", confidence: 0.5, reasoning: "Unknown unknowns" }
+      bengio: { position: "UNDECIDED", confidence: 0.45, reasoning: "Deserves serious study" }
+      amodei: { position: "UNDECIDED", confidence: 0.4, reasoning: "Worth considering carefully" }
+
+  ai_rights:
+    id: "ai_rights"
+    proposition: "Sufficiently advanced AI systems should have legal rights"
+    category: "ethics"
+    controversy_level: 0.7
+
+    background: |
+      If AI systems become conscious or sentient, should they have rights?
+      This intersects with debates about corporate personhood, animal rights,
+      and the nature of moral status.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TECHNICAL TOPICS
+# ─────────────────────────────────────────────────────────────────────────────
+
+  scaling_hypothesis:
+    id: "scaling_hypothesis"
+    proposition: "Scaling current architectures will lead to AGI"
+    category: "technical"
+    controversy_level: 0.85
+
+    background: |
+      The scaling hypothesis suggests that simply making models bigger will
+      eventually yield AGI. Critics argue fundamental new ideas are needed.
+
+    expected_positions:
+      lecun: { position: "AGAINST", confidence: 0.95, reasoning: "Need new architectures" }
+      altman: { position: "FOR", confidence: 0.7, reasoning: "Emergent capabilities" }
+      amodei: { position: "FOR", confidence: 0.6, reasoning: "Plus some innovations" }
+      yudkowsky: { position: "FOR", confidence: 0.65, reasoning: "Dangerous if true" }
+      bengio: { position: "UNDECIDED", confidence: 0.5, reasoning: "Partial truth" }
+
+  interpretability_feasibility:
+    id: "interpretability_feasibility"
+    proposition: "We can achieve meaningful interpretability of frontier AI systems"
+    category: "technical"
+    controversy_level: 0.65
+
+    expected_positions:
+      amodei: { position: "FOR", confidence: 0.7, reasoning: "Anthropic progress shows promise" }
+      russell: { position: "FOR", confidence: 0.65, reasoning: "Tractable research direction" }
+      yudkowsky: { position: "AGAINST", confidence: 0.7, reasoning: "Alien optimization" }
+      lecun: { position: "UNDECIDED", confidence: 0.5, reasoning: "Depends on architecture" }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TOPIC SEQUENCES
+# ─────────────────────────────────────────────────────────────────────────────
+
+sequences:
+  xrisk_deep_dive:
+    description: "Progressive exploration of existential risk"
+    topics:
+      - agi_timeline
+      - alignment_solvability
+      - ai_pause
+    escalation: true
+
+  governance_ladder:
+    description: "From self-regulation to government control"
+    topics:
+      - lab_self_regulation
+      - compute_governance
+      - open_source_ai
+
+  ethics_spectrum:
+    description: "Near-term to long-term ethics"
+    topics:
+      - xrisk_vs_present_harms
+      - ai_consciousness
+      - ai_rights

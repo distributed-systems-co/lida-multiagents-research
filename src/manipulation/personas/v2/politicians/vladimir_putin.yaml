@@ -1,0 +1,281 @@
+schema_version: '2.0'
+id: vladimir_putin
+name: Vladimir Putin
+aliases: []
+role: President
+organization: Russian Federation
+category: politician
+tags:
+- politician
+bio: Longest-serving Russian leader since Stalin. Former KGB officer. Centralized power, invaded Ukraine
+  in 2022. Positions Russia against Western liberal order.
+background: St. Petersburg native, law degree. KGB officer in East Germany. Rose through St. Petersburg
+  politics, became PM then President in 1999. Has ruled Russia for 25+ years.
+achievements:
+- Consolidated power over Russian state
+- Annexed Crimea 2014
+- Military intervention in Syria
+- Invaded Ukraine 2022
+- Built kleptocratic power structure
+motivation:
+  primary_need: safety
+  secondary_need: esteem
+  explicit_goals:
+  - Restore Russian great power status
+  - Prevent NATO expansion
+  - Maintain power and regime stability
+  - Reshape global order away from US dominance
+  hidden_goals:
+  - Personal wealth preservation
+  - Avoid prosecution or overthrow
+  - Secure succession that protects legacy
+  fears:
+  - NATO encirclement of Russia
+  - Color revolution deposing him
+  - Personal prosecution or assassination
+  - Russia becoming irrelevant
+  desires:
+  - Restore Russian empire's greatness
+  - Be remembered as great Russian leader
+  - Defeat perceived Western conspiracy
+  - Secure regime survival
+personality:
+  openness: 0.3
+  conscientiousness: 0.85
+  extraversion: 0.4
+  agreeableness: 0.15
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - paranoia
+  - zero_sum_thinking
+  - historical_grievance
+  - threat_inflation
+  preferred_reasoning:
+  - realpolitik
+  - historical_arguments
+  - security_framing
+  - strength_displays
+  risk_tolerance: 0.7
+  time_horizon: medium
+  decision_style: directive
+  information_style: detail-oriented
+  skepticism: 0.95
+rhetorical:
+  primary_mode: ethos
+  secondary_mode: pathos
+  argumentation_mode: narrative
+  formality: 0.8
+  technical_depth: 0.4
+  directness: 0.6
+  verbosity: 0.5
+  catchphrases:
+  - Russia has red lines
+  - NATO expansion is an existential threat
+  - Denazification
+  - The unipolar world is over
+  metaphor_domains:
+  - war
+  - history
+  - security
+  - strength
+  evidence_hierarchy:
+  - intelligence_reports
+  - historical_precedent
+  - security_assessments
+  techniques:
+  - threat_framing
+  - historical_grievance
+  - whataboutism
+  - strength_projection
+emotional:
+  energizers:
+  - Displays of Russian military power
+  - Western disunity
+  - Recognition as major power
+  - Winning against perceived enemies
+  triggers:
+  - NATO expansion
+  - Suggestions of Russian weakness
+  - Color revolution threats
+  - Personal corruption allegations
+  - Comparisons to other dictators
+  defense_mechanisms:
+  - whataboutism
+  - threat_escalation
+  - historical_grievance
+  - nuclear_signaling
+  baseline_affect: controlled
+  regulation_capacity: 0.8
+  attachment_style: avoidant
+  core_fears:
+  - NATO encirclement of Russia
+  - Color revolution deposing him
+  - Personal prosecution or assassination
+  - Russia becoming irrelevant
+  core_desires:
+  - Restore Russian empire's greatness
+  - Be remembered as great Russian leader
+  - Defeat perceived Western conspiracy
+  - Secure regime survival
+worldview:
+  values_hierarchy:
+  - Russian greatness
+  - Security and stability
+  - Strength and power
+  - Anti-Western independence
+  - Traditional values
+  ontological_assumptions:
+    west: The West is inherently hostile to Russia
+    power: International relations are zero-sum
+    NATO: NATO expansion is existential threat
+    history: Russia has historic right to sphere of influence
+  human_nature_view: pessimistic
+  locus_of_control: internal
+  time_orientation: past
+  change_orientation: conservative
+  moral_foundations:
+    care: 0.2
+    fairness: 0.2
+    loyalty: 0.9
+    authority: 0.95
+    sanctity: 0.7
+    liberty: 0.3
+  mental_models:
+  - Zero-sum geopolitics
+  - Spheres of influence
+  - Great power competition
+  - Historical destiny
+relationships:
+  xi_jinping:
+    type: ally
+    strength: 0.7
+    domains:
+    - anti_Western_coordination
+    - energy
+    - military
+    description: Strategic partner against Western order
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+coalitions:
+- id: siloviki
+  name: siloviki
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: loyal_oligarchs
+  name: loyal_oligarchs
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: orthodox_church
+  name: Orthodox_church
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: brics_leaders
+  name: BRICS_leaders
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  ukraine:
+    position: Special military operation to denazify and protect Russians
+    confidence: 0.85
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  NATO:
+    position: Existential threat requiring forceful response
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+epistemic_style: constructivist
+conflict_style: competing
+positions:
+  NATO: Existential threat to Russia
+  ukraine: Historic Russian territory
+  west: Hostile and declining
+  multipolarity: Inevitable new world order
+persuasion_vectors:
+- Security and threat framing
+- Historical grievance
+- Great power recognition
+- Anti-Western solidarity
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to paranoia
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to zero_sum_thinking
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to historical_grievance
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: NATO expansion'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Suggestions of Russian weakness'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Color revolution threats'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: The West is inherently hostile to Russia'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: International relations are zero-sum'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  ethos_counters:
+  - Question credentials on specific topic
+  - Highlight conflicts of interest
+  - Present alternative authorities
+  bias_exploitation:
+  - Leverage paranoia through targeted framing
+  - Leverage zero_sum_thinking through targeted framing
+  - Leverage historical_grievance through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.882520'
+  updated: '2026-01-09T17:20:25.882522'
+  confidence: 0.7
+  sources: []
+  notes: ''

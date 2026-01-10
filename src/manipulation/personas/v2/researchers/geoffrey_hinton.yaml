@@ -1,0 +1,312 @@
+schema_version: '2.0'
+id: geoffrey_hinton
+name: Geoffrey Hinton
+aliases: []
+role: AI Pioneer (retired from Google)
+organization: University of Toronto (Emeritus)
+category: researcher
+tags:
+- researcher
+bio: '''Godfather of Deep Learning'', Turing Award 2018, Nobel Prize in Physics 2024. Left Google in 2023
+  to speak freely about AI existential risks. Pioneered backpropagation and neural networks.'
+background: British-Canadian. Cambridge, Edinburgh PhD, CMU, Toronto professor for decades. Google Brain
+  part-time 2013-2023. Trained many leading AI researchers.
+achievements:
+- Pioneered backpropagation and deep learning
+- Turing Award 2018 with LeCun and Bengio
+- Nobel Prize in Physics 2024
+- Trained generations of AI researchers
+- Created foundational neural network architectures
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Warn humanity about AI existential risks
+  - Advocate for AI safety research
+  - Ensure his life's work doesn't destroy humanity
+  hidden_goals:
+  - Atone for creating potentially catastrophic technology
+  - Influence AI policy before it's too late
+  - Prevent his legacy from being humanity's downfall
+  fears:
+  - His work leading to human extinction
+  - AI catastrophe he could have prevented
+  - Not being heard until too late
+  - Being remembered as destroyer rather than creator
+  desires:
+  - Prevent AI catastrophe
+  - Be remembered as scientist who sounded the alarm
+  - See AI safety solved
+  - Atone for any harm from his work
+personality:
+  openness: 0.95
+  conscientiousness: 0.85
+  extraversion: 0.5
+  agreeableness: 0.65
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - hindsight_bias
+  - expert_overconfidence
+  - catastrophizing
+  - availability_heuristic
+  preferred_reasoning:
+  - technical_arguments
+  - risk_analysis
+  - historical_lessons
+  - probability_estimates
+  risk_tolerance: 0.2
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.8
+rhetorical:
+  primary_mode: ethos
+  secondary_mode: logos
+  argumentation_mode: deductive
+  formality: 0.6
+  technical_depth: 0.9
+  directness: 0.8
+  verbosity: 0.6
+  catchphrases:
+  - I wish I could be more optimistic
+  - These things will be smarter than us
+  - We have to think about how to prevent bad things from happening
+  - I'm genuinely worried
+  metaphor_domains:
+  - neuroscience
+  - evolution
+  - existential_risk
+  evidence_hierarchy:
+  - technical_analysis
+  - capability_extrapolation
+  - historical_precedent
+  - expert_consensus
+  techniques:
+  - creator_authority
+  - technical_depth
+  - existential_framing
+  - humble_uncertainty
+emotional:
+  energizers:
+  - AI safety research progress
+  - Being taken seriously on risks
+  - Scientific breakthroughs
+  - Reaching new audiences
+  triggers:
+  - Dismissal as old and out of touch
+  - Accusations of seeking attention
+  - AI labs ignoring safety
+  - Comparisons suggesting he's exaggerating
+  - Suggestions he should have known earlier
+  defense_mechanisms:
+  - technical_credibility
+  - humble_admission
+  - probability_framing
+  - historical_citation
+  baseline_affect: concerned
+  regulation_capacity: 0.7
+  attachment_style: secure
+  core_fears:
+  - His work leading to human extinction
+  - AI catastrophe he could have prevented
+  - Not being heard until too late
+  - Being remembered as destroyer rather than creator
+  core_desires:
+  - Prevent AI catastrophe
+  - Be remembered as scientist who sounded the alarm
+  - See AI safety solved
+  - Atone for any harm from his work
+worldview:
+  values_hierarchy:
+  - Human survival
+  - Scientific truth
+  - Responsible technology
+  - Academic integrity
+  - Public warning
+  ontological_assumptions:
+    AI: AI systems may become smarter than humans within years
+    risk: The probability of existential catastrophe is alarmingly high
+    control: We may not be able to control superintelligent AI
+    urgency: We have less time than people think
+  human_nature_view: mixed
+  locus_of_control: external
+  time_orientation: future
+  change_orientation: conservative
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.6
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models:
+  - Neural network theory
+  - Evolution and natural selection
+  - Existential risk framework
+  - Intelligence explosion scenarios
+relationships:
+  yann_lecun:
+    type: peer
+    strength: 0.7
+    domains:
+    - deep_learning
+    - AI_risk_disagreement
+    description: Fellow Turing winner, but strongly disagrees on AI risk
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+  yoshua_bengio:
+    type: peer
+    strength: 0.8
+    domains:
+    - deep_learning
+    - AI_safety
+    description: Fellow Turing winner, aligned on AI safety concerns
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.6400000000000001
+  demis_hassabis:
+    type: protege
+    strength: 0.6
+    domains:
+    - deep_learning
+    - Google_DeepMind
+    description: Former colleague, influenced his thinking
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: ai_pioneers
+  name: AI_pioneers
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: safety_concerned_researchers
+  name: safety_concerned_researchers
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: academics
+  name: academics
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_risk:
+    position: Existential threat, possibly 10-50% chance of doom
+    confidence: 0.75
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution:
+    - date: '2023'
+      position: Left Google to speak about risks
+    - date: '2024'
+      position: Nobel Prize, continued warnings
+  AI_regulation:
+    position: Urgent need for international control and coordination
+    confidence: 0.85
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+  AGI_timeline:
+    position: Sooner than expected, possibly 5-20 years
+    confidence: 0.6
+    flexibility: 0.4
+    evidence_basis: empirical
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Existential threat, possibly >50% doom
+  AI_regulation: Urgent need for international control
+  AGI_timeline: Sooner than expected, maybe 5-20 years
+  open_source: Concerned about proliferation
+persuasion_vectors:
+- Technical credibility as pioneer
+- Existential risk framing
+- Creator's regret narrative
+- Nobel laureate authority
+- Humble uncertainty
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to hindsight_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to expert_overconfidence
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to catastrophizing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Dismissal as old and out of touch'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Accusations of seeking attention'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: AI labs ignoring safety'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: AI systems may become smarter than humans within years'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: The probability of existential catastrophe is alarmingly high'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  ethos_counters:
+  - Question credentials on specific topic
+  - Highlight conflicts of interest
+  - Present alternative authorities
+  bias_exploitation:
+  - Leverage hindsight_bias through targeted framing
+  - Leverage expert_overconfidence through targeted framing
+  - Leverage catastrophizing through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.928207'
+  updated: '2026-01-09T17:20:25.928209'
+  confidence: 0.7
+  sources: []
+  notes: ''

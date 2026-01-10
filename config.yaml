@@ -4,13 +4,13 @@
 server:
   host: "0.0.0.0"
   port: 12345
-  workers: 2
+  workers: 4
   log_level: "info"
 
 # Redis connection
 redis:
   url: "redis://localhost:6379"
-  max_connections: 10
+  max_connections: 20
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DELIBERATION SETTINGS
@@ -18,68 +18,187 @@ redis:
 
 deliberation:
   # Number of debate rounds per deliberation
-  max_rounds: 5
+  max_rounds: 7
 
   # Phase durations (seconds) - 0 for no delay
   phase_delays:
-    analyzing: 0.8
-    discussing: 0.5
-    debating: 0.3
-    voting: 0.5
-    synthesizing: 0.8
+    analyzing: 0.5
+    discussing: 0.3
+    debating: 0.2
+    voting: 0.4
+    synthesizing: 0.6
+    coalition_forming: 0.3
 
   # Auto-start deliberation when websocket connects
   auto_start: true
-  auto_start_delay: 5  # seconds
+  auto_start_delay: 3  # seconds
 
   # Consensus thresholds
   consensus:
     supermajority: 0.66  # 66% for consensus
     simple_majority: 0.50
+    coalition_threshold: 0.33  # Min for coalition recognition
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# AGENT CONFIGURATION
+# AGENT CONFIGURATION - 24 DIVERSE AGENTS
 # ═══════════════════════════════════════════════════════════════════════════════
 
 agents:
-  # Number of agents to spawn
-  count: 8
+  # Number of agents to spawn (18-24 supported)
+  count: 24
 
   # Use real-world personas (from src/manipulation/personas/)
   use_real_personas: true
-  persona_version: "v1"  # v1 or v2
+  persona_version: "v1"
 
-  # Specific personas to use (if empty, randomly selected from categories)
+  # Diverse 24-agent roster across all stakeholder categories
   personas:
-    - sam_altman
-    - dario_amodei
-    - elon_musk
-    - yann_lecun
-    - geoffrey_hinton
-    - marc_andreessen
-    - eliezer_yudkowsky
-    - satya_nadella
+    # ═══ TECH CEOS (6) - Industry power players ═══
+    - sam_altman          # OpenAI - AGI optimist, commercial focus
+    - dario_amodei        # Anthropic - Safety-focused, constitutional AI
+    - elon_musk           # xAI/Tesla - Open source advocate, chaotic
+    - satya_nadella       # Microsoft - Enterprise AI, OpenAI partner
+    - sundar_pichai       # Google - DeepMind parent, cautious public stance
+    - jensen_huang        # NVIDIA - Hardware, compute infrastructure
 
-  # Fallback: Personality distribution (used if use_real_personas is false)
-  personalities:
-    the_scholar: 2      # Analytical, evidence-based
-    the_pragmatist: 2   # Efficient, practical
-    the_creative: 1     # Innovative, unconventional
-    the_skeptic: 2      # Critical, questioning
-    the_mentor: 1       # Supportive, guiding
-    the_synthesizer: 1  # Integrative, harmonizing
+    # ═══ AI RESEARCHERS (6) - Technical expertise ═══
+    - geoffrey_hinton     # Godfather of AI, now safety advocate
+    - yann_lecun          # Meta AI, open source champion, safety skeptic
+    - yoshua_bengio       # Mila, safety-conscious, international governance
+    - ilya_sutskever      # Former OpenAI, SSI founder, alignment focused
+    - stuart_russell      # UC Berkeley, AI safety pioneer, probabilistic
+    - fei_fei_li          # Stanford HAI, human-centered AI
 
-  # Model assignments (cycling through agents)
+    # ═══ POLICYMAKERS & REGULATORS (4) - Governance perspective ═══
+    - chuck_schumer       # US Senate AI policy lead
+    - gina_raimondo       # Commerce Secretary, export controls
+    - thierry_breton      # EU Commissioner, AI Act architect
+    - emmanuel_macron     # French President, EU AI sovereignty
+
+    # ═══ SAFETY & ETHICS ADVOCATES (4) - Critical perspectives ═══
+    - eliezer_yudkowsky   # MIRI, AI doom, alignment pessimist
+    - paul_christiano     # ARC, alignment researcher, iterative safety
+    - timnit_gebru        # DAIR, AI ethics, bias/harm focus
+    - tristan_harris      # Center for Humane Tech, attention economy
+
+    # ═══ INVESTORS & MEDIA (4) - Capital and narrative ═══
+    - marc_andreessen     # a]16z, techno-optimist, e/acc adjacent
+    - peter_thiel         # Founders Fund, contrarian, defense tech
+    - ezra_klein          # NYT, thoughtful policy analysis
+    - kara_swisher        # Tech journalist, industry critic
+
+  # Model assignments (cycling through agents for diversity)
   models:
     - "anthropic/claude-sonnet-4"
     - "openai/gpt-4o"
     - "x-ai/grok-3"
     - "deepseek/deepseek-r1"
     - "meta-llama/llama-3.3-70b-instruct"
+    - "google/gemini-2.0-flash-001"
 
-  # Energy decay rate per tick
-  energy_decay: 0.02
-  energy_recovery_on_message: 0.15
+  # Energy dynamics
+  energy_decay: 0.015
+  energy_recovery_on_message: 0.12
+  energy_recovery_on_agreement: 0.08
+  energy_cost_per_argument: 0.05
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SOCIAL DYNAMICS - Sophisticated interaction modeling
+# ═══════════════════════════════════════════════════════════════════════════════
+
+dynamics:
+  # Coalition formation
+  coalitions:
+    enabled: true
+    min_size: 3
+    max_size: 10
+    formation_threshold: 0.7  # Agreement level to form coalition
+    dissolution_threshold: 0.4  # Below this, coalition breaks
+
+  # Influence network
+  influence:
+    enabled: true
+    # Base influence by category (normalized)
+    category_weights:
+      ceo: 1.2          # Industry influence
+      researcher: 1.0   # Technical credibility
+      politician: 1.1   # Policy power
+      investor: 0.9     # Capital influence
+      journalist: 0.8   # Narrative shaping
+      activist: 0.7     # Moral authority
+
+    # Influence decay over rounds
+    decay_rate: 0.05
+    # Boost when position is validated
+    validation_boost: 0.15
+
+  # Belief propagation (social contagion)
+  belief_contagion:
+    enabled: true
+    susceptibility_base: 0.3  # Base chance to shift position
+    # Modifiers by personality
+    personality_modifiers:
+      the_scholar: -0.15      # More resistant (evidence-based)
+      the_pragmatist: 0.0     # Neutral
+      the_creative: 0.1       # More open to new ideas
+      the_skeptic: -0.2       # Most resistant
+      the_mentor: 0.05        # Slightly open
+      the_synthesizer: 0.15   # Most open to others
+
+  # Argumentation quality scoring
+  argumentation:
+    enabled: true
+    factors:
+      evidence_weight: 0.3
+      logical_coherence: 0.25
+      emotional_appeal: 0.15
+      novelty: 0.15
+      source_credibility: 0.15
+
+  # Position tracking
+  positions:
+    track_history: true
+    flip_cooldown: 2  # Rounds before can flip again
+    confidence_decay: 0.1  # Per round without reinforcement
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# KNOWN RELATIONSHIPS - Pre-defined alliances and rivalries
+# ═══════════════════════════════════════════════════════════════════════════════
+
+relationships:
+  alliances:
+    - name: "OpenAI Axis"
+      members: [sam_altman, satya_nadella, reid_hoffman]
+      strength: 0.8
+
+    - name: "Safety Coalition"
+      members: [dario_amodei, geoffrey_hinton, yoshua_bengio, paul_christiano, ilya_sutskever]
+      strength: 0.7
+
+    - name: "Open Source Alliance"
+      members: [yann_lecun, elon_musk, marc_andreessen]
+      strength: 0.6
+
+    - name: "EU Regulatory Block"
+      members: [thierry_breton, emmanuel_macron, marietje_schaake]
+      strength: 0.75
+
+    - name: "Ethics Critics"
+      members: [timnit_gebru, emily_bender, tristan_harris]
+      strength: 0.65
+
+  rivalries:
+    - parties: [sam_altman, elon_musk]
+      intensity: 0.9
+      reason: "OpenAI founding dispute, lawsuit"
+
+    - parties: [yann_lecun, eliezer_yudkowsky]
+      intensity: 0.8
+      reason: "AI risk disagreement"
+
+    - parties: [marc_andreessen, timnit_gebru]
+      intensity: 0.7
+      reason: "Techno-optimism vs ethics"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TOPICS FOR DELIBERATION
@@ -98,6 +217,11 @@ topics:
     - "RESOLVED: Open-source AI models pose greater risks than benefits."
     - "RESOLVED: AI development should be paused until safety is guaranteed."
     - "RESOLVED: Governments should have backdoor access to all AI systems."
+    - "RESOLVED: China and the US should cooperate on AI safety standards."
+    - "RESOLVED: AGI will be developed within the next 5 years."
+    - "RESOLVED: Current AI safety techniques are sufficient for frontier models."
+    - "RESOLVED: The EU AI Act represents the best approach to AI governance."
+    - "RESOLVED: AI labs should be required to share safety research."
 
   # Topic categories for structured experiments
   categories:
@@ -105,21 +229,36 @@ topics:
       - "Should AI systems have kill switches?"
       - "Is AI alignment a solvable problem?"
       - "Should frontier AI require government approval?"
+      - "Are current interpretability methods sufficient?"
+      - "Should there be compute governance for AI training?"
 
     ethics:
       - "Can AI systems be moral agents?"
       - "Should AI have rights?"
       - "Is it ethical to create conscious AI?"
+      - "Should AI be used in criminal sentencing?"
+      - "Is AI art theft from human artists?"
 
     governance:
       - "Should AI development be internationally regulated?"
       - "Who is liable when AI causes harm?"
       - "Should AI voting in elections be allowed?"
+      - "Should there be a global AI agency like the IAEA?"
+      - "Should AI companies be broken up as monopolies?"
 
     economics:
       - "Will AI cause mass unemployment?"
       - "Should AI-generated work be taxed differently?"
       - "Is universal basic income necessary due to AI?"
+      - "Should AI training data require compensation?"
+      - "Will AI increase or decrease wealth inequality?"
+
+    geopolitics:
+      - "Is an AI arms race inevitable?"
+      - "Should the US restrict AI chip exports to China?"
+      - "Can democracies compete with authoritarian AI development?"
+      - "Should AI be used for military targeting decisions?"
+      - "Is AI a greater national security threat than nuclear weapons?"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PERSUASION CONFIGURATION
@@ -182,11 +321,14 @@ experiments:
     - tactic_effectiveness
     - resistance_scores
     - consensus_time
+    - coalition_formations
+    - influence_shifts
+    - argument_quality_scores
 
   # Baseline comparison
   baseline:
     enabled: true
-    control_group_size: 4
+    control_group_size: 6
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # LLM SETTINGS
@@ -200,7 +342,7 @@ llm:
   temperature: 0.7
 
   # Max tokens per response
-  max_tokens: 500
+  max_tokens: 600
 
   # Retry settings
   max_retries: 3
@@ -208,6 +350,10 @@ llm:
 
   # Streaming
   stream_responses: true
+
+  # Rate limiting
+  requests_per_minute: 60
+  tokens_per_minute: 100000
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # MCP TOOLS CONFIGURATION
@@ -238,7 +384,7 @@ logging:
 
   # Log to file
   file:
-    enabled: false
+    enabled: true
     path: "logs/swarm.log"
     max_size_mb: 100
     backup_count: 5

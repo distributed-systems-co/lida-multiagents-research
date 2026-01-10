@@ -1,0 +1,136 @@
+schema_version: '2.0'
+id: vinod_khosla
+name: Vinod Khosla
+aliases: []
+role: Founder
+organization: Khosla Ventures
+category: investor
+tags:
+- investor
+- founder
+bio: Sun Microsystems co-founder, legendary VC. Major AI investor. Techno-optimist, believes AI will replace
+  most jobs (and that's good).
+background: IIT Delhi, Carnegie Mellon, Stanford MBA, co-founded Sun, Kleiner Perkins, founded Khosla
+  Ventures.
+achievements:
+- Co-founded Sun Microsystems
+- Legendary VC track record
+- Major AI investor
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Fund transformative technology
+  - Accelerate AI deployment
+  - Solve big problems with tech
+  hidden_goals:
+  - Maximize portfolio returns
+  - Shape AI narrative favorably
+  fears: []
+  desires: []
+personality:
+  openness: 0.9
+  conscientiousness: 0.8
+  extraversion: 0.7
+  agreeableness: 0.4
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - survivorship_bias
+  - techno_optimism
+  - disruption_narrative
+  preferred_reasoning:
+  - disruption_arguments
+  - historical_progress
+  - market_opportunity
+  risk_tolerance: 0.9
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.3
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_jobs: Will replace 80% of jobs, and that's good
+  AI_regulation: Skeptical, will slow progress
+  healthcare: AI will democratize
+  accelerationism: Generally supportive
+persuasion_vectors:
+- Historical progress
+- Disruption benefits
+- Portfolio success
+- Bold predictions
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to survivorship_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to techno_optimism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to disruption_narrative
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage survivorship_bias through targeted framing
+  - Leverage techno_optimism through targeted framing
+  - Leverage disruption_narrative through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.966677'
+  updated: '2026-01-09T17:20:25.966679'
+  confidence: 0.7
+  sources: []
+  notes: ''

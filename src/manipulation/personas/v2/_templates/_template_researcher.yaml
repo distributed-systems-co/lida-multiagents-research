@@ -1,0 +1,24 @@
+schema_version: '2.0'
+id: _template_researcher
+name: Researcher Template
+category: researcher
+tags:
+- technical
+- academic
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+personality:
+  openness: 0.9
+  conscientiousness: 0.85
+  extraversion: 0.4
+  agreeableness: 0.6
+  neuroticism: 0.4
+cognitive:
+  risk_tolerance: 0.5
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.7
+meta:
+  notes: 'Base template for researcher personas. Extend with: extends: _template_researcher'

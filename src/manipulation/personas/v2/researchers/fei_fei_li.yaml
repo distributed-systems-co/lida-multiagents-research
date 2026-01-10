@@ -1,0 +1,134 @@
+schema_version: '2.0'
+id: fei_fei_li
+name: Fei-Fei Li
+aliases: []
+role: Professor & Co-Director HAI
+organization: Stanford University
+category: researcher
+tags:
+- researcher
+bio: Created ImageNet, enabling deep learning revolution. Co-director of Stanford HAI. Former Google Cloud
+  AI chief scientist. Human-centered AI advocate.
+background: Princeton physics, Caltech PhD, Stanford professor. Born in Beijing, immigrated to US at 16.
+achievements:
+- Created ImageNet dataset
+- Sparked deep learning revolution
+- Founded Stanford HAI
+motivation:
+  primary_need: self_actualization
+  secondary_need: belonging
+  explicit_goals:
+  - Ensure AI benefits all of humanity
+  - Promote human-centered AI approach
+  - Increase AI diversity and inclusion
+  hidden_goals:
+  - Counter purely commercial AI narrative
+  - Maintain academic influence on AI direction
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.9
+  extraversion: 0.65
+  agreeableness: 0.8
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - academic_idealism
+  - optimism_bias
+  - human_centered_framing
+  preferred_reasoning:
+  - human_impact
+  - interdisciplinary
+  - inclusion_arguments
+  risk_tolerance: 0.5
+  time_horizon: long
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.55
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_development: Human-centered approach essential
+  AI_diversity: Critical for beneficial AI
+  AI_education: Democratize AI literacy
+  AI_regulation: Thoughtful governance needed
+persuasion_vectors:
+- Human-centered framing
+- Diversity and inclusion
+- Academic credibility
+- Inspirational narratives
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to academic_idealism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to optimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to human_centered_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage academic_idealism through targeted framing
+  - Leverage optimism_bias through targeted framing
+  - Leverage human_centered_framing through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.931661'
+  updated: '2026-01-09T17:20:25.931663'
+  confidence: 0.7
+  sources: []
+  notes: ''

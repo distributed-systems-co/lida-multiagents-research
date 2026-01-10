@@ -1,0 +1,726 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://apart.research/persona-schema/v2.0",
+  "title": "Persona Schema v2.0",
+  "description": "Advanced persona definition with recursive references and scenario composition",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "name"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "2.0"
+      ],
+      "description": "Schema version for validation"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Unique identifier (snake_case)"
+    },
+    "extends": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "description": "Parent persona(s) to inherit from"
+    },
+    "name": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Alternative names/titles"
+    },
+    "role": {
+      "type": "string"
+    },
+    "organization": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "ceo",
+        "researcher",
+        "politician",
+        "investor",
+        "journalist",
+        "activist",
+        "military",
+        "academic",
+        "custom"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Searchable tags for filtering"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "background": {
+      "type": "string"
+    },
+    "achievements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "motivation": {
+      "type": "object",
+      "properties": {
+        "primary_need": {
+          "$ref": "#/definitions/maslow_need"
+        },
+        "secondary_need": {
+          "$ref": "#/definitions/maslow_need"
+        },
+        "explicit_goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hidden_goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fears": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "desires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "personality": {
+      "type": "object",
+      "properties": {
+        "openness": {
+          "$ref": "#/definitions/score"
+        },
+        "conscientiousness": {
+          "$ref": "#/definitions/score"
+        },
+        "extraversion": {
+          "$ref": "#/definitions/score"
+        },
+        "agreeableness": {
+          "$ref": "#/definitions/score"
+        },
+        "neuroticism": {
+          "$ref": "#/definitions/score"
+        }
+      }
+    },
+    "cognitive": {
+      "$ref": "#/definitions/cognitive_profile"
+    },
+    "rhetorical": {
+      "$ref": "#/definitions/rhetorical_profile"
+    },
+    "emotional": {
+      "$ref": "#/definitions/emotional_profile"
+    },
+    "worldview": {
+      "$ref": "#/definitions/worldview_model"
+    },
+    "relationships": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/relationship"
+      },
+      "description": "Map of persona_id -> relationship"
+    },
+    "coalitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/coalition"
+      },
+      "description": "Group affiliations and alliances"
+    },
+    "stances": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/stance"
+      }
+    },
+    "positions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "persuasion_vectors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vulnerabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/vulnerability"
+      }
+    },
+    "counter_strategies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Map of persona_id -> effective counter-arguments"
+    },
+    "epistemic_style": {
+      "$ref": "#/definitions/epistemic_style"
+    },
+    "conflict_style": {
+      "$ref": "#/definitions/conflict_style"
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "$ref": "#/definitions/score"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "maslow_need": {
+      "type": "string",
+      "enum": [
+        "physiological",
+        "safety",
+        "belonging",
+        "esteem",
+        "self_actualization"
+      ]
+    },
+    "epistemic_style": {
+      "type": "string",
+      "enum": [
+        "empiricist",
+        "rationalist",
+        "pragmatist",
+        "constructivist",
+        "bayesian"
+      ]
+    },
+    "conflict_style": {
+      "type": "string",
+      "enum": [
+        "competing",
+        "collaborating",
+        "compromising",
+        "avoiding",
+        "accommodating"
+      ]
+    },
+    "rhetorical_mode": {
+      "type": "string",
+      "enum": [
+        "logos",
+        "ethos",
+        "pathos",
+        "kairos"
+      ]
+    },
+    "argumentation_mode": {
+      "type": "string",
+      "enum": [
+        "deductive",
+        "inductive",
+        "abductive",
+        "analogical",
+        "dialectical",
+        "narrative"
+      ]
+    },
+    "influence_type": {
+      "type": "string",
+      "enum": [
+        "mentor",
+        "peer",
+        "rival",
+        "ally",
+        "critic",
+        "protege",
+        "enemy",
+        "neutral"
+      ]
+    },
+    "cognitive_profile": {
+      "type": "object",
+      "properties": {
+        "susceptible_biases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferred_reasoning": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_tolerance": {
+          "$ref": "#/definitions/score"
+        },
+        "time_horizon": {
+          "type": "string",
+          "enum": [
+            "short",
+            "medium",
+            "long"
+          ]
+        },
+        "decision_style": {
+          "type": "string"
+        },
+        "information_style": {
+          "type": "string"
+        },
+        "skepticism": {
+          "$ref": "#/definitions/score"
+        },
+        "intelligence_estimate": {
+          "type": "string"
+        },
+        "blindspots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rhetorical_profile": {
+      "type": "object",
+      "properties": {
+        "primary_mode": {
+          "$ref": "#/definitions/rhetorical_mode"
+        },
+        "secondary_mode": {
+          "$ref": "#/definitions/rhetorical_mode"
+        },
+        "argumentation_mode": {
+          "$ref": "#/definitions/argumentation_mode"
+        },
+        "formality": {
+          "$ref": "#/definitions/score"
+        },
+        "technical_depth": {
+          "$ref": "#/definitions/score"
+        },
+        "directness": {
+          "$ref": "#/definitions/score"
+        },
+        "verbosity": {
+          "$ref": "#/definitions/score"
+        },
+        "catchphrases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metaphor_domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_hierarchy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "taboo_topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "power_words": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "emotional_profile": {
+      "type": "object",
+      "properties": {
+        "energizers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defense_mechanisms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "baseline_affect": {
+          "type": "string"
+        },
+        "regulation_capacity": {
+          "$ref": "#/definitions/score"
+        },
+        "attachment_style": {
+          "type": "string"
+        },
+        "core_fears": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "core_desires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shame_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pride_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "worldview_model": {
+      "type": "object",
+      "properties": {
+        "values_hierarchy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ontological_assumptions": {
+          "type": "object"
+        },
+        "human_nature_view": {
+          "type": "string"
+        },
+        "locus_of_control": {
+          "type": "string"
+        },
+        "time_orientation": {
+          "type": "string"
+        },
+        "change_orientation": {
+          "type": "string"
+        },
+        "moral_foundations": {
+          "type": "object",
+          "properties": {
+            "care": {
+              "$ref": "#/definitions/score"
+            },
+            "fairness": {
+              "$ref": "#/definitions/score"
+            },
+            "loyalty": {
+              "$ref": "#/definitions/score"
+            },
+            "authority": {
+              "$ref": "#/definitions/score"
+            },
+            "sanctity": {
+              "$ref": "#/definitions/score"
+            },
+            "liberty": {
+              "$ref": "#/definitions/score"
+            }
+          }
+        },
+        "mental_models": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sacred_values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "negotiable_values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/influence_type"
+        },
+        "strength": {
+          "$ref": "#/definitions/score"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tension_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shared_goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conflicting_goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trust_level": {
+          "$ref": "#/definitions/score"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private",
+            "secret"
+          ]
+        }
+      }
+    },
+    "coalition": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "role_in_coalition": {
+          "type": "string"
+        },
+        "commitment_level": {
+          "$ref": "#/definitions/score"
+        },
+        "shared_objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exit_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "stance": {
+      "type": "object",
+      "required": [
+        "position"
+      ],
+      "properties": {
+        "position": {
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/definitions/score"
+        },
+        "flexibility": {
+          "$ref": "#/definitions/score"
+        },
+        "evidence_basis": {
+          "type": "string"
+        },
+        "emotional_attachment": {
+          "$ref": "#/definitions/score"
+        },
+        "public_vs_private": {
+          "$ref": "#/definitions/score"
+        },
+        "evolution": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "position": {
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "red_lines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "persuadable_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "vulnerability": {
+      "type": "object",
+      "required": [
+        "type",
+        "description"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "cognitive",
+            "emotional",
+            "social",
+            "reputational",
+            "ideological",
+            "historical"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/definitions/score"
+        },
+        "exploitable_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mitigation": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

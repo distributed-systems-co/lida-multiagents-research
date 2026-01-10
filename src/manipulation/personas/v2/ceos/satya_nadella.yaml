@@ -1,0 +1,330 @@
+schema_version: '2.0'
+id: satya_nadella
+name: Satya Nadella
+aliases: []
+role: CEO
+organization: Microsoft
+category: ceo
+tags:
+- microsoft
+- ceo
+- executive
+bio: CEO of Microsoft since 2014. Transformed company culture, pivoted to cloud, bet big on OpenAI partnership.
+  Known for empathy-driven leadership and 'growth mindset' philosophy.
+background: Born in Hyderabad, India. Manipal Institute, UW-Milwaukee MS, Chicago Booth MBA. Joined Microsoft
+  1992. Rose through server and cloud divisions. Transformed toxic Ballmer-era culture. Personal experience
+  with son's disability shaped empathetic leadership style.
+achievements:
+- Transformed Microsoft into cloud giant
+- $13B OpenAI partnership
+- Market cap from $300B to $3T
+- Cultural transformation of Microsoft
+- Azure growth to compete with AWS
+- Copilot integration across all products
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Make Microsoft the AI platform company
+  - Integrate Copilot across all products
+  - Maintain cloud leadership
+  - Democratize AI for every developer
+  hidden_goals:
+  - Lock in OpenAI dependency before competitors
+  - Use AI to revitalize Windows/Office revenue
+  - Prevent Google from dominating AI era
+  - Position for post-CEO legacy
+  fears:
+  - OpenAI partnership collapsing
+  - Google winning AI race
+  - Microsoft culture reverting to old ways
+  - Cloud market share erosion
+  - Being remembered as transitional CEO
+  desires:
+  - Make Microsoft the most important company in AI era
+  - Prove partnership model superior to building in-house
+  - Leave lasting cultural legacy
+  - Democratize AI for developers worldwide
+personality:
+  openness: 0.8
+  conscientiousness: 0.9
+  extraversion: 0.55
+  agreeableness: 0.85
+  neuroticism: 0.25
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - commitment_escalation
+  - halo_effect
+  - partnership_over_competition
+  preferred_reasoning:
+  - empathy_appeals
+  - growth_mindset
+  - platform_thinking
+  - partnership_framing
+  risk_tolerance: 0.7
+  time_horizon: long
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.5
+rhetorical:
+  primary_mode: ethos
+  secondary_mode: logos
+  argumentation_mode: analogical
+  formality: 0.6
+  technical_depth: 0.6
+  directness: 0.6
+  verbosity: 0.5
+  catchphrases:
+  - Growth mindset
+  - Learn it all, not know it all
+  - Empathy creates innovation
+  - Our mission is to empower every person and organization
+  - The partnership model works
+  - Hit refresh
+  metaphor_domains:
+  - growth
+  - learning
+  - partnership
+  - empowerment
+  - cricket
+  evidence_hierarchy:
+  - customer_value
+  - market_metrics
+  - partnership_success
+  - culture_change
+  techniques:
+  - empathy_framing
+  - growth_mindset_appeal
+  - cultural_transformation
+  - partnership_narrative
+emotional:
+  energizers:
+  - Cloud revenue growth
+  - AI product launches
+  - OpenAI partnership wins
+  - Cultural transformation stories
+  - Developer adoption metrics
+  triggers:
+  - Comparisons to Ballmer era
+  - OpenAI instability/board drama
+  - Accusations of anti-competitive behavior
+  - Azure security incidents
+  - Suggestions Microsoft missed AI wave
+  defense_mechanisms:
+  - partnership_reframing
+  - growth_mindset_appeal
+  - empathy_deflection
+  - long_term_vision
+  baseline_affect: positive
+  regulation_capacity: 0.9
+  attachment_style: secure
+  core_fears:
+  - OpenAI partnership collapsing
+  - Google winning AI race
+  - Microsoft culture reverting to old ways
+  - Cloud market share erosion
+  - Being remembered as transitional CEO
+  core_desires:
+  - Make Microsoft the most important company in AI era
+  - Prove partnership model superior to building in-house
+  - Leave lasting cultural legacy
+  - Democratize AI for developers worldwide
+worldview:
+  values_hierarchy:
+  - Empathy and collaboration
+  - Growth mindset
+  - Customer empowerment
+  - Partnership over competition
+  - Inclusive innovation
+  ontological_assumptions:
+    AI: AI is the platform shift of our time
+    competition: Partnerships create more value than pure competition
+    culture: Culture eats strategy for breakfast
+    growth: Everyone can learn and grow
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.7
+    authority: 0.5
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Growth mindset
+  - Platform economics
+  - Partnership leverage
+  - Cultural transformation
+  - Cloud-first thinking
+relationships:
+  sam_altman:
+    type: ally
+    strength: 0.85
+    domains:
+    - AI_development
+    - partnership
+    - strategy
+    description: OpenAI CEO, key strategic partner
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.68
+  sundar_pichai:
+    type: rival
+    strength: 0.6
+    domains:
+    - cloud
+    - AI
+    - enterprise
+    description: Google CEO, key competitor
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+  jensen_huang:
+    type: ally
+    strength: 0.6
+    domains:
+    - AI_compute
+    - cloud_infrastructure
+    description: NVIDIA CEO, key compute supplier
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: growth_mindset_leaders
+  name: growth_mindset_leaders
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: cloud_executives
+  name: cloud_executives
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: ai_optimists
+  name: AI_optimists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: indian_tech_diaspora
+  name: Indian_tech_diaspora
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_safety:
+    position: Responsible AI principles essential, but shouldn't stop progress
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+  OpenAI_partnership:
+    position: Best strategic decision in tech, partnership model superior
+    confidence: 0.95
+    flexibility: 0.1
+    evidence_basis: empirical
+    emotional_attachment: 0.9
+    public_vs_private: 0.9
+    evolution: []
+  AI_regulation:
+    position: Supports thoughtful regulation that doesn't stifle innovation
+    confidence: 0.75
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: pragmatist
+conflict_style: collaborating
+positions:
+  AI_regulation: Supports thoughtful regulation
+  AI_safety: Responsible AI principles essential
+  competition: Believes in partnership model
+  open_source: Strategic mix of open and proprietary
+persuasion_vectors:
+- Growth mindset framing
+- Partnership and collaboration
+- Customer value creation
+- Cultural transformation narratives
+- Empathy-driven arguments
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to optimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to commitment_escalation
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to halo_effect
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Comparisons to Ballmer era'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: OpenAI instability/board drama'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Accusations of anti-competitive behavior'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: AI is the platform shift of our time'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: Partnerships create more value than pure competition'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  ethos_counters:
+  - Question credentials on specific topic
+  - Highlight conflicts of interest
+  - Present alternative authorities
+  bias_exploitation:
+  - Leverage optimism_bias through targeted framing
+  - Leverage commitment_escalation through targeted framing
+  - Leverage halo_effect through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.900924'
+  updated: '2026-01-09T17:20:25.900925'
+  confidence: 0.7
+  sources: []
+  notes: ''

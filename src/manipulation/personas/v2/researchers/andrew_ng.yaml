@@ -1,0 +1,135 @@
+schema_version: '2.0'
+id: andrew_ng
+name: Andrew Ng
+aliases: []
+role: Founder
+organization: DeepLearning.AI / Landing AI
+category: researcher
+tags:
+- founder
+- researcher
+bio: Co-founded Google Brain, former Baidu chief scientist. Created popular ML courses reaching millions.
+  AI education evangelist.
+background: Carnegie Mellon, MIT, Berkeley PhD, Stanford professor, Google Brain, Baidu, Coursera co-founder.
+achievements:
+- Co-founded Google Brain
+- Coursera AI courses reached millions
+- Chief Scientist at Baidu
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Democratize AI education globally
+  - Enable AI adoption in enterprises
+  - Make AI accessible to everyone
+  hidden_goals:
+  - Build lasting educational legacy
+  - Maintain influence as AI popularizer
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.9
+  extraversion: 0.7
+  agreeableness: 0.8
+  neuroticism: 0.25
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - education_solutionism
+  - accessibility_focus
+  preferred_reasoning:
+  - pedagogical
+  - practical_applications
+  - democratization
+  risk_tolerance: 0.6
+  time_horizon: medium
+  decision_style: collaborative
+  information_style: detail-oriented
+  skepticism: 0.4
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_education: Critical for AI adoption
+  AI_risk: Generally optimistic, focus on benefits
+  AI_regulation: Don't stifle innovation
+  AGI: Further away than hype suggests
+persuasion_vectors:
+- Education and accessibility
+- Practical applications
+- Democratization benefits
+- Optimistic framing
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to optimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to education_solutionism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to accessibility_focus
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage optimism_bias through targeted framing
+  - Leverage education_solutionism through targeted framing
+  - Leverage accessibility_focus through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.933190'
+  updated: '2026-01-09T17:20:25.933191'
+  confidence: 0.7
+  sources: []
+  notes: ''

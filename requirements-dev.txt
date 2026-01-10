@@ -1,0 +1,19 @@
+# Development dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.0.0
+black>=23.0.0
+ruff>=0.1.0
+mypy>=1.0.0
+ipython>=8.0.0
+
+# Optional: MLX support (Apple Silicon only)
+# Uncomment on Apple Silicon machines:
+# mlx-lm>=0.30.2
+# mlx-vlm>=0.3.0
+
+# Optional: Transformers (heavy, not needed for core functionality)
+# transformers>=4.36.0
+
+# Optional: DSPy for advanced prompting
+# dspy-ai>=2.4.0

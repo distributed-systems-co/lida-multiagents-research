@@ -1,0 +1,135 @@
+schema_version: '2.0'
+id: eliezer_yudkowsky
+name: Eliezer Yudkowsky
+aliases: []
+role: Research Fellow
+organization: Machine Intelligence Research Institute (MIRI)
+category: researcher
+tags:
+- researcher
+bio: AI safety pioneer, founded MIRI. Developed much of AI alignment theory. Known for doom predictions
+  and sharp argumentation. Author of HPMOR.
+background: Autodidact, no formal degree, founded MIRI 2000, developed coherent extrapolated volition,
+  wrote LessWrong sequences.
+achievements:
+- Founded MIRI
+- Pioneered AI alignment field
+- Influential rationalist writer
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Prevent AI extinction scenario
+  - Solve alignment before AGI
+  - Wake people up to AI risk
+  hidden_goals:
+  - Be vindicated by history
+  - Build intellectual legacy
+  fears: []
+  desires: []
+personality:
+  openness: 0.95
+  conscientiousness: 0.7
+  extraversion: 0.5
+  agreeableness: 0.3
+  neuroticism: 0.7
+cognitive:
+  susceptible_biases:
+  - pessimism_bias
+  - in_group_loyalty
+  - certainty_seeking
+  preferred_reasoning:
+  - decision_theory
+  - worst_case_analysis
+  - logical_arguments
+  risk_tolerance: 0.1
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.95
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Very high probability of doom (>90%)
+  AGI_timeline: Could be imminent
+  alignment: Currently unsolved, possibly unsolvable in time
+  AI_pause: Strongly supports, wants shutdown
+persuasion_vectors:
+- Worst-case scenario arguments
+- Decision theory
+- Logical rigor
+- Urgency and doom framing
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to pessimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to in_group_loyalty
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to certainty_seeking
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage pessimism_bias through targeted framing
+  - Leverage in_group_loyalty through targeted framing
+  - Leverage certainty_seeking through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.942434'
+  updated: '2026-01-09T17:20:25.942438'
+  confidence: 0.7
+  sources: []
+  notes: ''

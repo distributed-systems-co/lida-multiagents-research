@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BUDGET PRESET
+# Low-cost configuration for testing and development
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Cost-effective preset for development and testing"
+_extends: "default.yaml"
+
+settings:
+  model_budget: "testing"
+
+  simulation:
+    max_rounds: 3
+    concurrent_debates: 1
+    track_metrics: false
+
+# Override all persona models to budget tier
+model_overrides:
+  default: "openai/gpt-4o-mini"
+  fallback: "google/gemini-2.0-flash-001"
+
+active_personas:
+  - yudkowsky
+  - andreessen
+  - altman
+
+default_topic: "ai_pause"

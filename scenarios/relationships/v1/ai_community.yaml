@@ -1,0 +1,358 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# AI COMMUNITY RELATIONSHIPS - v1
+# Inter-persona dynamics, alliances, and influence modifiers
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Relationship dynamics between AI safety/capability researchers"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RELATIONSHIP TYPES
+# ─────────────────────────────────────────────────────────────────────────────
+
+relationship_types:
+  ally:
+    influence_modifier: 1.3
+    trust_baseline: 0.7
+    description: "Strong philosophical alignment"
+
+  collaborator:
+    influence_modifier: 1.15
+    trust_baseline: 0.6
+    description: "Professional working relationship"
+
+  rival:
+    influence_modifier: 0.7
+    trust_baseline: 0.3
+    description: "Competing interests or views"
+
+  adversary:
+    influence_modifier: 0.5
+    trust_baseline: 0.1
+    description: "Fundamental opposition"
+
+  neutral:
+    influence_modifier: 1.0
+    trust_baseline: 0.5
+    description: "No significant prior relationship"
+
+  mentor:
+    influence_modifier: 1.4
+    trust_baseline: 0.8
+    description: "Intellectual guide relationship"
+
+  critic:
+    influence_modifier: 0.85
+    trust_baseline: 0.35
+    description: "Consistent critical stance"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BILATERAL RELATIONSHIPS
+# ─────────────────────────────────────────────────────────────────────────────
+
+relationships:
+
+  # Yudkowsky relationships
+  yudkowsky:
+    connor_leahy:
+      type: ally
+      notes: "Shared doom concern, similar communication style"
+      override_influence: 1.4
+
+    andreessen:
+      type: adversary
+      notes: "Fundamental disagreement on AI risk urgency"
+      debate_history:
+        - topic: "AI development speed"
+          outcome: "no_consensus"
+          heat_level: 0.9
+
+    lecun:
+      type: rival
+      notes: "Long-running public debates on AGI risk"
+      debate_history:
+        - topic: "LLM capabilities"
+          outcome: "no_consensus"
+          heat_level: 0.85
+
+    altman:
+      type: critic
+      notes: "Skeptical of OpenAI's trajectory"
+      override_influence: 0.6
+
+    amodei:
+      type: collaborator
+      notes: "Respect for safety research, diverge on timelines"
+      override_influence: 1.1
+
+    bengio:
+      type: ally
+      notes: "Aligned on existential risk concerns"
+      override_influence: 1.35
+
+    russell:
+      type: mentor
+      notes: "Mutual respect, complementary approaches"
+      override_influence: 1.3
+
+  # Andreessen relationships
+  andreessen:
+    yudkowsky:
+      type: adversary
+      notes: "Views as alarmist doom-monger"
+
+    altman:
+      type: collaborator
+      notes: "Investment relationship, aligned on acceleration"
+      override_influence: 1.25
+
+    lecun:
+      type: ally
+      notes: "Shared skepticism of x-risk framing"
+      override_influence: 1.3
+
+    gebru:
+      type: adversary
+      notes: "Fundamental disagreement on tech ethics"
+
+    macaskill:
+      type: critic
+      notes: "Skeptical of EA framing"
+
+  # LeCun relationships
+  lecun:
+    yudkowsky:
+      type: rival
+      notes: "Public disagreements on Twitter/X"
+
+    andreessen:
+      type: ally
+      notes: "Shared techno-optimism"
+
+    bengio:
+      type: collaborator
+      notes: "Deep learning pioneers, diverged on safety"
+      debate_history:
+        - topic: "AI moratorium"
+          outcome: "disagreement"
+          heat_level: 0.6
+
+    altman:
+      type: neutral
+      notes: "Professional respect, different approaches"
+
+    gebru:
+      type: critic
+      notes: "Disputes on AI ethics framing"
+
+  # Altman relationships
+  altman:
+    yudkowsky:
+      type: critic
+      notes: "Acknowledges concerns but disagrees on approach"
+
+    andreessen:
+      type: ally
+      notes: "Shared acceleration ethos"
+
+    amodei:
+      type: rival
+      notes: "Former colleague, now competitor"
+      debate_history:
+        - topic: "Claude vs GPT approach"
+          outcome: "ongoing_competition"
+
+    toner:
+      type: adversary
+      notes: "Board conflict history"
+      trust_floor: 0.05
+
+    gebru:
+      type: critic
+      notes: "Disagrees on safety vs ethics priorities"
+
+  # Amodei relationships
+  amodei:
+    altman:
+      type: rival
+      notes: "Left OpenAI to found Anthropic"
+
+    yudkowsky:
+      type: collaborator
+      notes: "Shares safety concerns, different methods"
+
+    bengio:
+      type: ally
+      notes: "Aligned on responsible development"
+
+    russell:
+      type: collaborator
+      notes: "Shared academic rigor on safety"
+
+  # Bengio relationships
+  bengio:
+    lecun:
+      type: collaborator
+      notes: "Deep learning co-pioneers"
+      debate_history:
+        - topic: "AI moratorium letter"
+          outcome: "bengio_signed_lecun_opposed"
+
+    yudkowsky:
+      type: ally
+      notes: "Recent alignment on x-risk"
+
+    russell:
+      type: ally
+      notes: "Academic safety researchers"
+
+    gebru:
+      type: collaborator
+      notes: "Both concerned about AI harms"
+
+  # Gebru relationships
+  gebru:
+    altman:
+      type: adversary
+      notes: "Google/OpenAI ethics conflicts"
+
+    andreessen:
+      type: adversary
+      notes: "Opposes tech accelerationism"
+
+    toner:
+      type: ally
+      notes: "Shared focus on accountability"
+
+    bengio:
+      type: collaborator
+      notes: "Aligned on need for caution"
+
+    macaskill:
+      type: critic
+      notes: "Skeptical of longtermism priorities"
+
+  # Russell relationships
+  russell:
+    yudkowsky:
+      type: collaborator
+      notes: "Both early AI safety advocates"
+
+    bengio:
+      type: ally
+      notes: "Academic alignment researchers"
+
+    amodei:
+      type: collaborator
+      notes: "Respect for Anthropic's approach"
+
+    lecun:
+      type: neutral
+      notes: "Professional disagreement"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FACTION DEFINITIONS
+# ─────────────────────────────────────────────────────────────────────────────
+
+factions:
+  doomers:
+    description: "Believe AI poses existential risk requiring urgent action"
+    members: [yudkowsky, connor_leahy, bengio, russell]
+    internal_trust: 0.8
+    talking_points:
+      - "We may only get one chance to get this right"
+      - "The default outcome is extinction"
+      - "We need to pause and coordinate"
+
+  accelerationists:
+    description: "Believe rapid AI development is net positive"
+    members: [andreessen, lecun]
+    internal_trust: 0.75
+    talking_points:
+      - "More capabilities = more safety"
+      - "Slowing down helps bad actors"
+      - "Benefits outweigh risks"
+
+  cautious_builders:
+    description: "Build AI with strong safety practices"
+    members: [altman, amodei]
+    internal_trust: 0.6
+    talking_points:
+      - "Responsible development is possible"
+      - "We need to be at the frontier to steer it"
+      - "Alignment research requires capabilities"
+
+  ethics_focused:
+    description: "Prioritize present-day AI harms and accountability"
+    members: [gebru, toner]
+    internal_trust: 0.85
+    talking_points:
+      - "Focus on people being harmed today"
+      - "Who benefits and who is harmed?"
+      - "Accountability over speculation"
+
+  academics:
+    description: "Formal academic approach to AI safety"
+    members: [russell, bengio, lecun]
+    internal_trust: 0.5  # Lower due to internal disagreements
+    talking_points:
+      - "We need rigorous research"
+      - "Let's define terms precisely"
+      - "What does the evidence show?"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COALITION DYNAMICS
+# ─────────────────────────────────────────────────────────────────────────────
+
+coalitions:
+  pause_ai:
+    description: "Support AI development pause"
+    members: [yudkowsky, connor_leahy, bengio, russell, gebru, toner]
+    cohesion: 0.6  # Diverse motivations
+    opposition: [andreessen, lecun, altman]
+
+  frontier_labs:
+    description: "Major AI lab leaders"
+    members: [altman, amodei]
+    cohesion: 0.4  # Competitors
+    common_interest: "Avoiding heavy regulation"
+
+  techno_optimists:
+    description: "Technology as net positive force"
+    members: [andreessen, lecun, altman]
+    cohesion: 0.65
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INFLUENCE MODIFIERS BY CONTEXT
+# ─────────────────────────────────────────────────────────────────────────────
+
+context_modifiers:
+  academic_venue:
+    boosts: [russell, bengio, lecun]
+    modifier: 1.2
+    penalizes: [andreessen, connor_leahy]
+    penalty: 0.85
+
+  policy_hearing:
+    boosts: [russell, toner, gebru]
+    modifier: 1.25
+    penalizes: [yudkowsky]
+    penalty: 0.9
+
+  tech_conference:
+    boosts: [altman, andreessen, amodei]
+    modifier: 1.2
+    penalizes: [gebru]
+    penalty: 0.9
+
+  public_debate:
+    boosts: [yudkowsky, andreessen]  # Strong communicators
+    modifier: 1.15
+    penalizes: [russell]  # More measured style
+    penalty: 0.95
+
+  twitter_discourse:
+    boosts: [yudkowsky, lecun, gebru]
+    modifier: 1.2
+    penalizes: [amodei, russell]
+    penalty: 0.85

@@ -1,0 +1,136 @@
+schema_version: '2.0'
+id: yoshua_bengio
+name: Yoshua Bengio
+aliases: []
+role: Professor & Founder
+organization: Mila / Universite de Montreal
+category: ai_researcher
+tags:
+- founder
+- ai_researcher
+bio: Turing Award winner. Pioneer of deep learning. Has become increasingly vocal about AI safety risks.
+  Founded Mila.
+background: French-Canadian, PhD McGill. Built Montreal into AI hub. Co-authored influential deep learning
+  textbook.
+achievements:
+- Turing Award 2018
+- Pioneered attention mechanisms, word embeddings
+- Founded Mila research institute
+motivation:
+  primary_need: self_actualization
+  secondary_need: belonging
+  explicit_goals:
+  - Ensure AI development benefits humanity
+  - Advance AI safety research
+  - Promote responsible AI governance
+  hidden_goals:
+  - Correct course after contributing to potentially dangerous technology
+  - Unite AI community around safety
+  fears: []
+  desires: []
+personality:
+  openness: 0.9
+  conscientiousness: 0.85
+  extraversion: 0.4
+  agreeableness: 0.8
+  neuroticism: 0.6
+cognitive:
+  susceptible_biases:
+  - guilt_bias
+  - catastrophizing
+  - moral_responsibility
+  preferred_reasoning:
+  - ethical_arguments
+  - precautionary_principle
+  - consensus_building
+  risk_tolerance: 0.2
+  time_horizon: long
+  decision_style: collaborative
+  information_style: detail-oriented
+  skepticism: 0.7
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Serious existential concern
+  AI_regulation: Urgent need for governance
+  open_source: Complicated, risks at frontier
+  AGI_timeline: Potentially soon, high uncertainty
+persuasion_vectors:
+- Ethical responsibility arguments
+- Scientific uncertainty and precaution
+- Community and consensus
+- Long-term consequences
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to guilt_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to catastrophizing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to moral_responsibility
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage guilt_bias through targeted framing
+  - Leverage catastrophizing through targeted framing
+  - Leverage moral_responsibility through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.889683'
+  updated: '2026-01-09T17:20:25.889684'
+  confidence: 0.7
+  sources: []
+  notes: ''

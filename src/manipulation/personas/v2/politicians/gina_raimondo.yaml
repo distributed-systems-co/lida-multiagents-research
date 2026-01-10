@@ -1,0 +1,134 @@
+schema_version: '2.0'
+id: gina_raimondo
+name: Gina Raimondo
+aliases: []
+role: Secretary of Commerce
+organization: US Department of Commerce
+category: politician
+tags:
+- politician
+bio: Commerce Secretary, key figure in AI chip export controls and AI governance. Former Rhode Island
+  Governor. Managing CHIPS Act implementation.
+background: Harvard, Yale Law, Oxford Rhodes Scholar, venture capitalist, RI Treasurer, Governor 2015-2021.
+achievements:
+- Implemented AI chip export controls
+- Leading CHIPS Act implementation
+- Key AI governance figure
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Maintain US AI/chip leadership
+  - Implement effective export controls
+  - Balance innovation and security
+  hidden_goals:
+  - Position Commerce as AI regulator
+  - Build tech policy credentials
+  fears: []
+  desires: []
+personality:
+  openness: 0.7
+  conscientiousness: 0.9
+  extraversion: 0.7
+  agreeableness: 0.6
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - policy_optimism
+  - bureaucratic_framing
+  - competitiveness_focus
+  preferred_reasoning:
+  - national_security
+  - economic_competitiveness
+  - diplomatic_arguments
+  risk_tolerance: 0.5
+  time_horizon: medium
+  decision_style: collaborative
+  information_style: detail-oriented
+  skepticism: 0.55
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  export_controls: Essential for national security
+  CHIPS_Act: Critical investment
+  China: Strategic competition
+  AI_governance: Commerce should lead
+persuasion_vectors:
+- National security
+- Economic competitiveness
+- Strategic framing
+- Bipartisan support
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to policy_optimism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to bureaucratic_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to competitiveness_focus
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage policy_optimism through targeted framing
+  - Leverage bureaucratic_framing through targeted framing
+  - Leverage competitiveness_focus through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.952967'
+  updated: '2026-01-09T17:20:25.952968'
+  confidence: 0.7
+  sources: []
+  notes: ''

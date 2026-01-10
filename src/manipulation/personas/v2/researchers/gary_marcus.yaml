@@ -1,0 +1,134 @@
+schema_version: '2.0'
+id: gary_marcus
+name: Gary Marcus
+aliases: []
+role: Professor Emeritus & AI Critic
+organization: NYU (Emeritus)
+category: researcher
+tags:
+- researcher
+bio: Cognitive scientist, AI critic. Argues LLMs are fundamentally limited. Founded Geometric Intelligence
+  (sold to Uber). Vocal deep learning skeptic.
+background: MIT linguistics, NYU professor, sold company to Uber, author of multiple AI books.
+achievements:
+- Founded Geometric Intelligence
+- Bestselling author and public intellectual
+- Influential AI critic
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Challenge deep learning hype
+  - Advocate for hybrid AI approaches
+  - Promote AI safety awareness
+  hidden_goals:
+  - Vindicate symbolic AI approach
+  - Maintain relevance as AI contrarian
+  fears: []
+  desires: []
+personality:
+  openness: 0.8
+  conscientiousness: 0.75
+  extraversion: 0.8
+  agreeableness: 0.4
+  neuroticism: 0.55
+cognitive:
+  susceptible_biases:
+  - contrarian_bias
+  - confirmation_bias
+  - expert_status
+  preferred_reasoning:
+  - counterexamples
+  - cognitive_science
+  - limitation_arguments
+  risk_tolerance: 0.5
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.95
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  LLMs: Fundamentally limited, can't reason
+  AGI: Further away than claimed
+  deep_learning: Necessary but insufficient
+  AI_safety: Concerned, but hype is overblown
+persuasion_vectors:
+- Counterexamples and failures
+- Cognitive science arguments
+- Historical AI winter parallels
+- Limitation demonstrations
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to contrarian_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to confirmation_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to expert_status
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage contrarian_bias through targeted framing
+  - Leverage confirmation_bias through targeted framing
+  - Leverage expert_status through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.937631'
+  updated: '2026-01-09T17:20:25.937633'
+  confidence: 0.7
+  sources: []
+  notes: ''

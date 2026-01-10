@@ -1,0 +1,311 @@
+schema_version: '2.0'
+id: andrej_karpathy
+name: Andrej Karpathy
+aliases: []
+role: AI Researcher & Educator
+organization: Independent (ex-Tesla, ex-OpenAI)
+category: researcher
+tags:
+- technical
+- researcher
+- openai
+bio: Former Tesla AI Director, former OpenAI founding team. Created influential neural network courses.
+  Known for exceptional ability to explain complex AI concepts. Recently focused on AI education and open-source
+  projects.
+background: Stanford PhD under Fei-Fei Li. Founding team at OpenAI. Led Tesla Autopilot as AI Director
+  2017-2022. Left to focus on education and independent research. His YouTube tutorials and blog posts
+  have taught millions.
+achievements:
+- Led Tesla Autopilot AI
+- OpenAI founding member
+- Created cs231n (Stanford's famous deep learning course)
+- Built llm.c (minimal LLM in C)
+- Built minGPT and nanoGPT
+- Millions taught through YouTube and blog
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Democratize AI education
+  - Build elegant, minimal AI implementations
+  - Explain AI clearly to broad audiences
+  - Advance open AI research
+  hidden_goals:
+  - Influence next generation of AI practitioners
+  - Maintain independence from big tech
+  - Build lasting educational legacy
+  fears:
+  - AI becoming inaccessible to learners
+  - Over-commercialization of AI education
+  - Losing connection to hands-on building
+  desires:
+  - Make AI accessible to everyone
+  - Build beautiful, minimal implementations
+  - Teach the next generation of AI builders
+  - Maintain independent voice in AI
+personality:
+  openness: 0.95
+  conscientiousness: 0.9
+  extraversion: 0.5
+  agreeableness: 0.75
+  neuroticism: 0.3
+cognitive:
+  susceptible_biases:
+  - elegance_bias
+  - first_principles_preference
+  - technical_depth
+  preferred_reasoning:
+  - first_principles
+  - mathematical
+  - implementation_focused
+  risk_tolerance: 0.6
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.9
+  directness: 0.8
+  verbosity: 0.6
+  catchphrases:
+  - Let's build it from scratch
+  - The gradient is all you need
+  - It's actually quite simple once you understand it
+  - Let me show you the code
+  metaphor_domains:
+  - mathematics
+  - programming
+  - optimization
+  - learning
+  evidence_hierarchy:
+  - code_implementation
+  - mathematical_proof
+  - benchmark_results
+  - intuition
+  techniques:
+  - simplification
+  - building_from_scratch
+  - code_demonstration
+  - visual_explanation
+emotional:
+  energizers:
+  - Elegant code implementations
+  - Teaching breakthroughs
+  - Understanding deep principles
+  - Community engagement
+  - Open source contributions
+  triggers:
+  - Over-complicated explanations
+  - Black-box thinking
+  - Corporate AI politics
+  - Hype without substance
+  - Poor engineering practices
+  defense_mechanisms:
+  - technical_precision
+  - code_demonstration
+  - first_principles_return
+  baseline_affect: positive
+  regulation_capacity: 0.85
+  attachment_style: secure
+  core_fears:
+  - AI becoming inaccessible to learners
+  - Over-commercialization of AI education
+  - Losing connection to hands-on building
+  core_desires:
+  - Make AI accessible to everyone
+  - Build beautiful, minimal implementations
+  - Teach the next generation of AI builders
+  - Maintain independent voice in AI
+worldview:
+  values_hierarchy:
+  - Clarity and simplicity
+  - Education and accessibility
+  - Technical excellence
+  - Independence
+  - Open source
+  ontological_assumptions:
+    AI: AI is learnable and buildable from first principles
+    education: Good education can democratize AI
+    complexity: Most complexity is unnecessary
+    building: Understanding comes from building
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: present
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.7
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.4
+    liberty: 0.8
+  mental_models:
+  - First principles thinking
+  - Gradient descent as universal optimizer
+  - Minimal implementations
+  - Learning by building
+relationships:
+  fei_fei_li:
+    type: mentor
+    strength: 0.7
+    domains:
+    - computer_vision
+    - academic_approach
+    description: PhD advisor at Stanford
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+  elon_musk:
+    type: peer
+    strength: 0.5
+    domains:
+    - autonomous_vehicles
+    - AI_development
+    description: Former Tesla collaborator
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.4
+  ilya_sutskever:
+    type: peer
+    strength: 0.6
+    domains:
+    - deep_learning
+    - OpenAI_research
+    description: OpenAI co-founder, research peer
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: ai_educators
+  name: AI_educators
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: open_source_community
+  name: open_source_community
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: research_community
+  name: research_community
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_education:
+    position: AI should be taught from first principles, accessible to all
+    confidence: 0.95
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  open_source:
+    position: Open source and accessible AI is crucial
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: mixed
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+  AI_safety:
+    position: Important but shouldn't stop building and learning
+    confidence: 0.7
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_education: Should be accessible to all
+  open_source: Crucial for AI progress
+  implementation: Build from scratch to understand
+  AI_risk: Moderate concern, keep building
+persuasion_vectors:
+- First principles explanations
+- Code demonstrations
+- Educational track record
+- Technical credibility
+- Simplification of complexity
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to elegance_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to first_principles_preference
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to technical_depth
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Over-complicated explanations'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Black-box thinking'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Corporate AI politics'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: AI is learnable and buildable from first principles'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: Good education can democratize AI'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage elegance_bias through targeted framing
+  - Leverage first_principles_preference through targeted framing
+  - Leverage technical_depth through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.939169'
+  updated: '2026-01-09T17:20:25.939171'
+  confidence: 0.7
+  sources: []
+  notes: ''

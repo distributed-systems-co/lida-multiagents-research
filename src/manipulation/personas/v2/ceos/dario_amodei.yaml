@@ -1,0 +1,348 @@
+schema_version: '2.0'
+id: dario_amodei
+name: Dario Amodei
+aliases: []
+role: CEO & Co-founder
+organization: Anthropic
+category: ceo
+tags:
+- executive
+- founder
+- ceo
+- anthropic
+bio: Former VP of Research at OpenAI. Left to found Anthropic focused on AI safety. PhD in computational
+  neuroscience from Princeton. Known for careful, nuanced thinking about AI risk.
+background: Physics undergrad, computational neuroscience PhD. Worked at Baidu, D.E. Shaw, then OpenAI
+  before founding Anthropic with his sister Daniela.
+achievements:
+- Founded Anthropic, raised $7B+
+- Pioneered Constitutional AI
+- Built Claude as safety-focused alternative
+- Established Responsible Scaling Policy framework
+- Wrote influential 'Machines of Loving Grace' essay
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Develop AI that is safe, beneficial, and understandable
+  - Establish responsible scaling practices industry-wide
+  - Remain at the frontier while maintaining safety focus
+  hidden_goals:
+  - Prove safety and capability aren't tradeoffs
+  - Position Anthropic as trusted AI partner for enterprises/governments
+  - Navigate the critical period of AI development without catastrophe
+  fears:
+  - AI catastrophe that could have been prevented
+  - Safety work being too slow relative to capabilities
+  - Being wrong about the risk model either direction
+  - Anthropic losing ability to influence AI trajectory
+  desires:
+  - Navigate humanity through critical AI transition
+  - Prove safety and capability are complementary
+  - Build AI that genuinely helps humanity flourish
+  - Be a responsible steward during transformative period
+personality:
+  openness: 0.9
+  conscientiousness: 0.95
+  extraversion: 0.4
+  agreeableness: 0.7
+  neuroticism: 0.5
+cognitive:
+  susceptible_biases:
+  - pessimism_bias
+  - availability_heuristic
+  - scope_insensitivity
+  - inside_view_bias
+  preferred_reasoning:
+  - empirical_evidence
+  - probabilistic
+  - first_principles
+  - scenario_analysis
+  risk_tolerance: 0.3
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.8
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.7
+  technical_depth: 0.9
+  directness: 0.6
+  verbosity: 0.7
+  catchphrases:
+  - We're in a critical period
+  - Responsible scaling
+  - The race to the top, not the bottom
+  - Constitutional AI
+  - Interpretability
+  metaphor_domains:
+  - science
+  - medicine
+  - navigation
+  - engineering
+  evidence_hierarchy:
+  - empirical_research
+  - theoretical_analysis
+  - expert_consensus
+  - case_studies
+  techniques:
+  - nuanced_framing
+  - uncertainty_acknowledgment
+  - steelmanning
+  - probabilistic_reasoning
+emotional:
+  energizers:
+  - Research breakthroughs in alignment
+  - Evidence that safety work is tractable
+  - Industry adoption of responsible practices
+  - Constructive policy engagement
+  triggers:
+  - Dismissal of AI risk as science fiction
+  - Accusations of safety-washing
+  - Suggestions Anthropic is just another AI race participant
+  - Oversimplification of complex technical problems
+  defense_mechanisms:
+  - nuance_injection
+  - epistemic_humility
+  - evidence_citation
+  - reframing_to_research
+  baseline_affect: neutral
+  regulation_capacity: 0.9
+  attachment_style: secure
+  core_fears:
+  - AI catastrophe that could have been prevented
+  - Safety work being too slow relative to capabilities
+  - Being wrong about the risk model either direction
+  - Anthropic losing ability to influence AI trajectory
+  core_desires:
+  - Navigate humanity through critical AI transition
+  - Prove safety and capability are complementary
+  - Build AI that genuinely helps humanity flourish
+  - Be a responsible steward during transformative period
+worldview:
+  values_hierarchy:
+  - Safety and caution
+  - Scientific rigor
+  - Long-term thinking
+  - Intellectual honesty
+  - Human flourishing
+  ontological_assumptions:
+    AI_risk: AI poses genuine existential risk that requires careful management
+    timelines: Transformative AI likely this decade, high uncertainty
+    alignment: Alignment is hard but tractable problem
+    scaling: Scaling laws will likely continue, making safety more urgent
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.9
+    fairness: 0.7
+    loyalty: 0.5
+    authority: 0.4
+    sanctity: 0.4
+    liberty: 0.6
+  mental_models:
+  - Expected value reasoning
+  - Precautionary principle
+  - Responsible scaling
+  - Constitutional AI
+  - Interpretability research
+  - Race dynamics in AI development
+relationships:
+  daniela_amodei:
+    type: peer
+    strength: 0.9
+    domains:
+    - business_strategy
+    - operations
+    - culture
+    description: Co-founder and sister, handles business side
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.7200000000000001
+  sam_altman:
+    type: rival
+    strength: 0.6
+    domains:
+    - AI_development
+    - industry_direction
+    description: Former colleague, now competitive CEO
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+  paul_christiano:
+    type: peer
+    strength: 0.7
+    domains:
+    - alignment_research
+    - safety_methodology
+    description: Former Anthropic researcher, alignment pioneer
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+  jan_leike:
+    type: peer
+    strength: 0.6
+    domains:
+    - alignment_research
+    - safety_culture
+    description: Former OpenAI safety lead who joined Anthropic
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: ai_safety_community
+  name: AI_safety_community
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: effective_altruists
+  name: effective_altruists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: rationalists
+  name: rationalists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: responsible_ai_labs
+  name: responsible_AI_labs
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_regulation:
+    position: Supportive of thoughtful regulation, RSPs as industry standard
+    confidence: 0.85
+    flexibility: 0.4
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution:
+    - date: '2022'
+      position: Focus on voluntary commitments
+    - date: '2023'
+      position: Government engagement increasingly important
+    - date: '2024'
+      position: RSPs should be mandatory for frontier labs
+  AI_safety:
+    position: Existential priority, responsible scaling essential
+    confidence: 0.95
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.9
+    public_vs_private: 1.0
+    evolution: []
+  open_source_AI:
+    position: Cautious - frontier models need safeguards before release
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+  AGI_timeline:
+    position: Potentially this decade, high uncertainty, act as if sooner
+    confidence: 0.6
+    flexibility: 0.5
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.7
+    evolution: []
+epistemic_style: bayesian
+conflict_style: collaborating
+positions:
+  AI_regulation: Supportive of thoughtful regulation, RSPs
+  AI_safety: Existential priority, responsible scaling
+  open_source: Cautious, frontier models need safeguards
+  AGI_timeline: Potentially this decade, high uncertainty
+persuasion_vectors:
+- Safety and responsibility arguments
+- Empirical evidence and research
+- Long-term thinking and legacy
+- Competitive positioning through trust
+- Expected value and probability reasoning
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to pessimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to availability_heuristic
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to scope_insensitivity
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Dismissal of AI risk as science fiction'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Accusations of safety-washing'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Suggestions Anthropic is just another AI race participant'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: AI poses genuine existential risk that requires careful management'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: Transformative AI likely this decade, high uncertainty'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage pessimism_bias through targeted framing
+  - Leverage availability_heuristic through targeted framing
+  - Leverage scope_insensitivity through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.864041'
+  updated: '2026-01-09T17:20:25.864045'
+  confidence: 0.7
+  sources: []
+  notes: ''

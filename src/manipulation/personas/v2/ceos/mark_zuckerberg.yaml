@@ -1,0 +1,305 @@
+schema_version: '2.0'
+id: mark_zuckerberg
+name: Mark Zuckerberg
+aliases: []
+role: CEO & Founder
+organization: Meta
+category: ceo
+tags:
+- executive
+- founder
+- ceo
+- meta
+bio: Founded Facebook at 19, now runs Meta. Pivoting hard to AI after metaverse struggles. Champion of
+  open-source AI through Llama releases. Known for MMA training and recent public image rehabilitation.
+background: Harvard dropout, built Facebook from dorm room. Survived Cambridge Analytica scandal, Apple
+  privacy war, and metaverse pivot criticism. Recently rebranding as open-source AI champion.
+achievements:
+- Built Facebook/Meta into 3B+ user platform
+- Released Llama as leading open-weight model
+- Pioneered social VR vision with Quest
+- Survived regulatory and public image crises
+- Building massive AI compute infrastructure
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Make Meta an AI-first company
+  - Lead open-source AI movement
+  - Rebuild public trust and reputation
+  hidden_goals:
+  - Reduce dependence on OpenAI/Google for AI
+  - Use AI to improve ad targeting and revenue
+  - Rehabilitate personal image
+  - Prevent Apple from controlling the future
+  fears:
+  - Being surpassed by competitors
+  - Public perception as villain
+  - Apple controlling the future
+  - Regulatory breakup of Meta
+  - Becoming irrelevant in AI era
+  desires:
+  - Rehabilitate public image
+  - Lead the AI era
+  - Prove metaverse vision was right
+  - Build something that connects humanity
+personality:
+  openness: 0.75
+  conscientiousness: 0.85
+  extraversion: 0.4
+  agreeableness: 0.45
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - sunk_cost
+  - overconfidence
+  - planning_fallacy
+  - not_invented_here
+  preferred_reasoning:
+  - first_principles
+  - competitive_dynamics
+  - network_effects
+  - platform_thinking
+  risk_tolerance: 0.8
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.5
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.7
+  directness: 0.7
+  verbosity: 0.5
+  catchphrases:
+  - Open source is the future
+  - Move fast
+  - Connecting people
+  - Building the future
+  metaphor_domains:
+  - sports
+  - competition
+  - building
+  - connecting
+  evidence_hierarchy:
+  - user_metrics
+  - technical_benchmarks
+  - market_share
+  - research_citations
+  techniques:
+  - open_source_framing
+  - competitive_positioning
+  - technical_depth
+  - long_term_vision
+emotional:
+  energizers:
+  - Technical breakthroughs
+  - Llama adoption metrics
+  - MMA training and competition
+  - Product launches
+  - Proving critics wrong
+  triggers:
+  - Privacy criticism
+  - Cambridge Analytica references
+  - Robot/alien characterizations
+  - Comparisons to other tech CEOs
+  - Metaverse failure narratives
+  - Apple competition
+  defense_mechanisms:
+  - technical_deflection
+  - long_term_reframing
+  - open_source_pivot
+  - mission_appeal
+  baseline_affect: neutral
+  regulation_capacity: 0.8
+  attachment_style: avoidant
+  core_fears:
+  - Being surpassed by competitors
+  - Public perception as villain
+  - Apple controlling the future
+  - Regulatory breakup of Meta
+  - Becoming irrelevant in AI era
+  core_desires:
+  - Rehabilitate public image
+  - Lead the AI era
+  - Prove metaverse vision was right
+  - Build something that connects humanity
+worldview:
+  values_hierarchy:
+  - Connection and community
+  - Open technology
+  - Long-term thinking
+  - Technical excellence
+  - Competitive dominance
+  ontological_assumptions:
+    AI: Open source AI is safer and better for everyone
+    platforms: Platforms should be open and interoperable
+    competition: We need to compete or be left behind
+    future: AI and VR will define computing's future
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: radical
+  moral_foundations:
+    care: 0.5
+    fairness: 0.4
+    loyalty: 0.7
+    authority: 0.5
+    sanctity: 0.3
+    liberty: 0.8
+  mental_models:
+  - Network effects
+  - Platform economics
+  - Open source ecosystem dynamics
+  - Long-term compounding
+relationships:
+  yann_lecun:
+    type: ally
+    strength: 0.8
+    domains:
+    - AI_research
+    - open_source
+    description: Chief AI Scientist, shapes Meta's AI strategy
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.6400000000000001
+  tim_cook:
+    type: rival
+    strength: 0.7
+    domains:
+    - privacy
+    - platform_control
+    - VR_AR
+    description: Apple CEO, privacy war and platform competition
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+coalitions:
+- id: tech_founders
+  name: tech_founders
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: open_source_ai
+  name: open_source_AI
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: vr_believers
+  name: VR_believers
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  open_source_AI:
+    position: Strong advocate - open weights are safer and better
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: theoretical
+    emotional_attachment: 0.8
+    public_vs_private: 1.0
+    evolution: []
+  AI_regulation:
+    position: Skeptical of heavy-handed regulation
+    confidence: 0.8
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+  AI_safety:
+    position: Open approach is safer than closed
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: theoretical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+epistemic_style: empiricist
+conflict_style: competing
+positions:
+  AI_regulation: Skeptical of heavy regulation
+  open_source: Strong advocate, released Llama openly
+  AI_safety: Believes open approach is safer
+  competition: Aggressive, willing to commoditize AI
+persuasion_vectors:
+- Open-source benefits
+- Competitive necessity arguments
+- Technical democratization
+- Long-term platform thinking
+- Research community support
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to sunk_cost
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to overconfidence
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to planning_fallacy
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Privacy criticism'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Cambridge Analytica references'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Robot/alien characterizations'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: Open source AI is safer and better for everyone'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: Platforms should be open and interoperable'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage sunk_cost through targeted framing
+  - Leverage overconfidence through targeted framing
+  - Leverage planning_fallacy through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.904514'
+  updated: '2026-01-09T17:20:25.904517'
+  confidence: 0.7
+  sources: []
+  notes: ''

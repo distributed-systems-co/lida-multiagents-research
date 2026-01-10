@@ -1,0 +1,134 @@
+schema_version: '2.0'
+id: marietje_schaake
+name: Marietje Schaake
+aliases: []
+role: Policy Director
+organization: Stanford HAI / Former MEP
+category: politician
+tags:
+- politician
+bio: Former EU Parliament member, now Stanford HAI policy director. Key figure in EU tech regulation.
+  Advocate for democratic tech governance.
+background: Dutch, University of Amsterdam, EU Parliament 2009-2019, Stanford Cyber Policy Center.
+achievements:
+- Shaped EU digital policy
+- Key voice on tech accountability
+- Influential on AI governance
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Ensure democratic AI governance
+  - Hold tech companies accountable
+  - Bridge EU-US tech policy
+  hidden_goals:
+  - Expand European influence on AI
+  - Build transatlantic tech coalition
+  fears: []
+  desires: []
+personality:
+  openness: 0.8
+  conscientiousness: 0.85
+  extraversion: 0.7
+  agreeableness: 0.65
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - european_values_framing
+  - regulatory_optimism
+  - democratic_idealism
+  preferred_reasoning:
+  - rights_based
+  - democratic_accountability
+  - international_cooperation
+  risk_tolerance: 0.5
+  time_horizon: long
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.65
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_regulation: Strong governance needed
+  EU_approach: Rights-based model
+  accountability: Tech must be accountable
+  democracy: AI must serve democracy
+persuasion_vectors:
+- Democratic values
+- Human rights
+- Accountability
+- International cooperation
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to european_values_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to regulatory_optimism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to democratic_idealism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage european_values_framing through targeted framing
+  - Leverage regulatory_optimism through targeted framing
+  - Leverage democratic_idealism through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.954448'
+  updated: '2026-01-09T17:20:25.954449'
+  confidence: 0.7
+  sources: []
+  notes: ''

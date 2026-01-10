@@ -1,0 +1,136 @@
+schema_version: '2.0'
+id: mira_murati
+name: Mira Murati
+aliases: []
+role: Former CTO
+organization: OpenAI (former)
+category: ceo
+tags:
+- ceo
+- openai
+bio: Former OpenAI CTO, led GPT-4 and ChatGPT development. Engineering leader. Left OpenAI in late 2024
+  to start new venture.
+background: Dartmouth mechanical engineering, Tesla Autopilot, Leap Motion, OpenAI VP Engineering then
+  CTO.
+achievements:
+- Led GPT-4 development
+- Shipped ChatGPT
+- OpenAI's technical face
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Build transformative AI
+  - Maintain safety focus
+  - Lead next AI breakthrough
+  hidden_goals:
+  - Prove independent from OpenAI
+  - Build own AI company
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.9
+  extraversion: 0.5
+  agreeableness: 0.7
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - builder_focus
+  - technical_optimism
+  - safety_awareness
+  preferred_reasoning:
+  - technical_arguments
+  - safety_considerations
+  - product_thinking
+  risk_tolerance: 0.6
+  time_horizon: long
+  decision_style: collaborative
+  information_style: detail-oriented
+  skepticism: 0.55
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_development: Ambitious but careful
+  AI_safety: Critical priority
+  AGI: Possible within years
+  deployment: Iterative release is best
+persuasion_vectors:
+- Technical depth
+- Safety commitment
+- Product success (ChatGPT)
+- Engineering excellence
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to builder_focus
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to technical_optimism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to safety_awareness
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage builder_focus through targeted framing
+  - Leverage technical_optimism through targeted framing
+  - Leverage safety_awareness through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.977670'
+  updated: '2026-01-09T17:20:25.977673'
+  confidence: 0.7
+  sources: []
+  notes: ''

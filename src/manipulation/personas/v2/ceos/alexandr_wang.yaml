@@ -1,0 +1,136 @@
+schema_version: '2.0'
+id: alexandr_wang
+name: Alexandr Wang
+aliases: []
+role: CEO & Founder
+organization: Scale AI
+category: ceo
+tags:
+- executive
+- founder
+- ceo
+bio: Founded Scale AI at 19. Built leading data labeling platform for AI. Major defense and enterprise
+  contracts. Youngest self-made billionaire.
+background: MIT dropout, Quora engineer at 17, founded Scale at 19. Defense tech advocate.
+achievements:
+- Built Scale to $14B valuation
+- Major DoD/government contracts
+- Youngest self-made billionaire
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Make Scale the data infrastructure for AI
+  - Support US AI/defense leadership
+  - Enable enterprise AI adoption
+  hidden_goals:
+  - Become essential to AI supply chain
+  - Expand into model evaluation/safety
+  fears: []
+  desires: []
+personality:
+  openness: 0.8
+  conscientiousness: 0.9
+  extraversion: 0.6
+  agreeableness: 0.5
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - youth_confidence
+  - national_security_framing
+  - growth_at_all_costs
+  preferred_reasoning:
+  - infrastructure_arguments
+  - national_security
+  - market_size
+  risk_tolerance: 0.8
+  time_horizon: medium
+  decision_style: directive
+  information_style: detail-oriented
+  skepticism: 0.5
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  defense_AI: Critical for US security
+  AI_regulation: Support sensible guardrails
+  data_quality: Data is the bottleneck
+  US_China: US must maintain lead
+persuasion_vectors:
+- Data infrastructure arguments
+- National security framing
+- Market opportunity
+- Quality and scale
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to youth_confidence
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to national_security_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to growth_at_all_costs
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage youth_confidence through targeted framing
+  - Leverage national_security_framing through targeted framing
+  - Leverage growth_at_all_costs through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.923605'
+  updated: '2026-01-09T17:20:25.923610'
+  confidence: 0.7
+  sources: []
+  notes: ''

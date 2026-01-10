@@ -1,0 +1,136 @@
+schema_version: '2.0'
+id: arthur_mensch
+name: Arthur Mensch
+aliases: []
+role: CEO & Co-founder
+organization: Mistral AI
+category: ceo
+tags:
+- executive
+- founder
+- ceo
+bio: Ex-DeepMind researcher, founded Mistral in Paris. Building European AI champion. Known for efficiency
+  and open-weight releases.
+background: École Polytechnique, ENS, worked at Google DeepMind on Chinchilla scaling laws.
+achievements:
+- Raised €600M+ in first year
+- Released efficient open models
+- Made Mistral European AI leader
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Build European AI independence
+  - Prove smaller models can compete
+  - Champion open model approach
+  hidden_goals:
+  - Challenge US AI dominance
+  - Influence EU AI policy favorably
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.9
+  extraversion: 0.5
+  agreeableness: 0.55
+  neuroticism: 0.35
+cognitive:
+  susceptible_biases:
+  - efficiency_bias
+  - european_exceptionalism
+  - underdog_mentality
+  preferred_reasoning:
+  - efficiency_arguments
+  - technical_elegance
+  - open_source_benefits
+  risk_tolerance: 0.75
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_regulation: EU AI Act is workable
+  open_source: Strong advocate, open weights
+  efficiency: Size isn't everything
+  sovereignty: Europe needs AI independence
+persuasion_vectors:
+- Technical efficiency
+- European sovereignty
+- Open-source benefits
+- Underdog narrative
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to efficiency_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to european_exceptionalism
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to underdog_mentality
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage efficiency_bias through targeted framing
+  - Leverage european_exceptionalism through targeted framing
+  - Leverage underdog_mentality through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.918737'
+  updated: '2026-01-09T17:20:25.918738'
+  confidence: 0.7
+  sources: []
+  notes: ''

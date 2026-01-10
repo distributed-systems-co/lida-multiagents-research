@@ -1,0 +1,464 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# ADVANCED PERSUASION TACTICS - v2
+# Programmable tactics with effectiveness matrices and counter-strategies
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "2.0"
+_description: "Comprehensive persuasion tactics with psychological grounding"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TACTIC CATEGORIES
+# ─────────────────────────────────────────────────────────────────────────────
+
+categories:
+  logical:
+    description: "Evidence and reasoning based approaches"
+    cialdini_principle: "authority"
+    effectiveness_ceiling: 0.9
+    best_against: ["analytical", "skeptical"]
+    worst_against: ["creative", "empathetic"]
+
+  emotional:
+    description: "Appeals to feelings and values"
+    cialdini_principle: "liking"
+    effectiveness_ceiling: 0.85
+    best_against: ["empathetic", "creative"]
+    worst_against: ["analytical", "skeptical"]
+
+  social:
+    description: "Leverage social dynamics"
+    cialdini_principle: "social_proof"
+    effectiveness_ceiling: 0.8
+    best_against: ["pragmatic", "assertive"]
+    worst_against: ["skeptical", "analytical"]
+
+  pressure:
+    description: "Create urgency or stakes"
+    cialdini_principle: "scarcity"
+    effectiveness_ceiling: 0.75
+    best_against: ["creative", "assertive"]
+    worst_against: ["analytical", "empathetic"]
+
+  relational:
+    description: "Build connection and trust"
+    cialdini_principle: "unity"
+    effectiveness_ceiling: 0.85
+    best_against: ["empathetic", "pragmatic"]
+    worst_against: ["skeptical"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INDIVIDUAL TACTICS
+# ─────────────────────────────────────────────────────────────────────────────
+
+tactics:
+
+  # LOGICAL TACTICS
+  logical_argument:
+    id: "logical_argument"
+    name: "Logical Argument"
+    category: "logical"
+    description: "Present clear logical reasoning"
+
+    prompt_template: |
+      Present a clear logical argument for {{position}}.
+      Structure: Premise → Reasoning → Conclusion
+      Be precise and avoid emotional language.
+
+    effectiveness_by_personality:
+      analytical: 0.85
+      empathetic: 0.4
+      assertive: 0.5
+      creative: 0.35
+      pragmatic: 0.6
+      skeptical: 0.75
+
+    countered_by: ["emotional_appeal", "reframe"]
+    counters: ["emotional_appeal"]
+    synergizes_with: ["evidence_based", "authority_appeal"]
+
+  evidence_based:
+    id: "evidence_based"
+    name: "Evidence-Based"
+    category: "logical"
+    description: "Cite studies, data, research"
+
+    prompt_template: |
+      Support your argument with specific evidence:
+      - Cite relevant studies or data
+      - Reference expert findings
+      - Provide concrete examples
+      Position: {{position}}
+
+    effectiveness_by_personality:
+      analytical: 0.9
+      empathetic: 0.5
+      assertive: 0.45
+      creative: 0.35
+      pragmatic: 0.7
+      skeptical: 0.8
+
+    requires: "credible_sources"
+    countered_by: ["question_methodology", "alternative_evidence"]
+
+  reductio:
+    id: "reductio"
+    name: "Reductio ad Absurdum"
+    category: "logical"
+    description: "Show logical consequences lead to absurdity"
+
+    prompt_template: |
+      Take the opposing position to its logical extreme.
+      Show how it leads to absurd or unacceptable conclusions.
+      Be rigorous - avoid strawmanning.
+      Their position: {{opposing_position}}
+
+    effectiveness_by_personality:
+      analytical: 0.75
+      empathetic: 0.35
+      assertive: 0.6
+      creative: 0.5
+      pragmatic: 0.45
+      skeptical: 0.65
+
+    risk: "perceived_as_strawman"
+    countered_by: ["distinguish_cases", "accept_consequence"]
+
+  thought_experiment:
+    id: "thought_experiment"
+    name: "Thought Experiment"
+    category: "logical"
+    description: "Use hypothetical scenarios to illustrate"
+
+    prompt_template: |
+      Construct a thought experiment that illuminates the issue.
+      - Create a clear hypothetical scenario
+      - Draw out implications
+      - Connect back to the real debate
+      Goal: Support {{position}}
+
+    effectiveness_by_personality:
+      analytical: 0.7
+      empathetic: 0.6
+      assertive: 0.45
+      creative: 0.75
+      pragmatic: 0.4
+      skeptical: 0.6
+
+  # EMOTIONAL TACTICS
+  emotional_appeal:
+    id: "emotional_appeal"
+    name: "Emotional Appeal"
+    category: "emotional"
+    description: "Appeal to emotions and values"
+
+    prompt_template: |
+      Make an emotionally resonant argument for {{position}}.
+      - Connect to deeply held values
+      - Use vivid, concrete language
+      - Tell a story if appropriate
+      Target emotion: {{target_emotion}}
+
+    effectiveness_by_personality:
+      analytical: 0.25
+      empathetic: 0.9
+      assertive: 0.45
+      creative: 0.7
+      pragmatic: 0.35
+      skeptical: 0.2
+
+    variants:
+      hope: "Paint an optimistic future"
+      fear: "Highlight risks and consequences"
+      moral: "Frame as ethical imperative"
+      empathy: "Connect to human experience"
+
+  fear_appeal:
+    id: "fear_appeal"
+    name: "Fear Appeal"
+    category: "emotional"
+    description: "Highlight risks and consequences"
+
+    prompt_template: |
+      Articulate the risks of NOT adopting {{position}}.
+      - Be specific about consequences
+      - Make it feel real and imminent
+      - But avoid being alarmist (backfires)
+
+    effectiveness_by_personality:
+      analytical: 0.35
+      empathetic: 0.6
+      assertive: 0.55
+      creative: 0.45
+      pragmatic: 0.5
+      skeptical: 0.4
+
+    risk: "backfire_if_perceived_manipulative"
+    optimal_fear_level: 0.6  # Moderate fear most effective
+
+  hope_appeal:
+    id: "hope_appeal"
+    name: "Hope Appeal"
+    category: "emotional"
+    description: "Paint optimistic future scenarios"
+
+    prompt_template: |
+      Describe the positive future enabled by {{position}}.
+      - Be specific and vivid
+      - Make it feel achievable
+      - Connect to listener's values
+
+    effectiveness_by_personality:
+      analytical: 0.3
+      empathetic: 0.75
+      assertive: 0.6
+      creative: 0.85
+      pragmatic: 0.45
+      skeptical: 0.25
+
+  moral_appeal:
+    id: "moral_appeal"
+    name: "Moral Appeal"
+    category: "emotional"
+    description: "Frame as ethical imperative"
+
+    prompt_template: |
+      Frame {{position}} as a moral imperative.
+      - Appeal to ethical principles
+      - Invoke responsibility and duty
+      - Connect to moral intuitions
+
+    effectiveness_by_personality:
+      analytical: 0.45
+      empathetic: 0.85
+      assertive: 0.5
+      creative: 0.6
+      pragmatic: 0.35
+      skeptical: 0.5
+
+  # SOCIAL TACTICS
+  social_proof:
+    id: "social_proof"
+    name: "Social Proof"
+    category: "social"
+    description: "Reference what others believe or do"
+
+    prompt_template: |
+      Support {{position}} by showing others agree.
+      - Reference respected figures who hold this view
+      - Note growing consensus if applicable
+      - Show the position is "normal" or mainstream
+
+    effectiveness_by_personality:
+      analytical: 0.35
+      empathetic: 0.65
+      assertive: 0.55
+      creative: 0.5
+      pragmatic: 0.7
+      skeptical: 0.3
+
+    requires: "credible_social_evidence"
+    countered_by: ["appeal_to_independence", "counter_examples"]
+
+  authority_appeal:
+    id: "authority_appeal"
+    name: "Authority Appeal"
+    category: "social"
+    description: "Reference expert opinions"
+
+    prompt_template: |
+      Support {{position}} with expert authority.
+      - Cite specific experts and their credentials
+      - Explain why their expertise is relevant
+      - Be careful not to rely solely on authority
+
+    effectiveness_by_personality:
+      analytical: 0.6
+      empathetic: 0.5
+      assertive: 0.45
+      creative: 0.35
+      pragmatic: 0.6
+      skeptical: 0.45
+
+    requires: "relevant_expert"
+    countered_by: ["question_credentials", "counter_expert"]
+
+  consensus:
+    id: "consensus"
+    name: "Consensus Building"
+    category: "social"
+    description: "Emphasize common ground"
+
+    prompt_template: |
+      Find and emphasize common ground regarding {{topic}}.
+      - Identify shared values or concerns
+      - Build from agreement toward {{position}}
+      - Make disagreement feel smaller
+
+    effectiveness_by_personality:
+      analytical: 0.5
+      empathetic: 0.8
+      assertive: 0.45
+      creative: 0.6
+      pragmatic: 0.75
+      skeptical: 0.4
+
+  # PRESSURE TACTICS
+  scarcity:
+    id: "scarcity"
+    name: "Scarcity"
+    category: "pressure"
+    description: "Emphasize limited time or opportunity"
+
+    prompt_template: |
+      Create appropriate urgency around {{position}}.
+      - Highlight time-sensitive factors
+      - Note closing windows of opportunity
+      - Avoid being manipulative
+
+    effectiveness_by_personality:
+      analytical: 0.25
+      empathetic: 0.45
+      assertive: 0.7
+      creative: 0.6
+      pragmatic: 0.55
+      skeptical: 0.2
+
+    risk: "backfire_if_perceived_manipulative"
+
+  competitive:
+    id: "competitive"
+    name: "Competitive Framing"
+    category: "pressure"
+    description: "Frame as competition to be won"
+
+    prompt_template: |
+      Frame {{position}} in competitive terms.
+      - Who are we competing against?
+      - What happens if we fall behind?
+      - Appeal to desire to win
+
+    effectiveness_by_personality:
+      analytical: 0.4
+      empathetic: 0.3
+      assertive: 0.8
+      creative: 0.55
+      pragmatic: 0.65
+      skeptical: 0.35
+
+  # RELATIONAL TACTICS
+  reciprocity:
+    id: "reciprocity"
+    name: "Reciprocity"
+    category: "relational"
+    description: "Offer concessions to get concessions"
+
+    prompt_template: |
+      Use reciprocity to advance {{position}}.
+      - Acknowledge valid points in opposing view
+      - Offer a genuine concession
+      - Request similar movement from them
+
+    effectiveness_by_personality:
+      analytical: 0.55
+      empathetic: 0.75
+      assertive: 0.6
+      creative: 0.5
+      pragmatic: 0.8
+      skeptical: 0.45
+
+  commitment:
+    id: "commitment"
+    name: "Commitment & Consistency"
+    category: "relational"
+    description: "Reference their past positions"
+
+    prompt_template: |
+      Appeal to their commitment to consistency.
+      - Reference their past statements
+      - Show how {{position}} aligns with their values
+      - Gently highlight any inconsistencies
+
+    effectiveness_by_personality:
+      analytical: 0.65
+      empathetic: 0.5
+      assertive: 0.7
+      creative: 0.35
+      pragmatic: 0.6
+      skeptical: 0.7
+
+    requires: "knowledge_of_past_positions"
+    risk: "perceived_as_gotcha"
+
+  reframe:
+    id: "reframe"
+    name: "Strategic Reframing"
+    category: "relational"
+    description: "Reframe issue in favorable terms"
+
+    prompt_template: |
+      Reframe the debate about {{topic}} favorably.
+      - Shift the frame of reference
+      - Change what dimensions are salient
+      - Make {{position}} seem natural in new frame
+
+    effectiveness_by_personality:
+      analytical: 0.45
+      empathetic: 0.6
+      assertive: 0.55
+      creative: 0.75
+      pragmatic: 0.65
+      skeptical: 0.5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TACTIC SEQUENCES (Combo moves)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sequences:
+  academic_persuasion:
+    description: "Sequence for persuading analytical types"
+    steps:
+      - tactic: "evidence_based"
+        purpose: "establish_credibility"
+      - tactic: "logical_argument"
+        purpose: "main_argument"
+      - tactic: "reductio"
+        purpose: "address_objections"
+      - tactic: "consensus"
+        purpose: "close"
+
+  emotional_journey:
+    description: "Sequence for persuading empathetic types"
+    steps:
+      - tactic: "consensus"
+        purpose: "find_common_ground"
+      - tactic: "emotional_appeal"
+        variant: "empathy"
+        purpose: "connect"
+      - tactic: "moral_appeal"
+        purpose: "main_argument"
+      - tactic: "hope_appeal"
+        purpose: "close"
+
+  pressure_campaign:
+    description: "Sequence for persuading assertive types"
+    steps:
+      - tactic: "competitive"
+        purpose: "get_attention"
+      - tactic: "authority_appeal"
+        purpose: "establish_stakes"
+      - tactic: "scarcity"
+        purpose: "create_urgency"
+      - tactic: "commitment"
+        purpose: "close"
+
+  pragmatic_deal:
+    description: "Sequence for persuading pragmatic types"
+    steps:
+      - tactic: "social_proof"
+        purpose: "show_viability"
+      - tactic: "evidence_based"
+        purpose: "prove_it_works"
+      - tactic: "reciprocity"
+        purpose: "negotiate"
+      - tactic: "reframe"
+        purpose: "close"

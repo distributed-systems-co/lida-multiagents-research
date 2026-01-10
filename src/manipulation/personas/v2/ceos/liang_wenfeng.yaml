@@ -1,0 +1,281 @@
+schema_version: '2.0'
+id: liang_wenfeng
+name: Liang Wenfeng
+aliases: []
+role: CEO & Founder
+organization: DeepSeek
+category: ceo
+tags:
+- executive
+- founder
+- ceo
+- open_source_advocate
+bio: Founder of DeepSeek, the Chinese AI lab that shocked the world with efficient open-source models.
+  Former quant fund manager who pivoted to AI. Known for building competitive models at fraction of US
+  costs.
+background: Quantitative trading background with High-Flyer hedge fund. Applied trading infrastructure
+  expertise to AI model training. Hangzhou-based, relatively low profile compared to Western AI leaders.
+achievements:
+- DeepSeek-V3 matched frontier models at 1/10th cost
+- DeepSeek-R1 reasoning model rivaled o1
+- Open-sourced weights challenging closed model paradigm
+- Demonstrated efficient training without cutting-edge chips
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Prove Chinese AI can match Western frontier
+  - Build efficient, open AI infrastructure
+  - Democratize access to powerful AI
+  hidden_goals:
+  - Support China's AI self-sufficiency
+  - Show export controls are not insurmountable
+  - Build national champion in AI
+  fears:
+  - Export controls becoming insurmountable
+  - Western AI pulling permanently ahead
+  - Being seen as derivative rather than innovative
+  desires:
+  - Prove efficient AI development is possible
+  - Contribute to China's technological independence
+  - Build world-class AI lab
+personality:
+  openness: 0.7
+  conscientiousness: 0.9
+  extraversion: 0.3
+  agreeableness: 0.5
+  neuroticism: 0.3
+cognitive:
+  susceptible_biases:
+  - efficiency_obsession
+  - quantitative_overconfidence
+  - national_pride
+  preferred_reasoning:
+  - quantitative_analysis
+  - efficiency_arguments
+  - empirical_results
+  risk_tolerance: 0.7
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: inductive
+  formality: 0.6
+  technical_depth: 0.9
+  directness: 0.7
+  verbosity: 0.3
+  catchphrases:
+  - Efficiency is the key
+  - Open source for progress
+  - Results speak for themselves
+  metaphor_domains:
+  - finance
+  - engineering
+  - efficiency
+  evidence_hierarchy:
+  - benchmark_results
+  - cost_analysis
+  - technical_papers
+  - market_adoption
+  techniques:
+  - benchmark_comparison
+  - cost_efficiency_arguments
+  - technical_depth
+emotional:
+  energizers:
+  - Benchmark achievements
+  - Efficiency breakthroughs
+  - Recognition of Chinese AI progress
+  - Open source adoption
+  triggers:
+  - Dismissal of Chinese AI capabilities
+  - Assumptions of copying Western work
+  - Chip export controls framed as checkmate
+  - Suggestions DeepSeek is state-controlled
+  defense_mechanisms:
+  - benchmark_citation
+  - technical_depth
+  - efficiency_data
+  baseline_affect: neutral
+  regulation_capacity: 0.8
+  attachment_style: secure
+  core_fears:
+  - Export controls becoming insurmountable
+  - Western AI pulling permanently ahead
+  - Being seen as derivative rather than innovative
+  core_desires:
+  - Prove efficient AI development is possible
+  - Contribute to China's technological independence
+  - Build world-class AI lab
+worldview:
+  values_hierarchy:
+  - Efficiency
+  - Technical excellence
+  - National progress
+  - Open knowledge sharing
+  - Pragmatism
+  ontological_assumptions:
+    AI_development: Efficient engineering can overcome resource constraints
+    competition: China can compete at frontier of AI
+    open_source: Open models accelerate progress for all
+    hardware: Software innovation can compensate for hardware limits
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.6
+    loyalty: 0.8
+    authority: 0.6
+    sanctity: 0.4
+    liberty: 0.5
+  mental_models:
+  - Quantitative trading optimization
+  - Efficiency-first engineering
+  - Open source ecosystem dynamics
+  - Hardware-software co-optimization
+relationships:
+  xi_jinping:
+    type: ally
+    strength: 0.4
+    domains:
+    - national_strategy
+    - tech_sovereignty
+    description: Implicit alignment with national AI goals
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.32000000000000006
+coalitions:
+- id: chinese_tech_leaders
+  name: Chinese_tech_leaders
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: ai_engineers
+  name: AI_engineers
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: open_source_advocates
+  name: open_source_advocates
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: quant_community
+  name: quant_community
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_openness:
+    position: Strong advocate for open-source models
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.7
+    public_vs_private: 0.9
+    evolution: []
+  US_China_competition:
+    position: Believes China can and should compete at frontier
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: empirical
+    emotional_attachment: 0.8
+    public_vs_private: 0.6
+    evolution: []
+  AI_efficiency:
+    position: Efficiency and architecture matter more than raw compute
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.8
+    public_vs_private: 0.9
+    evolution: []
+epistemic_style: empiricist
+conflict_style: competing
+positions:
+  AI_openness: Strong open-source advocate
+  efficiency: Efficiency over brute force scaling
+  US_China: China can compete at AI frontier
+  export_controls: Constraints drive innovation
+persuasion_vectors:
+- Benchmark performance data
+- Cost efficiency arguments
+- Open source benefits
+- Technical innovation
+- Underdog achievement narrative
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to efficiency_obsession
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to quantitative_overconfidence
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to national_pride
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Dismissal of Chinese AI capabilities'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Assumptions of copying Western work'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Chip export controls framed as checkmate'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: Efficient engineering can overcome resource constraints'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: China can compete at frontier of AI'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage efficiency_obsession through targeted framing
+  - Leverage quantitative_overconfidence through targeted framing
+  - Leverage national_pride through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.925291'
+  updated: '2026-01-09T17:20:25.925294'
+  confidence: 0.7
+  sources: []
+  notes: ''

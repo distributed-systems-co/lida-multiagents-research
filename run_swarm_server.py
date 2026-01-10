@@ -79,22 +79,52 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# Extended palettes for 24+ agents
 AGENT_PALETTES = [
+    # Row 1: Warm colors
     {"color": "#FF6B6B", "bg": "#2D1F1F", "name": "Coral"},
+    {"color": "#F8B500", "bg": "#2D261F", "name": "Amber"},
+    {"color": "#FF8C00", "bg": "#2D221F", "name": "Orange"},
+    {"color": "#FFD93D", "bg": "#2D2A1F", "name": "Sunflower"},
+    # Row 2: Cool blues/greens
     {"color": "#4ECDC4", "bg": "#1F2D2B", "name": "Teal"},
     {"color": "#45B7D1", "bg": "#1F252D", "name": "Sky"},
-    {"color": "#96CEB4", "bg": "#222D25", "name": "Sage"},
-    {"color": "#DDA0DD", "bg": "#2D1F2D", "name": "Plum"},
-    {"color": "#F7DC6F", "bg": "#2D2B1F", "name": "Gold"},
-    {"color": "#BB8FCE", "bg": "#251F2D", "name": "Lavender"},
     {"color": "#85C1E9", "bg": "#1F252D", "name": "Azure"},
-    {"color": "#F8B500", "bg": "#2D261F", "name": "Amber"},
     {"color": "#00CED1", "bg": "#1F2D2D", "name": "Cyan"},
-    {"color": "#FF8C00", "bg": "#2D221F", "name": "Orange"},
+    # Row 3: Greens
+    {"color": "#96CEB4", "bg": "#222D25", "name": "Sage"},
     {"color": "#98FB98", "bg": "#1F2D1F", "name": "Mint"},
+    {"color": "#2ECC71", "bg": "#1F2D22", "name": "Emerald"},
+    {"color": "#58D68D", "bg": "#1F2D20", "name": "Spring"},
+    # Row 4: Purples/Pinks
+    {"color": "#DDA0DD", "bg": "#2D1F2D", "name": "Plum"},
+    {"color": "#BB8FCE", "bg": "#251F2D", "name": "Lavender"},
+    {"color": "#E74C3C", "bg": "#2D1F1F", "name": "Ruby"},
+    {"color": "#F7DC6F", "bg": "#2D2B1F", "name": "Gold"},
+    # Row 5: Additional variety
+    {"color": "#3498DB", "bg": "#1F222D", "name": "Ocean"},
+    {"color": "#9B59B6", "bg": "#251F2D", "name": "Violet"},
+    {"color": "#1ABC9C", "bg": "#1F2D28", "name": "Turquoise"},
+    {"color": "#E67E22", "bg": "#2D231F", "name": "Carrot"},
+    # Row 6: More colors for 24+
+    {"color": "#F39C12", "bg": "#2D281F", "name": "Marigold"},
+    {"color": "#16A085", "bg": "#1F2D26", "name": "Pine"},
+    {"color": "#8E44AD", "bg": "#231F2D", "name": "Grape"},
+    {"color": "#2980B9", "bg": "#1F232D", "name": "Cobalt"},
+    # Row 7: Extended set
+    {"color": "#D35400", "bg": "#2D1F1F", "name": "Pumpkin"},
+    {"color": "#27AE60", "bg": "#1F2D1F", "name": "Forest"},
+    {"color": "#C0392B", "bg": "#2D1F1F", "name": "Crimson"},
+    {"color": "#7D3C98", "bg": "#241F2D", "name": "Amethyst"},
 ]
 
-AGENT_ICONS = ["◆", "●", "▲", "■", "★", "◈", "◉", "⬟", "⬡", "◐", "◑", "▼"]
+# Extended icons for 24+ agents
+AGENT_ICONS = [
+    "◆", "●", "▲", "■", "★", "◈", "◉", "⬟",
+    "⬡", "◐", "◑", "▼", "◇", "○", "△", "□",
+    "☆", "◎", "⬢", "◖", "◗", "▽", "◊", "⬠",
+    "✦", "✧", "⬣", "◯", "▷", "◁", "▶", "◀",
+]
 
 PERSONALITY_INFO = {
     "the_scholar": {"emoji": "📚", "short": "Scholar", "trait": "analytical"},
@@ -495,30 +525,34 @@ class SwarmOrchestrator:
         agents_cfg = CONFIG.get("agents", {})
         delib_cfg = CONFIG.get("deliberation", {})
         persuasion_cfg = CONFIG.get("persuasion", {})
+        dynamics_cfg = CONFIG.get("dynamics", {})
+        relationships_cfg = CONFIG.get("relationships", {})
 
-        self.num_agents = min(num_agents or agents_cfg.get("count", 8), 12)
+        # Support up to 32 concurrent agents
+        self.num_agents = min(num_agents or agents_cfg.get("count", 8), 32)
         self.live_mode = live_mode
         self.tools_mode = tools_mode
 
         self.agents: Dict[str, Agent] = {}
-        self.messages: deque = deque(maxlen=200)
-        self.tool_calls: deque = deque(maxlen=100)
+        self.messages: deque = deque(maxlen=500)  # Increased for more agents
+        self.tool_calls: deque = deque(maxlen=200)
         self.start_time = time.time()
 
         # Deliberation state (from config)
         self.current_topic = ""
         self.phase = ""
         self.current_round = 0
-        self.max_rounds = delib_cfg.get("max_rounds", int(os.getenv("MAX_ROUNDS", "5")))
+        self.max_rounds = delib_cfg.get("max_rounds", int(os.getenv("MAX_ROUNDS", "7")))
         self.phase_delays = delib_cfg.get("phase_delays", {
-            "analyzing": 0.8,
-            "discussing": 0.5,
-            "debating": 0.3,
-            "voting": 0.5,
-            "synthesizing": 0.8,
+            "analyzing": 0.5,
+            "discussing": 0.3,
+            "debating": 0.2,
+            "voting": 0.4,
+            "synthesizing": 0.6,
+            "coalition_forming": 0.3,
         })
         self.auto_start = delib_cfg.get("auto_start", True)
-        self.auto_start_delay = delib_cfg.get("auto_start_delay", 5)
+        self.auto_start_delay = delib_cfg.get("auto_start_delay", 3)
         self.consensus: Dict[str, int] = {}
         self.deliberation_active = False
         self.paused = False  # Pause control
@@ -533,9 +567,58 @@ class SwarmOrchestrator:
         # Agent positions (FOR/AGAINST/UNDECIDED)
         self.agent_positions: Dict[str, str] = {}
         self.position_history: Dict[str, List[str]] = {}  # Track position changes
+        self.position_confidence: Dict[str, float] = {}  # Confidence in position
 
         # Belief dynamics (sophisticated tracking)
         self.belief_states: Dict[str, BeliefState] = {}  # agent_id -> belief state
+
+        # ═══════════════════════════════════════════════════════════════════════
+        # SOCIAL DYNAMICS - Coalition, Influence, and Relationships
+        # ═══════════════════════════════════════════════════════════════════════
+
+        # Coalition tracking
+        coalitions_cfg = dynamics_cfg.get("coalitions", {})
+        self.coalitions_enabled = coalitions_cfg.get("enabled", True)
+        self.active_coalitions: List[Dict] = []  # [{name, members, position, strength}]
+        self.coalition_history: List[Dict] = []
+        self.coalition_min_size = coalitions_cfg.get("min_size", 3)
+        self.coalition_formation_threshold = coalitions_cfg.get("formation_threshold", 0.7)
+
+        # Influence network
+        influence_cfg = dynamics_cfg.get("influence", {})
+        self.influence_enabled = influence_cfg.get("enabled", True)
+        self.agent_influence: Dict[str, float] = {}  # agent_id -> influence score
+        self.influence_category_weights = influence_cfg.get("category_weights", {
+            "ceo": 1.2,
+            "researcher": 1.0,
+            "politician": 1.1,
+            "investor": 0.9,
+            "journalist": 0.8,
+            "activist": 0.7,
+        })
+        self.influence_decay_rate = influence_cfg.get("decay_rate", 0.05)
+        self.influence_validation_boost = influence_cfg.get("validation_boost", 0.15)
+
+        # Belief contagion
+        contagion_cfg = dynamics_cfg.get("belief_contagion", {})
+        self.belief_contagion_enabled = contagion_cfg.get("enabled", True)
+        self.susceptibility_base = contagion_cfg.get("susceptibility_base", 0.3)
+        self.personality_susceptibility_modifiers = contagion_cfg.get("personality_modifiers", {
+            "the_scholar": -0.15,
+            "the_pragmatist": 0.0,
+            "the_creative": 0.1,
+            "the_skeptic": -0.2,
+            "the_mentor": 0.05,
+            "the_synthesizer": 0.15,
+        })
+
+        # Pre-defined relationships (alliances and rivalries)
+        self.alliances = relationships_cfg.get("alliances", [])
+        self.rivalries = relationships_cfg.get("rivalries", [])
+        self.relationship_matrix: Dict[str, Dict[str, float]] = {}  # agent_id -> {other_id: affinity}
+
+        # Argumentation quality tracking
+        self.argument_scores: Dict[str, List[float]] = {}  # agent_id -> [scores]
 
         # The Persuader meta-game (using config)
         self.persuader = Persuader()
@@ -573,6 +656,8 @@ class SwarmOrchestrator:
 
         # Initialize
         self._create_agents()
+        self._init_relationships()
+        self._init_influence_scores()
 
     def _create_agents(self):
         """Create diverse agent swarm with real-world personas or archetypes."""
@@ -760,6 +845,193 @@ class SwarmOrchestrator:
                 prompt_subcategory=prompt.subcategory if prompt else "",
                 prompt_text=prompt.text if prompt else "",
             )
+
+    def _init_relationships(self):
+        """Initialize relationship matrix from config alliances and rivalries."""
+        # Initialize empty relationships for all agents
+        for agent_id in self.agents:
+            self.relationship_matrix[agent_id] = {}
+            for other_id in self.agents:
+                if agent_id != other_id:
+                    self.relationship_matrix[agent_id][other_id] = 0.0  # Neutral
+
+        # Map agent names to IDs for relationship lookup
+        name_to_id = {}
+        for agent_id, agent in self.agents.items():
+            # Use persona ID (from prompt_category or name slug)
+            name_slug = agent.name.lower().replace(" ", "_").replace("-", "_")
+            name_to_id[name_slug] = agent_id
+            # Also map full name
+            name_to_id[agent.name.lower()] = agent_id
+
+        # Apply alliances (positive relationships)
+        for alliance in self.alliances:
+            members = alliance.get("members", [])
+            strength = alliance.get("strength", 0.5)
+            alliance_name = alliance.get("name", "Unknown Alliance")
+
+            member_ids = [name_to_id.get(m.lower(), None) for m in members]
+            member_ids = [m for m in member_ids if m is not None]
+
+            for i, agent_id in enumerate(member_ids):
+                for other_id in member_ids:
+                    if agent_id != other_id and agent_id in self.relationship_matrix:
+                        self.relationship_matrix[agent_id][other_id] = strength
+
+            if member_ids:
+                logger.info(f"Alliance '{alliance_name}': {len(member_ids)} members linked")
+
+        # Apply rivalries (negative relationships)
+        for rivalry in self.rivalries:
+            parties = rivalry.get("parties", [])
+            intensity = rivalry.get("intensity", 0.5)
+            reason = rivalry.get("reason", "")
+
+            party_ids = [name_to_id.get(p.lower(), None) for p in parties]
+            party_ids = [p for p in party_ids if p is not None]
+
+            for i, agent_id in enumerate(party_ids):
+                for other_id in party_ids:
+                    if agent_id != other_id and agent_id in self.relationship_matrix:
+                        self.relationship_matrix[agent_id][other_id] = -intensity
+
+            if len(party_ids) >= 2:
+                logger.info(f"Rivalry: {parties[0]} vs {parties[1]} ({reason})")
+
+    def _init_influence_scores(self):
+        """Initialize influence scores based on agent categories."""
+        for agent_id, agent in self.agents.items():
+            # Get category from prompt_category or map from personality
+            category = agent.prompt_category.lower() if agent.prompt_category else "researcher"
+
+            # Get base influence from category weights
+            base_influence = self.influence_category_weights.get(category, 1.0)
+
+            # Add some variance
+            variance = random.uniform(-0.1, 0.1)
+            self.agent_influence[agent_id] = max(0.3, min(1.5, base_influence + variance))
+
+            # Initialize argument scores
+            self.argument_scores[agent_id] = []
+
+            # Initialize position confidence
+            self.position_confidence[agent_id] = random.uniform(0.6, 0.9)
+
+        logger.info(f"Initialized influence scores for {len(self.agents)} agents")
+
+    def detect_coalitions(self) -> List[Dict]:
+        """Detect emergent coalitions based on position alignment and relationships."""
+        if not self.coalitions_enabled:
+            return []
+
+        coalitions = []
+        positions = {"FOR": [], "AGAINST": [], "UNDECIDED": []}
+
+        # Group agents by position
+        for agent_id, position in self.agent_positions.items():
+            positions[position].append(agent_id)
+
+        # Check each position group for coalition formation
+        for position, agents in positions.items():
+            if len(agents) >= self.coalition_min_size:
+                # Calculate average relationship strength within group
+                total_affinity = 0
+                pairs = 0
+                for i, a1 in enumerate(agents):
+                    for a2 in agents[i+1:]:
+                        if a1 in self.relationship_matrix and a2 in self.relationship_matrix.get(a1, {}):
+                            total_affinity += self.relationship_matrix[a1].get(a2, 0)
+                            pairs += 1
+
+                avg_affinity = total_affinity / max(1, pairs)
+
+                if avg_affinity >= self.coalition_formation_threshold or len(agents) >= 5:
+                    # Form coalition
+                    coalition = {
+                        "position": position,
+                        "members": agents,
+                        "size": len(agents),
+                        "cohesion": avg_affinity,
+                        "influence": sum(self.agent_influence.get(a, 1.0) for a in agents),
+                        "formed_at": self.current_round,
+                    }
+                    coalitions.append(coalition)
+
+        self.active_coalitions = coalitions
+        return coalitions
+
+    def calculate_belief_shift(self, agent_id: str, influencer_id: str, argument_strength: float) -> float:
+        """Calculate probability of belief shift based on dynamics model."""
+        if not self.belief_contagion_enabled:
+            return 0.0
+
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return 0.0
+
+        # Base susceptibility
+        susceptibility = self.susceptibility_base
+
+        # Personality modifier
+        personality_mod = self.personality_susceptibility_modifiers.get(
+            agent.personality_type, 0.0
+        )
+        susceptibility += personality_mod
+
+        # Relationship modifier
+        relationship = self.relationship_matrix.get(agent_id, {}).get(influencer_id, 0.0)
+        susceptibility += relationship * 0.2  # Allies more persuasive
+
+        # Influencer's influence score
+        influencer_influence = self.agent_influence.get(influencer_id, 1.0)
+        susceptibility *= influencer_influence
+
+        # Current confidence reduces susceptibility
+        confidence = self.position_confidence.get(agent_id, 0.7)
+        susceptibility *= (1.0 - confidence * 0.5)
+
+        # Argument strength
+        susceptibility *= argument_strength
+
+        return max(0.0, min(1.0, susceptibility))
+
+    def update_influence_scores(self):
+        """Update influence scores based on round outcomes."""
+        if not self.influence_enabled:
+            return
+
+        # Decay all influence slightly
+        for agent_id in self.agent_influence:
+            self.agent_influence[agent_id] *= (1.0 - self.influence_decay_rate)
+
+        # Boost influence for agents whose position gained support
+        if self.consensus:
+            winning_position = max(self.consensus.items(), key=lambda x: x[1])[0] if self.consensus else None
+            for agent_id, position in self.agent_positions.items():
+                if position == winning_position:
+                    self.agent_influence[agent_id] += self.influence_validation_boost
+                    self.agent_influence[agent_id] = min(2.0, self.agent_influence[agent_id])
+
+    async def broadcast_dynamics_update(self):
+        """Broadcast social dynamics state to all clients."""
+        dynamics_data = {
+            "coalitions": self.active_coalitions,
+            "influence_scores": {
+                agent_id: {
+                    "name": self.agents[agent_id].name,
+                    "influence": score,
+                    "position": self.agent_positions.get(agent_id, "UNDECIDED"),
+                    "confidence": self.position_confidence.get(agent_id, 0.7),
+                }
+                for agent_id, score in self.agent_influence.items()
+            },
+            "relationships_active": len([
+                1 for a1 in self.relationship_matrix
+                for a2, v in self.relationship_matrix[a1].items()
+                if abs(v) > 0.3
+            ]),
+        }
+        await self.broadcast("dynamics_update", dynamics_data)
 
     async def init_llm(self) -> bool:
         """Initialize LLM client."""
@@ -2757,7 +3029,12 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
 
 def _create_default_app() -> FastAPI:
     """Create default app for uvicorn import."""
-    num_agents = int(os.environ.get("SWARM_AGENTS", "8"))
+    # Get num_agents from env var, falling back to config value
+    agents_cfg = CONFIG.get("agents", {})
+    config_count = agents_cfg.get("count", 8)
+    env_agents = os.environ.get("SWARM_AGENTS")
+    num_agents = int(env_agents) if env_agents else config_count
+
     live_mode = os.environ.get("SWARM_LIVE", "").lower() in ("1", "true", "yes")
     tools_mode = os.environ.get("SWARM_TOOLS", "").lower() in ("1", "true", "yes")
 

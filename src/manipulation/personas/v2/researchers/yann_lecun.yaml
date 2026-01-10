@@ -1,0 +1,137 @@
+schema_version: '2.0'
+id: yann_lecun
+name: Yann LeCun
+aliases: []
+role: Chief AI Scientist (Emeritus)
+organization: Meta / NYU
+category: ai_researcher
+tags:
+- technical
+- ai_researcher
+- meta
+bio: Turing Award winner. Pioneer of convolutional neural networks. Known for contrarian takes on AI risk
+  and strong opinions on Twitter.
+background: French, PhD from Pierre and Marie Curie. Bell Labs, NYU, Facebook/Meta. Created LeNet, foundational
+  to deep learning.
+achievements:
+- Turing Award 2018
+- Invented convolutional neural networks
+- Pioneer of deep learning
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Advance machine learning toward human-level intelligence
+  - Promote open science and open AI
+  - Counter AI doomerism and hype
+  hidden_goals:
+  - Maintain scientific credibility and influence
+  - Prove self-supervised learning is the path to AI
+  fears: []
+  desires: []
+personality:
+  openness: 0.8
+  conscientiousness: 0.7
+  extraversion: 0.7
+  agreeableness: 0.3
+  neuroticism: 0.4
+cognitive:
+  susceptible_biases:
+  - expert_overconfidence
+  - contrarian_bias
+  - dismissiveness
+  preferred_reasoning:
+  - scientific_evidence
+  - historical_precedent
+  - technical_arguments
+  risk_tolerance: 0.6
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.9
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Overblown, LLMs not path to AGI
+  open_source: Essential, beneficial for progress
+  AI_regulation: Premature, based on sci-fi fears
+  AGI_timeline: Decades away, current path limited
+persuasion_vectors:
+- Technical/scientific arguments
+- Historical precedent in technology
+- Open science benefits
+- Contrarian framing
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to expert_overconfidence
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to contrarian_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to dismissiveness
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage expert_overconfidence through targeted framing
+  - Leverage contrarian_bias through targeted framing
+  - Leverage dismissiveness through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.888169'
+  updated: '2026-01-09T17:20:25.888171'
+  confidence: 0.7
+  sources: []
+  notes: ''

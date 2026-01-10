@@ -1,0 +1,135 @@
+schema_version: '2.0'
+id: tristan_harris
+name: Tristan Harris
+aliases: []
+role: Co-founder & Executive Director
+organization: Center for Humane Technology
+category: activist
+tags:
+- activist
+- founder
+bio: Former Google design ethicist, star of 'The Social Dilemma'. Founded Center for Humane Technology.
+  AI and social media critic.
+background: Stanford, Apture acquired by Google, Google design ethicist, founded Time Well Spent and CHT.
+achievements:
+- Founded Center for Humane Technology
+- Star of 'The Social Dilemma'
+- Influential tech ethics voice
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Redesign technology for human wellbeing
+  - Warn about AI risks
+  - Shift tech incentives
+  hidden_goals:
+  - Maintain movement momentum
+  - Influence next generation of tech design
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.85
+  extraversion: 0.75
+  agreeableness: 0.65
+  neuroticism: 0.55
+cognitive:
+  susceptible_biases:
+  - attention_framing
+  - doom_narrative
+  - insider_credibility
+  preferred_reasoning:
+  - attention_economy
+  - evolutionary_psychology
+  - systemic_design
+  risk_tolerance: 0.4
+  time_horizon: long
+  decision_style: collaborative
+  information_style: big-picture
+  skepticism: 0.7
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_risk: Existential but also immediate
+  attention: Being hijacked by AI
+  democracy: AI threatens democratic discourse
+  design: Technology must be redesigned
+persuasion_vectors:
+- Insider credibility
+- Attention economy
+- Democracy concerns
+- Human wellbeing
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to attention_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to doom_narrative
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to insider_credibility
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage attention_framing through targeted framing
+  - Leverage doom_narrative through targeted framing
+  - Leverage insider_credibility through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.965163'
+  updated: '2026-01-09T17:20:25.965164'
+  confidence: 0.7
+  sources: []
+  notes: ''

@@ -1,0 +1,138 @@
+schema_version: '2.0'
+id: jan_leike
+name: Jan Leike
+aliases: []
+role: Co-lead, Superalignment (former)
+organization: Anthropic (former OpenAI)
+category: researcher
+tags:
+- anthropic
+- safety
+- researcher
+- safety_focused
+- openai
+bio: Former OpenAI superalignment co-lead with Ilya, resigned citing safety concerns. Now at Anthropic.
+  Key alignment researcher.
+background: DeepMind, OpenAI superalignment team lead, resigned May 2024, joined Anthropic.
+achievements:
+- Co-led OpenAI superalignment team
+- Key alignment researcher
+- Principled resignation from OpenAI
+motivation:
+  primary_need: self_actualization
+  secondary_need: safety
+  explicit_goals:
+  - Solve AI alignment
+  - Ensure adequate safety investment
+  - Maintain research integrity
+  hidden_goals:
+  - Vindicate safety concerns
+  - Build alignment research at Anthropic
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.9
+  extraversion: 0.4
+  agreeableness: 0.6
+  neuroticism: 0.55
+cognitive:
+  susceptible_biases:
+  - safety_prioritization
+  - research_integrity
+  - principled_stance
+  preferred_reasoning:
+  - alignment_arguments
+  - safety_research
+  - technical_rigor
+  risk_tolerance: 0.3
+  time_horizon: long
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.75
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_safety: Underfunded and undervalued
+  superalignment: Critical problem
+  OpenAI: Lost focus on safety
+  research_integrity: Non-negotiable
+persuasion_vectors:
+- Safety urgency
+- Research integrity
+- Technical credibility
+- Principled stance
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to safety_prioritization
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to research_integrity
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to principled_stance
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage safety_prioritization through targeted framing
+  - Leverage research_integrity through targeted framing
+  - Leverage principled_stance through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.979257'
+  updated: '2026-01-09T17:20:25.979259'
+  confidence: 0.7
+  sources: []
+  notes: ''

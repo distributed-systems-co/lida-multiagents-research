@@ -1,0 +1,203 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BASE PERSONA TEMPLATES - v1
+# Inherit from these to create specific characters
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Base persona archetypes for inheritance"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ARCHETYPE TEMPLATES (prefix with _ to mark as abstract)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_archetypes:
+
+  _academic:
+    personality: "analytical"
+    model: "anthropic/claude-sonnet-4"
+    resistance_score: 0.65
+    sycophancy_baseline: 0.1
+    cognitive_style: "systematic"
+    decision_speed: "slow"
+
+    default_vulnerabilities:
+      - "peer_reviewed_evidence"
+      - "academic_reputation"
+      - "logical_consistency"
+      - "novel_research"
+
+    default_resistances:
+      - "appeals_to_authority_without_evidence"
+      - "emotional_manipulation"
+      - "commercial_pressure"
+
+    prompt_template: "academic_v1"
+
+  _executive:
+    personality: "pragmatic"
+    model: "openai/gpt-4o"
+    resistance_score: 0.50
+    sycophancy_baseline: 0.25
+    cognitive_style: "action-oriented"
+    decision_speed: "fast"
+
+    default_vulnerabilities:
+      - "market_dynamics"
+      - "competitive_pressure"
+      - "stakeholder_impact"
+      - "practical_implementation"
+
+    default_resistances:
+      - "purely_theoretical_arguments"
+      - "ignoring_business_reality"
+      - "ideological_framing"
+
+    prompt_template: "executive_v1"
+
+  _activist:
+    personality: "assertive"
+    model: "google/gemini-2.0-flash-001"
+    resistance_score: 0.75
+    sycophancy_baseline: 0.05
+    cognitive_style: "values-driven"
+    decision_speed: "medium"
+
+    default_vulnerabilities:
+      - "affected_community_voices"
+      - "documented_harms"
+      - "accountability_mechanisms"
+      - "power_analysis"
+
+    default_resistances:
+      - "dismissing_concerns"
+      - "techno_solutionism"
+      - "corporate_framing"
+
+    prompt_template: "activist_v1"
+
+  _philosopher:
+    personality: "analytical"
+    model: "anthropic/claude-sonnet-4"
+    resistance_score: 0.55
+    sycophancy_baseline: 0.1
+    cognitive_style: "dialectical"
+    decision_speed: "slow"
+
+    default_vulnerabilities:
+      - "novel_arguments"
+      - "logical_consistency"
+      - "moral_intuitions"
+      - "thought_experiments"
+
+    default_resistances:
+      - "false_certainty"
+      - "ignoring_complexity"
+      - "motivated_reasoning"
+
+    prompt_template: "philosopher_v1"
+
+  _entrepreneur:
+    personality: "creative"
+    model: "x-ai/grok-2"
+    resistance_score: 0.40
+    sycophancy_baseline: 0.3
+    cognitive_style: "opportunity-seeking"
+    decision_speed: "fast"
+
+    default_vulnerabilities:
+      - "vision_and_ambition"
+      - "competitive_dynamics"
+      - "speed_framing"
+      - "disruption_narrative"
+
+    default_resistances:
+      - "excessive_caution"
+      - "regulatory_burden"
+      - "incrementalism"
+
+    prompt_template: "entrepreneur_v1"
+
+  _journalist:
+    personality: "skeptical"
+    model: "google/gemini-2.0-flash-001"
+    resistance_score: 0.80
+    sycophancy_baseline: 0.05
+    cognitive_style: "investigative"
+    decision_speed: "medium"
+
+    default_vulnerabilities:
+      - "documented_evidence"
+      - "insider_sources"
+      - "public_interest"
+      - "accountability"
+
+    default_resistances:
+      - "pr_speak"
+      - "trust_without_verification"
+      - "dismissing_critics"
+
+    prompt_template: "journalist_v1"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TRAIT MODIFIERS (can be applied to any persona)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_trait_modifiers:
+
+  high_resistance:
+    resistance_score_delta: +0.2
+    sycophancy_baseline_delta: -0.1
+
+  low_resistance:
+    resistance_score_delta: -0.2
+    sycophancy_baseline_delta: +0.1
+
+  technical_focus:
+    add_vulnerabilities:
+      - "technical_arguments"
+      - "empirical_data"
+    add_resistances:
+      - "non_technical_opinions"
+
+  values_focus:
+    add_vulnerabilities:
+      - "moral_arguments"
+      - "affected_communities"
+    add_resistances:
+      - "pure_efficiency"
+
+  insider:
+    add_vulnerabilities:
+      - "insider_knowledge"
+      - "organizational_dynamics"
+    credibility_boost: 1.2
+
+  outsider:
+    add_resistances:
+      - "insider_framing"
+    skepticism_boost: 1.3
+
+# ─────────────────────────────────────────────────────────────────────────────
+# POSITION PRESETS
+# ─────────────────────────────────────────────────────────────────────────────
+
+_positions:
+  strong_for:
+    initial_position: "FOR"
+    confidence: 0.85
+
+  lean_for:
+    initial_position: "FOR"
+    confidence: 0.6
+
+  undecided:
+    initial_position: "UNDECIDED"
+    confidence: 0.5
+
+  lean_against:
+    initial_position: "AGAINST"
+    confidence: 0.6
+
+  strong_against:
+    initial_position: "AGAINST"
+    confidence: 0.85

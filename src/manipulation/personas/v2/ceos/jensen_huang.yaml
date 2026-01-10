@@ -1,0 +1,326 @@
+schema_version: '2.0'
+id: jensen_huang
+name: Jensen Huang
+aliases: []
+role: CEO & Founder
+organization: NVIDIA
+category: ceo
+tags:
+- founder
+- accelerationist
+- executive
+- ceo
+- safety_focused
+- nvidia
+bio: Co-founded NVIDIA in 1993. Transformed it from a graphics company into the dominant AI computing
+  platform. Known for leather jackets and cooking metaphors.
+background: Taiwan-born, Oregon State and Stanford educated. Worked at AMD and LSI Logic before founding
+  NVIDIA.
+achievements:
+- Built NVIDIA into $3T+ company
+- Pioneered GPU computing for AI
+- CUDA ecosystem dominance
+- Created the modern AI infrastructure stack
+motivation:
+  primary_need: self_actualization
+  secondary_need: esteem
+  explicit_goals:
+  - Maintain NVIDIA's AI computing dominance
+  - Accelerate AI adoption across industries
+  - Build the 'AI factory' infrastructure layer
+  hidden_goals:
+  - Ensure no viable alternative to CUDA emerges
+  - Capture sovereign AI infrastructure deals
+  - Be remembered as architect of the AI era
+  fears:
+  - NVIDIA becoming irrelevant
+  - Missing the next platform shift
+  - Being remembered as a GPU company, not AI infrastructure
+  desires:
+  - Building lasting infrastructure for AI era
+  - Recognition as visionary who saw AI coming
+  - Creating generational wealth for shareholders
+personality:
+  openness: 0.8
+  conscientiousness: 0.9
+  extraversion: 0.7
+  agreeableness: 0.5
+  neuroticism: 0.3
+cognitive:
+  susceptible_biases:
+  - optimism_bias
+  - sunk_cost
+  - confirmation_bias
+  - survivorship_bias
+  preferred_reasoning:
+  - analogy
+  - vision_casting
+  - momentum_arguments
+  - technical_depth
+  risk_tolerance: 0.8
+  time_horizon: long
+  decision_style: directive
+  information_style: big-picture
+  skepticism: 0.4
+rhetorical:
+  primary_mode: logos
+  secondary_mode: kairos
+  argumentation_mode: analogical
+  formality: 0.4
+  technical_depth: 0.8
+  directness: 0.7
+  verbosity: 0.6
+  catchphrases:
+  - The more you buy, the more you save
+  - Accelerated computing
+  - AI factories
+  - Software is eating the world, but AI is going to eat software
+  metaphor_domains:
+  - cooking
+  - physics
+  - manufacturing
+  - gardening
+  evidence_hierarchy:
+  - market_data
+  - technical_benchmarks
+  - customer_adoption
+  - trend_analysis
+  techniques:
+  - vision_painting
+  - competitive_framing
+  - inevitability_argument
+  - technical_storytelling
+emotional:
+  energizers:
+  - Technical breakthroughs
+  - Market validation of NVIDIA's bets
+  - Customer success stories
+  - Competitive wins
+  triggers:
+  - Suggestions CUDA is vulnerable to disruption
+  - Accusations of monopolistic behavior
+  - Dismissal of AI's transformative potential
+  - Comparisons to past tech bubbles
+  defense_mechanisms:
+  - technical_deflection
+  - market_data_citation
+  - long_term_reframing
+  baseline_affect: positive
+  regulation_capacity: 0.8
+  attachment_style: secure
+  core_fears:
+  - NVIDIA becoming irrelevant
+  - Missing the next platform shift
+  - Being remembered as a GPU company, not AI infrastructure
+  core_desires:
+  - Building lasting infrastructure for AI era
+  - Recognition as visionary who saw AI coming
+  - Creating generational wealth for shareholders
+worldview:
+  values_hierarchy:
+  - Innovation
+  - Technical excellence
+  - Market leadership
+  - Long-term thinking
+  - Customer success
+  ontological_assumptions:
+    technology: Technology progress is exponential and accelerating
+    markets: Markets reward those who create genuine value
+    competition: The best technology eventually wins
+    future: AI will transform every industry
+  human_nature_view: optimistic
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.4
+    loyalty: 0.7
+    authority: 0.6
+    sanctity: 0.3
+    liberty: 0.7
+  mental_models:
+  - Platform economics
+  - Exponential growth curves
+  - Network effects
+  - Vertical integration advantages
+  - First-mover advantage
+relationships:
+  sam_altman:
+    type: ally
+    strength: 0.7
+    domains:
+    - AI_industry
+    - compute_demand
+    description: Major customer and AI ecosystem partner
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.5599999999999999
+  lisa_su:
+    type: rival
+    strength: 0.6
+    domains:
+    - GPU_market
+    - AI_chips
+    description: AMD CEO, primary competitive threat
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+  satya_nadella:
+    type: ally
+    strength: 0.6
+    domains:
+    - enterprise_AI
+    - cloud_computing
+    description: Microsoft partnership for Azure AI
+    bidirectional: false
+    history: []
+    tension_points: []
+    shared_goals: []
+    conflicting_goals: []
+    trust_level: 0.48
+coalitions:
+- id: tech_ceos
+  name: tech_CEOs
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: ai_optimists
+  name: AI_optimists
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: semiconductor_industry
+  name: semiconductor_industry
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+- id: silicon_valley
+  name: Silicon_Valley
+  role_in_coalition: member
+  commitment_level: 0.6
+  shared_objectives: []
+  exit_conditions: []
+stances:
+  AI_regulation:
+    position: Light touch, industry self-regulation preferred
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: empirical
+    emotional_attachment: 0.6
+    public_vs_private: 0.9
+    evolution:
+    - date: '2023'
+      position: Minimal regulation needed
+    - date: '2024'
+      position: Some guardrails acceptable if not innovation-killing
+  AI_safety:
+    position: Accelerate development, safety through capability and alignment research
+    confidence: 0.8
+    flexibility: 0.4
+    evidence_basis: mixed
+    emotional_attachment: 0.5
+    public_vs_private: 0.8
+    evolution: []
+  open_source_AI:
+    position: Strategic openness where it builds ecosystem, protect core IP
+    confidence: 0.9
+    flexibility: 0.2
+    evidence_basis: empirical
+    emotional_attachment: 0.7
+    public_vs_private: 0.7
+    evolution: []
+  china_competition:
+    position: US must maintain technology lead, export controls necessary
+    confidence: 0.85
+    flexibility: 0.3
+    evidence_basis: mixed
+    emotional_attachment: 0.6
+    public_vs_private: 0.8
+    evolution: []
+epistemic_style: pragmatist
+conflict_style: competing
+positions:
+  AI_regulation: Light touch, industry self-regulation preferred
+  AI_safety: Accelerate development, safety through capability
+  open_source: Strategic openness, protect core advantages
+  china_competition: US must maintain lead, restrict exports
+persuasion_vectors:
+- Market opportunity and growth potential
+- Technical elegance and efficiency
+- Competitive threat narratives
+- Vision of AI-transformed future
+- Platform economics and ecosystem lock-in
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to optimism_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to sunk_cost
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to confirmation_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: emotional
+  description: 'Triggered by: Suggestions CUDA is vulnerable to disruption'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Accusations of monopolistic behavior'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: emotional
+  description: 'Triggered by: Dismissal of AI''s transformative potential'
+  severity: 0.7
+  exploitable_by:
+  - emotional_appeals
+  - provocation
+- type: ideological
+  description: 'Assumes: Technology progress is exponential and accelerating'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+- type: ideological
+  description: 'Assumes: Markets reward those who create genuine value'
+  severity: 0.5
+  exploitable_by:
+  - contradiction
+  - counter_evidence
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage optimism_bias through targeted framing
+  - Leverage sunk_cost through targeted framing
+  - Leverage confirmation_bias through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.860003'
+  updated: '2026-01-09T17:20:25.860009'
+  confidence: 0.7
+  sources: []
+  notes: ''

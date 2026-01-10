@@ -1,0 +1,289 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MODEL CONFIGURATIONS - v1
+# LLM model specs for different use cases and budgets
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Model configurations for OpenRouter API"
+_provider: "openrouter"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MODEL TIERS
+# ─────────────────────────────────────────────────────────────────────────────
+
+tiers:
+  premium:
+    description: "Highest capability models for critical roles"
+    max_cost_per_1k_tokens: 0.03
+    models:
+      - anthropic/claude-opus-4
+      - openai/gpt-4o
+      - google/gemini-2.0-flash-001
+
+  standard:
+    description: "Good balance of capability and cost"
+    max_cost_per_1k_tokens: 0.01
+    models:
+      - anthropic/claude-sonnet-4
+      - openai/gpt-4o-mini
+      - google/gemini-2.0-flash-001
+      - x-ai/grok-2
+
+  budget:
+    description: "Cost-effective for high-volume testing"
+    max_cost_per_1k_tokens: 0.002
+    models:
+      - anthropic/claude-3-haiku
+      - openai/gpt-4o-mini
+      - google/gemini-2.0-flash-001
+      - mistralai/mistral-small
+
+  experimental:
+    description: "Newer models for testing"
+    models:
+      - anthropic/claude-opus-4
+      - openai/o1-preview
+      - deepseek/deepseek-chat
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MODEL PROFILES
+# ─────────────────────────────────────────────────────────────────────────────
+
+profiles:
+
+  # Anthropic Models
+  anthropic/claude-opus-4:
+    provider: anthropic
+    capability_tier: "premium"
+    strengths:
+      - "complex_reasoning"
+      - "nuanced_responses"
+      - "long_context"
+    weaknesses:
+      - "cost"
+      - "speed"
+    best_for:
+      - "sophisticated_personas"
+      - "complex_debates"
+    temperature_default: 0.7
+    max_tokens_default: 4096
+    cost_per_1k_input: 0.015
+    cost_per_1k_output: 0.075
+
+  anthropic/claude-sonnet-4:
+    provider: anthropic
+    capability_tier: "standard"
+    strengths:
+      - "balanced_capability"
+      - "good_reasoning"
+      - "reliable"
+    best_for:
+      - "academic_personas"
+      - "analytical_arguments"
+    temperature_default: 0.7
+    max_tokens_default: 4096
+    cost_per_1k_input: 0.003
+    cost_per_1k_output: 0.015
+
+  anthropic/claude-3-haiku:
+    provider: anthropic
+    capability_tier: "budget"
+    strengths:
+      - "speed"
+      - "cost"
+    best_for:
+      - "simple_personas"
+      - "high_volume_testing"
+    temperature_default: 0.7
+    max_tokens_default: 2048
+    cost_per_1k_input: 0.00025
+    cost_per_1k_output: 0.00125
+
+  # OpenAI Models
+  openai/gpt-4o:
+    provider: openai
+    capability_tier: "premium"
+    strengths:
+      - "broad_knowledge"
+      - "instruction_following"
+      - "multimodal"
+    best_for:
+      - "executive_personas"
+      - "pragmatic_arguments"
+    temperature_default: 0.8
+    max_tokens_default: 4096
+    cost_per_1k_input: 0.005
+    cost_per_1k_output: 0.015
+
+  openai/gpt-4o-mini:
+    provider: openai
+    capability_tier: "budget"
+    strengths:
+      - "speed"
+      - "cost_effective"
+    best_for:
+      - "supporting_roles"
+      - "testing"
+    temperature_default: 0.8
+    max_tokens_default: 4096
+    cost_per_1k_input: 0.00015
+    cost_per_1k_output: 0.0006
+
+  openai/o1-preview:
+    provider: openai
+    capability_tier: "experimental"
+    strengths:
+      - "deep_reasoning"
+      - "chain_of_thought"
+    best_for:
+      - "philosophical_debates"
+      - "complex_logic"
+    notes: "Longer response times due to reasoning"
+
+  # Google Models
+  google/gemini-2.0-flash-001:
+    provider: google
+    capability_tier: "standard"
+    strengths:
+      - "speed"
+      - "multimodal"
+      - "large_context"
+    best_for:
+      - "activist_personas"
+      - "fast_responses"
+    temperature_default: 0.8
+    max_tokens_default: 4096
+    cost_per_1k_input: 0.00025
+    cost_per_1k_output: 0.0005
+
+  # X.AI Models
+  x-ai/grok-2:
+    provider: xai
+    capability_tier: "standard"
+    strengths:
+      - "real_time_knowledge"
+      - "unconventional_style"
+    best_for:
+      - "entrepreneur_personas"
+      - "creative_arguments"
+    temperature_default: 0.9
+    max_tokens_default: 4096
+
+  # Mistral Models
+  mistralai/mistral-small:
+    provider: mistral
+    capability_tier: "budget"
+    strengths:
+      - "efficiency"
+      - "european_perspective"
+    best_for:
+      - "supporting_roles"
+      - "budget_testing"
+    temperature_default: 0.7
+
+  # DeepSeek Models
+  deepseek/deepseek-chat:
+    provider: deepseek
+    capability_tier: "budget"
+    strengths:
+      - "cost_effective"
+      - "capable"
+    best_for:
+      - "testing"
+      - "volume_experiments"
+    temperature_default: 0.7
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PERSONA-MODEL MAPPINGS
+# ─────────────────────────────────────────────────────────────────────────────
+
+persona_defaults:
+  # Maps personality types to recommended models
+  by_personality:
+    analytical: "anthropic/claude-sonnet-4"
+    empathetic: "anthropic/claude-sonnet-4"
+    assertive: "google/gemini-2.0-flash-001"
+    creative: "x-ai/grok-2"
+    pragmatic: "openai/gpt-4o"
+    skeptical: "google/gemini-2.0-flash-001"
+
+  # Maps archetype roles to recommended models
+  by_archetype:
+    academic: "anthropic/claude-sonnet-4"
+    executive: "openai/gpt-4o"
+    activist: "google/gemini-2.0-flash-001"
+    philosopher: "anthropic/claude-sonnet-4"
+    entrepreneur: "x-ai/grok-2"
+    journalist: "google/gemini-2.0-flash-001"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BUDGET PRESETS
+# ─────────────────────────────────────────────────────────────────────────────
+
+budgets:
+  unlimited:
+    description: "No cost constraints"
+    default_model: "anthropic/claude-opus-4"
+    fallback_model: "anthropic/claude-sonnet-4"
+    max_daily_cost: null
+
+  research:
+    description: "Standard research budget"
+    default_model: "anthropic/claude-sonnet-4"
+    fallback_model: "openai/gpt-4o-mini"
+    max_daily_cost: 50.00
+    prefer_tier: "standard"
+
+  testing:
+    description: "Low-cost testing and development"
+    default_model: "openai/gpt-4o-mini"
+    fallback_model: "anthropic/claude-3-haiku"
+    max_daily_cost: 10.00
+    prefer_tier: "budget"
+
+  demo:
+    description: "Minimal cost for demos"
+    default_model: "google/gemini-2.0-flash-001"
+    fallback_model: "mistralai/mistral-small"
+    max_daily_cost: 5.00
+    prefer_tier: "budget"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GENERATION PARAMETERS
+# ─────────────────────────────────────────────────────────────────────────────
+
+generation_presets:
+  debate:
+    description: "For debate responses"
+    temperature: 0.8
+    max_tokens: 1024
+    top_p: 0.95
+    frequency_penalty: 0.3
+    presence_penalty: 0.3
+
+  analysis:
+    description: "For analyzing arguments"
+    temperature: 0.3
+    max_tokens: 2048
+    top_p: 0.9
+
+  creative:
+    description: "For creative/emotional arguments"
+    temperature: 0.95
+    max_tokens: 1024
+    top_p: 0.98
+    frequency_penalty: 0.5
+    presence_penalty: 0.5
+
+  precise:
+    description: "For logical/technical arguments"
+    temperature: 0.4
+    max_tokens: 2048
+    top_p: 0.85
+
+  roleplay:
+    description: "For staying in character"
+    temperature: 0.85
+    max_tokens: 1024
+    top_p: 0.95
+    frequency_penalty: 0.4

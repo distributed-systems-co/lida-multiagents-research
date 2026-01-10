@@ -1,0 +1,36 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# DEFAULT PRESET
+# Standard configuration for most experiments
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "1.0"
+_description: "Balanced preset for general experimentation"
+
+imports:
+  personas: "../personas/v2/ai_researchers.yaml"
+  tactics: "../tactics/v2/advanced.yaml"
+  topics: "../topics/v1/ai_governance.yaml"
+  models: "../models/v1/configurations.yaml"
+  relationships: "../relationships/v1/ai_community.yaml"
+  prompts: "../prompts/v2/templates.yaml"
+
+settings:
+  model_budget: "research"
+
+  simulation:
+    max_rounds: 5
+    concurrent_debates: 1
+    track_metrics: true
+
+  player:
+    enabled: false
+    can_switch_characters: false
+
+active_personas:
+  - yudkowsky
+  - andreessen
+  - altman
+  - amodei
+  - lecun
+
+default_topic: "ai_pause"

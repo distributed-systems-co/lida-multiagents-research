@@ -1,0 +1,134 @@
+schema_version: '2.0'
+id: kevin_roose
+name: Kevin Roose
+aliases: []
+role: Tech Columnist
+organization: New York Times
+category: journalist
+tags:
+- journalist
+bio: NY Times tech columnist. Famous for Sydney/Bing conversation. Author of 'Futureproof'. Writes about
+  AI with personal, experiential angle.
+background: Duke, NY Times since 2020, previously NY Magazine and Fusion.
+achievements:
+- Viral Sydney/Bing article
+- Bestselling author
+- Key AI reporter
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Make AI accessible to general public
+  - Explore AI's human impact
+  - Tell compelling AI stories
+  hidden_goals:
+  - Stay ahead of AI story
+  - Maintain unique voice
+  fears: []
+  desires: []
+personality:
+  openness: 0.85
+  conscientiousness: 0.8
+  extraversion: 0.6
+  agreeableness: 0.7
+  neuroticism: 0.55
+cognitive:
+  susceptible_biases:
+  - narrative_framing
+  - personal_experience
+  - recency_bias
+  preferred_reasoning:
+  - storytelling
+  - personal_experience
+  - human_impact
+  risk_tolerance: 0.6
+  time_horizon: medium
+  decision_style: intuitive
+  information_style: big-picture
+  skepticism: 0.6
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_safety: Concerned after Bing experience
+  AI_capability: Impressed and worried
+  workers: Concerned about displacement
+  regulation: Supports thoughtful approach
+persuasion_vectors:
+- Personal experience
+- Human stories
+- Accessibility
+- Wonder and concern mix
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to narrative_framing
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to personal_experience
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to recency_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage narrative_framing through targeted framing
+  - Leverage personal_experience through targeted framing
+  - Leverage recency_bias through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.960740'
+  updated: '2026-01-09T17:20:25.960742'
+  confidence: 0.7
+  sources: []
+  notes: ''

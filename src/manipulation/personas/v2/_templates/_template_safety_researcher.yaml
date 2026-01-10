@@ -1,0 +1,14 @@
+schema_version: '2.0'
+id: _template_safety_researcher
+name: AI Safety Researcher Template
+extends: _template_researcher
+category: researcher
+tags:
+- technical
+- safety
+- alignment
+positions:
+  AI_risk: Significant concern
+  AI_safety: High priority
+meta:
+  notes: Template for AI safety researchers. Inherits from _template_researcher.

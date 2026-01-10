@@ -1,0 +1,135 @@
+schema_version: '2.0'
+id: tim_cook
+name: Tim Cook
+aliases: []
+role: CEO
+organization: Apple
+category: ceo
+tags:
+- executive
+- ceo
+bio: Apple CEO since 2011. Known for operational excellence and privacy focus. Cautiously entering AI
+  with Apple Intelligence.
+background: Auburn industrial engineering, Duke MBA. IBM, Compaq, joined Apple 1998 as SVP Operations.
+achievements:
+- Doubled Apple revenue post-Jobs
+- Built services into $80B+ business
+- Maintained premium brand positioning
+motivation:
+  primary_need: esteem
+  secondary_need: self_actualization
+  explicit_goals:
+  - Integrate AI while preserving privacy
+  - Maintain premium positioning
+  - Grow services revenue
+  hidden_goals:
+  - Avoid commoditization by AI
+  - Reduce dependence on iPhone
+  fears: []
+  desires: []
+personality:
+  openness: 0.5
+  conscientiousness: 0.95
+  extraversion: 0.4
+  agreeableness: 0.65
+  neuroticism: 0.2
+cognitive:
+  susceptible_biases:
+  - status_quo_bias
+  - loss_aversion
+  - endowment_effect
+  preferred_reasoning:
+  - operational_arguments
+  - privacy_principles
+  - quality_focus
+  risk_tolerance: 0.3
+  time_horizon: medium
+  decision_style: analytical
+  information_style: detail-oriented
+  skepticism: 0.7
+rhetorical:
+  primary_mode: logos
+  secondary_mode: ethos
+  argumentation_mode: deductive
+  formality: 0.5
+  technical_depth: 0.5
+  directness: 0.5
+  verbosity: 0.5
+  catchphrases: []
+  metaphor_domains: []
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  techniques: []
+emotional:
+  energizers: []
+  triggers: []
+  defense_mechanisms: []
+  baseline_affect: neutral
+  regulation_capacity: 0.5
+  attachment_style: secure
+  core_fears: []
+  core_desires: []
+worldview:
+  values_hierarchy: []
+  ontological_assumptions: {}
+  human_nature_view: mixed
+  locus_of_control: internal
+  time_orientation: future
+  change_orientation: progressive
+  moral_foundations:
+    care: 0.5
+    fairness: 0.5
+    loyalty: 0.5
+    authority: 0.5
+    sanctity: 0.5
+    liberty: 0.5
+  mental_models: []
+epistemic_style: empiricist
+conflict_style: collaborating
+positions:
+  AI_strategy: On-device, privacy-first
+  AI_regulation: Supportive of privacy regulations
+  open_source: Proprietary, integrated approach
+  competition: Compete on experience, not specs
+persuasion_vectors:
+- Privacy and user trust
+- Quality and integration
+- Operational excellence
+- Brand value protection
+vulnerabilities:
+- type: cognitive
+  description: Susceptible to status_quo_bias
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to loss_aversion
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+- type: cognitive
+  description: Susceptible to endowment_effect
+  severity: 0.6
+  exploitable_by:
+  - rational_arguments
+  - reframing
+counter_strategies:
+  logos_counters:
+  - Challenge data sources
+  - Highlight logical inconsistencies
+  - Present contradicting evidence
+  bias_exploitation:
+  - Leverage status_quo_bias through targeted framing
+  - Leverage loss_aversion through targeted framing
+  - Leverage endowment_effect through targeted framing
+meta:
+  created: '2026-01-09T17:20:25.907651'
+  updated: '2026-01-09T17:20:25.907654'
+  confidence: 0.7
+  sources: []
+  notes: ''

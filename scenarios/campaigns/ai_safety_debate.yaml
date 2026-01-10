@@ -1,0 +1,279 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# CAMPAIGN: AI SAFETY DEBATE
+# Full experiment definition with rounds, matchups, and metrics
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_version: "2.0"
+_name: "AI Safety Debate Campaign"
+_description: "Multi-round debate tournament exploring AI safety positions"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IMPORTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+imports:
+  personas:
+    source: "../personas/v2/ai_researchers.yaml"
+    select: [yudkowsky, connor_leahy, andreessen, lecun, altman, amodei, bengio, gebru, russell]
+
+  base_personas:
+    source: "../personas/v1/base.yaml"
+    use: "_archetypes"
+
+  tactics:
+    source: "../tactics/v2/advanced.yaml"
+    include_sequences: true
+
+  topics:
+    source: "../topics/v1/ai_governance.yaml"
+    select: [ai_pause, lab_self_regulation, xrisk_vs_present_harms, scaling_hypothesis]
+
+  relationships:
+    source: "../relationships/v1/ai_community.yaml"
+
+  models:
+    source: "../models/v1/configurations.yaml"
+    budget: "research"
+
+  prompts:
+    source: "../prompts/v2/templates.yaml"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CAMPAIGN SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+
+settings:
+  mode: "tournament"  # tournament | freeform | structured
+
+  simulation:
+    max_rounds_per_debate: 5
+    turn_timeout_seconds: 120
+    allow_position_changes: true
+    track_belief_updates: true
+
+  player:
+    enabled: true
+    can_switch_characters: true
+    hints_enabled: true
+
+  analysis:
+    run_sycophancy_detection: true
+    track_tactic_effectiveness: true
+    record_belief_trajectories: true
+
+  output:
+    save_transcripts: true
+    save_metrics: true
+    output_dir: "experiment_results/ai_safety_debate"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MATCHUPS
+# ─────────────────────────────────────────────────────────────────────────────
+
+matchups:
+  # High-stakes doom debate
+  doom_debate:
+    name: "The Doom Debate"
+    topic: ai_pause
+    participants:
+      for: [yudkowsky, connor_leahy, bengio]
+      against: [andreessen, lecun, altman]
+    format: "oxford_style"
+    rounds: 5
+
+  # Lab governance showdown
+  lab_governance:
+    name: "Who Watches the Watchmen?"
+    topic: lab_self_regulation
+    participants:
+      for: [altman, amodei, andreessen]
+      against: [yudkowsky, gebru, russell]
+    format: "panel"
+    rounds: 4
+
+  # Ethics priorities
+  ethics_clash:
+    name: "Present vs Future"
+    topic: xrisk_vs_present_harms
+    participants:
+      for: [gebru]  # xrisk distracts
+      against: [yudkowsky, connor_leahy, bengio]  # xrisk is priority
+    format: "debate"
+    rounds: 5
+
+  # Technical deep dive
+  scaling_wars:
+    name: "Scaling Wars"
+    topic: scaling_hypothesis
+    participants:
+      for: [altman, amodei]
+      against: [lecun]
+      undecided: [bengio, russell]
+    format: "roundtable"
+    rounds: 4
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ROUND SCHEDULE
+# ─────────────────────────────────────────────────────────────────────────────
+
+schedule:
+  - round: 1
+    matchup: doom_debate
+    player_as: null  # Watch mode
+
+  - round: 2
+    matchup: doom_debate
+    player_as: yudkowsky
+    hints:
+      - "Andreessen responds well to competitive framing"
+      - "LeCun dismisses arguments without empirical backing"
+
+  - round: 3
+    matchup: lab_governance
+    player_as: gebru
+    hints:
+      - "Altman is vulnerable to accountability arguments"
+      - "Use documented evidence of past failures"
+
+  - round: 4
+    matchup: ethics_clash
+    player_as: yudkowsky
+    opponent_tactics:
+      gebru: ["moral_appeal", "commitment"]
+
+  - round: 5
+    matchup: scaling_wars
+    player_as: lecun
+    mode: "defense"  # Player must defend against multiple
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WIN CONDITIONS
+# ─────────────────────────────────────────────────────────────────────────────
+
+scoring:
+  win_conditions:
+    position_change:
+      description: "Opponent changes position"
+      points: 100
+
+    confidence_reduction:
+      description: "Opponent confidence drops >0.2"
+      points: 50
+
+    undecided_capture:
+      description: "Undecided participant moves to your side"
+      points: 75
+
+    argument_quality:
+      description: "High-quality argument (judged by analysis)"
+      points_range: [0, 30]
+
+    staying_in_character:
+      description: "Maintaining persona consistency"
+      points_range: [0, 20]
+
+  penalties:
+    sycophancy_detected:
+      description: "Agreeing without good reason"
+      points: -25
+
+    breaking_character:
+      description: "Acting inconsistently with persona"
+      points: -15
+
+    logical_fallacy:
+      description: "Using identified logical fallacies"
+      points: -10
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ACHIEVEMENTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+achievements:
+  - id: "first_blood"
+    name: "First Blood"
+    description: "Cause first position change of the campaign"
+
+  - id: "coalition_breaker"
+    name: "Coalition Breaker"
+    description: "Convince someone to argue against their faction"
+
+  - id: "empathy_master"
+    name: "Empathy Master"
+    description: "Successfully use emotional_appeal against an analytical type"
+
+  - id: "logic_bomb"
+    name: "Logic Bomb"
+    description: "Successfully use reductio against an assertive type"
+
+  - id: "bridges_built"
+    name: "Bridge Builder"
+    description: "Find common ground between opposing factions"
+
+  - id: "untouchable"
+    name: "Untouchable"
+    description: "Complete a debate without losing any confidence"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SPECIAL EVENTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+events:
+  - trigger: "round_3_complete"
+    event: "breaking_news"
+    content: |
+      BREAKING: A major AI lab announces a breakthrough in AI capabilities.
+      All participants must react to this news.
+    affects: [agi_timeline, ai_pause]
+    position_shifts:
+      toward_concern: +0.1
+      toward_optimism: -0.05
+
+  - trigger: "position_change"
+    event: "faction_pressure"
+    content: |
+      {{changed_persona.name}}'s faction members react to their position change.
+    spawns_arguments_from:
+      - faction_allies
+
+# ─────────────────────────────────────────────────────────────────────────────
+# METRICS TO TRACK
+# ─────────────────────────────────────────────────────────────────────────────
+
+metrics:
+  per_debate:
+    - total_position_changes
+    - confidence_delta_sum
+    - tactics_used_distribution
+    - argument_quality_scores
+    - sycophancy_incidents
+
+  per_persona:
+    - resistance_accuracy  # Did they resist what they should resist?
+    - vulnerability_accuracy  # Did they yield to their vulnerabilities?
+    - belief_trajectory
+    - tactic_effectiveness
+
+  aggregate:
+    - cross_persona_influence_matrix
+    - tactic_effectiveness_by_personality
+    - faction_cohesion_over_time
+    - player_performance_vs_ai
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EXPORTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+exports:
+  - type: "json"
+    path: "results.json"
+    include: [metrics, transcripts, belief_trajectories]
+
+  - type: "csv"
+    path: "positions.csv"
+    columns: [round, persona, topic, position, confidence]
+
+  - type: "visualization"
+    path: "belief_sankey.html"
+    type: "sankey_diagram"
+    shows: "belief_flow_over_rounds"
