@@ -30,7 +30,8 @@ deliberation:
     coalition_forming: 0.3
 
   # Auto-start deliberation when websocket connects
-  auto_start: true
+  # DISABLED by default - researchers manually trigger actions
+  auto_start: false
   auto_start_delay: 3  # seconds
 
   # Consensus thresholds

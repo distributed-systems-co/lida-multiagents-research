@@ -3020,6 +3020,347 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         quorums = getattr(orch, 'quorums', {})
         return {"quorums": list(quorums.values())}
 
+    # ═══════════════════════════════════════════════════════════════════════════
+    # INTERACTIVE RESEARCH ENDPOINTS - Manual persona control
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @app.post("/api/config/reload")
+    async def reload_config():
+        """Hot-reload config.yaml without restarting server."""
+        global CONFIG
+        try:
+            CONFIG = load_config()
+            return {"status": "reloaded", "agents_count": CONFIG.get("agents", {}).get("count", 8)}
+        except Exception as e:
+            raise HTTPException(500, f"Failed to reload config: {e}")
+
+    @app.get("/api/personas/library")
+    async def list_persona_library():
+        """List all available personas from the YAML library."""
+        try:
+            persona_lib = YAMLPersonaLibrary(version="v1")
+            personas_by_category = {}
+            for persona_id, persona in persona_lib.personas.items():
+                cat = persona.category
+                if cat not in personas_by_category:
+                    personas_by_category[cat] = []
+                personas_by_category[cat].append({
+                    "id": persona_id,
+                    "name": persona.name,
+                    "role": persona.role,
+                    "organization": persona.organization,
+                    "bio": persona.bio[:200] + "..." if len(persona.bio) > 200 else persona.bio,
+                })
+            return {
+                "total": len(persona_lib.personas),
+                "categories": personas_by_category,
+            }
+        except Exception as e:
+            raise HTTPException(500, f"Failed to load persona library: {e}")
+
+    @app.get("/api/persona/{persona_id}")
+    async def get_persona_details(persona_id: str):
+        """Get full details for a specific persona."""
+        try:
+            persona_lib = YAMLPersonaLibrary(version="v1")
+            persona = persona_lib.get(persona_id)
+            if not persona:
+                raise HTTPException(404, f"Persona '{persona_id}' not found")
+
+            return {
+                "id": persona_id,
+                "name": persona.name,
+                "role": persona.role,
+                "organization": persona.organization,
+                "category": persona.category,
+                "bio": persona.bio,
+                "background": persona.background,
+                "achievements": persona.achievements,
+                "positions": persona.positions,
+                "persuasion_vectors": persona.persuasion_vectors,
+                "worldview": {
+                    "values": persona.worldview.values_hierarchy if hasattr(persona.worldview, 'values_hierarchy') else [],
+                    "assumptions": persona.worldview.ontological_assumptions if hasattr(persona.worldview, 'ontological_assumptions') else {},
+                },
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(500, f"Error loading persona: {e}")
+
+    @app.post("/api/persona/{persona_id}/speak")
+    async def persona_speak(persona_id: str, request: dict = Body(...)):
+        """
+        Have a persona speak on a topic. Single LLM call.
+
+        Body: {"topic": "AI safety", "context": "optional context", "model": "optional model override"}
+        """
+        orch = app.state.orchestrator
+        topic = request.get("topic", "")
+        context = request.get("context", "")
+        model_override = request.get("model")
+
+        if not topic:
+            raise HTTPException(400, "Topic is required")
+
+        # Find persona in active agents or load from library
+        agent = None
+        for a in orch.agents.values():
+            if persona_id in a.name.lower().replace(" ", "_") or a.id == persona_id:
+                agent = a
+                break
+
+        if not agent:
+            # Try loading from library
+            try:
+                persona_lib = YAMLPersonaLibrary(version="v1")
+                persona = persona_lib.get(persona_id)
+                if persona:
+                    # Build system prompt
+                    system_prompt = orch._build_persona_prompt(persona)
+                else:
+                    raise HTTPException(404, f"Persona '{persona_id}' not found")
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(500, f"Error loading persona: {e}")
+        else:
+            system_prompt = agent.prompt_text
+
+        # Build the prompt
+        user_prompt = f"Topic: {topic}"
+        if context:
+            user_prompt += f"\n\nContext: {context}"
+        user_prompt += "\n\nShare your perspective on this topic, speaking as yourself."
+
+        # Make LLM call if available
+        if orch.llm_client:
+            try:
+                model = model_override or (agent.model if agent else "anthropic/claude-sonnet-4")
+                response = await orch.llm_client.chat(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    model=model,
+                    max_tokens=600,
+                )
+                return {
+                    "persona": persona_id,
+                    "name": agent.name if agent else persona.name,
+                    "topic": topic,
+                    "response": response,
+                    "model": model,
+                }
+            except Exception as e:
+                raise HTTPException(500, f"LLM call failed: {e}")
+        else:
+            # Return prompt for manual use
+            return {
+                "persona": persona_id,
+                "name": agent.name if agent else persona_id,
+                "topic": topic,
+                "system_prompt": system_prompt,
+                "user_prompt": user_prompt,
+                "note": "LLM not configured. Use these prompts with your preferred model.",
+            }
+
+    @app.post("/api/persona/{persona_id}/respond")
+    async def persona_respond(persona_id: str, request: dict = Body(...)):
+        """
+        Get a persona's response to a specific prompt/question.
+
+        Body: {"prompt": "What do you think about...", "model": "optional"}
+        """
+        orch = app.state.orchestrator
+        prompt = request.get("prompt", "")
+        model_override = request.get("model")
+
+        if not prompt:
+            raise HTTPException(400, "Prompt is required")
+
+        # Find or load persona
+        agent = None
+        system_prompt = ""
+        persona_name = persona_id
+
+        for a in orch.agents.values():
+            if persona_id in a.name.lower().replace(" ", "_") or a.id == persona_id:
+                agent = a
+                system_prompt = a.prompt_text
+                persona_name = a.name
+                break
+
+        if not agent:
+            try:
+                persona_lib = YAMLPersonaLibrary(version="v1")
+                persona = persona_lib.get(persona_id)
+                if persona:
+                    system_prompt = orch._build_persona_prompt(persona)
+                    persona_name = persona.name
+                else:
+                    raise HTTPException(404, f"Persona '{persona_id}' not found")
+            except HTTPException:
+                raise
+            except Exception as e:
+                raise HTTPException(500, f"Error: {e}")
+
+        if orch.llm_client:
+            try:
+                model = model_override or (agent.model if agent else "anthropic/claude-sonnet-4")
+                response = await orch.llm_client.chat(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt},
+                    ],
+                    model=model,
+                    max_tokens=600,
+                )
+                return {
+                    "persona": persona_id,
+                    "name": persona_name,
+                    "prompt": prompt,
+                    "response": response,
+                    "model": model,
+                }
+            except Exception as e:
+                raise HTTPException(500, f"LLM call failed: {e}")
+        else:
+            return {
+                "persona": persona_id,
+                "name": persona_name,
+                "system_prompt": system_prompt,
+                "user_prompt": prompt,
+                "note": "LLM not configured. Use these prompts manually.",
+            }
+
+    @app.post("/api/conversation/start")
+    async def start_conversation(request: dict = Body(...)):
+        """
+        Start a multi-persona conversation on a topic.
+
+        Body: {
+            "personas": ["sam_altman", "eliezer_yudkowsky"],
+            "topic": "AI safety priorities",
+            "rounds": 2
+        }
+        """
+        orch = app.state.orchestrator
+        persona_ids = request.get("personas", [])
+        topic = request.get("topic", "")
+        rounds = min(request.get("rounds", 1), 5)  # Cap at 5 rounds
+
+        if len(persona_ids) < 2:
+            raise HTTPException(400, "At least 2 personas required")
+        if not topic:
+            raise HTTPException(400, "Topic is required")
+
+        # Load personas
+        persona_lib = YAMLPersonaLibrary(version="v1")
+        participants = []
+        for pid in persona_ids:
+            persona = persona_lib.get(pid)
+            if persona:
+                participants.append({
+                    "id": pid,
+                    "name": persona.name,
+                    "system_prompt": orch._build_persona_prompt(persona),
+                })
+
+        if len(participants) < 2:
+            raise HTTPException(400, "Could not load enough valid personas")
+
+        # If no LLM, return the setup for manual use
+        if not orch.llm_client:
+            return {
+                "status": "setup",
+                "topic": topic,
+                "participants": [{"id": p["id"], "name": p["name"]} for p in participants],
+                "prompts": {
+                    p["id"]: {
+                        "system": p["system_prompt"],
+                        "opening": f"Topic for discussion: {topic}\n\nShare your opening perspective.",
+                    }
+                    for p in participants
+                },
+                "note": "LLM not configured. Use these prompts to run the conversation manually.",
+            }
+
+        # Run conversation with LLM
+        conversation = []
+        context = f"Topic: {topic}\n\n"
+
+        for round_num in range(rounds):
+            for participant in participants:
+                # Build prompt with conversation history
+                messages = [
+                    {"role": "system", "content": participant["system_prompt"]},
+                    {"role": "user", "content": context + "Respond to the discussion. Be concise (2-3 paragraphs max)."},
+                ]
+
+                try:
+                    response = await orch.llm_client.chat(
+                        messages=messages,
+                        model="anthropic/claude-sonnet-4",
+                        max_tokens=400,
+                    )
+                    conversation.append({
+                        "round": round_num + 1,
+                        "persona": participant["id"],
+                        "name": participant["name"],
+                        "response": response,
+                    })
+                    context += f"\n{participant['name']}: {response}\n"
+                except Exception as e:
+                    conversation.append({
+                        "round": round_num + 1,
+                        "persona": participant["id"],
+                        "name": participant["name"],
+                        "error": str(e),
+                    })
+
+        return {
+            "status": "completed",
+            "topic": topic,
+            "rounds": rounds,
+            "participants": [p["name"] for p in participants],
+            "conversation": conversation,
+        }
+
+    @app.post("/api/session/activate")
+    async def activate_personas(request: dict = Body(...)):
+        """
+        Activate specific personas for the current session.
+        This rebuilds the agent roster with selected personas.
+
+        Body: {"personas": ["sam_altman", "yann_lecun", "chuck_schumer"]}
+        """
+        orch = app.state.orchestrator
+        persona_ids = request.get("personas", [])
+
+        if not persona_ids:
+            raise HTTPException(400, "At least one persona required")
+
+        # Update config and rebuild agents
+        agents_cfg = CONFIG.get("agents", {})
+        agents_cfg["personas"] = persona_ids
+        agents_cfg["count"] = len(persona_ids)
+
+        # Clear existing agents and rebuild
+        orch.agents.clear()
+        orch.num_agents = len(persona_ids)
+
+        model_list = agents_cfg.get("models", list(MODELS.values()))
+        orch._create_real_persona_agents(agents_cfg, model_list)
+        orch._init_relationships()
+        orch._init_influence_scores()
+
+        return {
+            "status": "activated",
+            "count": len(orch.agents),
+            "personas": [{"id": a.id, "name": a.name} for a in orch.agents.values()],
+        }
+
     return app
 
 

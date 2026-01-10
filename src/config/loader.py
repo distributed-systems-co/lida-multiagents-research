@@ -42,46 +42,212 @@ def deep_merge(base: Dict, override: Dict) -> Dict:
     return result
 
 
+def load_yaml_file(path: Union[str, Path]) -> Dict:
+    """Load a YAML file, returning empty dict if not found."""
+    path = Path(path)
+    if path.exists():
+        with open(path) as f:
+            return yaml.safe_load(f) or {}
+    logger.warning(f"File not found: {path}")
+    return {}
+
+
+def resolve_path(base_path: Path, relative_path: str) -> Path:
+    """Resolve a relative path from a base path."""
+    if relative_path.startswith("../"):
+        return (base_path.parent / relative_path).resolve()
+    return (base_path / relative_path).resolve()
+
+
+def load_component(component_type: str, path_or_name: str, version: str = "v1") -> Dict:
+    """
+    Load a component (personas, tactics, etc.) from the hierarchical structure.
+
+    Args:
+        component_type: Type of component (personas, tactics, topics, etc.)
+        path_or_name: Either a relative path or just a filename
+        version: Version directory to look in (v1, v2, etc.)
+
+    Returns:
+        Loaded component data.
+    """
+    base_dir = COMPONENT_DIRS.get(component_type)
+    if not base_dir:
+        logger.warning(f"Unknown component type: {component_type}")
+        return {}
+
+    # If it's a relative path, resolve it
+    if "/" in path_or_name or path_or_name.endswith(".yaml"):
+        if path_or_name.startswith("../"):
+            # Relative to scenarios dir
+            full_path = (SCENARIOS_DIR / path_or_name.lstrip("../")).resolve()
+        else:
+            full_path = base_dir / path_or_name
+    else:
+        # Just a name, look in version directory
+        full_path = base_dir / version / f"{path_or_name}.yaml"
+
+    return load_yaml_file(full_path)
+
+
+def resolve_imports(config: Dict, base_path: Path = None) -> Dict:
+    """
+    Resolve imports in a config, loading referenced components.
+
+    Args:
+        config: Configuration dict that may contain 'imports' key
+        base_path: Base path for resolving relative imports
+
+    Returns:
+        Config with imports resolved and merged.
+    """
+    if "imports" not in config:
+        return config
+
+    imports = config.pop("imports")
+    resolved = {}
+
+    for key, import_spec in imports.items():
+        if isinstance(import_spec, str):
+            # Simple string path
+            source_path = import_spec
+            select = None
+            use = None
+        elif isinstance(import_spec, dict):
+            source_path = import_spec.get("source", "")
+            select = import_spec.get("select")
+            use = import_spec.get("use")
+        else:
+            continue
+
+        # Resolve the path
+        if base_path:
+            full_path = resolve_path(base_path, source_path)
+        else:
+            full_path = SCENARIOS_DIR / source_path.lstrip("../")
+
+        loaded = load_yaml_file(full_path)
+
+        # Apply 'use' filter (load specific key from file)
+        if use and use in loaded:
+            loaded = loaded[use]
+
+        # Apply 'select' filter (select specific items)
+        if select and isinstance(loaded, dict):
+            if "personas" in loaded:
+                # Filter personas
+                loaded["personas"] = {
+                    k: v for k, v in loaded.get("personas", {}).items()
+                    if k in select
+                }
+            elif "topics" in loaded:
+                # Filter topics
+                loaded["topics"] = {
+                    k: v for k, v in loaded.get("topics", {}).items()
+                    if k in select
+                }
+
+        resolved[key] = loaded
+
+    # Merge resolved imports into config
+    for key, data in resolved.items():
+        if key not in config:
+            config[key] = data
+        elif isinstance(config[key], dict) and isinstance(data, dict):
+            config[key] = deep_merge(data, config[key])
+
+    return config
+
+
+def resolve_extends(config: Dict, base_path: Path = None) -> Dict:
+    """
+    Resolve _extends directive, loading and merging base config.
+
+    Args:
+        config: Configuration dict that may contain '_extends' key
+        base_path: Base path for resolving relative extends
+
+    Returns:
+        Config with extends resolved and merged.
+    """
+    if "_extends" not in config:
+        return config
+
+    extends_path = config.pop("_extends")
+
+    # Resolve the path
+    if base_path:
+        full_path = resolve_path(base_path, extends_path)
+    else:
+        full_path = SCENARIOS_DIR / "presets" / extends_path
+
+    base_config = load_yaml_file(full_path)
+
+    # Recursively resolve extends in base
+    base_config = resolve_extends(base_config, full_path.parent)
+
+    # Merge: config overrides base
+    return deep_merge(base_config, config)
+
+
 @lru_cache(maxsize=16)
 def load_scenario(name: str = None) -> Dict[str, Any]:
     """
     Load a scenario configuration.
+
+    Supports loading from:
+    - scenarios/*.yaml (legacy flat files)
+    - scenarios/presets/*.yaml (preset configurations)
+    - scenarios/campaigns/*.yaml (full campaign definitions)
 
     Args:
         name: Scenario name (without .yaml) or path to yaml file.
               If None, uses SCENARIO env var or 'default'.
 
     Returns:
-        Merged configuration dictionary.
+        Merged configuration dictionary with imports resolved.
     """
     # Determine scenario to load
     if name is None:
         name = os.getenv("SCENARIO", "default")
 
-    # Load default first
-    default_path = SCENARIOS_DIR / DEFAULT_SCENARIO
     config = {}
+    scenario_path = None
 
-    if default_path.exists():
-        with open(default_path) as f:
-            config = yaml.safe_load(f) or {}
-        logger.info(f"Loaded default scenario from {default_path}")
+    # Search order: presets > campaigns > root scenarios
+    search_paths = [
+        SCENARIOS_DIR / "presets" / f"{name}.yaml",
+        SCENARIOS_DIR / "campaigns" / f"{name}.yaml",
+        SCENARIOS_DIR / f"{name}.yaml",
+    ]
 
-    # If requesting non-default, merge on top
-    if name != "default":
-        # Check if it's a path or just a name
-        if name.endswith(".yaml") or "/" in name:
-            scenario_path = Path(name)
-        else:
-            scenario_path = SCENARIOS_DIR / f"{name}.yaml"
+    # Also check if it's a direct path
+    if name.endswith(".yaml") or "/" in name:
+        search_paths.insert(0, Path(name))
 
-        if scenario_path.exists():
-            with open(scenario_path) as f:
-                override = yaml.safe_load(f) or {}
-            config = deep_merge(config, override)
-            logger.info(f"Merged scenario '{name}' from {scenario_path}")
-        else:
-            logger.warning(f"Scenario '{name}' not found at {scenario_path}")
+    # Find first existing file
+    for path in search_paths:
+        if path.exists():
+            scenario_path = path
+            config = load_yaml_file(path)
+            logger.info(f"Loaded scenario from {path}")
+            break
+
+    if not config and name != "default":
+        logger.warning(f"Scenario '{name}' not found in any location")
+        # Fall back to default
+        default_path = SCENARIOS_DIR / "presets" / "default.yaml"
+        if default_path.exists():
+            config = load_yaml_file(default_path)
+            scenario_path = default_path
+
+    # Resolve _extends directive
+    if scenario_path:
+        config = resolve_extends(config, scenario_path.parent)
+
+    # Resolve imports
+    if scenario_path:
+        config = resolve_imports(config, scenario_path.parent)
 
     # Apply environment variable overrides
     config = apply_env_overrides(config)
