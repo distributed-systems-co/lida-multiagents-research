@@ -228,7 +228,7 @@ class Agent:
             "prompt_id": self.prompt_id,
             "prompt_category": self.prompt_category,
             "prompt_subcategory": self.prompt_subcategory,
-            "prompt_text": self.prompt_text[:200] if self.prompt_text else "",
+            "prompt_text": self.prompt_text or "",
             "status": self.status,
             "current_thought": self.current_thought,
             "messages_sent": self.messages_sent,

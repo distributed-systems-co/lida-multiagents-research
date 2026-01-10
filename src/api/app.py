@@ -3963,7 +3963,7 @@ def get_agent_details(state) -> dict:
         base_info["prompt_id"] = getattr(agent, "prompt_id", None)
         base_info["prompt_category"] = getattr(agent, "prompt_category", None)
         base_info["prompt_subcategory"] = getattr(agent, "prompt_subcategory", None)
-        base_info["persona_prompt"] = getattr(agent, "persona_prompt", "")[:200] + "..." if len(getattr(agent, "persona_prompt", "")) > 200 else getattr(agent, "persona_prompt", "")
+        base_info["persona_prompt"] = getattr(agent, "persona_prompt", "")
         base_info["beliefs"] = agent._beliefs
         base_info["belief_count"] = len(agent._beliefs)
         base_info["knowledge_items"] = len(agent._knowledge_base)

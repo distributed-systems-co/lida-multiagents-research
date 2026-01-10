@@ -917,12 +917,11 @@
 
                         <!-- Prompt/Persona Info -->
                         <div v-if="agent.prompt_category" class="mb-2 bg-gradient-to-r from-indigo-900/30 to-purple-900/20 rounded p-2 border border-indigo-800/30">
-                            <div class="flex items-center gap-1 mb-1 flex-wrap">
+                            <div class="flex items-center gap-1 flex-wrap">
                                 <span class="text-[9px] bg-indigo-500/30 text-indigo-300 px-1.5 py-0.5 rounded uppercase tracking-wider">{{ agent.prompt_category }}</span>
                                 <span v-if="agent.prompt_subcategory" class="text-[9px] bg-purple-500/30 text-purple-300 px-1.5 py-0.5 rounded">{{ agent.prompt_subcategory }}</span>
                                 <span v-if="agent.prompt_id" class="text-[9px] text-gray-500">#{{ agent.prompt_id }}</span>
                             </div>
-                            <div v-if="agent.prompt_text" class="text-[10px] text-gray-400 leading-relaxed truncate-2">{{ agent.prompt_text }}</div>
                         </div>
 
                         <!-- Status & Activity -->
