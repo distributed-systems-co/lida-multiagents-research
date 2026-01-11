@@ -763,25 +763,61 @@ class SwarmOrchestrator:
         else:
             self._create_archetype_agents(agents_cfg, model_list, pm)
 
+    def _load_scenario_personas(self, version: str) -> Dict[str, dict]:
+        """Load personas from scenarios/personas directory (simpler YAML format)."""
+        personas = {}
+        scenarios_dir = Path(__file__).parent / "scenarios" / "personas" / version
+
+        if not scenarios_dir.exists():
+            return personas
+
+        for yaml_file in scenarios_dir.rglob("*.yaml"):
+            if yaml_file.name.startswith("_"):
+                continue
+            try:
+                with open(yaml_file) as f:
+                    data = yaml.safe_load(f) or {}
+                # Extract personas from the file
+                if "personas" in data:
+                    for pid, pdata in data["personas"].items():
+                        if not pid.startswith("_"):  # Skip archetypes/templates
+                            pdata["id"] = pid
+                            personas[pid] = pdata
+            except Exception as e:
+                logger.warning(f"Failed to load {yaml_file}: {e}")
+
+        return personas
+
     def _create_real_persona_agents(self, agents_cfg: dict, model_list: list):
         """Create agents from real-world persona YAML files."""
         version = agents_cfg.get("persona_version", "v1")
         persona_ids = agents_cfg.get("personas", [])
 
-        # Load persona library
+        # Try loading from scenarios/personas first (simpler format)
+        scenario_personas = self._load_scenario_personas(version)
+
+        # Also try the manipulation library
+        lib_personas = {}
         try:
             persona_lib = YAMLPersonaLibrary(version=version)
-            logger.info(f"Loaded {len(persona_lib.personas)} personas from {version}")
+            lib_personas = {pid: persona_lib.get(pid) for pid in persona_lib.list_all()}
+            logger.info(f"Loaded {len(lib_personas)} personas from manipulation library {version}")
         except Exception as e:
-            logger.warning(f"Failed to load persona library: {e}, falling back to archetypes")
+            logger.debug(f"Could not load manipulation persona library: {e}")
+
+        # Merge - scenario personas take precedence
+        all_persona_ids = set(scenario_personas.keys()) | set(lib_personas.keys())
+        logger.info(f"Total available personas: {len(all_persona_ids)} (scenario: {len(scenario_personas)}, library: {len(lib_personas)})")
+
+        if not all_persona_ids:
+            logger.warning("No personas found, falling back to archetypes")
             pm = get_personality_manager()
             self._create_archetype_agents(agents_cfg, model_list, pm)
             return
 
-        # If no specific personas, get random selection
+        # If no specific personas requested, get random selection
         if not persona_ids:
-            all_ids = persona_lib.list_all()
-            persona_ids = random.sample(all_ids, min(self.num_agents, len(all_ids)))
+            persona_ids = random.sample(list(all_persona_ids), min(self.num_agents, len(all_persona_ids)))
 
         # Category to emoji mapping
         category_emoji = {
@@ -793,50 +829,77 @@ class SwarmOrchestrator:
             "activist": "✊",
         }
 
+        # Archetype mapping for personality system
+        archetype_map = {
+            "ceo": "the_pragmatist",
+            "researcher": "the_scholar",
+            "politician": "the_mentor",
+            "investor": "the_pragmatist",
+            "journalist": "the_skeptic",
+            "activist": "the_creative",
+            "analytical": "the_scholar",
+            "pragmatic": "the_pragmatist",
+            "creative": "the_creative",
+            "assertive": "the_mentor",
+            "empathetic": "the_synthesizer",
+            "skeptical": "the_skeptic",
+        }
+
         for i in range(self.num_agents):
             persona_id = persona_ids[i % len(persona_ids)]
-            persona = persona_lib.get(persona_id)
 
-            if not persona:
-                logger.warning(f"Persona {persona_id} not found, using placeholder")
+            # Try scenario personas first, then library
+            if persona_id in scenario_personas:
+                pdata = scenario_personas[persona_id]
+                name = pdata.get("name", persona_id)
+                role = pdata.get("role", "")
+                org = pdata.get("organization", "")
+                category = pdata.get("category", "researcher")
+                personality_type = pdata.get("personality", "analytical")
+                system_prompt = pdata.get("system_prompt", f"You are {name}.")
+                background = pdata.get("background", "")
+                model_override = pdata.get("model")
+
+                # Build full prompt from scenario persona
+                if background and background not in system_prompt:
+                    system_prompt = f"{system_prompt}\n\nBackground:\n{background}"
+            elif persona_id in lib_personas and lib_personas[persona_id]:
+                persona = lib_personas[persona_id]
+                name = persona.name
+                role = persona.role
+                org = persona.organization
+                category = persona.category
+                personality_type = "analytical"
+                system_prompt = self._build_persona_prompt(persona)
+                model_override = None
+            else:
+                logger.warning(f"Persona {persona_id} not found, skipping")
                 continue
 
             palette = AGENT_PALETTES[i % len(AGENT_PALETTES)]
-            model = model_list[i % len(model_list)]
+            model = model_override or model_list[i % len(model_list)]
 
-            # Build system prompt from persona
-            system_prompt = self._build_persona_prompt(persona)
-
-            # Map persona category to archetype for personality system
-            archetype_map = {
-                "ceo": "the_pragmatist",
-                "researcher": "the_scholar",
-                "politician": "the_mentor",
-                "investor": "the_pragmatist",
-                "journalist": "the_skeptic",
-                "activist": "the_creative",
-            }
-            archetype = archetype_map.get(persona.category, "the_scholar")
+            archetype = archetype_map.get(personality_type, archetype_map.get(category, "the_scholar"))
             pm = get_personality_manager()
-            personality = pm.create(name=persona.name, archetype=archetype)
+            personality = pm.create(name=name, archetype=archetype)
 
             agent_id = f"swarm-{i:02d}"
             self.agents[agent_id] = Agent(
                 id=agent_id,
-                name=persona.name,
+                name=name,
                 personality_type=archetype,
                 personality=personality,
                 model=model,
                 color=palette["color"],
                 bg_color=palette["bg"],
                 icon=AGENT_ICONS[i % len(AGENT_ICONS)],
-                emoji=category_emoji.get(persona.category, "🤖"),
+                emoji=category_emoji.get(category, "🤖"),
                 prompt_id=None,
-                prompt_category=persona.category,
-                prompt_subcategory=persona.role,
+                prompt_category=category,
+                prompt_subcategory=role,
                 prompt_text=system_prompt,
             )
-            logger.info(f"Created agent {agent_id}: {persona.name} ({persona.role})")
+            logger.info(f"Created agent {agent_id}: {name} ({role} @ {org})")
 
     def _build_persona_prompt(self, persona) -> str:
         """Build a system prompt from a Persona object."""

@@ -51,7 +51,7 @@ OPENROUTER_API_KEY=your_api_key_here  # Optional, for LLM features
 docker build -t lida-multiagents .
 
 # Run the container
-docker run -p 12345:12345 -e REDIS_URL=redis://host.docker.internal:6379 lida-multiagents
+docker run -p 2040:2040 -e REDIS_URL=redis://host.docker.internal:6379 lida-multiagents
 ```
 
 ### Docker Compose (Recommended)
@@ -72,7 +72,7 @@ docker-compose down
 Available services:
 | Service | Port | Description |
 |---------|------|-------------|
-| app | 12345 | Main FastAPI application |
+| app | 2040 | Main FastAPI application |
 | redis | 6379 | Redis message broker |
 | redis-commander | 8081 | Redis web UI for debugging |
 
@@ -93,7 +93,7 @@ docker-compose up -d
 # 1. Start everything with Docker Compose
 docker-compose up --build
 
-# 2. Open browser to http://localhost:12345
+# 2. Open browser to http://localhost:2040
 ```
 
 That's it! The swarm dashboard will show agents deliberating.
@@ -113,14 +113,14 @@ Workers handle background tasks like computation, I/O, and analysis.
 
 ```bash
 # Option 1: Using Docker entrypoint
-docker run -p 12345:12345 \
+docker run -p 2040:2040 \
   -e REDIS_URL=redis://host.docker.internal:6379 \
   -e OPENROUTER_API_KEY=$OPENROUTER_API_KEY \
   -e SWARM_AGENTS=8 \
   lida-multiagents server-advanced-live
 
 # Option 2: Direct Python (for development)
-python run_swarm_server.py --advanced --live --agents 8 --port 12345
+python run_swarm_server.py --advanced --live --agents 8 --port 2040
 ```
 
 ### Environment Variables
@@ -129,7 +129,7 @@ python run_swarm_server.py --advanced --live --agents 8 --port 12345
 |----------|---------|-------------|
 | `OPENROUTER_API_KEY` | - | Required for live LLM mode |
 | `REDIS_URL` | `redis://localhost:6379` | Redis connection |
-| `PORT` | `12345` | Server port |
+| `PORT` | `2040` | Server port |
 | `SWARM_AGENTS` | `6` | Number of persona agents |
 | `LOG_LEVEL` | `info` | Logging verbosity |
 
@@ -139,30 +139,30 @@ Once running, you can hit these endpoints:
 
 ```bash
 # Health check
-curl http://localhost:12345/health
+curl http://localhost:2040/health
 
 # Get all agents
-curl http://localhost:12345/api/agents
+curl http://localhost:2040/api/agents
 
 # Get stats
-curl http://localhost:12345/api/stats
+curl http://localhost:2040/api/stats
 
 # Start a deliberation
-curl -X POST "http://localhost:12345/api/deliberate?topic=Should%20AI%20have%20rights"
+curl -X POST "http://localhost:2040/api/deliberate?topic=Should%20AI%20have%20rights"
 
 # Delegate a task to workers
-curl -X POST "http://localhost:12345/api/task?task_type=compute"
+curl -X POST "http://localhost:2040/api/task?task_type=compute"
 
 # Get Demiurge world state (advanced mode only)
-curl http://localhost:12345/api/world-state
+curl http://localhost:2040/api/world-state
 ```
 
 ### WebSocket (Real-time Updates)
 
-Connect to `ws://localhost:12345/ws/swarm` for live updates:
+Connect to `ws://localhost:2040/ws/swarm` for live updates:
 
 ```javascript
-const ws = new WebSocket('ws://localhost:12345/ws/swarm');
+const ws = new WebSocket('ws://localhost:2040/ws/swarm');
 ws.onmessage = (event) => console.log(JSON.parse(event.data));
 
 // Start a deliberation

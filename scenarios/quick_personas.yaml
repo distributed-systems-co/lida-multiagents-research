@@ -1,0 +1,34 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Quick Personas Scenario - Fast debates with real tech leaders
+# ═══════════════════════════════════════════════════════════════════════════════
+
+simulation:
+  num_agents: 4
+  max_rounds_per_agent: 2
+  tick_interval_ms: 50
+
+# Use the persona system
+agents:
+  use_real_personas: true
+  persona_version: "v2"
+  # Specify exact personas to use (from tech_leaders.yaml and ai_researchers.yaml)
+  # IDs must match the keys in the personas: section of the YAML files
+  personas:
+    - elon_musk      # tech_leaders.yaml
+    - satya_nadella  # tech_leaders.yaml
+    - altman         # ai_researchers.yaml (Sam Altman)
+    - lecun          # ai_researchers.yaml (Yann LeCun)
+
+persuader:
+  model: "google/gemini-2.0-flash-001"
+
+models:
+  default: "google/gemini-2.0-flash-001"
+  agent_weights:
+    "google/gemini-2.0-flash-001": 0.5
+    "deepseek/deepseek-chat": 0.5
+
+topics:
+  - "RESOLVED: AI development should be paused until we have better alignment techniques."
+  - "RESOLVED: Open source AI is safer than closed AI development."
+  - "RESOLVED: AI companies should be strictly liable for harms caused by their systems."
