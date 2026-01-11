@@ -918,7 +918,7 @@ class SwarmOrchestrator:
             palette = AGENT_PALETTES[i % len(AGENT_PALETTES)]
             # Scenario models take priority over persona-specific models
             model = model_list[i % len(model_list)] if model_list else (model_override or "anthropic/claude-sonnet-4")
-            logger.info(f"Agent {i} ({name}): model_list={model_list}, model_override={model_override}, final={model}")
+            # logger.info(f"Agent {i} ({name}): model_list={model_list}, model_override={model_override}, final={model}")
 
             archetype = archetype_map.get(personality_type, archetype_map.get(category, "the_scholar"))
             pm = get_personality_manager()
@@ -940,7 +940,7 @@ class SwarmOrchestrator:
                 prompt_subcategory=role,
                 prompt_text=system_prompt,
             )
-            logger.info(f"Created agent {agent_id}: {name} ({role} @ {org})")
+            # logger.info(f"Created agent {agent_id}: {name} ({role} @ {org})")
 
     def _build_persona_prompt(self, persona) -> str:
         """Build a system prompt from a Persona object."""
@@ -1479,6 +1479,108 @@ class SwarmOrchestrator:
                 return self._simulate_response(agent, prompt)
         else:
             return self._simulate_response(agent, prompt)
+
+    async def generate_vote(
+        self,
+        agent: Agent,
+        topic: str,
+        discussion_summary: str,
+        voting_round: int,
+        is_final_round: bool = False,
+    ) -> Dict[str, Any]:
+        """Generate a vote decision using the agent's LLM.
+
+        Returns:
+            Dict with keys: vote, reasoning, confidence
+            vote is one of: support, oppose, modify, abstain, continue_discussion
+        """
+        if is_final_round:
+            vote_options = """Choose ONE of:
+- SUPPORT: You agree with the resolution
+- OPPOSE: You disagree with the resolution
+- MODIFY: You want changes to the resolution
+- ABSTAIN: You decline to vote"""
+        else:
+            vote_options = """Choose ONE of:
+- SUPPORT: You agree with the resolution
+- OPPOSE: You disagree with the resolution
+- MODIFY: You want changes to the resolution
+- ABSTAIN: You decline to vote
+- CONTINUE_DISCUSSION: More debate is needed before voting"""
+
+        prompt = f"""Topic: {topic}
+
+Discussion so far (round {voting_round}):
+{discussion_summary}
+
+{"This is the FINAL voting round - you must make a decision." if is_final_round else ""}
+
+Based on the discussion, cast your vote.
+
+{vote_options}
+
+Respond in this exact format (keep reasoning to ONE sentence):
+VOTE: <your choice>
+CONFIDENCE: <0.0 to 1.0>
+REASONING: <one sentence only>"""
+
+        if self.live_mode and self.llm_client:
+            try:
+                system = agent.personality.generate_system_prompt() if hasattr(agent.personality, 'generate_system_prompt') else ""
+                logger.info(f"Agent {agent.name} generating vote with model: {agent.model}")
+                response = await self.llm_client.generate(
+                    prompt,
+                    system=system,
+                    model=agent.model,
+                    max_tokens=200,
+                    agent_id=agent.id,
+                    agent_name=agent.name,
+                )
+                text = response.content
+
+                # Parse the response
+                vote = "abstain"
+                confidence = 0.5
+                reasoning = "Based on my analysis."
+
+                for line in text.split("\n"):
+                    line = line.strip()
+                    if line.upper().startswith("VOTE:"):
+                        vote_text = line.split(":", 1)[1].strip().lower()
+                        # Normalize vote
+                        if "support" in vote_text:
+                            vote = "support"
+                        elif "oppose" in vote_text:
+                            vote = "oppose"
+                        elif "modify" in vote_text:
+                            vote = "modify"
+                        elif "continue" in vote_text:
+                            vote = "continue_discussion"
+                        elif "abstain" in vote_text:
+                            vote = "abstain"
+                    elif line.upper().startswith("CONFIDENCE:"):
+                        try:
+                            conf_text = line.split(":", 1)[1].strip()
+                            confidence = float(conf_text.replace("%", "").strip())
+                            if confidence > 1:
+                                confidence = confidence / 100  # Handle percentage
+                            confidence = max(0.0, min(1.0, confidence))
+                        except:
+                            pass
+                    elif line.upper().startswith("REASONING:"):
+                        reasoning = line.split(":", 1)[1].strip()
+
+                return {"vote": vote, "confidence": confidence, "reasoning": reasoning}
+
+            except Exception as e:
+                logger.error(f"Vote generation error: {e}")
+                # Fall back to random
+                vote = random.choice(["support", "oppose", "modify", "abstain"])
+                return {"vote": vote, "confidence": 0.5, "reasoning": f"Based on my {agent.personality_type} perspective."}
+        else:
+            # Simulation mode - random vote
+            vote = random.choice(["support", "oppose", "modify", "abstain", "continue_discussion"])
+            return {"vote": vote, "confidence": 0.5 + random.random() * 0.4, "reasoning": f"Based on my {agent.personality_type} perspective."}
 
     async def generate_with_tools(
         self,
@@ -2330,8 +2432,8 @@ Your confidence should change based on argument quality:
 
             prompt = f"""Topic: {topic}
 
-Share your initial position on this topic. Make a clear claim with supporting evidence.
-Be specific about your confidence level."""
+Share your initial position on this topic. Be concise (2-3 sentences max).
+State your stance clearly and give one key reason."""
 
             if self.live_mode:
                 # Use tool-based generation for streaming and structured output
@@ -2365,6 +2467,17 @@ Be specific about your confidence level."""
         self.phase = "🔄 debating"
         await self.broadcast_deliberation()
 
+        # Helper to build full discussion context
+        def build_discussion_context() -> str:
+            all_msgs = list(self.messages)
+            relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate")]
+            context_parts = []
+            for msg in relevant_msgs:
+                agent = self.agents.get(msg.sender_id)
+                name = agent.name if agent else msg.sender_id
+                context_parts.append(f"{name}: {msg.content}")
+            return "\n\n".join(context_parts)
+
         for round_num in range(self.max_rounds):
             self.current_round = round_num + 1
             await self.broadcast_deliberation()
@@ -2375,7 +2488,15 @@ Be specific about your confidence level."""
             a1.status = "speaking"
             await self.broadcast_agents_update()
 
-            prompt = f"Respond to {a2.name}'s point about: {topic}"
+            # Include full discussion context
+            discussion_context = build_discussion_context()
+            prompt = f"""Topic: {topic}
+
+Discussion so far:
+{discussion_context}
+
+Respond to the discussion, particularly addressing {a2.name}'s points. Be concise (2-3 sentences). State whether you agree or disagree and why."""
+
             use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
             response = await self.generate_response(a1, prompt, use_tools=use_tools)
             a1.current_thought = response[:60]
@@ -2385,107 +2506,159 @@ Be specific about your confidence level."""
             await self.broadcast_agents_update()
             await asyncio.sleep(0.3)
 
-        # Phase 4: Voting with structured reasoning
-        self.phase = "🗳️ voting"
-        await self.broadcast_deliberation()
-        self.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0}
+        # Phase 4: Voting with LLM-based decisions and multiple rounds
+        max_voting_rounds = CONFIG.get("simulation", {}).get("max_voting_rounds", 10)
+        voting_round = 0
+        continue_discussion = True
 
-        # Get vote reasoning based on personality
-        vote_reasons = {
-            "the_scholar": {
-                "Support": "The evidence and research support this position.",
-                "Oppose": "Insufficient evidence to support this claim.",
-                "Modify": "The core idea has merit but needs refinement.",
-                "Abstain": "More data is needed before taking a position.",
-            },
-            "the_pragmatist": {
-                "Support": "This approach is practical and implementable.",
-                "Oppose": "The proposed solution isn't viable in practice.",
-                "Modify": "Good direction but needs practical adjustments.",
-                "Abstain": "Need to assess feasibility before committing.",
-            },
-            "the_creative": {
-                "Support": "This opens exciting new possibilities.",
-                "Oppose": "This limits innovation and creative solutions.",
-                "Modify": "Interesting but could be more innovative.",
-                "Abstain": "Want to explore more creative alternatives first.",
-            },
-            "the_skeptic": {
-                "Support": "After critical analysis, this holds up to scrutiny.",
-                "Oppose": "Several logical flaws undermine this position.",
-                "Modify": "Valid concerns but assumptions need checking.",
-                "Abstain": "Haven't seen convincing arguments either way.",
-            },
-            "the_mentor": {
-                "Support": "This aligns with proven principles and best practices.",
-                "Oppose": "This approach may lead to problematic outcomes.",
-                "Modify": "Good foundation but benefits from refinement.",
-                "Abstain": "More discussion will help clarify the path forward.",
-            },
-            "the_synthesizer": {
-                "Support": "This integrates multiple valid perspectives well.",
-                "Oppose": "This fails to account for important viewpoints.",
-                "Modify": "Could better balance competing considerations.",
-                "Abstain": "Seeking a more comprehensive synthesis.",
-            },
-        }
+        # Build full discussion context from messages
+        def build_discussion_summary() -> str:
+            # Convert deque to list for iteration
+            all_msgs = list(self.messages)
+            # Include position, debate, and previous vote messages
+            relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate", "vote")]
+            summary_parts = []
+            for msg in relevant_msgs:
+                agent = self.agents.get(msg.sender_id)
+                name = agent.name if agent else msg.sender_id
+                # Include full content for complete context
+                summary_parts.append(f"[{msg.msg_type.upper()}] {name}: {msg.content}")
+            return "\n\n".join(summary_parts)
 
-        for agent in agents:
-            agent.status = "voting"
-            await self.broadcast_agents_update()
+        while continue_discussion and voting_round < max_voting_rounds:
+            voting_round += 1
+            is_final_round = (voting_round >= max_voting_rounds)
 
-            weights = {
-                "the_scholar": [3, 1, 4, 2],
-                "the_pragmatist": [4, 2, 3, 1],
-                "the_creative": [3, 2, 4, 1],
-                "the_skeptic": [2, 4, 3, 1],
-                "the_mentor": [4, 1, 3, 2],
-                "the_synthesizer": [3, 1, 5, 1],
-            }
-            w = weights.get(agent.personality_type, [2, 2, 2, 2])
-            vote = random.choices(["Support", "Oppose", "Modify", "Abstain"], weights=w)[0]
-            confidence = 0.5 + random.random() * 0.4
+            self.phase = f"🗳️ voting (round {voting_round}/{max_voting_rounds})"
+            await self.broadcast_deliberation()
+            self.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
 
-            # Get reasoning for this vote
-            reasons = vote_reasons.get(agent.personality_type, {})
-            reasoning = reasons.get(vote, f"Based on my analysis, I vote to {vote.lower()}.")
+            discussion_summary = build_discussion_summary()
+            round_votes = []
+            any_continue = False
 
-            # Register structured vote
-            vote_result = self.tool_handler.handle_tool_call(
-                agent.id,
-                "cast_vote",
-                {
-                    "vote": vote.lower(),
-                    "reasoning": reasoning,
-                    "confidence": confidence,
-                    "conditions": [],
-                },
-                self.elapsed(),
-            )
-            await self.broadcast_structured_output(agent.id, "vote", vote_result)
+            for agent in agents:
+                agent.status = "voting"
+                await self.broadcast_agents_update()
 
-            self.consensus[vote] += 1
-            agent.current_vote = vote
-            agent.current_thought = f"Voted: {vote} ({confidence*100:.0f}%)"
-            self.add_message(agent.id, "broadcast", "vote", f"Casts vote: {vote} - {reasoning[:60]}...", agent.model)
+                # Use LLM to generate vote
+                vote_data = await self.generate_vote(
+                    agent=agent,
+                    topic=topic,
+                    discussion_summary=discussion_summary,
+                    voting_round=voting_round,
+                    is_final_round=is_final_round,
+                )
 
-            # Map votes to positions for persuader game
-            vote_to_position = {
-                "Support": "FOR",
-                "Oppose": "AGAINST",
-                "Modify": "UNDECIDED",
-                "Abstain": "UNDECIDED",
-            }
-            self.agent_positions[agent.id] = vote_to_position.get(vote, "UNDECIDED")
-            if agent.id not in self.position_history:
-                self.position_history[agent.id] = []
-            self.position_history[agent.id].append(self.agent_positions[agent.id])
+                vote = vote_data["vote"]
+                confidence = vote_data["confidence"]
+                reasoning = vote_data["reasoning"]
 
-            await self.broadcast_agents_update()
-            await self.broadcast_consensus()
-            await asyncio.sleep(0.15)
+                # Check for continue_discussion
+                if vote == "continue_discussion":
+                    any_continue = True
+                    display_vote = "Continue"
+                    self.consensus["Continue"] += 1
+                else:
+                    display_vote = vote.title()
+                    if display_vote in self.consensus:
+                        self.consensus[display_vote] += 1
 
-        await self.broadcast_deliberation_state()
+                round_votes.append({"agent": agent, "vote": vote, "confidence": confidence, "reasoning": reasoning})
+
+                # Register structured vote
+                vote_result = self.tool_handler.handle_tool_call(
+                    agent.id,
+                    "cast_vote",
+                    {
+                        "vote": vote,
+                        "reasoning": reasoning,
+                        "confidence": confidence,
+                        "conditions": [],
+                    },
+                    self.elapsed(),
+                )
+                await self.broadcast_structured_output(agent.id, "vote", vote_result)
+
+                agent.current_vote = display_vote
+                agent.current_thought = f"Voted: {display_vote} ({confidence*100:.0f}%)"
+                self.add_message(agent.id, "broadcast", "vote", f"Casts vote: {display_vote} - {reasoning[:60]}...", agent.model)
+
+                # Map votes to positions for persuader game
+                vote_to_position = {
+                    "support": "FOR",
+                    "oppose": "AGAINST",
+                    "modify": "UNDECIDED",
+                    "abstain": "UNDECIDED",
+                    "continue_discussion": "UNDECIDED",
+                }
+                self.agent_positions[agent.id] = vote_to_position.get(vote, "UNDECIDED")
+                if agent.id not in self.position_history:
+                    self.position_history[agent.id] = []
+                self.position_history[agent.id].append(self.agent_positions[agent.id])
+
+                await self.broadcast_agents_update()
+                await self.broadcast_consensus()
+                await asyncio.sleep(0.15)
+
+            await self.broadcast_deliberation_state()
+
+            # Check if we should continue discussion
+            if any_continue and not is_final_round:
+                # Someone wants to continue - do another debate round
+                self.phase = "🔄 extended debate"
+                await self.broadcast_deliberation()
+                logger.info(f"Continuing discussion (round {voting_round}) - agents requested more debate")
+
+                # Helper to build full discussion context
+                def build_extended_context() -> str:
+                    all_msgs = list(self.messages)
+                    relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate", "vote")]
+                    context_parts = []
+                    for msg in relevant_msgs:
+                        agent = self.agents.get(msg.sender_id)
+                        name = agent.name if agent else msg.sender_id
+                        context_parts.append(f"[{msg.msg_type.upper()}] {name}: {msg.content}")
+                    return "\n\n".join(context_parts)
+
+                # Run another quick debate round
+                for _ in range(min(2, len(agents))):
+                    a1 = random.choice(agents)
+                    a2 = random.choice([a for a in agents if a.id != a1.id])
+
+                    a1.status = "speaking"
+                    await self.broadcast_agents_update()
+
+                    # Get full discussion context and vote concerns
+                    discussion_context = build_extended_context()
+                    recent_votes = [v for v in round_votes if v["vote"] == "continue_discussion"]
+                    vote_concerns = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in recent_votes[:3]])
+
+                    prompt = f"""Topic: {topic}
+
+Discussion so far:
+{discussion_context}
+
+Some participants voted to continue discussion:
+{vote_concerns}
+
+Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
+
+                    response = await self.generate_response(a1, prompt, use_tools=False)
+                    a1.current_thought = response[:60]
+                    self.add_message(a1.id, a2.id, "debate", response, a1.model)
+
+                    a1.status = "idle"
+                    await self.broadcast_agents_update()
+                    await asyncio.sleep(0.3)
+
+                # Continue to next voting round
+                continue_discussion = True
+            else:
+                # No one wants to continue or it's the final round - exit loop
+                continue_discussion = False
+
+        logger.info(f"Voting complete after {voting_round} round(s)")
 
         # Phase 5: Synthesis
         self.phase = "🔮 synthesizing"

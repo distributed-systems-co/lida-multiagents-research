@@ -20,6 +20,7 @@ class VoteType(Enum):
     OPPOSE = "oppose"
     MODIFY = "modify"
     ABSTAIN = "abstain"
+    CONTINUE_DISCUSSION = "continue_discussion"
 
 
 @dataclass
