@@ -589,6 +589,17 @@ class SwarmOrchestrator:
         self.live_mode = live_mode
         self.tools_mode = tools_mode
 
+        # Log mode prominently
+        if self.live_mode:
+            logger.warning("=" * 80)
+            logger.warning("🔴 LIVE MODE ENABLED - Real LLM API calls will be made to OpenRouter")
+            logger.warning("=" * 80)
+        else:
+            logger.warning("=" * 80)
+            logger.warning("🟢 SIMULATION MODE - Using mock responses (no API calls)")
+            logger.warning("   To enable live mode: set SWARM_LIVE=true environment variable")
+            logger.warning("=" * 80)
+
         self.agents: Dict[str, Agent] = {}
         self.messages: deque = deque(maxlen=500)  # Increased for more agents
         self.tool_calls: deque = deque(maxlen=200)
@@ -1453,10 +1464,11 @@ class SwarmOrchestrator:
         if self.live_mode and self.llm_client:
             try:
                 system = agent.personality.generate_system_prompt()
+                logger.info(f"Agent {agent.name} generating response with model: {agent.model}")
                 response = await self.llm_client.generate(
                     prompt,
                     system=system,
-                    model=MODELS.get(agent.model, "anthropic/claude-sonnet-4"),
+                    model=agent.model,  # Use agent's model directly
                     max_tokens=200,
                 )
                 return response.content
@@ -1506,7 +1518,7 @@ When responding:
                 # Use OpenRouter with tools
                 from src.llm import OpenRouterLM
                 lm = OpenRouterLM(
-                    model=MODELS.get(agent.model, "openai/gpt-4o"),
+                    model=agent.model,
                     enable_logprobs=True,
                 )
 
@@ -2002,10 +2014,11 @@ Your confidence should change based on argument quality:
         if self.live_mode and self.llm_client:
             try:
                 system = agent.personality.generate_system_prompt() if hasattr(agent.personality, 'generate_system_prompt') else ""
+                logger.info(f"Agent {agent.name} generating debate response with model: {agent.model}")
                 response = await self.llm_client.generate(
                     response_prompt,
                     system=system,
-                    model=MODELS.get(agent.model, "anthropic/claude-sonnet-4"),
+                    model=agent.model,
                     max_tokens=400,
                 )
                 agent_response = response.content

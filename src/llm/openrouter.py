@@ -197,6 +197,9 @@ class OpenRouterClient:
         """Non-streaming completion."""
         client = await self._get_client()
 
+        logger.info(f"OpenRouter API call - Requesting model: {payload['model']}")
+        logger.debug(f"OpenRouter payload: {json.dumps({k: v for k, v in payload.items() if k != 'messages'}, indent=2)}")
+
         response = await client.post(
             f"{self.base_url}/chat/completions",
             json=payload,
@@ -204,10 +207,15 @@ class OpenRouterClient:
         response.raise_for_status()
 
         data = response.json()
+        actual_model = data.get("model", payload["model"])
+
+        logger.info(f"OpenRouter API response - Actual model used: {actual_model}")
+        if actual_model != payload["model"]:
+            logger.warning(f"Model mismatch! Requested: {payload['model']}, Got: {actual_model}")
 
         return StreamingResponse(
             content=data["choices"][0]["message"]["content"],
-            model=data.get("model", payload["model"]),
+            model=actual_model,
             finish_reason=data["choices"][0].get("finish_reason"),
             usage=data.get("usage", {}),
         )
@@ -215,6 +223,8 @@ class OpenRouterClient:
     async def _stream_complete(self, payload: dict) -> AsyncIterator[str]:
         """Streaming completion yielding content chunks."""
         client = await self._get_client()
+
+        logger.info(f"OpenRouter API call (streaming) - Requesting model: {payload['model']}")
 
         async with client.stream(
             "POST",
