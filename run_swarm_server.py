@@ -744,19 +744,24 @@ class SwarmOrchestrator:
         models_cfg = CONFIG.get("models", {})
 
         # Get models from config or use defaults
-        # Support: agents.models list, models.agent_weights dict, or fallback
-        if agents_cfg.get("models"):
-            model_list = agents_cfg.get("models")
-        elif models_cfg.get("agent_weights"):
-            # Use weighted models from config
+        # Priority: models.agent_weights > models.default > agents.models > fallback
+        if models_cfg.get("agent_weights"):
+            # Scenario-specified weighted models (highest priority)
             model_list = list(models_cfg.get("agent_weights", {}).keys())
+            logger.info(f"Using models.agent_weights: {model_list}")
         elif models_cfg.get("default"):
             model_list = [models_cfg.get("default")]
+            logger.info(f"Using models.default: {model_list}")
+        elif agents_cfg.get("models"):
+            model_list = agents_cfg.get("models")
+            logger.info(f"Using agents.models: {model_list}")
         else:
             model_list = list(MODELS.values())
+            logger.info(f"Using fallback MODELS: {model_list[:3]}...")
 
         # Check if we should use real-world personas
         use_real_personas = agents_cfg.get("use_real_personas", False)
+        logger.info(f"use_real_personas={use_real_personas}, agents_cfg keys={list(agents_cfg.keys())}")
 
         if use_real_personas:
             self._create_real_persona_agents(agents_cfg, model_list)
@@ -900,7 +905,9 @@ class SwarmOrchestrator:
                 continue
 
             palette = AGENT_PALETTES[i % len(AGENT_PALETTES)]
-            model = model_override or model_list[i % len(model_list)]
+            # Scenario models take priority over persona-specific models
+            model = model_list[i % len(model_list)] if model_list else (model_override or "anthropic/claude-sonnet-4")
+            logger.info(f"Agent {i} ({name}): model_list={model_list}, model_override={model_override}, final={model}")
 
             archetype = archetype_map.get(personality_type, archetype_map.get(category, "the_scholar"))
             pm = get_personality_manager()
