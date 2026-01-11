@@ -40,7 +40,37 @@ class DatasetStore:
 
     def _init_db(self):
         """Initialize database schema."""
+        import os
+        import fcntl
+        import time
+        clear_logs = os.getenv("CLEAR_LOGS_ON_START", "").lower() in ("true", "1", "yes")
+
         with self._transaction() as conn:
+            # Clear LLM logs if requested (use lock + marker to ensure only first worker clears)
+            if clear_logs:
+                marker_file = Path("/tmp/.llm_logs_cleared")
+                lock_file = Path("/tmp/.llm_logs_clear.lock")
+                container_start = str(int(Path("/proc/1/stat").stat().st_mtime))
+
+                try:
+                    with open(lock_file, "w") as f:
+                        fcntl.flock(f, fcntl.LOCK_EX)  # Blocking lock
+                        # Check marker while holding lock
+                        should_clear = True
+                        if marker_file.exists():
+                            try:
+                                if marker_file.read_text().strip() == container_start:
+                                    should_clear = False
+                            except Exception:
+                                pass
+
+                        if should_clear:
+                            conn.execute("DROP TABLE IF EXISTS llm_response_log")
+                            logger.info("Cleared LLM response logs (CLEAR_LOGS_ON_START=true)")
+                            marker_file.write_text(container_start)
+                except Exception as e:
+                    logger.warning(f"Could not clear logs: {e}")
+
             conn.executescript("""
                 CREATE TABLE IF NOT EXISTS datasets (
                     id TEXT PRIMARY KEY,
@@ -89,6 +119,7 @@ class DatasetStore:
                 CREATE TABLE IF NOT EXISTS llm_response_log (
                     id TEXT PRIMARY KEY,
                     agent_id TEXT,
+                    agent_name TEXT,
                     model_requested TEXT,
                     model_actual TEXT,
                     prompt TEXT,
@@ -356,6 +387,7 @@ class DatasetStore:
         tokens_out: Optional[int] = None,
         duration_ms: Optional[int] = None,
         full_logs: bool = False,
+        agent_name: Optional[str] = None,
     ):
         """Log an LLM response.
 
@@ -369,6 +401,7 @@ class DatasetStore:
             tokens_out: Output token count
             duration_ms: Request duration in milliseconds
             full_logs: If True, store complete content; if False, truncate to 200 chars
+            agent_name: Human-readable name of the agent (e.g., "Elon Musk")
         """
         log_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc).isoformat()
@@ -382,11 +415,11 @@ class DatasetStore:
             conn.execute(
                 """
                 INSERT INTO llm_response_log
-                (id, agent_id, model_requested, model_actual, prompt, response,
+                (id, agent_id, agent_name, model_requested, model_actual, prompt, response,
                  tokens_in, tokens_out, timestamp, duration_ms)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (log_id, agent_id, model_requested, model_actual, prompt, response,
+                (log_id, agent_id, agent_name, model_requested, model_actual, prompt, response,
                  tokens_in, tokens_out, now, duration_ms),
             )
 
@@ -435,6 +468,7 @@ class DatasetStore:
             {
                 "id": row["id"],
                 "agent_id": row["agent_id"],
+                "agent_name": row["agent_name"],
                 "model_requested": row["model_requested"],
                 "model_actual": row["model_actual"],
                 "prompt": row["prompt"],

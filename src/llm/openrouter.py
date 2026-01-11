@@ -193,6 +193,7 @@ class OpenRouterClient:
         max_tokens: int = 4096,
         stream: bool = False,
         agent_id: Optional[str] = None,
+        agent_name: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse | AsyncIterator[str]:
         """
@@ -205,6 +206,7 @@ class OpenRouterClient:
             max_tokens: Max tokens to generate
             stream: Whether to stream the response
             agent_id: Optional agent ID for logging (overrides client's agent_id)
+            agent_name: Optional agent name for logging (e.g., "Elon Musk")
             **kwargs: Additional parameters passed to the API
 
         Returns:
@@ -232,11 +234,11 @@ class OpenRouterClient:
         effective_agent_id = agent_id or self.agent_id
 
         if stream:
-            return self._stream_complete(payload, effective_agent_id)
+            return self._stream_complete(payload, effective_agent_id, agent_name)
         else:
-            return await self._complete(payload, effective_agent_id)
+            return await self._complete(payload, effective_agent_id, agent_name)
 
-    async def _complete(self, payload: dict, agent_id: Optional[str] = None) -> StreamingResponse:
+    async def _complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None) -> StreamingResponse:
         """Non-streaming completion."""
         client = await self._get_client()
 
@@ -276,6 +278,7 @@ class OpenRouterClient:
                     tokens_out=usage.get("completion_tokens"),
                     duration_ms=duration_ms,
                     full_logs=_is_full_logs(),
+                    agent_name=agent_name,
                 )
             except Exception as e:
                 logger.warning(f"Failed to log LLM response: {e}")
@@ -287,7 +290,7 @@ class OpenRouterClient:
             usage=usage,
         )
 
-    async def _stream_complete(self, payload: dict, agent_id: Optional[str] = None) -> AsyncIterator[str]:
+    async def _stream_complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None) -> AsyncIterator[str]:
         """Streaming completion yielding content chunks."""
         client = await self._get_client()
 
@@ -324,6 +327,7 @@ class OpenRouterClient:
         messages: list[Message | dict],
         on_chunk: Optional[Callable[[str], None]] = None,
         agent_id: Optional[str] = None,
+        agent_name: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse:
         """
@@ -333,6 +337,7 @@ class OpenRouterClient:
             messages: Chat messages
             on_chunk: Optional callback for each chunk
             agent_id: Optional agent ID for logging (overrides client's agent_id)
+            agent_name: Optional agent name for logging (e.g., "Elon Musk")
             **kwargs: Passed to complete()
 
         Returns:
@@ -346,7 +351,7 @@ class OpenRouterClient:
         response = StreamingResponse(model=model_requested)
 
         start_time = time.time()
-        async for chunk in await self.complete(messages, stream=True, agent_id=effective_agent_id, **kwargs):
+        async for chunk in await self.complete(messages, stream=True, agent_id=effective_agent_id, agent_name=agent_name, **kwargs):
             response.content += chunk
             response.raw_chunks.append(chunk)
             if on_chunk:
@@ -371,6 +376,7 @@ class OpenRouterClient:
                     tokens_out=None,
                     duration_ms=duration_ms,
                     full_logs=_is_full_logs(),
+                    agent_name=agent_name,
                 )
             except Exception as e:
                 logger.warning(f"Failed to log streamed LLM response: {e}")
@@ -382,6 +388,7 @@ class OpenRouterClient:
         prompt: str,
         system: Optional[str] = None,
         agent_id: Optional[str] = None,
+        agent_name: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse:
         """
@@ -391,6 +398,7 @@ class OpenRouterClient:
             prompt: User prompt
             system: Optional system prompt
             agent_id: Optional agent ID for logging (overrides client's agent_id)
+            agent_name: Optional agent name for logging (e.g., "Elon Musk")
             **kwargs: Passed to complete()
 
         Returns:
@@ -401,13 +409,14 @@ class OpenRouterClient:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
 
-        return await self.complete(messages, agent_id=agent_id, **kwargs)
+        return await self.complete(messages, agent_id=agent_id, agent_name=agent_name, **kwargs)
 
     async def stream_generate(
         self,
         prompt: str,
         system: Optional[str] = None,
         agent_id: Optional[str] = None,
+        agent_name: Optional[str] = None,
         **kwargs,
     ) -> AsyncIterator[str]:
         """
@@ -417,6 +426,7 @@ class OpenRouterClient:
             prompt: User prompt
             system: Optional system prompt
             agent_id: Optional agent ID for logging (overrides client's agent_id)
+            agent_name: Optional agent name for logging (e.g., "Elon Musk")
             **kwargs: Passed to complete()
 
         Yields:
@@ -427,7 +437,7 @@ class OpenRouterClient:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
 
-        async for chunk in await self.complete(messages, stream=True, agent_id=agent_id, **kwargs):
+        async for chunk in await self.complete(messages, stream=True, agent_id=agent_id, agent_name=agent_name, **kwargs):
             yield chunk
 
     async def chat(
@@ -435,6 +445,7 @@ class OpenRouterClient:
         messages: list[dict],
         model: Optional[str] = None,
         agent_id: Optional[str] = None,
+        agent_name: Optional[str] = None,
         **kwargs,
     ) -> str:
         """
@@ -444,12 +455,13 @@ class OpenRouterClient:
             messages: Chat messages
             model: Model to use (defaults to default_model)
             agent_id: Optional agent ID for logging (overrides client's agent_id)
+            agent_name: Optional agent name for logging (e.g., "Elon Musk")
             **kwargs: Passed to complete()
 
         Returns:
             Response content as string
         """
-        response = await self.complete(messages, model=model, stream=False, agent_id=agent_id, **kwargs)
+        response = await self.complete(messages, model=model, stream=False, agent_id=agent_id, agent_name=agent_name, **kwargs)
         return response.content
 
 
@@ -469,11 +481,12 @@ async def stream_chat(
     messages: list[dict],
     model: str = "anthropic/claude-sonnet-4.5",
     agent_id: Optional[str] = None,
+    agent_name: Optional[str] = None,
     **kwargs,
 ) -> AsyncIterator[str]:
     """Convenience function for streaming chat."""
     client = get_client()
-    async for chunk in await client.complete(messages, model=model, stream=True, agent_id=agent_id, **kwargs):
+    async for chunk in await client.complete(messages, model=model, stream=True, agent_id=agent_id, agent_name=agent_name, **kwargs):
         yield chunk
 
 
@@ -481,9 +494,10 @@ async def chat(
     messages: list[dict],
     model: str = "anthropic/claude-sonnet-4.5",
     agent_id: Optional[str] = None,
+    agent_name: Optional[str] = None,
     **kwargs,
 ) -> str:
     """Convenience function for non-streaming chat."""
     client = get_client()
-    response = await client.complete(messages, model=model, stream=False, agent_id=agent_id, **kwargs)
+    response = await client.complete(messages, model=model, stream=False, agent_id=agent_id, agent_name=agent_name, **kwargs)
     return response.content

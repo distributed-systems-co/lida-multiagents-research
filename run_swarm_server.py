@@ -1471,6 +1471,7 @@ class SwarmOrchestrator:
                     model=agent.model,  # Use agent's model directly
                     max_tokens=200,
                     agent_id=agent.id,  # For LLM response logging
+                    agent_name=agent.name,
                 )
                 return response.content
             except Exception as e:
@@ -1537,6 +1538,7 @@ When responding:
                     max_tokens=300,
                     tools=DELIBERATION_TOOLS,
                     agent_id=agent.id,  # For LLM response logging
+                    agent_name=agent.name,
                 )
 
                 # Stream simulation (actual streaming would need async generator)
@@ -1830,6 +1832,7 @@ Generate a persuasive message (2-3 paragraphs)."""
                     model=self.persuader.model,
                     max_tokens=500,
                     agent_id="persuader",  # For LLM response logging
+                    agent_name=getattr(self.persuader, 'name', 'Persuader'),
                 )
                 persuader_msg = response.content
             except Exception as e:
@@ -2024,6 +2027,7 @@ Your confidence should change based on argument quality:
                     model=agent.model,
                     max_tokens=400,
                     agent_id=agent.id,  # For LLM response logging
+                    agent_name=agent.name,
                 )
                 agent_response = response.content
             except Exception as e:
@@ -3425,6 +3429,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         if orch.llm_client:
             try:
                 model = model_override or (agent.model if agent else "anthropic/claude-sonnet-4")
+                agent_name_val = agent.name if agent else persona.name if persona else persona_id
                 response = await orch.llm_client.chat(
                     messages=[
                         {"role": "system", "content": system_prompt},
@@ -3433,6 +3438,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                     model=model,
                     max_tokens=600,
                     agent_id=persona_id,  # For LLM response logging
+                    agent_name=agent_name_val,
                 )
                 return {
                     "persona": persona_id,
@@ -3505,6 +3511,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                     model=model,
                     max_tokens=600,
                     agent_id=persona_id,  # For LLM response logging
+                    agent_name=persona_name,
                 )
                 return {
                     "persona": persona_id,
@@ -3594,6 +3601,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                         model="anthropic/claude-sonnet-4",
                         max_tokens=400,
                         agent_id=participant["id"],  # For LLM response logging
+                        agent_name=participant["name"],
                     )
                     conversation.append({
                         "round": round_num + 1,
@@ -3824,6 +3832,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                         model=response_model,
                         max_tokens=800,
                         agent_id=persona_id,  # For LLM response logging
+                        agent_name=persona.name,
                     )
 
                     yield f"event: response\ndata: {json.dumps({'persona': persona_id, 'name': persona.name, 'response': response, 'model': response_model, 'hydrated': research_context is not None, 'research_context': research_context.to_dict() if research_context else None})}\n\n"
@@ -3983,6 +3992,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                                 model="anthropic/claude-sonnet-4",
                                 max_tokens=400,
                                 agent_id=participant["id"],  # For LLM response logging
+                                agent_name=participant["name"],
                             )
 
                             entry = {
