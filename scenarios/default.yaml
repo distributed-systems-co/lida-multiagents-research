@@ -3,6 +3,12 @@
 # All simulation parameters in one place
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# Dependencies: persona files available in this scenario
+# These are loaded from scenarios/ relative paths
+_imports:
+  - personas/v2/ai_researchers.yaml    # yudkowsky, connor, andreessen, lecun, altman, amodei, bengio, russell, gebru, toner, macaskill
+  - personas/v2/tech_leaders.yaml      # elon_musk, satya_nadella, sundar_pichai, jensen_huang, mark_zuckerberg, tim_cook
+
 server:
   port: 12345
   host: "0.0.0.0"

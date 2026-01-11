@@ -764,27 +764,50 @@ class SwarmOrchestrator:
             self._create_archetype_agents(agents_cfg, model_list, pm)
 
     def _load_scenario_personas(self, version: str) -> Dict[str, dict]:
-        """Load personas from scenarios/personas directory (simpler YAML format)."""
+        """Load personas from scenarios/personas directory based on _imports in config."""
         personas = {}
-        scenarios_dir = Path(__file__).parent / "scenarios" / "personas" / version
+        scenarios_dir = Path(__file__).parent / "scenarios"
 
-        if not scenarios_dir.exists():
-            return personas
+        # Check if scenario specifies explicit imports
+        imports = CONFIG.get("_imports", [])
 
-        for yaml_file in scenarios_dir.rglob("*.yaml"):
-            if yaml_file.name.startswith("_"):
-                continue
-            try:
-                with open(yaml_file) as f:
-                    data = yaml.safe_load(f) or {}
-                # Extract personas from the file
-                if "personas" in data:
-                    for pid, pdata in data["personas"].items():
-                        if not pid.startswith("_"):  # Skip archetypes/templates
-                            pdata["id"] = pid
-                            personas[pid] = pdata
-            except Exception as e:
-                logger.warning(f"Failed to load {yaml_file}: {e}")
+        if imports:
+            # Load only explicitly imported persona files
+            for import_path in imports:
+                yaml_file = scenarios_dir / import_path
+                if not yaml_file.exists():
+                    logger.warning(f"Imported file not found: {yaml_file}")
+                    continue
+                try:
+                    with open(yaml_file) as f:
+                        data = yaml.safe_load(f) or {}
+                    if "personas" in data:
+                        for pid, pdata in data["personas"].items():
+                            if not pid.startswith("_"):
+                                pdata["id"] = pid
+                                personas[pid] = pdata
+                        logger.info(f"Loaded {len([p for p in data['personas'] if not p.startswith('_')])} personas from {import_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to load {yaml_file}: {e}")
+        else:
+            # Fallback: scan all files in personas/{version}/ directory
+            personas_dir = scenarios_dir / "personas" / version
+            if not personas_dir.exists():
+                return personas
+
+            for yaml_file in personas_dir.rglob("*.yaml"):
+                if yaml_file.name.startswith("_"):
+                    continue
+                try:
+                    with open(yaml_file) as f:
+                        data = yaml.safe_load(f) or {}
+                    if "personas" in data:
+                        for pid, pdata in data["personas"].items():
+                            if not pid.startswith("_"):
+                                pdata["id"] = pid
+                                personas[pid] = pdata
+                except Exception as e:
+                    logger.warning(f"Failed to load {yaml_file}: {e}")
 
         return personas
 
