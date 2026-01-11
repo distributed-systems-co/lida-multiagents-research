@@ -142,7 +142,7 @@ class PersonalityAgent:
             from .personality_local import MLXModelConfig
             self.model_config = MLXModelConfig(
                 model_path="mlx-community/Josiefied-Qwen3-4B-abliterated-v1-4bit",
-                max_tokens=200,
+                max_tokens=500,
                 temperature=0.7,
             )
 

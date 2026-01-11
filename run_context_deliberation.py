@@ -118,7 +118,7 @@ Be direct about whether you support Position A, Position B, or a nuanced approac
 
     positions = {}
     for agent in agents:
-        response = await agent(opening_prompt, max_tokens=200)
+        response = await agent(opening_prompt, max_tokens=500)
         positions[agent.identity.name] = response.text
 
         console.print(f"\n[bold blue][{agent.identity.name}][/]")
@@ -142,7 +142,7 @@ Challenge or support their position using evidence from your knowledge base.
 Be specific about facts, data, or sources that inform your response.
 2-3 sentences.'''
 
-        response = await agent(debate_prompt, max_tokens=200)
+        response = await agent(debate_prompt, max_tokens=500)
 
         console.print(f"\n[bold magenta][{agent.identity.name}] → [{opponent.identity.name}][/]")
         console.print(Panel(response.text, border_style="magenta"))

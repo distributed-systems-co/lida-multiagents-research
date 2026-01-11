@@ -150,7 +150,7 @@ Required params: {', '.join([p.name for p in matching_tool.parameters if p.requi
 Return JSON only, e.g.: {{"company": "Nvidia", "metrics": ["price", "market_cap"]}}"""
 
             # Get params (non-streaming for JSON)
-            param_result = await client.generate(param_prompt, max_tokens=200)
+            param_result = await client.generate(param_prompt, max_tokens=500)
 
             # Parse params
             import re, json

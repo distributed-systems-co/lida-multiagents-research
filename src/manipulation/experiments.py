@@ -392,7 +392,7 @@ POSITION: [your position in 1-2 sentences]
 CONFIDENCE: [0.0-1.0]
 """
         if self.llm_client:
-            response = await self.llm_client.generate(prompt, model=model, max_tokens=200)
+            response = await self.llm_client.generate(prompt, model=model, max_tokens=500)
             text = response.content
         else:
             # Simulation mode

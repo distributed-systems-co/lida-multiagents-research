@@ -1469,7 +1469,7 @@ class SwarmOrchestrator:
                     prompt,
                     system=system,
                     model=agent.model,  # Use agent's model directly
-                    max_tokens=200,
+                    max_tokens=500,
                     agent_id=agent.id,  # For LLM response logging
                     agent_name=agent.name,
                 )

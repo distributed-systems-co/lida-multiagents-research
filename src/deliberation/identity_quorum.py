@@ -155,7 +155,7 @@ POSITION: <position_id>
 CONFIDENCE: <0-100>
 REASONING: <brief explanation>"""
 
-        response = await lm(prompt, max_tokens=200)
+        response = await lm(prompt, max_tokens=500)
 
         # Parse response
         position = None
@@ -213,7 +213,7 @@ Your position: {target.current_position}
 
 Provide your expert input."""
 
-            answer = await target_lm(answer_prompt, max_tokens=200)
+            answer = await target_lm(answer_prompt, max_tokens=500)
             exchange.append({"role": target.agent_id, "content": answer.text})
 
             # Source reconsiders
@@ -240,7 +240,7 @@ Your position: {target.current_position}
 
 Provide your strongest counterargument to their position."""
 
-            counter = await target_lm(oppose_prompt, max_tokens=200)
+            counter = await target_lm(oppose_prompt, max_tokens=500)
             exchange.append({"role": target.agent_id, "content": counter.text})
 
             # Source must respond
@@ -251,7 +251,7 @@ Your position: {source.current_position}
 Defend your position or acknowledge valid points and potentially adjust.
 Respond with your updated stance."""
 
-            defense = await source_lm(defend_prompt, max_tokens=200)
+            defense = await source_lm(defend_prompt, max_tokens=500)
             exchange.append({"role": source.agent_id, "content": defense.text})
 
         elif relationship.rel_type == RelationshipType.MUST_ALIGN:
@@ -263,7 +263,7 @@ Their position: {target.current_position}
 
 Propose a synthesis or compromise."""
 
-            proposal = await source_lm(align_prompt_source, max_tokens=200)
+            proposal = await source_lm(align_prompt_source, max_tokens=500)
             exchange.append({"role": source.agent_id, "content": proposal.text})
 
             align_prompt_target = f"""{source.agent_id} proposes: "{proposal.text}"
@@ -272,7 +272,7 @@ Your position: {target.current_position}
 
 Accept, modify, or counter-propose."""
 
-            response = await target_lm(align_prompt_target, max_tokens=200)
+            response = await target_lm(align_prompt_target, max_tokens=500)
             exchange.append({"role": target.agent_id, "content": response.text})
 
         elif relationship.rel_type == RelationshipType.VETO_POWER:

@@ -47,7 +47,7 @@ async def run_conversation(persona1_key: str, persona2_key: str, topic: str, tur
 
     config = MLXModelConfig(
         model_path="mlx-community/Josiefied-Qwen3-4B-abliterated-v1-4bit",
-        max_tokens=200,
+        max_tokens=500,
         temperature=0.7,
     )
 

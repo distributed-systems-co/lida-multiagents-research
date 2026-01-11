@@ -120,7 +120,7 @@ Example: safety_first: 0.45 high
 
 Your estimates should sum to approximately 1.0."""
 
-    response = await lm(prompt, max_tokens=200)
+    response = await lm(prompt, max_tokens=500)
 
     # Parse response
     results = {}
