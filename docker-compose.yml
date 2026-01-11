@@ -17,6 +17,7 @@ services:
       - SCENARIO=${SCENARIO:-default}
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
+      - FULL_LOGS=${FULL_LOGS:-false}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
@@ -48,6 +49,7 @@ services:
       - SERVER_ROLE=streaming
       - WORKERS=${STREAMING_WORKERS:-2}
       - SWARM_LIVE=${SWARM_LIVE:-false}
+      - FULL_LOGS=${FULL_LOGS:-false}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
@@ -103,6 +105,7 @@ services:
       - SCENARIO=${SCENARIO:-default}
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
+      - FULL_LOGS=${FULL_LOGS:-false}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
@@ -137,6 +140,7 @@ services:
       - NUM_WORKERS=${NUM_WORKERS:-8}
       - WORKER_CAPACITY=${WORKER_CAPACITY:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
+      - FULL_LOGS=${FULL_LOGS:-false}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
