@@ -9,7 +9,7 @@ _imports:
   - personas/v2/ai_researchers.yaml    # altman, lecun, yudkowsky, amodei, bengio, russell, andreessen, gebru, etc.
 
 simulation:
-  num_agents: 4
+  num_agents: 1
   max_rounds_per_agent: 2
   max_voting_rounds: 10  # Maximum rounds before forcing a final vote
   auto_start_topic: "Will AGI arrive before 2030?"  # Optional: auto-start deliberation with this topic
@@ -22,9 +22,6 @@ agents:
   # IDs must match the keys in the personas: section of the imported YAML files
   personas:
     - elon_musk      # from tech_leaders.yaml
-    - satya_nadella  # from tech_leaders.yaml
-    - altman         # from ai_researchers.yaml (Sam Altman)
-    - lecun          # from ai_researchers.yaml (Yann LeCun)
 
 persuader:
   model: "google/gemini-2.0-flash-001"

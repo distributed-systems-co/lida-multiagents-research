@@ -49,6 +49,8 @@ services:
       - PORT=${STREAMING_PORT:-8787}
       - SERVER_ROLE=streaming
       - WORKERS=${STREAMING_WORKERS:-2}
+      - SCENARIO=${SCENARIO:-default}
+      - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
       - FULL_LOGS=${FULL_LOGS:-false}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}

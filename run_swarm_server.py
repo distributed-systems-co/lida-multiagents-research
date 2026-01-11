@@ -29,6 +29,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from collections import deque
+import redis.asyncio as aioredis
 
 import uvicorn
 
@@ -620,6 +621,9 @@ class SwarmOrchestrator:
         })
         self.auto_start = delib_cfg.get("auto_start", True)
         self.auto_start_delay = delib_cfg.get("auto_start_delay", 3)
+        # Check for auto_start_topic in simulation config - starts immediately without waiting for UI
+        sim_cfg = CONFIG.get("simulation", {})
+        self.auto_start_topic = sim_cfg.get("auto_start_topic", None)
         self.consensus: Dict[str, int] = {}
         self.deliberation_active = False
         self.paused = False  # Pause control
@@ -2478,33 +2482,37 @@ State your stance clearly and give one key reason."""
                 context_parts.append(f"{name}: {msg.content}")
             return "\n\n".join(context_parts)
 
-        for round_num in range(self.max_rounds):
-            self.current_round = round_num + 1
-            await self.broadcast_deliberation()
+        # Skip debate if only one agent
+        if len(agents) >= 2:
+            for round_num in range(self.max_rounds):
+                self.current_round = round_num + 1
+                await self.broadcast_deliberation()
 
-            a1 = random.choice(agents)
-            a2 = random.choice([a for a in agents if a.id != a1.id])
+                a1 = random.choice(agents)
+                a2 = random.choice([a for a in agents if a.id != a1.id])
 
-            a1.status = "speaking"
-            await self.broadcast_agents_update()
+                a1.status = "speaking"
+                await self.broadcast_agents_update()
 
-            # Include full discussion context
-            discussion_context = build_discussion_context()
-            prompt = f"""Topic: {topic}
+                # Include full discussion context
+                discussion_context = build_discussion_context()
+                prompt = f"""Topic: {topic}
 
 Discussion so far:
 {discussion_context}
 
 Respond to the discussion, particularly addressing {a2.name}'s points. Be concise (2-3 sentences). State whether you agree or disagree and why."""
 
-            use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
-            response = await self.generate_response(a1, prompt, use_tools=use_tools)
-            a1.current_thought = response[:60]
-            self.add_message(a1.id, a2.id, "debate", response, a1.model)
+                use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
+                response = await self.generate_response(a1, prompt, use_tools=use_tools)
+                a1.current_thought = response[:60]
+                self.add_message(a1.id, a2.id, "debate", response, a1.model)
 
-            a1.status = "idle"
-            await self.broadcast_agents_update()
-            await asyncio.sleep(0.3)
+                a1.status = "idle"
+                await self.broadcast_agents_update()
+                await asyncio.sleep(0.3)
+        else:
+            logger.info("Skipping debate phase - only one agent")
 
         # Phase 4: Voting with LLM-based decisions and multiple rounds
         max_voting_rounds = CONFIG.get("simulation", {}).get("max_voting_rounds", 10)
@@ -2621,20 +2629,21 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                         context_parts.append(f"[{msg.msg_type.upper()}] {name}: {msg.content}")
                     return "\n\n".join(context_parts)
 
-                # Run another quick debate round
-                for _ in range(min(2, len(agents))):
-                    a1 = random.choice(agents)
-                    a2 = random.choice([a for a in agents if a.id != a1.id])
+                # Run another quick debate round (only if multiple agents)
+                if len(agents) >= 2:
+                    for _ in range(min(2, len(agents))):
+                        a1 = random.choice(agents)
+                        a2 = random.choice([a for a in agents if a.id != a1.id])
 
-                    a1.status = "speaking"
-                    await self.broadcast_agents_update()
+                        a1.status = "speaking"
+                        await self.broadcast_agents_update()
 
-                    # Get full discussion context and vote concerns
-                    discussion_context = build_extended_context()
-                    recent_votes = [v for v in round_votes if v["vote"] == "continue_discussion"]
-                    vote_concerns = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in recent_votes[:3]])
+                        # Get full discussion context and vote concerns
+                        discussion_context = build_extended_context()
+                        recent_votes = [v for v in round_votes if v["vote"] == "continue_discussion"]
+                        vote_concerns = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in recent_votes[:3]])
 
-                    prompt = f"""Topic: {topic}
+                        prompt = f"""Topic: {topic}
 
 Discussion so far:
 {discussion_context}
@@ -2644,13 +2653,15 @@ Some participants voted to continue discussion:
 
 Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
 
-                    response = await self.generate_response(a1, prompt, use_tools=False)
-                    a1.current_thought = response[:60]
-                    self.add_message(a1.id, a2.id, "debate", response, a1.model)
+                        response = await self.generate_response(a1, prompt, use_tools=False)
+                        a1.current_thought = response[:60]
+                        self.add_message(a1.id, a2.id, "debate", response, a1.model)
 
-                    a1.status = "idle"
-                    await self.broadcast_agents_update()
-                    await asyncio.sleep(0.3)
+                        a1.status = "idle"
+                        await self.broadcast_agents_update()
+                        await asyncio.sleep(0.3)
+                else:
+                    logger.info("Skipping extended debate - only one agent")
 
                 # Continue to next voting round
                 continue_discussion = True
@@ -4251,6 +4262,64 @@ def _create_default_app() -> FastAPI:
         asyncio.create_task(orch.decay_energy())
 
         async def auto_deliberate():
+            # Use Redis lock to ensure only one worker runs auto_deliberate
+            redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+            lock_acquired = False
+            redis_client = None
+
+            try:
+                redis_client = await aioredis.from_url(redis_url)
+                # Try to acquire lock with 5 minute expiration (NX = only if not exists)
+                lock_acquired = await redis_client.set(
+                    "deliberation:auto_worker_lock",
+                    f"worker_{os.getpid()}",
+                    nx=True,
+                    ex=300
+                )
+                if not lock_acquired:
+                    logger.info(f"Another worker holds the auto_deliberate lock, this worker will skip")
+                    return
+                logger.info(f"Worker {os.getpid()} acquired auto_deliberate lock")
+            except Exception as e:
+                logger.warning(f"Redis lock check failed: {e}, proceeding anyway (may cause duplicates)")
+                lock_acquired = True  # Proceed if Redis unavailable
+            finally:
+                if redis_client:
+                    await redis_client.close()
+
+            if not lock_acquired:
+                return
+
+            # Check for auto_start_topic - starts immediately without waiting for websockets
+            if orch.auto_start_topic:
+                logger.info(f"Auto-starting deliberation with topic: {orch.auto_start_topic}")
+
+                # Wait for system to be ready (agents loaded, LLM initialized if live mode)
+                max_wait = 60  # Maximum seconds to wait
+                waited = 0
+                while waited < max_wait:
+                    agents_ready = len(orch.agents) > 0
+                    llm_ready = not orch.live_mode or orch.llm_client is not None
+
+                    if agents_ready and llm_ready:
+                        logger.info(f"System ready after {waited}s: {len(orch.agents)} agents, LLM={'ready' if llm_ready else 'waiting'}")
+                        break
+
+                    await asyncio.sleep(1)
+                    waited += 1
+                    if waited % 5 == 0:
+                        logger.info(f"Waiting for system... agents={len(orch.agents)}, llm_ready={llm_ready}")
+
+                if waited >= max_wait:
+                    logger.warning(f"Timeout waiting for system, starting anyway")
+
+                try:
+                    await orch.run_deliberation(orch.auto_start_topic)
+                except Exception as e:
+                    logger.error(f"Auto-start deliberation error: {e}")
+                return  # Only run once for auto_start_topic
+
+            # Regular auto-deliberation (waits for websocket connections)
             if not orch.auto_start:
                 logger.info("Auto-deliberation disabled in config")
                 return
@@ -4329,6 +4398,63 @@ async def run_server(
 
     # Auto-start deliberation loop (using config values)
     async def auto_deliberate():
+        # Use Redis lock to ensure only one worker runs auto_deliberate
+        redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+        lock_acquired = False
+        redis_client = None
+
+        try:
+            redis_client = await aioredis.from_url(redis_url)
+            # Try to acquire lock with 5 minute expiration (NX = only if not exists)
+            lock_acquired = await redis_client.set(
+                "deliberation:auto_worker_lock",
+                f"worker_{os.getpid()}",
+                nx=True,
+                ex=300
+            )
+            if not lock_acquired:
+                logger.info(f"Another worker holds the auto_deliberate lock, this worker will skip")
+                return
+            logger.info(f"Worker {os.getpid()} acquired auto_deliberate lock")
+        except Exception as e:
+            logger.warning(f"Redis lock check failed: {e}, proceeding anyway (may cause duplicates)")
+            lock_acquired = True  # Proceed if Redis unavailable
+        finally:
+            if redis_client:
+                await redis_client.close()
+
+        if not lock_acquired:
+            return
+
+        # Check for auto_start_topic - starts immediately without waiting for websockets
+        if orchestrator.auto_start_topic:
+            logger.info(f"Auto-starting deliberation with topic: {orchestrator.auto_start_topic}")
+
+            # Wait for system to be ready (agents loaded, LLM initialized if live mode)
+            max_wait = 60  # Maximum seconds to wait
+            waited = 0
+            while waited < max_wait:
+                agents_ready = len(orchestrator.agents) > 0
+                llm_ready = not orchestrator.live_mode or orchestrator.llm_client is not None
+
+                if agents_ready and llm_ready:
+                    logger.info(f"System ready after {waited}s: {len(orchestrator.agents)} agents, LLM={'ready' if llm_ready else 'waiting'}")
+                    break
+
+                await asyncio.sleep(1)
+                waited += 1
+                if waited % 5 == 0:
+                    logger.info(f"Waiting for system... agents={len(orchestrator.agents)}, llm_ready={llm_ready}")
+
+            if waited >= max_wait:
+                logger.warning(f"Timeout waiting for system, starting anyway")
+
+            try:
+                await orchestrator.run_deliberation(orchestrator.auto_start_topic)
+            except Exception as e:
+                logger.error(f"Auto-start deliberation error: {e}")
+            return  # Only run once for auto_start_topic
+
         if not orchestrator.auto_start:
             logger.info("Auto-deliberation disabled in config")
             return
