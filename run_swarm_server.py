@@ -624,6 +624,7 @@ class SwarmOrchestrator:
         # Check for auto_start_topic in simulation config - starts immediately without waiting for UI
         sim_cfg = CONFIG.get("simulation", {})
         self.auto_start_topic = sim_cfg.get("auto_start_topic", None)
+        logger.info(f"auto_start_topic from config: {self.auto_start_topic!r} (sim_cfg keys: {list(sim_cfg.keys())})")
         self.consensus: Dict[str, int] = {}
         self.deliberation_active = False
         self.paused = False  # Pause control
@@ -3253,6 +3254,21 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         })
         return {"status": "stopped"}
 
+    @app.get("/api/deliberation/status")
+    async def get_deliberation_status():
+        """Get current deliberation status for polling."""
+        orch = app.state.orchestrator
+        return {
+            "active": orch.deliberation_active,
+            "phase": orch.phase,
+            "topic": orch.current_topic,
+            "paused": getattr(orch, 'paused', False),
+            "consensus": orch.consensus,
+            "agent_count": len(orch.agents),
+            "total_messages": orch.total_messages,
+            "completed": not orch.deliberation_active and orch.phase in ("complete", "stopped", "idle", ""),
+        }
+
     @app.post("/api/inject")
     async def inject_content(payload: dict = Body(...)):
         """Inject content into the deliberation."""
@@ -4254,12 +4270,26 @@ def _create_default_app() -> FastAPI:
     @app.on_event("startup")
     async def startup():
         """Initialize async components on startup."""
+        logger.info(f"Startup event starting for worker {os.getpid()}")
         orch = app.state.orchestrator
+
+        # Note: We don't clear stale locks here because ALL workers run this,
+        # which would defeat the locking mechanism. Instead, we rely on the
+        # 5-minute TTL on the lock to expire stale locks from previous runs.
+
         if orch.live_mode:
+            logger.info("Initializing LLM...")
             await orch.init_llm()
+            logger.info("LLM initialized")
         if orch.tools_mode:
+            logger.info("Initializing MCP...")
             await orch.init_mcp()
+            logger.info("MCP initialized")
         asyncio.create_task(orch.decay_energy())
+
+        # Log auto_start_topic for debugging
+        logger.info(f"auto_start_topic: {orch.auto_start_topic}")
+        logger.info(f"Startup event complete for worker {os.getpid()}")
 
         async def auto_deliberate():
             # Use Redis lock to ensure only one worker runs auto_deliberate
@@ -4268,18 +4298,28 @@ def _create_default_app() -> FastAPI:
             redis_client = None
 
             try:
-                redis_client = await aioredis.from_url(redis_url)
+                # Add timeout for Redis connection
+                redis_client = await asyncio.wait_for(
+                    aioredis.from_url(redis_url),
+                    timeout=10.0
+                )
                 # Try to acquire lock with 5 minute expiration (NX = only if not exists)
-                lock_acquired = await redis_client.set(
-                    "deliberation:auto_worker_lock",
-                    f"worker_{os.getpid()}",
-                    nx=True,
-                    ex=300
+                lock_acquired = await asyncio.wait_for(
+                    redis_client.set(
+                        "deliberation:auto_worker_lock",
+                        f"worker_{os.getpid()}",
+                        nx=True,
+                        ex=300
+                    ),
+                    timeout=5.0
                 )
                 if not lock_acquired:
                     logger.info(f"Another worker holds the auto_deliberate lock, this worker will skip")
                     return
                 logger.info(f"Worker {os.getpid()} acquired auto_deliberate lock")
+            except asyncio.TimeoutError:
+                logger.warning(f"Redis connection timed out, proceeding anyway (may cause duplicates)")
+                lock_acquired = True
             except Exception as e:
                 logger.warning(f"Redis lock check failed: {e}, proceeding anyway (may cause duplicates)")
                 lock_acquired = True  # Proceed if Redis unavailable
@@ -4404,18 +4444,28 @@ async def run_server(
         redis_client = None
 
         try:
-            redis_client = await aioredis.from_url(redis_url)
+            # Add timeout for Redis connection
+            redis_client = await asyncio.wait_for(
+                aioredis.from_url(redis_url),
+                timeout=10.0
+            )
             # Try to acquire lock with 5 minute expiration (NX = only if not exists)
-            lock_acquired = await redis_client.set(
-                "deliberation:auto_worker_lock",
-                f"worker_{os.getpid()}",
-                nx=True,
-                ex=300
+            lock_acquired = await asyncio.wait_for(
+                redis_client.set(
+                    "deliberation:auto_worker_lock",
+                    f"worker_{os.getpid()}",
+                    nx=True,
+                    ex=300
+                ),
+                timeout=5.0
             )
             if not lock_acquired:
                 logger.info(f"Another worker holds the auto_deliberate lock, this worker will skip")
                 return
             logger.info(f"Worker {os.getpid()} acquired auto_deliberate lock")
+        except asyncio.TimeoutError:
+            logger.warning(f"Redis connection timed out, proceeding anyway (may cause duplicates)")
+            lock_acquired = True
         except Exception as e:
             logger.warning(f"Redis lock check failed: {e}, proceeding anyway (may cause duplicates)")
             lock_acquired = True  # Proceed if Redis unavailable
