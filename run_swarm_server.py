@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from collections import deque
 
+import redis
 import uvicorn
 
 
@@ -630,6 +631,16 @@ class SwarmOrchestrator:
         self.total_messages = 0
         self.total_tool_calls = 0
 
+        # Redis client for cross-worker status sync
+        redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+        try:
+            self.redis_client = redis.from_url(redis_url)
+            self.redis_client.ping()
+            logger.info(f"Redis connected for status sync: {redis_url}")
+        except Exception as e:
+            logger.warning(f"Redis connection failed, status sync disabled: {e}")
+            self.redis_client = None
+
         # Topics from config (can be a list or dict)
         topics_cfg = CONFIG.get("topics", {})
         if isinstance(topics_cfg, list):
@@ -1115,6 +1126,36 @@ class SwarmOrchestrator:
 
         logger.info(f"Initialized influence scores for {len(self.agents)} agents")
 
+    def sync_status_to_redis(self):
+        """Sync deliberation status to Redis for cross-worker consistency."""
+        if not self.redis_client:
+            return
+        try:
+            status = {
+                "active": self.deliberation_active,
+                "phase": self.phase,
+                "topic": self.current_topic,
+                "paused": self.paused,
+                "consensus": self.consensus,
+                "agent_count": len(self.agents),
+                "total_messages": self.total_messages,
+            }
+            self.redis_client.set("delib:status", json.dumps(status), ex=300)  # 5 min TTL
+        except Exception as e:
+            logger.warning(f"Failed to sync status to Redis: {e}")
+
+    def get_status_from_redis(self) -> Optional[dict]:
+        """Get deliberation status from Redis (for workers not running the deliberation)."""
+        if not self.redis_client:
+            return None
+        try:
+            data = self.redis_client.get("delib:status")
+            if data:
+                return json.loads(data)
+        except Exception as e:
+            logger.warning(f"Failed to get status from Redis: {e}")
+        return None
+
     def detect_coalitions(self) -> List[Dict]:
         """Detect emergent coalitions based on position alignment and relationships."""
         if not self.coalitions_enabled:
@@ -1314,10 +1355,14 @@ class SwarmOrchestrator:
             "round": self.current_round,
             "max_rounds": self.max_rounds,
         })
+        # Sync to Redis for cross-worker status queries
+        self.sync_status_to_redis()
 
     async def broadcast_consensus(self):
         """Broadcast consensus state."""
         await self.broadcast("consensus_update", {"consensus": self.consensus})
+        # Sync to Redis for cross-worker status queries
+        self.sync_status_to_redis()
 
     async def broadcast_stream_token(self, agent_id: str, token: str, done: bool = False):
         """Broadcast a streaming token from an agent."""
@@ -1500,15 +1545,15 @@ class SwarmOrchestrator:
         """
         if is_final_round:
             vote_options = """Choose ONE of:
-- SUPPORT: You agree with the resolution
-- OPPOSE: You disagree with the resolution
-- MODIFY: You want changes to the resolution
+- SUPPORT: You believe YES to the topic/question above
+- OPPOSE: You believe NO to the topic/question above
+- MODIFY: You want to change how the question is framed
 - ABSTAIN: You decline to vote"""
         else:
             vote_options = """Choose ONE of:
-- SUPPORT: You agree with the resolution
-- OPPOSE: You disagree with the resolution
-- MODIFY: You want changes to the resolution
+- SUPPORT: You believe YES to the topic/question above
+- OPPOSE: You believe NO to the topic/question above
+- MODIFY: You want to change how the question is framed
 - ABSTAIN: You decline to vote
 - CONTINUE_DISCUSSION: More debate is needed before voting"""
 
@@ -3257,15 +3302,39 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
     async def get_deliberation_status():
         """Get current deliberation status for polling."""
         orch = app.state.orchestrator
+
+        # If this worker has an active deliberation, return local state
+        if orch.deliberation_active or orch.phase:
+            return {
+                "active": orch.deliberation_active,
+                "phase": orch.phase,
+                "topic": orch.current_topic,
+                "paused": getattr(orch, 'paused', False),
+                "consensus": orch.consensus,
+                "agent_count": len(orch.agents),
+                "total_messages": orch.total_messages,
+                "completed": not orch.deliberation_active and orch.phase in ("complete", "stopped", "idle", ""),
+            }
+
+        # Otherwise, check Redis for status from another worker
+        redis_status = orch.get_status_from_redis()
+        if redis_status:
+            redis_status["completed"] = (
+                not redis_status.get("active") and
+                redis_status.get("phase", "") in ("complete", "stopped", "idle", "", "✅ complete")
+            )
+            return redis_status
+
+        # No deliberation running anywhere
         return {
-            "active": orch.deliberation_active,
-            "phase": orch.phase,
-            "topic": orch.current_topic,
-            "paused": getattr(orch, 'paused', False),
-            "consensus": orch.consensus,
+            "active": False,
+            "phase": "",
+            "topic": "",
+            "paused": False,
+            "consensus": {},
             "agent_count": len(orch.agents),
-            "total_messages": orch.total_messages,
-            "completed": not orch.deliberation_active and orch.phase in ("complete", "stopped", "idle", ""),
+            "total_messages": 0,
+            "completed": True,
         }
 
     @app.post("/api/inject")
