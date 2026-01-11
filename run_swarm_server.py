@@ -576,13 +576,16 @@ class SwarmOrchestrator:
     ):
         # Load from config with fallbacks
         agents_cfg = CONFIG.get("agents", {})
+        sim_cfg = CONFIG.get("simulation", {})
         delib_cfg = CONFIG.get("deliberation", {})
         persuasion_cfg = CONFIG.get("persuasion", {})
         dynamics_cfg = CONFIG.get("dynamics", {})
         relationships_cfg = CONFIG.get("relationships", {})
 
         # Support up to 32 concurrent agents
-        self.num_agents = min(num_agents or agents_cfg.get("count", 8), 32)
+        # Support both agents.count and simulation.num_agents
+        config_count = sim_cfg.get("num_agents") or agents_cfg.get("count", 8)
+        self.num_agents = min(num_agents or config_count, 32)
         self.live_mode = live_mode
         self.tools_mode = tools_mode
 
@@ -612,10 +615,15 @@ class SwarmOrchestrator:
         self.total_messages = 0
         self.total_tool_calls = 0
 
-        # Topics from config
+        # Topics from config (can be a list or dict)
         topics_cfg = CONFIG.get("topics", {})
-        self.default_topics = topics_cfg.get("default", DEFAULT_TOPICS)
-        self.topic_categories = topics_cfg.get("categories", {})
+        if isinstance(topics_cfg, list):
+            # If topics is a list, use it as default topics
+            self.default_topics = topics_cfg
+            self.topic_categories = {}
+        else:
+            self.default_topics = topics_cfg.get("default", DEFAULT_TOPICS)
+            self.topic_categories = topics_cfg.get("categories", {})
 
         # Check for scenario-provided topic (from SCENARIO env var)
         self.scenario_topic = None
@@ -733,9 +741,19 @@ class SwarmOrchestrator:
         """Create diverse agent swarm with real-world personas or archetypes."""
         pm = get_personality_manager()
         agents_cfg = CONFIG.get("agents", {})
+        models_cfg = CONFIG.get("models", {})
 
         # Get models from config or use defaults
-        model_list = agents_cfg.get("models", list(MODELS.values()))
+        # Support: agents.models list, models.agent_weights dict, or fallback
+        if agents_cfg.get("models"):
+            model_list = agents_cfg.get("models")
+        elif models_cfg.get("agent_weights"):
+            # Use weighted models from config
+            model_list = list(models_cfg.get("agent_weights", {}).keys())
+        elif models_cfg.get("default"):
+            model_list = [models_cfg.get("default")]
+        else:
+            model_list = list(MODELS.values())
 
         # Check if we should use real-world personas
         use_real_personas = agents_cfg.get("use_real_personas", False)
@@ -3825,8 +3843,10 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
 def _create_default_app() -> FastAPI:
     """Create default app for uvicorn import."""
     # Get num_agents from env var, falling back to config value
+    # Support both agents.count and simulation.num_agents
     agents_cfg = CONFIG.get("agents", {})
-    config_count = agents_cfg.get("count", 8)
+    sim_cfg = CONFIG.get("simulation", {})
+    config_count = sim_cfg.get("num_agents") or agents_cfg.get("count", 8)
     env_agents = os.environ.get("SWARM_AGENTS")
     num_agents = int(env_agents) if env_agents else config_count
 
