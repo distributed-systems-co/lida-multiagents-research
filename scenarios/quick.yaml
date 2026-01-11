@@ -5,7 +5,6 @@
 simulation:
   num_agents: 4
   max_rounds_per_agent: 2
-  tick_interval_ms: 50
 
 persuader:
   model: "google/gemini-2.0-flash-001"

@@ -1470,6 +1470,7 @@ class SwarmOrchestrator:
                     system=system,
                     model=agent.model,  # Use agent's model directly
                     max_tokens=200,
+                    agent_id=agent.id,  # For LLM response logging
                 )
                 return response.content
             except Exception as e:
@@ -1535,6 +1536,7 @@ When responding:
                     messages,
                     max_tokens=300,
                     tools=DELIBERATION_TOOLS,
+                    agent_id=agent.id,  # For LLM response logging
                 )
 
                 # Stream simulation (actual streaming would need async generator)
@@ -1827,6 +1829,7 @@ Generate a persuasive message (2-3 paragraphs)."""
                     persuasion_prompt,
                     model=self.persuader.model,
                     max_tokens=500,
+                    agent_id="persuader",  # For LLM response logging
                 )
                 persuader_msg = response.content
             except Exception as e:
@@ -2020,6 +2023,7 @@ Your confidence should change based on argument quality:
                     system=system,
                     model=agent.model,
                     max_tokens=400,
+                    agent_id=agent.id,  # For LLM response logging
                 )
                 agent_response = response.content
             except Exception as e:
@@ -3190,6 +3194,87 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             {"id": "mistralai/mistral-large-2411", "name": "Mistral Large"},
         ]}
 
+    @app.get("/api/llm/logs")
+    async def get_llm_logs(
+        limit: int = Query(100, description="Max records to return", ge=1, le=1000),
+        offset: int = Query(0, description="Records to skip", ge=0),
+        agent_id: Optional[str] = Query(None, description="Filter by agent ID"),
+        model: Optional[str] = Query(None, description="Filter by model name (partial match)"),
+        start_time: Optional[str] = Query(None, description="Filter by start time (ISO format)"),
+        end_time: Optional[str] = Query(None, description="Filter by end time (ISO format)"),
+        format: str = Query("json", description="Output format: json or csv"),
+    ):
+        """Get LLM response logs with optional filters.
+
+        Query params:
+        - limit: Max records (default 100, max 1000)
+        - offset: Records to skip for pagination
+        - agent_id: Filter by agent ID
+        - model: Filter by model name (partial match, e.g., 'claude' or 'gpt')
+        - start_time: Filter logs after this time (ISO format)
+        - end_time: Filter logs before this time (ISO format)
+        - format: 'json' (default) or 'csv'
+        """
+        try:
+            from src.api.datasets import DatasetStore
+
+            store = DatasetStore()
+            logs = store.get_llm_logs(
+                limit=limit,
+                offset=offset,
+                agent_id=agent_id,
+                model=model,
+                start_time=start_time,
+                end_time=end_time,
+            )
+            total = store.get_llm_log_count(agent_id=agent_id, model=model)
+
+            if format == "csv":
+                import csv
+                import io
+
+                output = io.StringIO()
+                if logs:
+                    writer = csv.DictWriter(output, fieldnames=logs[0].keys())
+                    writer.writeheader()
+                    writer.writerows(logs)
+
+                output.seek(0)
+                return StreamingResponse(
+                    iter([output.getvalue()]),
+                    media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=llm_logs.csv"},
+                )
+
+            return {
+                "logs": logs,
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+            }
+
+        except Exception as e:
+            logger.error(f"Error fetching LLM logs: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.get("/api/llm/logs/stats")
+    async def get_llm_logs_stats():
+        """Get LLM response log statistics."""
+        try:
+            from src.api.datasets import DatasetStore
+
+            store = DatasetStore()
+            stats = store.get_stats()
+
+            return {
+                "total_logs": stats.get("llm_response_logs", 0),
+                "storage_stats": stats,
+            }
+
+        except Exception as e:
+            logger.error(f"Error fetching LLM log stats: {e}")
+            raise HTTPException(500, str(e))
+
     @app.post("/api/quorum/create")
     async def create_quorum(config: dict = Body(...)):
         """Create a new quorum (team of agents)."""
@@ -3347,6 +3432,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                     ],
                     model=model,
                     max_tokens=600,
+                    agent_id=persona_id,  # For LLM response logging
                 )
                 return {
                     "persona": persona_id,
@@ -3418,6 +3504,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                     ],
                     model=model,
                     max_tokens=600,
+                    agent_id=persona_id,  # For LLM response logging
                 )
                 return {
                     "persona": persona_id,
@@ -3506,6 +3593,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                         messages=messages,
                         model="anthropic/claude-sonnet-4",
                         max_tokens=400,
+                        agent_id=participant["id"],  # For LLM response logging
                     )
                     conversation.append({
                         "round": round_num + 1,
@@ -3735,6 +3823,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                         ],
                         model=response_model,
                         max_tokens=800,
+                        agent_id=persona_id,  # For LLM response logging
                     )
 
                     yield f"event: response\ndata: {json.dumps({'persona': persona_id, 'name': persona.name, 'response': response, 'model': response_model, 'hydrated': research_context is not None, 'research_context': research_context.to_dict() if research_context else None})}\n\n"
@@ -3893,6 +3982,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                                 ],
                                 model="anthropic/claude-sonnet-4",
                                 max_tokens=400,
+                                agent_id=participant["id"],  # For LLM response logging
                             )
 
                             entry = {

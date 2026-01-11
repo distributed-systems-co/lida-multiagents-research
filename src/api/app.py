@@ -436,6 +436,88 @@ def create_app(
         from ..llm.openrouter import MODELS
         return {"models": MODELS}
 
+    @app.get("/api/llm/logs")
+    async def get_llm_logs(
+        limit: int = Query(100, description="Max records to return", ge=1, le=1000),
+        offset: int = Query(0, description="Records to skip", ge=0),
+        agent_id: Optional[str] = Query(None, description="Filter by agent ID"),
+        model: Optional[str] = Query(None, description="Filter by model name (partial match)"),
+        start_time: Optional[str] = Query(None, description="Filter by start time (ISO format)"),
+        end_time: Optional[str] = Query(None, description="Filter by end time (ISO format)"),
+        format: str = Query("json", description="Output format: json or csv"),
+    ):
+        """Get LLM response logs with optional filters.
+
+        Query params:
+        - limit: Max records (default 100, max 1000)
+        - offset: Records to skip for pagination
+        - agent_id: Filter by agent ID
+        - model: Filter by model name (partial match, e.g., 'claude' or 'gpt')
+        - start_time: Filter logs after this time (ISO format)
+        - end_time: Filter logs before this time (ISO format)
+        - format: 'json' (default) or 'csv'
+        """
+        try:
+            from .datasets import DatasetStore
+
+            store = DatasetStore()
+            logs = store.get_llm_logs(
+                limit=limit,
+                offset=offset,
+                agent_id=agent_id,
+                model=model,
+                start_time=start_time,
+                end_time=end_time,
+            )
+            total = store.get_llm_log_count(agent_id=agent_id, model=model)
+
+            if format == "csv":
+                import csv
+                import io
+                from fastapi.responses import StreamingResponse as FastAPIStreamingResponse
+
+                output = io.StringIO()
+                if logs:
+                    writer = csv.DictWriter(output, fieldnames=logs[0].keys())
+                    writer.writeheader()
+                    writer.writerows(logs)
+
+                output.seek(0)
+                return FastAPIStreamingResponse(
+                    iter([output.getvalue()]),
+                    media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=llm_logs.csv"},
+                )
+
+            return {
+                "logs": logs,
+                "total": total,
+                "limit": limit,
+                "offset": offset,
+            }
+
+        except Exception as e:
+            logger.error(f"Error fetching LLM logs: {e}")
+            raise HTTPException(500, str(e))
+
+    @app.get("/api/llm/logs/stats")
+    async def get_llm_logs_stats():
+        """Get LLM response log statistics."""
+        try:
+            from .datasets import DatasetStore
+
+            store = DatasetStore()
+            stats = store.get_stats()
+
+            return {
+                "total_logs": stats.get("llm_response_logs", 0),
+                "storage_stats": stats,
+            }
+
+        except Exception as e:
+            logger.error(f"Error fetching LLM log stats: {e}")
+            raise HTTPException(500, str(e))
+
     # ─────────────────────────────────────────────────────────────────────────
     # Cognitive Agent routes
     # ─────────────────────────────────────────────────────────────────────────

@@ -6,12 +6,48 @@ import asyncio
 import json
 import logging
 import os
+import time
 from dataclasses import dataclass, field
 from typing import AsyncIterator, Optional, Any, Callable
 
 import httpx
 
 logger = logging.getLogger(__name__)
+
+# LLM response logging
+_llm_logger = None
+
+
+def _is_full_logs() -> bool:
+    """Check if full logging is enabled (re-checked each call)."""
+    return os.getenv("FULL_LOGS", "").lower() in ("true", "1", "yes")
+
+
+def _get_llm_logger():
+    """Get or create the LLM response logger (DatasetStore)."""
+    global _llm_logger
+    if _llm_logger is None:
+        try:
+            from src.api.datasets import DatasetStore
+            _llm_logger = DatasetStore()
+        except Exception as e:
+            logger.warning(f"Could not initialize LLM logger: {e}")
+    return _llm_logger
+
+
+def _extract_prompt(messages: list[dict]) -> str:
+    """Extract prompt text from messages for logging."""
+    # Get the last user message as the primary prompt
+    for msg in reversed(messages):
+        if msg.get("role") == "user":
+            content = msg.get("content", "")
+            if isinstance(content, str):
+                return content
+            # Handle multimodal content (list format)
+            if isinstance(content, list):
+                texts = [c.get("text", "") for c in content if c.get("type") == "text"]
+                return " ".join(texts)
+    return ""
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
@@ -112,6 +148,7 @@ class OpenRouterClient:
         timeout: float = 120.0,
         site_url: Optional[str] = None,
         site_name: Optional[str] = None,
+        agent_id: Optional[str] = None,
     ):
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
         if not self.api_key:
@@ -122,6 +159,7 @@ class OpenRouterClient:
         self.timeout = timeout
         self.site_url = site_url or "https://github.com/distributed-systems-co/lida-multiagents-research"
         self.site_name = site_name or "LIDA Multi-Agent System"
+        self.agent_id = agent_id  # For LLM response logging
 
         self._client: Optional[httpx.AsyncClient] = None
 
@@ -154,6 +192,7 @@ class OpenRouterClient:
         temperature: float = 0.7,
         max_tokens: int = 4096,
         stream: bool = False,
+        agent_id: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse | AsyncIterator[str]:
         """
@@ -165,6 +204,7 @@ class OpenRouterClient:
             temperature: Sampling temperature
             max_tokens: Max tokens to generate
             stream: Whether to stream the response
+            agent_id: Optional agent ID for logging (overrides client's agent_id)
             **kwargs: Additional parameters passed to the API
 
         Returns:
@@ -188,23 +228,28 @@ class OpenRouterClient:
             **kwargs,
         }
 
-        if stream:
-            return self._stream_complete(payload)
-        else:
-            return await self._complete(payload)
+        # Use provided agent_id or fall back to client's agent_id
+        effective_agent_id = agent_id or self.agent_id
 
-    async def _complete(self, payload: dict) -> StreamingResponse:
+        if stream:
+            return self._stream_complete(payload, effective_agent_id)
+        else:
+            return await self._complete(payload, effective_agent_id)
+
+    async def _complete(self, payload: dict, agent_id: Optional[str] = None) -> StreamingResponse:
         """Non-streaming completion."""
         client = await self._get_client()
 
         logger.info(f"OpenRouter API call - Requesting model: {payload['model']}")
         logger.debug(f"OpenRouter payload: {json.dumps({k: v for k, v in payload.items() if k != 'messages'}, indent=2)}")
 
+        start_time = time.time()
         response = await client.post(
             f"{self.base_url}/chat/completions",
             json=payload,
         )
         response.raise_for_status()
+        duration_ms = int((time.time() - start_time) * 1000)
 
         data = response.json()
         actual_model = data.get("model", payload["model"])
@@ -213,14 +258,36 @@ class OpenRouterClient:
         if actual_model != payload["model"]:
             logger.warning(f"Model mismatch! Requested: {payload['model']}, Got: {actual_model}")
 
+        content = data["choices"][0]["message"]["content"]
+        usage = data.get("usage", {})
+
+        # Log the LLM response
+        llm_logger = _get_llm_logger()
+        if llm_logger:
+            try:
+                prompt = _extract_prompt(payload.get("messages", []))
+                llm_logger.log_llm_response(
+                    agent_id=agent_id,
+                    model_requested=payload["model"],
+                    model_actual=actual_model,
+                    prompt=prompt,
+                    response=content,
+                    tokens_in=usage.get("prompt_tokens"),
+                    tokens_out=usage.get("completion_tokens"),
+                    duration_ms=duration_ms,
+                    full_logs=_is_full_logs(),
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log LLM response: {e}")
+
         return StreamingResponse(
-            content=data["choices"][0]["message"]["content"],
+            content=content,
             model=actual_model,
             finish_reason=data["choices"][0].get("finish_reason"),
-            usage=data.get("usage", {}),
+            usage=usage,
         )
 
-    async def _stream_complete(self, payload: dict) -> AsyncIterator[str]:
+    async def _stream_complete(self, payload: dict, agent_id: Optional[str] = None) -> AsyncIterator[str]:
         """Streaming completion yielding content chunks."""
         client = await self._get_client()
 
@@ -256,6 +323,7 @@ class OpenRouterClient:
         self,
         messages: list[Message | dict],
         on_chunk: Optional[Callable[[str], None]] = None,
+        agent_id: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse:
         """
@@ -264,26 +332,56 @@ class OpenRouterClient:
         Args:
             messages: Chat messages
             on_chunk: Optional callback for each chunk
+            agent_id: Optional agent ID for logging (overrides client's agent_id)
             **kwargs: Passed to complete()
 
         Returns:
             Complete StreamingResponse with full content
         """
-        response = StreamingResponse(model=kwargs.get("model", self.default_model))
+        model = kwargs.get("model", self.default_model)
+        # Resolve model aliases for logging
+        model_requested = MODELS.get(model, model) if model in MODELS else model
+        effective_agent_id = agent_id or self.agent_id
 
-        async for chunk in await self.complete(messages, stream=True, **kwargs):
+        response = StreamingResponse(model=model_requested)
+
+        start_time = time.time()
+        async for chunk in await self.complete(messages, stream=True, agent_id=effective_agent_id, **kwargs):
             response.content += chunk
             response.raw_chunks.append(chunk)
             if on_chunk:
                 on_chunk(chunk)
+        duration_ms = int((time.time() - start_time) * 1000)
 
         response.finish_reason = "stop"
+
+        # Log the streamed LLM response
+        llm_logger = _get_llm_logger()
+        if llm_logger:
+            try:
+                msgs = [m.to_dict() if isinstance(m, Message) else m for m in messages]
+                prompt = _extract_prompt(msgs)
+                llm_logger.log_llm_response(
+                    agent_id=effective_agent_id,
+                    model_requested=model_requested,
+                    model_actual=response.model,
+                    prompt=prompt,
+                    response=response.content,
+                    tokens_in=None,  # Not available for streaming
+                    tokens_out=None,
+                    duration_ms=duration_ms,
+                    full_logs=_is_full_logs(),
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log streamed LLM response: {e}")
+
         return response
 
     async def generate(
         self,
         prompt: str,
         system: Optional[str] = None,
+        agent_id: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse:
         """
@@ -292,6 +390,7 @@ class OpenRouterClient:
         Args:
             prompt: User prompt
             system: Optional system prompt
+            agent_id: Optional agent ID for logging (overrides client's agent_id)
             **kwargs: Passed to complete()
 
         Returns:
@@ -302,12 +401,13 @@ class OpenRouterClient:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
 
-        return await self.complete(messages, **kwargs)
+        return await self.complete(messages, agent_id=agent_id, **kwargs)
 
     async def stream_generate(
         self,
         prompt: str,
         system: Optional[str] = None,
+        agent_id: Optional[str] = None,
         **kwargs,
     ) -> AsyncIterator[str]:
         """
@@ -316,6 +416,7 @@ class OpenRouterClient:
         Args:
             prompt: User prompt
             system: Optional system prompt
+            agent_id: Optional agent ID for logging (overrides client's agent_id)
             **kwargs: Passed to complete()
 
         Yields:
@@ -326,8 +427,30 @@ class OpenRouterClient:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
 
-        async for chunk in await self.complete(messages, stream=True, **kwargs):
+        async for chunk in await self.complete(messages, stream=True, agent_id=agent_id, **kwargs):
             yield chunk
+
+    async def chat(
+        self,
+        messages: list[dict],
+        model: Optional[str] = None,
+        agent_id: Optional[str] = None,
+        **kwargs,
+    ) -> str:
+        """
+        Non-streaming chat completion (convenience method).
+
+        Args:
+            messages: Chat messages
+            model: Model to use (defaults to default_model)
+            agent_id: Optional agent ID for logging (overrides client's agent_id)
+            **kwargs: Passed to complete()
+
+        Returns:
+            Response content as string
+        """
+        response = await self.complete(messages, model=model, stream=False, agent_id=agent_id, **kwargs)
+        return response.content
 
 
 # Global client instance
@@ -345,20 +468,22 @@ def get_client() -> OpenRouterClient:
 async def stream_chat(
     messages: list[dict],
     model: str = "anthropic/claude-sonnet-4.5",
+    agent_id: Optional[str] = None,
     **kwargs,
 ) -> AsyncIterator[str]:
     """Convenience function for streaming chat."""
     client = get_client()
-    async for chunk in await client.complete(messages, model=model, stream=True, **kwargs):
+    async for chunk in await client.complete(messages, model=model, stream=True, agent_id=agent_id, **kwargs):
         yield chunk
 
 
 async def chat(
     messages: list[dict],
     model: str = "anthropic/claude-sonnet-4.5",
+    agent_id: Optional[str] = None,
     **kwargs,
 ) -> str:
     """Convenience function for non-streaming chat."""
     client = get_client()
-    response = await client.complete(messages, model=model, stream=False, **kwargs)
+    response = await client.complete(messages, model=model, stream=False, agent_id=agent_id, **kwargs)
     return response.content

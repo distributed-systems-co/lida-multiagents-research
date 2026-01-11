@@ -251,6 +251,31 @@ class OpenRouterLM(BaseLM):
                 confidence=confidence,
             )
 
+            # Log the LLM response
+            try:
+                from src.api.datasets import DatasetStore
+                full_logs = os.getenv("FULL_LOGS", "").lower() in ("true", "1", "yes")
+                # Extract prompt from messages
+                prompt_text = ""
+                for msg in messages:
+                    if msg.get("role") == "user":
+                        prompt_text = msg.get("content", "")
+                        break
+                store = DatasetStore()
+                store.log_llm_response(
+                    agent_id=kwargs.get("agent_id"),
+                    model_requested=model,
+                    model_actual=data.get("model", model),
+                    prompt=prompt_text,
+                    response=text,
+                    tokens_in=usage.get("prompt_tokens"),
+                    tokens_out=usage.get("completion_tokens"),
+                    duration_ms=int(result.latency_ms),
+                    full_logs=full_logs,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log LLM response: {e}")
+
             # Track history
             self.history.append({
                 "messages": messages,

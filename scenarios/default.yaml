@@ -19,7 +19,6 @@ simulation:
   num_agents: 8
   max_agents: 12
   max_rounds_per_agent: 5
-  tick_interval_ms: 100
   auto_start: true
 
   initial_beliefs:

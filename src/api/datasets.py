@@ -85,6 +85,23 @@ class DatasetStore:
 
                 CREATE INDEX IF NOT EXISTS idx_msg_sender ON message_log(sender_id);
                 CREATE INDEX IF NOT EXISTS idx_msg_recipient ON message_log(recipient_id);
+
+                CREATE TABLE IF NOT EXISTS llm_response_log (
+                    id TEXT PRIMARY KEY,
+                    agent_id TEXT,
+                    model_requested TEXT,
+                    model_actual TEXT,
+                    prompt TEXT,
+                    response TEXT,
+                    tokens_in INTEGER,
+                    tokens_out INTEGER,
+                    timestamp TEXT NOT NULL,
+                    duration_ms INTEGER
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_llm_agent ON llm_response_log(agent_id);
+                CREATE INDEX IF NOT EXISTS idx_llm_model ON llm_response_log(model_actual);
+                CREATE INDEX IF NOT EXISTS idx_llm_timestamp ON llm_response_log(timestamp);
             """)
         logger.info(f"Database initialized at {self.db_path}")
 
@@ -327,6 +344,128 @@ class DatasetStore:
             for row in rows
         ]
 
+    # LLM response logging
+    def log_llm_response(
+        self,
+        agent_id: Optional[str],
+        model_requested: str,
+        model_actual: str,
+        prompt: str,
+        response: str,
+        tokens_in: Optional[int] = None,
+        tokens_out: Optional[int] = None,
+        duration_ms: Optional[int] = None,
+        full_logs: bool = False,
+    ):
+        """Log an LLM response.
+
+        Args:
+            agent_id: ID of the agent making the request
+            model_requested: Model that was requested
+            model_actual: Model that actually responded
+            prompt: The prompt sent (truncated to 200 chars unless full_logs=True)
+            response: The response received (truncated to 200 chars unless full_logs=True)
+            tokens_in: Input token count
+            tokens_out: Output token count
+            duration_ms: Request duration in milliseconds
+            full_logs: If True, store complete content; if False, truncate to 200 chars
+        """
+        log_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Truncate content unless full_logs is enabled
+        if not full_logs:
+            prompt = prompt[:200] + "..." if len(prompt) > 200 else prompt
+            response = response[:200] + "..." if len(response) > 200 else response
+
+        with self._transaction() as conn:
+            conn.execute(
+                """
+                INSERT INTO llm_response_log
+                (id, agent_id, model_requested, model_actual, prompt, response,
+                 tokens_in, tokens_out, timestamp, duration_ms)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (log_id, agent_id, model_requested, model_actual, prompt, response,
+                 tokens_in, tokens_out, now, duration_ms),
+            )
+
+    def get_llm_logs(
+        self,
+        limit: int = 100,
+        offset: int = 0,
+        agent_id: Optional[str] = None,
+        model: Optional[str] = None,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+    ) -> list[dict]:
+        """Get LLM response logs with optional filters.
+
+        Args:
+            limit: Maximum number of records to return
+            offset: Number of records to skip
+            agent_id: Filter by agent ID
+            model: Filter by model name (matches model_actual)
+            start_time: Filter by timestamp >= start_time (ISO format)
+            end_time: Filter by timestamp <= end_time (ISO format)
+        """
+        query = "SELECT * FROM llm_response_log WHERE 1=1"
+        params: list[Any] = []
+
+        if agent_id:
+            query += " AND agent_id = ?"
+            params.append(agent_id)
+        if model:
+            query += " AND model_actual LIKE ?"
+            params.append(f"%{model}%")
+        if start_time:
+            query += " AND timestamp >= ?"
+            params.append(start_time)
+        if end_time:
+            query += " AND timestamp <= ?"
+            params.append(end_time)
+
+        query += " ORDER BY timestamp DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+
+        with self._transaction() as conn:
+            rows = conn.execute(query, params).fetchall()
+
+        return [
+            {
+                "id": row["id"],
+                "agent_id": row["agent_id"],
+                "model_requested": row["model_requested"],
+                "model_actual": row["model_actual"],
+                "prompt": row["prompt"],
+                "response": row["response"],
+                "tokens_in": row["tokens_in"],
+                "tokens_out": row["tokens_out"],
+                "timestamp": row["timestamp"],
+                "duration_ms": row["duration_ms"],
+            }
+            for row in rows
+        ]
+
+    def get_llm_log_count(
+        self,
+        agent_id: Optional[str] = None,
+        model: Optional[str] = None,
+    ) -> int:
+        """Get count of LLM response logs."""
+        query = "SELECT COUNT(*) as c FROM llm_response_log WHERE 1=1"
+        params: list[Any] = []
+
+        if agent_id:
+            query += " AND agent_id = ?"
+            params.append(agent_id)
+        if model:
+            query += " AND model_actual LIKE ?"
+            params.append(f"%{model}%")
+
+        with self._transaction() as conn:
+            return conn.execute(query, params).fetchone()["c"]
+
     def get_stats(self) -> dict:
         """Get storage statistics."""
         with self._transaction() as conn:
@@ -334,10 +473,12 @@ class DatasetStore:
             records = conn.execute("SELECT COUNT(*) as c FROM records").fetchone()["c"]
             chats = conn.execute("SELECT COUNT(*) as c FROM chat_history").fetchone()["c"]
             messages = conn.execute("SELECT COUNT(*) as c FROM message_log").fetchone()["c"]
+            llm_logs = conn.execute("SELECT COUNT(*) as c FROM llm_response_log").fetchone()["c"]
 
         return {
             "datasets": datasets,
             "total_records": records,
             "chat_messages": chats,
             "logged_messages": messages,
+            "llm_response_logs": llm_logs,
         }
