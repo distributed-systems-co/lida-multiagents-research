@@ -9,11 +9,11 @@ services:
     volumes:
       - .:/app
       - app_data:/app/data
-      - app_logs:/app/logs
+      - ./logs:/app/logs
     environment:
       - PORT=${API_PORT:-2040}
       - SERVER_ROLE=api
-      - WORKERS=${API_WORKERS:-4}
+      - WORKERS=${API_WORKERS:-1}  # Must be 1 - orchestrator state is per-worker
       - SCENARIO=${SCENARIO:-default}
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
@@ -44,11 +44,11 @@ services:
     volumes:
       - .:/app
       - app_data:/app/data
-      - app_logs:/app/logs
+      - ./logs:/app/logs
     environment:
       - PORT=${STREAMING_PORT:-8787}
       - SERVER_ROLE=streaming
-      - WORKERS=${STREAMING_WORKERS:-2}
+      - WORKERS=${STREAMING_WORKERS:-1}  # Must be 1 - orchestrator state is per-worker
       - SCENARIO=${SCENARIO:-default}
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
@@ -102,7 +102,7 @@ services:
     volumes:
       - .:/app
       - app_data:/app/data
-      - app_logs:/app/logs
+      - ./logs:/app/logs
     environment:
       - PORT=${PORT:-12345}
       - WORKERS=${WORKERS:-2}
@@ -176,7 +176,6 @@ services:
 volumes:
   redis_data:
   app_data:
-  app_logs:
 
 # Compose profiles:
 #   (default)    - api + streaming + redis (main deployment)

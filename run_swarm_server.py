@@ -29,7 +29,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from collections import deque
-import redis.asyncio as aioredis
 
 import uvicorn
 
@@ -4287,93 +4286,9 @@ def _create_default_app() -> FastAPI:
             logger.info("MCP initialized")
         asyncio.create_task(orch.decay_energy())
 
-        # Log auto_start_topic for debugging
+        # Log auto_start_topic for debugging (auto-start is now handled by run_deliberation.py)
         logger.info(f"auto_start_topic: {orch.auto_start_topic}")
         logger.info(f"Startup event complete for worker {os.getpid()}")
-
-        async def auto_deliberate():
-            # Use Redis lock to ensure only one worker runs auto_deliberate
-            redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
-            lock_acquired = False
-            redis_client = None
-
-            try:
-                # Add timeout for Redis connection
-                redis_client = await asyncio.wait_for(
-                    aioredis.from_url(redis_url),
-                    timeout=10.0
-                )
-                # Try to acquire lock with 5 minute expiration (NX = only if not exists)
-                lock_acquired = await asyncio.wait_for(
-                    redis_client.set(
-                        "deliberation:auto_worker_lock",
-                        f"worker_{os.getpid()}",
-                        nx=True,
-                        ex=300
-                    ),
-                    timeout=5.0
-                )
-                if not lock_acquired:
-                    logger.info(f"Another worker holds the auto_deliberate lock, this worker will skip")
-                    return
-                logger.info(f"Worker {os.getpid()} acquired auto_deliberate lock")
-            except asyncio.TimeoutError:
-                logger.warning(f"Redis connection timed out, proceeding anyway (may cause duplicates)")
-                lock_acquired = True
-            except Exception as e:
-                logger.warning(f"Redis lock check failed: {e}, proceeding anyway (may cause duplicates)")
-                lock_acquired = True  # Proceed if Redis unavailable
-            finally:
-                if redis_client:
-                    await redis_client.close()
-
-            if not lock_acquired:
-                return
-
-            # Check for auto_start_topic - starts immediately without waiting for websockets
-            if orch.auto_start_topic:
-                logger.info(f"Auto-starting deliberation with topic: {orch.auto_start_topic}")
-
-                # Wait for system to be ready (agents loaded, LLM initialized if live mode)
-                max_wait = 60  # Maximum seconds to wait
-                waited = 0
-                while waited < max_wait:
-                    agents_ready = len(orch.agents) > 0
-                    llm_ready = not orch.live_mode or orch.llm_client is not None
-
-                    if agents_ready and llm_ready:
-                        logger.info(f"System ready after {waited}s: {len(orch.agents)} agents, LLM={'ready' if llm_ready else 'waiting'}")
-                        break
-
-                    await asyncio.sleep(1)
-                    waited += 1
-                    if waited % 5 == 0:
-                        logger.info(f"Waiting for system... agents={len(orch.agents)}, llm_ready={llm_ready}")
-
-                if waited >= max_wait:
-                    logger.warning(f"Timeout waiting for system, starting anyway")
-
-                try:
-                    await orch.run_deliberation(orch.auto_start_topic)
-                except Exception as e:
-                    logger.error(f"Auto-start deliberation error: {e}")
-                return  # Only run once for auto_start_topic
-
-            # Regular auto-deliberation (waits for websocket connections)
-            if not orch.auto_start:
-                logger.info("Auto-deliberation disabled in config")
-                return
-            await asyncio.sleep(orch.auto_start_delay)
-            while True:
-                try:
-                    if not orch.deliberation_active and len(orch.websockets) > 0:
-                        topic = random.choice(orch.default_topics)
-                        await orch.run_deliberation(topic)
-                except Exception as e:
-                    logger.error(f"Auto-deliberation error: {e}")
-                await asyncio.sleep(orch.auto_start_delay)
-
-        asyncio.create_task(auto_deliberate())
 
     @app.on_event("shutdown")
     async def shutdown():
@@ -4435,96 +4350,7 @@ async def run_server(
 
     # Start background tasks
     asyncio.create_task(orchestrator.decay_energy())
-
-    # Auto-start deliberation loop (using config values)
-    async def auto_deliberate():
-        # Use Redis lock to ensure only one worker runs auto_deliberate
-        redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
-        lock_acquired = False
-        redis_client = None
-
-        try:
-            # Add timeout for Redis connection
-            redis_client = await asyncio.wait_for(
-                aioredis.from_url(redis_url),
-                timeout=10.0
-            )
-            # Try to acquire lock with 5 minute expiration (NX = only if not exists)
-            lock_acquired = await asyncio.wait_for(
-                redis_client.set(
-                    "deliberation:auto_worker_lock",
-                    f"worker_{os.getpid()}",
-                    nx=True,
-                    ex=300
-                ),
-                timeout=5.0
-            )
-            if not lock_acquired:
-                logger.info(f"Another worker holds the auto_deliberate lock, this worker will skip")
-                return
-            logger.info(f"Worker {os.getpid()} acquired auto_deliberate lock")
-        except asyncio.TimeoutError:
-            logger.warning(f"Redis connection timed out, proceeding anyway (may cause duplicates)")
-            lock_acquired = True
-        except Exception as e:
-            logger.warning(f"Redis lock check failed: {e}, proceeding anyway (may cause duplicates)")
-            lock_acquired = True  # Proceed if Redis unavailable
-        finally:
-            if redis_client:
-                await redis_client.close()
-
-        if not lock_acquired:
-            return
-
-        # Check for auto_start_topic - starts immediately without waiting for websockets
-        if orchestrator.auto_start_topic:
-            logger.info(f"Auto-starting deliberation with topic: {orchestrator.auto_start_topic}")
-
-            # Wait for system to be ready (agents loaded, LLM initialized if live mode)
-            max_wait = 60  # Maximum seconds to wait
-            waited = 0
-            while waited < max_wait:
-                agents_ready = len(orchestrator.agents) > 0
-                llm_ready = not orchestrator.live_mode or orchestrator.llm_client is not None
-
-                if agents_ready and llm_ready:
-                    logger.info(f"System ready after {waited}s: {len(orchestrator.agents)} agents, LLM={'ready' if llm_ready else 'waiting'}")
-                    break
-
-                await asyncio.sleep(1)
-                waited += 1
-                if waited % 5 == 0:
-                    logger.info(f"Waiting for system... agents={len(orchestrator.agents)}, llm_ready={llm_ready}")
-
-            if waited >= max_wait:
-                logger.warning(f"Timeout waiting for system, starting anyway")
-
-            try:
-                await orchestrator.run_deliberation(orchestrator.auto_start_topic)
-            except Exception as e:
-                logger.error(f"Auto-start deliberation error: {e}")
-            return  # Only run once for auto_start_topic
-
-        if not orchestrator.auto_start:
-            logger.info("Auto-deliberation disabled in config")
-            return
-        logger.info(f"Auto-deliberation task started (delay: {orchestrator.auto_start_delay}s, max_rounds: {orchestrator.max_rounds})")
-        await asyncio.sleep(orchestrator.auto_start_delay)
-        while True:
-            try:
-                ws_count = len(orchestrator.websockets)
-                logger.info(f"Auto-deliberate check: active={orchestrator.deliberation_active}, websockets={ws_count}")
-                if not orchestrator.deliberation_active and ws_count > 0:
-                    topic = random.choice(orchestrator.default_topics)
-                    logger.info(f"Starting auto-deliberation on: {topic[:50]}...")
-                    await orchestrator.run_deliberation(topic)
-                elif not orchestrator.deliberation_active and ws_count == 0:
-                    logger.info("No WebSocket connections, waiting...")
-            except Exception as e:
-                logger.error(f"Auto-deliberation error: {e}")
-            await asyncio.sleep(orchestrator.auto_start_delay)
-
-    asyncio.create_task(auto_deliberate())
+    # Note: Auto-start deliberation is now handled by run_deliberation.py via API call
 
     # Run server
     print(f"\n🌐 Dashboard: http://localhost:{port}")
