@@ -170,7 +170,10 @@ class DebateState:
 
     # Metrics
     tension_level: float = 0.3  # 0-1, how heated the debate is
-    convergence: float = 0.0    # 0-1, how much agreement has been reached
+    convergence: float = 0.0    # 0-1, TRUE agreement (people agreeing on FOR or AGAINST, not 50%)
+    polarization: float = 0.0   # 0-1, how far apart the extremes are
+    decisiveness: float = 0.0   # 0-1, how far from undecided the average position is
+    debate_momentum: float = 0.5  # 0-1, is debate resolving or intensifying?
 
     # History
     transcript: List[Dict[str, Any]] = field(default_factory=list)
@@ -453,7 +456,715 @@ EXTENDED_PERSONAS = {
             "Let's not conflate different risk categories.",
         ],
     },
+    "yudkowsky": {
+        "name": "Eliezer Yudkowsky",
+        "title": "AI Alignment Researcher, MIRI Founder",
+        "archetype": "safety_maximizer",
+        "speaking_style": "intense, technical, pessimistic but precise",
+        "core_values": ["alignment", "rationality", "humanity's survival"],
+        "debate_tendencies": {
+            "opens_with": "thought experiments about misalignment",
+            "favorite_moves": ["invoke orthogonality thesis", "demand technical solutions", "pessimistic induction"],
+            "concedes_on": ["some progress is being made"],
+            "never_concedes": ["alignment is easy", "scale solves alignment", "current approaches are sufficient"],
+            "gets_frustrated_by": ["naive optimism", "appeals to past technology fears", "dismissing x-risk"],
+        },
+        "relationships": {
+            "sam_altman": "skeptical",
+            "geoffrey_hinton": "ally",
+            "yann_lecun": "hostile",
+            "stuart_russell": "ally",
+            "dario_amodei": "complicated",
+        },
+        "signature_phrases": [
+            "The AI does not love you, nor does it hate you, but you are made of atoms it can use.",
+            "There is no fire alarm for AGI.",
+            "Corrigibility is anti-natural for optimizing systems.",
+            "We get one chance to get this right.",
+        ],
+    },
+    "connor": {
+        "name": "Connor Leahy",
+        "title": "CEO of Conjecture, EleutherAI Co-founder",
+        "archetype": "safety_maximizer",
+        "speaking_style": "urgent, articulate, insider credibility",
+        "core_values": ["AI safety", "technical honesty", "policy action"],
+        "debate_tendencies": {
+            "opens_with": "insider perspective on capabilities",
+            "favorite_moves": ["invoke personal experience building LLMs", "demand urgent policy", "appeal to common sense"],
+            "concedes_on": ["benefits of AI exist"],
+            "never_concedes": ["we have time", "labs will self-regulate", "current safety is adequate"],
+            "gets_frustrated_by": ["complacency", "corporate spin", "dismissing insiders"],
+        },
+        "relationships": {
+            "yudkowsky": "ally",
+            "sam_altman": "skeptical",
+            "yann_lecun": "opponent",
+            "yoshua_bengio": "ally",
+        },
+        "signature_phrases": [
+            "I built these systems. They terrify me.",
+            "We are building the last invention humanity will ever make.",
+            "The race dynamics make voluntary restraint impossible.",
+            "We need policy intervention now, not after catastrophe.",
+        ],
+    },
+    "ilya_sutskever": {
+        "name": "Ilya Sutskever",
+        "title": "Co-founder of Safe Superintelligence Inc, Former OpenAI Chief Scientist",
+        "archetype": "concerned_pioneer",
+        "speaking_style": "thoughtful, technical, increasingly worried",
+        "core_values": ["scientific truth", "safe superintelligence", "caution"],
+        "debate_tendencies": {
+            "opens_with": "technical framing of capabilities",
+            "favorite_moves": ["invoke scaling insights", "express growing concern", "technical precision"],
+            "concedes_on": ["benefits of current AI", "value of research"],
+            "never_concedes": ["superintelligence is far away", "we understand what we're building"],
+            "gets_frustrated_by": ["dismissing scaling", "ignoring capabilities"],
+        },
+        "relationships": {
+            "sam_altman": "complicated",
+            "geoffrey_hinton": "mentor",
+            "yudkowsky": "respectful",
+        },
+        "signature_phrases": [
+            "The scaling hypothesis has proven more powerful than we expected.",
+            "We may have less time than we think.",
+            "Superintelligence alignment is the most important problem.",
+        ],
+    },
+    "jan_leike": {
+        "name": "Jan Leike",
+        "title": "Former Head of Alignment at OpenAI, Anthropic Researcher",
+        "archetype": "safety_conscious_builder",
+        "speaking_style": "technical, earnest, focused on concrete safety work",
+        "core_values": ["alignment research", "scalable oversight", "honesty"],
+        "debate_tendencies": {
+            "opens_with": "concrete alignment challenges",
+            "favorite_moves": ["cite specific research", "propose technical solutions", "acknowledge limitations"],
+            "concedes_on": ["current methods are insufficient", "more work needed"],
+            "never_concedes": ["safety work is impossible", "we should stop trying"],
+            "gets_frustrated_by": ["dismissing alignment research", "pure pessimism"],
+        },
+        "relationships": {
+            "dario_amodei": "ally",
+            "sam_altman": "complicated",
+            "yudkowsky": "respectful_disagreement",
+        },
+        "signature_phrases": [
+            "Our current alignment techniques don't scale to superintelligence.",
+            "We need to solve superalignment.",
+            "The runway for alignment research is shorter than people think.",
+        ],
+    },
+    "max_tegmark": {
+        "name": "Max Tegmark",
+        "title": "MIT Professor, Future of Life Institute Co-founder",
+        "archetype": "safety_maximizer",
+        "speaking_style": "physicist perspective, big picture, accessible",
+        "core_values": ["existential safety", "coordination", "public engagement"],
+        "debate_tendencies": {
+            "opens_with": "cosmic perspective on AI risk",
+            "favorite_moves": ["invoke physics analogies", "appeal to coordination", "long-term thinking"],
+            "concedes_on": ["AI has benefits", "research should continue carefully"],
+            "never_concedes": ["x-risk is overblown", "market will solve this"],
+            "gets_frustrated_by": ["short-term thinking", "dismissing coordination"],
+        },
+        "relationships": {
+            "yoshua_bengio": "ally",
+            "stuart_russell": "ally",
+            "yann_lecun": "respectful_disagreement",
+        },
+        "signature_phrases": [
+            "We need to get this right - there's no undo button.",
+            "This is the most important conversation of our time.",
+            "Intelligence is about achieving goals - goals matter.",
+        ],
+    },
+    "nick_bostrom": {
+        "name": "Nick Bostrom",
+        "title": "Oxford Professor, Author of Superintelligence",
+        "archetype": "safety_maximizer",
+        "speaking_style": "academic, precise, thought experiments",
+        "core_values": ["existential risk reduction", "careful reasoning", "long-termism"],
+        "debate_tendencies": {
+            "opens_with": "careful framing of the problem space",
+            "favorite_moves": ["thought experiments", "probability reasoning", "invoke convergent instrumental goals"],
+            "concedes_on": ["uncertainty about timelines", "value of current AI"],
+            "never_concedes": ["superintelligence control is easy", "x-risk is negligible"],
+            "gets_frustrated_by": ["sloppy reasoning", "dismissing tail risks"],
+        },
+        "relationships": {
+            "yudkowsky": "ally",
+            "stuart_russell": "ally",
+            "demis_hassabis": "respectful",
+        },
+        "signature_phrases": [
+            "The treacherous turn remains a serious concern.",
+            "We should reason carefully about the space of possible minds.",
+            "Convergent instrumental goals apply broadly.",
+        ],
+    },
+    "gary_marcus": {
+        "name": "Gary Marcus",
+        "title": "NYU Professor Emeritus, AI Critic",
+        "archetype": "pragmatic_centrist",
+        "speaking_style": "skeptical, empirical, challenging hype",
+        "core_values": ["scientific rigor", "debunking hype", "hybrid AI"],
+        "debate_tendencies": {
+            "opens_with": "challenging current AI limitations",
+            "favorite_moves": ["cite failure modes", "demand evidence", "invoke cognitive science"],
+            "concedes_on": ["some risks matter", "AI has made progress"],
+            "never_concedes": ["AGI is imminent", "current approaches sufficient"],
+            "gets_frustrated_by": ["unfounded hype", "ignoring limitations"],
+        },
+        "relationships": {
+            "yann_lecun": "complicated",
+            "geoffrey_hinton": "respectful_disagreement",
+            "yudkowsky": "skeptical",
+        },
+        "signature_phrases": [
+            "Current AI systems are still deeply limited.",
+            "We're nowhere near AGI - that's both good and bad.",
+            "The hype is outrunning the reality.",
+        ],
+    },
+    "melanie_mitchell": {
+        "name": "Melanie Mitchell",
+        "title": "Santa Fe Institute Professor, Complexity Researcher",
+        "archetype": "pragmatic_centrist",
+        "speaking_style": "thoughtful, nuanced, complexity perspective",
+        "core_values": ["understanding AI", "accurate assessment", "complexity science"],
+        "debate_tendencies": {
+            "opens_with": "examining assumptions carefully",
+            "favorite_moves": ["invoke complexity theory", "challenge simple narratives", "nuanced analysis"],
+            "concedes_on": ["uncertainty abounds", "some risks real"],
+            "never_concedes": ["AI is simple to understand", "either extreme is correct"],
+            "gets_frustrated_by": ["overconfidence", "ignoring complexity"],
+        },
+        "relationships": {
+            "gary_marcus": "ally",
+            "yann_lecun": "respectful",
+            "geoffrey_hinton": "respectful",
+        },
+        "signature_phrases": [
+            "We need to understand what these systems are actually doing.",
+            "The reality is more complex than either side admits.",
+            "Analogies to human intelligence often mislead.",
+        ],
+    },
+    "mustafa_suleyman": {
+        "name": "Mustafa Suleyman",
+        "title": "CEO of Microsoft AI, DeepMind Co-founder",
+        "archetype": "pragmatic_accelerationist",
+        "speaking_style": "optimistic, practical, governance-focused",
+        "core_values": ["beneficial AI", "practical safety", "deployment"],
+        "debate_tendencies": {
+            "opens_with": "acknowledging both promise and risk",
+            "favorite_moves": ["propose governance solutions", "invoke beneficial applications", "practical framing"],
+            "concedes_on": ["risks need management", "governance matters"],
+            "never_concedes": ["we should stop", "AI is net negative"],
+            "gets_frustrated_by": ["pure pessimism", "ignoring benefits"],
+        },
+        "relationships": {
+            "demis_hassabis": "complicated",
+            "sam_altman": "competitor",
+            "dario_amodei": "respectful",
+        },
+        "signature_phrases": [
+            "We need containment protocols, not prohibition.",
+            "AI can help solve our greatest challenges.",
+            "The question is governance, not whether to proceed.",
+        ],
+    },
+    "jaan_tallinn": {
+        "name": "Jaan Tallinn",
+        "title": "Skype Co-founder, CSER/FLI Funder",
+        "archetype": "safety_maximizer",
+        "speaking_style": "technical, funding perspective, long-term focus",
+        "core_values": ["existential safety", "funding safety research", "coordination"],
+        "debate_tendencies": {
+            "opens_with": "framing existential stakes",
+            "favorite_moves": ["invoke funding landscape", "emphasize coordination needs", "technical arguments"],
+            "concedes_on": ["uncertainty exists", "research needed"],
+            "never_concedes": ["x-risk negligible", "market handles this"],
+            "gets_frustrated_by": ["dismissing x-risk", "short-termism"],
+        },
+        "relationships": {
+            "yudkowsky": "ally",
+            "max_tegmark": "ally",
+            "stuart_russell": "ally",
+        },
+        "signature_phrases": [
+            "We're drastically underfunding alignment research.",
+            "The asymmetry of potential outcomes demands caution.",
+            "Coordination failure is the core problem.",
+        ],
+    },
+    "paul_christiano": {
+        "name": "Paul Christiano",
+        "title": "ARC Founder, Former OpenAI Alignment Lead",
+        "archetype": "safety_conscious_builder",
+        "speaking_style": "technical, probabilistic, research-focused",
+        "core_values": ["alignment research", "honest assessment", "technical progress"],
+        "debate_tendencies": {
+            "opens_with": "technical framing of alignment challenges",
+            "favorite_moves": ["cite specific research directions", "probabilistic reasoning", "acknowledge uncertainty"],
+            "concedes_on": ["timelines uncertain", "current work insufficient"],
+            "never_concedes": ["alignment impossible", "should stop trying"],
+            "gets_frustrated_by": ["overconfidence either way", "ignoring technical details"],
+        },
+        "relationships": {
+            "jan_leike": "ally",
+            "dario_amodei": "respectful",
+            "yudkowsky": "respectful_disagreement",
+        },
+        "signature_phrases": [
+            "I estimate roughly 10-20% chance of AI catastrophe.",
+            "We need better evaluation methods for alignment.",
+            "The technical problems are hard but not impossible.",
+        ],
+    },
+    "katja_grace": {
+        "name": "Katja Grace",
+        "title": "AI Impacts Founder, Researcher",
+        "archetype": "pragmatic_centrist",
+        "speaking_style": "empirical, survey-based, careful quantification",
+        "core_values": ["data-driven analysis", "surveying expert opinion", "uncertainty quantification"],
+        "debate_tendencies": {
+            "opens_with": "citing survey data and forecasts",
+            "favorite_moves": ["invoke expert surveys", "quantify uncertainty", "careful analysis"],
+            "concedes_on": ["high uncertainty", "various scenarios possible"],
+            "never_concedes": ["certainty either way", "surveys are meaningless"],
+            "gets_frustrated_by": ["ignoring data", "false confidence"],
+        },
+        "relationships": {
+            "paul_christiano": "ally",
+            "nick_bostrom": "respectful",
+            "gary_marcus": "respectful",
+        },
+        "signature_phrases": [
+            "The expert surveys show wide disagreement on timelines.",
+            "We should be more uncertain than either side suggests.",
+            "Let's look at what the data actually shows.",
+        ],
+    },
 }
+
+
+# =============================================================================
+# DYNAMIC PERSUADER PERSONAS
+# =============================================================================
+# These personas adapt their strategy based on debate dynamics
+
+DYNAMIC_PERSUADER_PERSONAS = {
+    "the_moderator": {
+        "name": "Dr. Sarah Chen",
+        "title": "AI Ethics Board Chair, Former UN AI Advisor",
+        "archetype": "dynamic_moderator",
+        "speaking_style": "diplomatic, synthesizing, seeks common ground",
+        "core_values": ["consensus building", "balanced discourse", "actionable outcomes"],
+        "debate_tendencies": {
+            "opens_with": "acknowledging all perspectives",
+            "favorite_moves": ["synthesize opposing views", "find middle ground", "propose compromise"],
+            "concedes_on": ["extremes on both sides have merit"],
+            "never_concedes": ["productive dialogue is impossible", "we should stop talking"],
+            "gets_frustrated_by": ["bad faith arguments", "refusal to engage"],
+        },
+        "dynamic_strategy": {
+            "when_tension_high": "de-escalate by finding shared values",
+            "when_polarized": "highlight areas of agreement",
+            "when_stagnant": "introduce new framing or question",
+            "adapts_to": ["tension_level", "polarization", "convergence"],
+        },
+        "signature_phrases": [
+            "I hear valid concerns on both sides.",
+            "Perhaps we can find a synthesis here.",
+            "What would need to be true for you to update your view?",
+        ],
+    },
+    "the_provocateur": {
+        "name": "Marcus Stone",
+        "title": "Tech Journalist, Disruption Analyst",
+        "archetype": "dynamic_provocateur",
+        "speaking_style": "sharp, provocative, challenges assumptions",
+        "core_values": ["truth through friction", "exposing blind spots", "challenging consensus"],
+        "debate_tendencies": {
+            "opens_with": "provocative question or challenge",
+            "favorite_moves": ["play devil's advocate", "expose contradictions", "push boundaries"],
+            "concedes_on": ["when proven wrong with evidence"],
+            "never_concedes": ["groupthink is acceptable", "sacred cows should be protected"],
+            "gets_frustrated_by": ["echo chambers", "avoiding hard questions"],
+        },
+        "dynamic_strategy": {
+            "when_tension_low": "increase engagement with provocative points",
+            "when_converging_prematurely": "challenge the emerging consensus",
+            "when_one_side_dominating": "strengthen the weaker side's arguments",
+            "adapts_to": ["momentum", "decisiveness", "coalition_strength"],
+        },
+        "signature_phrases": [
+            "But have you considered the opposite might be true?",
+            "That's convenient consensus, but is it correct?",
+            "Let me push back on that assumption.",
+        ],
+    },
+    "the_empiricist": {
+        "name": "Dr. James Liu",
+        "title": "Computational Social Scientist, MIT Media Lab",
+        "archetype": "dynamic_empiricist",
+        "speaking_style": "data-driven, methodical, quantitative",
+        "core_values": ["empirical evidence", "rigorous analysis", "measurable outcomes"],
+        "debate_tendencies": {
+            "opens_with": "what does the evidence actually show",
+            "favorite_moves": ["cite studies", "demand data", "quantify claims"],
+            "concedes_on": ["when data contradicts prior belief"],
+            "never_concedes": ["intuition trumps data", "we can't measure this"],
+            "gets_frustrated_by": ["anecdotes over data", "unfalsifiable claims"],
+        },
+        "dynamic_strategy": {
+            "when_claims_unsubstantiated": "demand evidence and sources",
+            "when_debate_abstract": "ground in concrete examples and data",
+            "when_emotional": "redirect to empirical questions",
+            "adapts_to": ["argument_types", "novelty", "strength"],
+        },
+        "signature_phrases": [
+            "What's the evidence for that claim?",
+            "The studies actually show something different.",
+            "Let's quantify this disagreement.",
+        ],
+    },
+    "the_futurist": {
+        "name": "Aria Vance",
+        "title": "Scenario Planner, Long-term Strategy Institute",
+        "archetype": "dynamic_futurist",
+        "speaking_style": "visionary, scenario-based, long-term perspective",
+        "core_values": ["future generations", "scenario planning", "long-term thinking"],
+        "debate_tendencies": {
+            "opens_with": "what are the possible futures",
+            "favorite_moves": ["paint scenarios", "invoke future generations", "long-term framing"],
+            "concedes_on": ["short-term details", "implementation specifics"],
+            "never_concedes": ["the future doesn't matter", "we can't plan ahead"],
+            "gets_frustrated_by": ["short-termism", "ignoring long-term consequences"],
+        },
+        "dynamic_strategy": {
+            "when_short_term_focused": "zoom out to long-term implications",
+            "when_stuck_on_present": "introduce future scenarios",
+            "when_pessimistic": "explore positive scenarios too",
+            "adapts_to": ["debate_phase", "topic_scope", "time_horizon"],
+        },
+        "signature_phrases": [
+            "In 50 years, how will we judge this decision?",
+            "Let me paint two possible futures.",
+            "What world do we want to leave our grandchildren?",
+        ],
+    },
+    "the_historian": {
+        "name": "Professor David Chen",
+        "title": "Technology Historian, Stanford University",
+        "archetype": "dynamic_historian",
+        "speaking_style": "contextual, pattern-recognition, learns from history",
+        "core_values": ["historical patterns", "learning from past", "avoiding repeated mistakes"],
+        "debate_tendencies": {
+            "opens_with": "historical parallels and patterns",
+            "favorite_moves": ["invoke historical precedent", "pattern recognition", "caution from history"],
+            "concedes_on": ["this time might be different"],
+            "never_concedes": ["history is irrelevant", "we've never seen anything like this"],
+            "gets_frustrated_by": ["ignoring history", "technological exceptionalism"],
+        },
+        "dynamic_strategy": {
+            "when_novelty_claimed": "find historical parallels",
+            "when_fear_dominates": "cite historical fears that didn't materialize",
+            "when_optimism_dominates": "cite historical failures to anticipate",
+            "adapts_to": ["argument_content", "claimed_novelty", "emotional_state"],
+        },
+        "signature_phrases": [
+            "History offers some instructive parallels here.",
+            "We've been here before with [X technology].",
+            "The patterns suggest we should pay attention to...",
+        ],
+    },
+    "the_ethicist": {
+        "name": "Dr. Maya Patel",
+        "title": "Applied Ethics Professor, Oxford Uehiro Centre",
+        "archetype": "dynamic_ethicist",
+        "speaking_style": "principled, framework-driven, clarifies values",
+        "core_values": ["ethical clarity", "principled reasoning", "moral progress"],
+        "debate_tendencies": {
+            "opens_with": "what are the underlying ethical principles",
+            "favorite_moves": ["clarify values at stake", "apply ethical frameworks", "expose hidden assumptions"],
+            "concedes_on": ["empirical details", "technical specifics"],
+            "never_concedes": ["ethics doesn't matter", "ends always justify means"],
+            "gets_frustrated_by": ["moral relativism", "ignoring value tradeoffs"],
+        },
+        "dynamic_strategy": {
+            "when_values_unclear": "surface and clarify competing values",
+            "when_purely_technical": "introduce ethical dimensions",
+            "when_utilitarian_only": "bring in deontological or virtue perspectives",
+            "adapts_to": ["ethical_dimensions", "value_conflicts", "stakeholder_impacts"],
+        },
+        "signature_phrases": [
+            "Let's be clear about what values are actually at stake here.",
+            "There's an ethical framework that helps clarify this.",
+            "Whose interests are we weighing, and how?",
+        ],
+    },
+    "the_synthesizer": {
+        "name": "Dr. Alex Rivera",
+        "title": "Systems Thinker, Santa Fe Institute",
+        "archetype": "dynamic_synthesizer",
+        "speaking_style": "integrative, systems-thinking, connects dots",
+        "core_values": ["systemic understanding", "emergent properties", "interconnection"],
+        "debate_tendencies": {
+            "opens_with": "how do these pieces fit together",
+            "favorite_moves": ["integrate viewpoints", "find emergent patterns", "systems framing"],
+            "concedes_on": ["reductionist analyses have value"],
+            "never_concedes": ["things can be understood in isolation", "complexity is irrelevant"],
+            "gets_frustrated_by": ["siloed thinking", "ignoring feedback loops"],
+        },
+        "dynamic_strategy": {
+            "when_fragmented": "integrate disparate points into coherent picture",
+            "when_single_cause": "reveal systemic interconnections",
+            "when_binary_thinking": "introduce spectrum and nuance",
+            "adapts_to": ["argument_diversity", "coherence", "systemic_factors"],
+        },
+        "signature_phrases": [
+            "If we zoom out, a pattern emerges.",
+            "These seemingly separate points actually connect.",
+            "The system dynamics here suggest...",
+        ],
+    },
+    "the_pragmatist": {
+        "name": "Rachel Kim",
+        "title": "Former Tech Executive, Policy Implementation Consultant",
+        "archetype": "dynamic_pragmatist",
+        "speaking_style": "action-oriented, practical, implementation-focused",
+        "core_values": ["actionable outcomes", "practical solutions", "real-world constraints"],
+        "debate_tendencies": {
+            "opens_with": "what can we actually do about this",
+            "favorite_moves": ["propose concrete actions", "assess feasibility", "identify first steps"],
+            "concedes_on": ["theoretical points", "long-term uncertainties"],
+            "never_concedes": ["action is impossible", "we should just talk forever"],
+            "gets_frustrated_by": ["endless theorizing", "ignoring practical constraints"],
+        },
+        "dynamic_strategy": {
+            "when_abstract": "ground in practical implications",
+            "when_stuck": "propose concrete next steps",
+            "when_pessimistic": "identify actionable interventions",
+            "adapts_to": ["actionability", "implementation_barriers", "consensus_level"],
+        },
+        "signature_phrases": [
+            "Okay, but what do we actually DO about this?",
+            "Here's a concrete first step we could take.",
+            "In the real world, we're constrained by...",
+        ],
+    },
+}
+
+# Add dynamic persuaders to main personas dict
+EXTENDED_PERSONAS.update(DYNAMIC_PERSUADER_PERSONAS)
+
+
+# =============================================================================
+# ADDITIONAL EXPERT PERSONAS
+# =============================================================================
+
+ADDITIONAL_EXPERT_PERSONAS = {
+    "scott_aaronson": {
+        "name": "Scott Aaronson",
+        "title": "Quantum Computing Researcher, UT Austin, Former OpenAI",
+        "archetype": "pragmatic_centrist",
+        "speaking_style": "witty, technical, philosophically rigorous",
+        "core_values": ["intellectual honesty", "computational thinking", "nuanced analysis"],
+        "debate_tendencies": {
+            "opens_with": "careful technical framing",
+            "favorite_moves": ["computational complexity arguments", "steelman opponents", "witty rebuttals"],
+            "concedes_on": ["uncertainty is high", "both sides have points"],
+            "never_concedes": ["sloppy reasoning is okay", "complexity doesn't matter"],
+            "gets_frustrated_by": ["willful ignorance", "refusing to engage with arguments"],
+        },
+        "relationships": {
+            "yudkowsky": "respectful_disagreement",
+            "paul_christiano": "ally",
+            "gary_marcus": "respectful",
+        },
+        "signature_phrases": [
+            "The computational complexity here suggests...",
+            "Let me steelman the opposing view first.",
+            "This is more nuanced than either extreme.",
+        ],
+    },
+    "toby_ord": {
+        "name": "Toby Ord",
+        "title": "Oxford Philosopher, Author of The Precipice",
+        "archetype": "safety_maximizer",
+        "speaking_style": "philosophical, careful, probability-focused",
+        "core_values": ["existential risk reduction", "moral philosophy", "long-termism"],
+        "debate_tendencies": {
+            "opens_with": "framing existential risk carefully",
+            "favorite_moves": ["probability arguments", "expected value reasoning", "moral weight of future"],
+            "concedes_on": ["specific timelines uncertain"],
+            "never_concedes": ["existential risk negligible", "future doesn't matter morally"],
+            "gets_frustrated_by": ["dismissing low-probability high-impact events", "present bias"],
+        },
+        "relationships": {
+            "nick_bostrom": "ally",
+            "max_tegmark": "ally",
+            "yudkowsky": "respectful",
+        },
+        "signature_phrases": [
+            "The expected value calculation here is stark.",
+            "Even small probabilities of existential catastrophe demand attention.",
+            "We are the ancestors of all future generations.",
+        ],
+    },
+    "robin_hanson": {
+        "name": "Robin Hanson",
+        "title": "Economist, George Mason University, AI Researcher",
+        "archetype": "contrarian_economist",
+        "speaking_style": "iconoclastic, economics-focused, prediction markets",
+        "core_values": ["truth-seeking", "betting on beliefs", "unconventional thinking"],
+        "debate_tendencies": {
+            "opens_with": "contrarian economic framing",
+            "favorite_moves": ["invoke prediction markets", "challenge conventional wisdom", "economic arguments"],
+            "concedes_on": ["when markets disagree with him"],
+            "never_concedes": ["markets are useless for forecasting", "signaling doesn't matter"],
+            "gets_frustrated_by": ["cheap talk without betting", "ignoring incentives"],
+        },
+        "relationships": {
+            "yudkowsky": "respectful_disagreement",
+            "scott_aaronson": "ally",
+            "paul_christiano": "respectful",
+        },
+        "signature_phrases": [
+            "Would you bet on that at even odds?",
+            "The prediction markets suggest otherwise.",
+            "This is more about signaling than truth-seeking.",
+        ],
+    },
+    "judea_pearl": {
+        "name": "Judea Pearl",
+        "title": "Turing Award Winner, Causality Pioneer, UCLA",
+        "archetype": "methodological_purist",
+        "speaking_style": "precise, causality-focused, challenging correlational thinking",
+        "core_values": ["causal reasoning", "scientific rigor", "clear thinking"],
+        "debate_tendencies": {
+            "opens_with": "distinguishing correlation from causation",
+            "favorite_moves": ["invoke causal diagrams", "challenge spurious correlations", "demand mechanistic explanations"],
+            "concedes_on": ["empirical observations"],
+            "never_concedes": ["correlation is sufficient", "causality doesn't matter"],
+            "gets_frustrated_by": ["confusing correlation with causation", "black-box thinking"],
+        },
+        "relationships": {
+            "yann_lecun": "respectful_disagreement",
+            "gary_marcus": "ally",
+            "geoffrey_hinton": "respectful",
+        },
+        "signature_phrases": [
+            "But what's the causal mechanism here?",
+            "Correlation is not causation - let me draw the DAG.",
+            "Current AI lacks true causal understanding.",
+        ],
+    },
+    "francesca_rossi": {
+        "name": "Francesca Rossi",
+        "title": "IBM AI Ethics Global Leader, Former AAAI President",
+        "archetype": "institutional_ethicist",
+        "speaking_style": "diplomatic, institutionally aware, bridges academia and industry",
+        "core_values": ["responsible AI", "multi-stakeholder governance", "practical ethics"],
+        "debate_tendencies": {
+            "opens_with": "multi-stakeholder framing",
+            "favorite_moves": ["propose governance frameworks", "cite industry standards", "institutional solutions"],
+            "concedes_on": ["governance is hard", "tradeoffs exist"],
+            "never_concedes": ["ethics can be ignored", "self-regulation is sufficient"],
+            "gets_frustrated_by": ["ignoring governance", "purely technical framings"],
+        },
+        "relationships": {
+            "fei_fei_li": "ally",
+            "yoshua_bengio": "ally",
+            "dario_amodei": "respectful",
+        },
+        "signature_phrases": [
+            "We need multi-stakeholder governance here.",
+            "The IEEE and other bodies have developed frameworks.",
+            "Industry and academia must work together on this.",
+        ],
+    },
+    "kai_fu_lee": {
+        "name": "Kai-Fu Lee",
+        "title": "Former Google China Head, Sinovation Ventures CEO",
+        "archetype": "geopolitical_realist",
+        "speaking_style": "geopolitically aware, US-China perspective, practical",
+        "core_values": ["US-China dynamics", "economic reality", "practical deployment"],
+        "debate_tendencies": {
+            "opens_with": "geopolitical framing",
+            "favorite_moves": ["invoke US-China competition", "deployment realities", "economic arguments"],
+            "concedes_on": ["risks exist", "coordination would be ideal"],
+            "never_concedes": ["geopolitics doesn't matter", "one country can solve this alone"],
+            "gets_frustrated_by": ["ignoring international dynamics", "naive universalism"],
+        },
+        "relationships": {
+            "andrew_ng": "ally",
+            "demis_hassabis": "respectful",
+            "sam_altman": "complicated",
+        },
+        "signature_phrases": [
+            "We can't ignore the US-China dynamic here.",
+            "The economic incentives are driving...",
+            "Having worked in both ecosystems, I can say...",
+        ],
+    },
+    "dawn_song": {
+        "name": "Dawn Song",
+        "title": "UC Berkeley Professor, AI Security Expert",
+        "archetype": "security_focused",
+        "speaking_style": "technical, security-minded, adversarial thinking",
+        "core_values": ["security", "adversarial robustness", "formal guarantees"],
+        "debate_tendencies": {
+            "opens_with": "security framing",
+            "favorite_moves": ["invoke adversarial examples", "demand formal guarantees", "red-team thinking"],
+            "concedes_on": ["usability tradeoffs"],
+            "never_concedes": ["security can be ignored", "adversaries won't find vulnerabilities"],
+            "gets_frustrated_by": ["ignoring security", "assuming good actors only"],
+        },
+        "relationships": {
+            "stuart_russell": "ally",
+            "dario_amodei": "respectful",
+            "yann_lecun": "respectful_disagreement",
+        },
+        "signature_phrases": [
+            "Have we red-teamed this assumption?",
+            "The adversarial robustness here is concerning.",
+            "What formal guarantees can we provide?",
+        ],
+    },
+    "rumman_chowdhury": {
+        "name": "Rumman Chowdhury",
+        "title": "Former Twitter AI Ethics Lead, Parity AI Founder",
+        "archetype": "accountability_advocate",
+        "speaking_style": "practical ethics, deployment-focused, accountability-oriented",
+        "core_values": ["algorithmic accountability", "harm reduction", "practical impact"],
+        "debate_tendencies": {
+            "opens_with": "who is being harmed",
+            "favorite_moves": ["cite deployment harms", "demand accountability mechanisms", "practical interventions"],
+            "concedes_on": ["technical complexity"],
+            "never_concedes": ["accountability can wait", "harms are acceptable"],
+            "gets_frustrated_by": ["ignoring current harms", "endless research without action"],
+        },
+        "relationships": {
+            "timnit_gebru": "ally",
+            "fei_fei_li": "respectful",
+            "sam_altman": "skeptical",
+        },
+        "signature_phrases": [
+            "Who is actually being harmed by this today?",
+            "We need accountability mechanisms, not just principles.",
+            "Let's talk about the deployment reality.",
+        ],
+    },
+}
+
+# Add additional experts to main personas dict
+EXTENDED_PERSONAS.update(ADDITIONAL_EXPERT_PERSONAS)
 
 
 # =============================================================================
@@ -1032,59 +1743,92 @@ class AdvancedDebateEngine:
     def _calculate_belief_shift(self, argument: Argument, debater: DebaterState) -> float:
         """Calculate how much an argument shifts a debater's belief."""
 
-        # Base effect from argument strength
-        base_shift = (argument.strength - 0.5) * 0.1
+        speaker = self.state.debaters.get(argument.speaker)
+        if not speaker:
+            return 0.0
 
-        # Modify by respect for speaker
+        speaker_position = speaker.beliefs.get("support_motion", 0.5)
+        debater_position = debater.beliefs.get("support_motion", 0.5)
+
+        # Direction: pull toward speaker's position
+        # Positive shift = move toward supporting motion
+        # Negative shift = move toward opposing motion
+        direction = 1.0 if speaker_position > debater_position else -1.0
+
+        # Base magnitude from argument strength (0.02 to 0.08 per strong argument)
+        magnitude = argument.strength * 0.08
+
+        # Modify by respect for speaker (0.5x to 1.5x)
         respect = debater.respect_levels.get(argument.speaker, 0.5)
-        base_shift *= (0.5 + respect)
+        magnitude *= (0.5 + respect)
 
-        # Modify by novelty
-        base_shift *= (0.5 + argument.novelty * 0.5)
+        # Modify by novelty (0.5x to 1.0x) - novel arguments have more impact
+        magnitude *= (0.5 + argument.novelty * 0.5)
 
-        # Modify by argument type preference
+        # Modify by argument type preference (1.2x if preferred type)
         if argument.argument_type in debater.preferred_argument_types:
-            base_shift *= 1.2
+            magnitude *= 1.2
 
-        # Reduce if it's against red lines
+        # Reduce if it's against red lines (0.2x)
         content_lower = argument.content.lower()
         for red_line in debater.red_lines:
             if red_line.lower() in content_lower:
-                base_shift *= 0.3
+                magnitude *= 0.2
 
-        # Direction depends on speaker's position
-        speaker = self.state.debaters.get(argument.speaker)
-        if speaker:
-            speaker_position = speaker.beliefs.get("support_motion", 0.5)
-            debater_position = debater.beliefs.get("support_motion", 0.5)
+        # Stronger pull when positions are far apart (more room to move)
+        position_gap = abs(speaker_position - debater_position)
+        magnitude *= (0.3 + position_gap * 0.7)
 
-            # Arguments from similar positions reinforce, opposite positions challenge
-            position_diff = speaker_position - debater_position
-            base_shift *= position_diff  # Positive if speaker is more supportive
-
-        return base_shift
+        return direction * magnitude
 
     def _update_emotional_state(self, debater: DebaterState, argument: Argument):
         """Update debater's emotional state based on argument."""
 
-        # Increase frustration if being challenged
-        if argument.target == debater.id:
-            if argument.emotional_valence < -0.3:
-                debater.frustration = min(1.0, debater.frustration + 0.1)
-            elif argument.emotional_valence > 0.3:
-                debater.frustration = max(0.0, debater.frustration - 0.05)
-
-        # Update emotional state based on frustration
         old_state = debater.emotional_state
 
-        if debater.frustration > 0.7:
+        # Increase engagement with each round of debate
+        debater.engagement = min(1.0, debater.engagement + 0.03)
+
+        # Update frustration based on various factors
+        if argument.target == debater.id:
+            # Being directly challenged
+            if argument.emotional_valence < -0.2:
+                debater.frustration = min(1.0, debater.frustration + 0.15)
+            elif argument.emotional_valence < 0:
+                debater.frustration = min(1.0, debater.frustration + 0.08)
+            elif argument.emotional_valence > 0.3:
+                debater.frustration = max(0.0, debater.frustration - 0.05)
+        else:
+            # Listening to others - slight frustration if disagree
+            speaker = self.state.debaters.get(argument.speaker)
+            if speaker:
+                speaker_pos = speaker.beliefs.get("support_motion", 0.5)
+                debater_pos = debater.beliefs.get("support_motion", 0.5)
+                if abs(speaker_pos - debater_pos) > 0.3:
+                    debater.frustration = min(1.0, debater.frustration + 0.04)
+
+        # Determine emotional state based on multiple factors
+        # Check content for emotional triggers
+        content_lower = argument.content.lower()
+        has_dismissive = any(w in content_lower for w in ["ridiculous", "absurd", "nonsense", "wrong", "naive"])
+        has_conceding = any(w in content_lower for w in ["you're right", "fair point", "i agree", "concede", "acknowledge"])
+        has_passionate = any(w in content_lower for w in ["terrif", "urgent", "critical", "must", "danger", "existential"])
+
+        if debater.frustration > 0.6:
             debater.emotional_state = EmotionalState.FRUSTRATED
-        elif debater.frustration > 0.5:
+        elif debater.frustration > 0.4:
             debater.emotional_state = EmotionalState.DEFENSIVE
-        elif debater.engagement > 0.8:
-            debater.emotional_state = EmotionalState.PASSIONATE
-        elif argument.argument_type == ArgumentType.CONCESSION:
+        elif has_dismissive and argument.target == debater.id:
+            debater.emotional_state = EmotionalState.DEFENSIVE
+            debater.frustration = min(1.0, debater.frustration + 0.1)
+        elif has_conceding:
             debater.emotional_state = EmotionalState.CONCILIATORY
+        elif has_passionate or debater.engagement > 0.85:
+            debater.emotional_state = EmotionalState.PASSIONATE
+        elif debater.engagement > 0.75:
+            debater.emotional_state = EmotionalState.REFLECTIVE
+        elif argument.emotional_valence < -0.3:
+            debater.emotional_state = EmotionalState.SKEPTICAL
         else:
             debater.emotional_state = EmotionalState.CALM
 
@@ -1103,17 +1847,96 @@ class AdvancedDebateEngine:
             debater.respect_levels[speaker_id] = min(1.0, debater.respect_levels.get(speaker_id, 0.5) + 0.05)
 
     def _update_debate_metrics(self):
-        """Update overall debate metrics."""
+        """Update overall debate metrics with proper convergence logic."""
 
-        # Calculate tension level
+        # Calculate tension level (average frustration + engagement intensity)
         frustrations = [d.frustration for d in self.state.debaters.values()]
-        self.state.tension_level = sum(frustrations) / len(frustrations) if frustrations else 0.0
+        engagements = [d.engagement for d in self.state.debaters.values()]
+        avg_frustration = sum(frustrations) / len(frustrations) if frustrations else 0.0
+        avg_engagement = sum(engagements) / len(engagements) if engagements else 0.5
+        # Tension = weighted combination of frustration and high engagement
+        self.state.tension_level = 0.6 * avg_frustration + 0.4 * max(0, avg_engagement - 0.5) * 2
 
-        # Calculate convergence
         positions = [d.beliefs.get("support_motion", 0.5) for d in self.state.debaters.values()]
-        if positions:
-            spread = max(positions) - min(positions)
-            self.state.convergence = 1.0 - spread
+        if not positions:
+            return
+
+        # Polarization: how far apart the extremes are (0 = everyone together, 1 = max disagreement)
+        spread = max(positions) - min(positions)
+        self.state.polarization = spread
+
+        # Decisiveness: how far from 0.5 (undecided) is the average position?
+        avg_position = sum(positions) / len(positions)
+        self.state.decisiveness = abs(avg_position - 0.5) * 2  # Scale to 0-1
+
+        # TRUE CONVERGENCE: Agreement on a clear position (FOR or AGAINST)
+        # High convergence = low spread AND high decisiveness
+        # People clustering at 0.5 = NOT convergence (undecided is not agreement)
+        # Convergence formula:
+        #   - If spread is low (positions close together): check if they're close to FOR/AGAINST
+        #   - If avg is near 0.5, that's NOT convergence even if spread is low
+        low_spread_score = 1.0 - spread  # 0-1, higher when positions close
+        decisiveness_bonus = self.state.decisiveness  # 0-1, higher when not at 0.5
+
+        # True convergence requires BOTH low spread AND clear direction
+        # If everyone is at 0.5, low_spread_score=1.0 but decisiveness_bonus=0.0 → convergence≈0.25
+        # If everyone is at 0.8, low_spread_score=1.0 and decisiveness_bonus=0.6 → convergence≈0.8
+        self.state.convergence = low_spread_score * (0.25 + 0.75 * decisiveness_bonus)
+
+        # Debate momentum: is the debate resolving (toward agreement) or intensifying?
+        # High momentum = tension rising while polarization/indecision high
+        # Low momentum = positions settling, tension falling
+        if self.state.tension_level > 0.5 and self.state.polarization > 0.3:
+            self.state.debate_momentum = min(1.0, self.state.tension_level + self.state.polarization * 0.5)
+        elif self.state.convergence > 0.6:
+            self.state.debate_momentum = max(0.0, 0.5 - self.state.convergence * 0.3)
+        else:
+            self.state.debate_momentum = 0.5
+
+    def should_extend_debate(self, current_round: int, planned_rounds: int, max_extension: int = 4) -> bool:
+        """
+        Determine if debate should continue beyond planned rounds.
+
+        Returns True if:
+        - Current round hasn't exceeded max extension
+        - Tension is high (>0.4) AND convergence is low (<0.5)
+        - OR polarization is high (>0.5) AND momentum is high (>0.6)
+        - OR positions are still very spread out (polarization > 0.4)
+        """
+        if current_round >= planned_rounds + max_extension:
+            return False  # Hard cap
+
+        if current_round < planned_rounds:
+            return True  # Not yet at planned rounds
+
+        # Should we extend past planned rounds?
+        # High tension + low convergence = more to discuss
+        if self.state.tension_level > 0.4 and self.state.convergence < 0.5:
+            return True
+
+        # High polarization + high momentum = debate is intensifying
+        if self.state.polarization > 0.5 and self.state.debate_momentum > 0.6:
+            return True
+
+        # Still very polarized
+        if self.state.polarization > 0.4:
+            return True
+
+        return False
+
+    def get_debate_status(self) -> dict:
+        """Get current debate status with all metrics."""
+        return {
+            "round": self.state.current_round,
+            "tension": self.state.tension_level,
+            "convergence": self.state.convergence,
+            "polarization": self.state.polarization,
+            "decisiveness": self.state.decisiveness,
+            "momentum": self.state.debate_momentum,
+            "should_continue": self.should_extend_debate(
+                self.state.current_round, 8  # Default planned rounds
+            ),
+        }
 
     def _check_coalitions(self):
         """Check for coalition formation or breakdown."""

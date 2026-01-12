@@ -1,0 +1,136 @@
+[
+  {
+    "scenario_id": "mega_timeline_debate",
+    "topic": "AGI Timeline Wars",
+    "motion": "Artificial General Intelligence will be achieved before 2030",
+    "participants": [
+      "ilya_sutskever",
+      "demis_hassabis",
+      "sam_altman",
+      "connor",
+      "yann_lecun",
+      "gary_marcus",
+      "melanie_mitchell",
+      "katja_grace",
+      "scott_aaronson",
+      "judea_pearl",
+      "paul_christiano",
+      "geoffrey_hinton",
+      "yoshua_bengio",
+      "nick_bostrom",
+      "the_empiricist",
+      "the_futurist"
+    ],
+    "planned_rounds": 16,
+    "actual_rounds": 17,
+    "extended": true,
+    "timestamp": "2026-01-11T22:19:30.418183",
+    "final_positions": {
+      "ilya_sutskever": {
+        "name": "Ilya Sutskever",
+        "position": 0.6761689627573887,
+        "stance": "FOR"
+      },
+      "demis_hassabis": {
+        "name": "Demis Hassabis",
+        "position": 0.6818577545223632,
+        "stance": "FOR"
+      },
+      "sam_altman": {
+        "name": "Sam Altman",
+        "position": 0.6602780583395885,
+        "stance": "FOR"
+      },
+      "connor": {
+        "name": "Connor Leahy",
+        "position": 0.6809809218133305,
+        "stance": "FOR"
+      },
+      "yann_lecun": {
+        "name": "Yann LeCun",
+        "position": 0.686936689003335,
+        "stance": "FOR"
+      },
+      "gary_marcus": {
+        "name": "Gary Marcus",
+        "position": 0.6849938347439009,
+        "stance": "FOR"
+      },
+      "melanie_mitchell": {
+        "name": "Melanie Mitchell",
+        "position": 0.6847967241132906,
+        "stance": "FOR"
+      },
+      "katja_grace": {
+        "name": "Katja Grace",
+        "position": 0.6682845102620142,
+        "stance": "FOR"
+      },
+      "scott_aaronson": {
+        "name": "Scott Aaronson",
+        "position": 0.6873683307398722,
+        "stance": "FOR"
+      },
+      "judea_pearl": {
+        "name": "Judea Pearl",
+        "position": 0.6876220180305678,
+        "stance": "FOR"
+      },
+      "paul_christiano": {
+        "name": "Paul Christiano",
+        "position": 0.6638061752344218,
+        "stance": "FOR"
+      },
+      "geoffrey_hinton": {
+        "name": "Geoffrey Hinton",
+        "position": 0.679043246266767,
+        "stance": "FOR"
+      },
+      "yoshua_bengio": {
+        "name": "Yoshua Bengio",
+        "position": 0.6862993766036842,
+        "stance": "FOR"
+      },
+      "nick_bostrom": {
+        "name": "Nick Bostrom",
+        "position": 0.6762932690809607,
+        "stance": "FOR"
+      },
+      "the_empiricist": {
+        "name": "Dr. James Liu",
+        "position": 0.6772073370829149,
+        "stance": "FOR"
+      },
+      "the_futurist": {
+        "name": "Aria Vance",
+        "position": 0.6746747693881417,
+        "stance": "FOR"
+      }
+    },
+    "position_changes": {},
+    "emotional_states": {
+      "ilya_sutskever": "conciliatory",
+      "demis_hassabis": "conciliatory",
+      "sam_altman": "conciliatory",
+      "connor": "conciliatory",
+      "yann_lecun": "frustrated",
+      "gary_marcus": "conciliatory",
+      "melanie_mitchell": "conciliatory",
+      "katja_grace": "conciliatory",
+      "scott_aaronson": "conciliatory",
+      "judea_pearl": "frustrated",
+      "paul_christiano": "frustrated",
+      "geoffrey_hinton": "conciliatory",
+      "yoshua_bengio": "frustrated",
+      "nick_bostrom": "conciliatory",
+      "the_empiricist": "frustrated",
+      "the_futurist": "passionate"
+    },
+    "tension": 0.6325000000000001,
+    "convergence": 0.5036484690026132,
+    "polarization": 0.027343959690979247,
+    "decisiveness": 0.35707649724781776,
+    "momentum": 0.5,
+    "total_arguments": 272
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "scenario_id": "turing_summit",
+    "topic": "Turing Award Winners Summit",
+    "motion": "Deep learning will lead to AGI within 10 years",
+    "participants": [
+      "geoffrey_hinton",
+      "yann_lecun",
+      "yoshua_bengio"
+    ],
+    "planned_rounds": 8,
+    "actual_rounds": 12,
+    "extended": true,
+    "timestamp": "2026-01-11T21:21:23.918123",
+    "final_positions": {
+      "geoffrey_hinton": {
+        "name": "Geoffrey Hinton",
+        "position": 0.5171753060233303,
+        "stance": "UNDECIDED"
+      },
+      "yann_lecun": {
+        "name": "Yann LeCun",
+        "position": 0.5180364815745184,
+        "stance": "UNDECIDED"
+      },
+      "yoshua_bengio": {
+        "name": "Yoshua Bengio",
+        "position": 0.5082785276625672,
+        "stance": "UNDECIDED"
+      }
+    },
+    "position_changes": {},
+    "emotional_states": {
+      "geoffrey_hinton": "passionate",
+      "yann_lecun": "frustrated",
+      "yoshua_bengio": "frustrated"
+    },
+    "tension": 0.8,
+    "convergence": 0.26909348090625645,
+    "polarization": 0.009757953911951223,
+    "decisiveness": 0.028993543506943942,
+    "momentum": 0.5,
+    "total_arguments": 36
+  }
+]

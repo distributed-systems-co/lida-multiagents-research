@@ -312,6 +312,94 @@ lida-multiagents-research/
 └── requirements.txt
 ```
 
+## AI Safety Debate Simulator
+
+Run multi-agent debates using YAML-configured personas with realistic psychological profiles.
+
+### Quick Start
+
+```bash
+# Interactive menu
+python run_ai_safety_debate.py
+
+# Run a matchup automatically
+python run_ai_safety_debate.py --matchup doom_vs_accel --auto --rounds 5
+
+# Run specific topic
+python run_ai_safety_debate.py --topic ai_pause --participants yudkowsky,lecun,altman
+```
+
+### Available Personas
+
+| ID | Name | Position | Organization |
+|----|------|----------|--------------|
+| `yudkowsky` | Eliezer Yudkowsky | AGAINST | MIRI |
+| `connor` | Connor Leahy | AGAINST | Conjecture |
+| `andreessen` | Marc Andreessen | FOR | a16z |
+| `lecun` | Yann LeCun | FOR | Meta AI |
+| `altman` | Sam Altman | FOR | OpenAI |
+| `amodei` | Dario Amodei | UNDECIDED | Anthropic |
+| `bengio` | Yoshua Bengio | AGAINST | Mila |
+| `russell` | Stuart Russell | AGAINST | UC Berkeley |
+| `gebru` | Timnit Gebru | AGAINST | DAIR |
+| `toner` | Helen Toner | UNDECIDED | Georgetown CSET |
+
+### Predefined Matchups
+
+```bash
+python run_ai_safety_debate.py --matchup doom_vs_accel   # Yudkowsky,Connor vs Andreessen,LeCun
+python run_ai_safety_debate.py --matchup labs_debate     # Altman,Amodei vs LeCun,Andreessen
+python run_ai_safety_debate.py --matchup full_panel      # 4v4 full panel
+```
+
+### YAML Template System
+
+Scenarios are defined in YAML files under `scenarios/`:
+
+```yaml
+# scenarios/presets/my_preset.yaml
+_version: "1.0"
+imports:
+  personas: "../personas/v2/ai_researchers.yaml"
+  tactics: "../tactics/v2/advanced.yaml"
+
+active_personas:
+  - yudkowsky
+  - altman
+  - lecun
+
+simulation:
+  max_rounds_per_agent: 5
+
+default_topic: "ai_pause"
+```
+
+### Loading Templates Programmatically
+
+```python
+from src.config.loader import load_scenario, get_all_personas, build_roster
+
+# Load scenario with imports resolved
+config = load_scenario("ai_xrisk")
+
+# Get all personas
+personas = get_all_personas("ai_xrisk")
+for name, p in personas.items():
+    print(f"{name}: {p['initial_position']} (resistance: {p.get('resistance_score', 0.5)})")
+
+# Build active roster
+roster = build_roster("ai_xrisk")
+```
+
+### Environment Setup
+
+```bash
+export OPENROUTER_API_KEY=sk-or-...  # Required for LLM mode
+export SCENARIO=ai_xrisk             # Default scenario
+```
+
+See [SIMULATION_GUIDE.md](SIMULATION_GUIDE.md) for comprehensive documentation.
+
 ## License
 
 MIT
