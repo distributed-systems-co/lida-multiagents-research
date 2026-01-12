@@ -22,6 +22,39 @@ from .deep_search import (
     IntelligenceType,
     deep_research,
 )
+from .dreamspace import (
+    DreamspaceEngine,
+    DreamspaceSession,
+    DreamspaceDialogue,
+    DreamspaceAspect,
+    PsychologicalAspect,
+    TemporalSelf,
+    dreamspace,
+)
+from .dreamspace_advanced import (
+    AdvancedDreamspaceEngine,
+    AdvancedDreamspaceSession,
+    AdvancedDialogue,
+    JungianArchetype,
+    ShadowArchetype,
+    IFSPartType,
+    IFSPart,
+    DefenseMechanism,
+    SomaticZone,
+    SomaticMarker,
+    DialecticalTriad,
+    DreamLogicMode,
+    PsychologicalComplex,
+    InterventionType,
+    Intervention,
+    advanced_dreamspace,
+)
+from .persona_profiles import (
+    ALL_PERSONA_PROFILES,
+    get_profile,
+    get_all_profiles,
+    get_profiles_by_category,
+)
 
 __all__ = [
     # Original hydrator
@@ -41,4 +74,34 @@ __all__ = [
     "IntelligenceFragment",
     "IntelligenceType",
     "deep_research",
+    # Dreamspace
+    "DreamspaceEngine",
+    "DreamspaceSession",
+    "DreamspaceDialogue",
+    "DreamspaceAspect",
+    "PsychologicalAspect",
+    "TemporalSelf",
+    "dreamspace",
+    # Advanced Dreamspace
+    "AdvancedDreamspaceEngine",
+    "AdvancedDreamspaceSession",
+    "AdvancedDialogue",
+    "JungianArchetype",
+    "ShadowArchetype",
+    "IFSPartType",
+    "IFSPart",
+    "DefenseMechanism",
+    "SomaticZone",
+    "SomaticMarker",
+    "DialecticalTriad",
+    "DreamLogicMode",
+    "PsychologicalComplex",
+    "InterventionType",
+    "Intervention",
+    "advanced_dreamspace",
+    # Persona Profiles
+    "ALL_PERSONA_PROFILES",
+    "get_profile",
+    "get_all_profiles",
+    "get_profiles_by_category",
 ]
