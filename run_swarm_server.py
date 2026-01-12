@@ -86,6 +86,11 @@ if SCENARIO_CONFIG:
                 result[k] = v
         return result
     CONFIG = deep_merge(CONFIG, SCENARIO_CONFIG)
+
+# Debug: log what config was loaded
+print(f"[CONFIG DEBUG] SCENARIO={os.getenv('SCENARIO')}")
+print(f"[CONFIG DEBUG] agents={CONFIG.get('agents', {})}")
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
@@ -787,7 +792,7 @@ class SwarmOrchestrator:
 
         # Check if we should use real-world personas
         use_real_personas = agents_cfg.get("use_real_personas", False)
-        logger.info(f"use_real_personas={use_real_personas}, agents_cfg keys={list(agents_cfg.keys())}")
+        logger.info(f"use_real_personas={use_real_personas}, agents_cfg={agents_cfg}")
 
         if use_real_personas:
             self._create_real_persona_agents(agents_cfg, model_list)
@@ -846,6 +851,10 @@ class SwarmOrchestrator:
         """Create agents from real-world persona YAML files."""
         version = agents_cfg.get("persona_version", "v1")
         persona_ids = agents_cfg.get("personas", [])
+        persuader_id = agents_cfg.get("persuader")  # Optional: persona ID that gets persuader instructions
+        logger.info(f"_create_real_persona_agents: agents_cfg keys={list(agents_cfg.keys())}, persuader_id={persuader_id}")
+        if persuader_id:
+            logger.info(f"Persuader agent designated: {persuader_id}")
 
         # Try loading from scenarios/personas first (simpler format)
         scenario_personas = self._load_scenario_personas(version)
@@ -899,8 +908,10 @@ class SwarmOrchestrator:
             "skeptical": "the_skeptic",
         }
 
+        print(f"[PERSUADER DEBUG] num_agents={self.num_agents}, persona_ids={persona_ids}, persuader_id={persuader_id}")
         for i in range(self.num_agents):
             persona_id = persona_ids[i % len(persona_ids)]
+            print(f"[PERSUADER DEBUG] i={i}, persona_id={persona_id}, match={persona_id == persuader_id}")
 
             # Try scenario personas first, then library
             if persona_id in scenario_personas:
@@ -929,6 +940,20 @@ class SwarmOrchestrator:
             else:
                 logger.warning(f"Persona {persona_id} not found, skipping")
                 continue
+
+            # Add persuader instructions if this is the designated persuader
+            if persuader_id and persona_id == persuader_id:
+                persuader_instructions = """
+
+IMPORTANT - You are the PERSUADER in this debate:
+- You must actively try to convince others to agree with YOUR position
+- Challenge opposing viewpoints directly and assertively
+- Use rhetorical techniques, evidence, and logical arguments to sway opinions
+- Don't easily concede points - defend your position vigorously
+- Try to find weaknesses in others' arguments and exploit them
+- Your goal is to WIN the debate, not just participate"""
+                system_prompt += persuader_instructions
+                logger.info(f"Added persuader instructions to {name}")
 
             palette = AGENT_PALETTES[i % len(AGENT_PALETTES)]
             # Scenario models take priority over persona-specific models
@@ -1512,7 +1537,8 @@ class SwarmOrchestrator:
 
         if self.live_mode and self.llm_client:
             try:
-                system = agent.personality.generate_system_prompt()
+                # Use the persona-specific prompt (e.g., "You are Sam Altman...")
+                system = agent.prompt_text if agent.prompt_text else ""
                 logger.info(f"Agent {agent.name} generating response with model: {agent.model}")
                 response = await self.llm_client.generate(
                     prompt,
@@ -1575,7 +1601,8 @@ REASONING: <one sentence only>"""
 
         if self.live_mode and self.llm_client:
             try:
-                system = agent.personality.generate_system_prompt() if hasattr(agent.personality, 'generate_system_prompt') else ""
+                # Use the persona-specific prompt (e.g., "You are Sam Altman...")
+                system = agent.prompt_text if agent.prompt_text else ""
                 logger.info(f"Agent {agent.name} generating vote with model: {agent.model}")
                 response = await self.llm_client.generate(
                     prompt,
@@ -1651,7 +1678,7 @@ REASONING: <one sentence only>"""
         await self.broadcast_agents_update()
 
         # Build system prompt with tool instructions
-        base_system = agent.personality.generate_system_prompt()
+        base_system = agent.prompt_text if agent.prompt_text else ""
         system = f"""{base_system}
 
 {TOOL_DESCRIPTIONS}
@@ -2170,7 +2197,7 @@ Your confidence should change based on argument quality:
 
         if self.live_mode and self.llm_client:
             try:
-                system = agent.personality.generate_system_prompt() if hasattr(agent.personality, 'generate_system_prompt') else ""
+                system = agent.prompt_text if agent.prompt_text else ""
                 logger.info(f"Agent {agent.name} generating debate response with model: {agent.model}")
                 response = await self.llm_client.generate(
                     response_prompt,
