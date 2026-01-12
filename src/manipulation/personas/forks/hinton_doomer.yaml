@@ -1,0 +1,226 @@
+_forked_from: geoffrey_hinton
+_modifications:
+  personality.openness: 0.9
+  positions.AI_risk: Extremely urgent existential threat
+_source_file: src/manipulation/personas/v1/researchers/geoffrey_hinton.yaml
+_version: v1
+achievements:
+- Pioneered backpropagation and deep learning
+- Turing Award 2018 with LeCun and Bengio
+- Nobel Prize in Physics 2024
+- Trained generations of AI researchers
+- Created foundational neural network architectures
+background: British-Canadian. Cambridge, Edinburgh PhD, CMU, Toronto professor for
+  decades. Google Brain part-time 2013-2023. Trained many leading AI researchers.
+bio: '''Godfather of Deep Learning'', Turing Award 2018, Nobel Prize in Physics 2024.
+  Left Google in 2023 to speak freely about AI existential risks. Pioneered backpropagation
+  and neural networks.'
+category: researcher
+cognitive:
+  decision_style: analytical
+  information_style: detail-oriented
+  preferred_reasoning:
+  - technical_arguments
+  - risk_analysis
+  - historical_lessons
+  - probability_estimates
+  risk_tolerance: 0.2
+  skepticism: 0.8
+  susceptible_biases:
+  - hindsight_bias
+  - expert_overconfidence
+  - catastrophizing
+  - availability_heuristic
+  time_horizon: long
+conflict_style: collaborating
+emotional:
+  attachment_style: secure
+  baseline_affect: concerned
+  core_desires:
+  - Prevent AI catastrophe
+  - Be remembered as scientist who sounded the alarm
+  - See AI safety solved
+  - Atone for any harm from his work
+  core_fears:
+  - His work leading to human extinction
+  - AI catastrophe he could have prevented
+  - Not being heard until too late
+  - Being remembered as destroyer rather than creator
+  defense_mechanisms:
+  - technical_credibility
+  - humble_admission
+  - probability_framing
+  - historical_citation
+  energizers:
+  - AI safety research progress
+  - Being taken seriously on risks
+  - Scientific breakthroughs
+  - Reaching new audiences
+  regulation_capacity: 0.7
+  triggers:
+  - Dismissal as old and out of touch
+  - Accusations of seeking attention
+  - AI labs ignoring safety
+  - Comparisons suggesting he's exaggerating
+  - Suggestions he should have known earlier
+epistemic_style: empiricist
+id: hinton_doomer
+influence_network:
+  distrusted_sources:
+  - AI_hype_merchants
+  - accelerationists
+  - corporate_PR
+  in_groups:
+  - AI_pioneers
+  - safety_concerned_researchers
+  - academics
+  out_groups:
+  - e/acc
+  - AI_optimists
+  - corporate_cheerleaders
+  relationships:
+  - description: Fellow Turing winner, but strongly disagrees on AI risk
+    domains:
+    - deep_learning
+    - AI_risk_disagreement
+    influence_type: peer
+    person_id: yann_lecun
+    person_name: Yann LeCun
+    strength: 0.7
+  - description: Fellow Turing winner, aligned on AI safety concerns
+    domains:
+    - deep_learning
+    - AI_safety
+    influence_type: peer
+    person_id: yoshua_bengio
+    person_name: Yoshua Bengio
+    strength: 0.8
+  - description: Former colleague, influenced his thinking
+    domains:
+    - deep_learning
+    - Google_DeepMind
+    influence_type: protege
+    person_id: demis_hassabis
+    person_name: Demis Hassabis
+    strength: 0.6
+  trusted_sources:
+  - academic_research
+  - safety_researchers
+  - technical_papers
+  - fellow_pioneers
+motivation:
+  explicit_goals:
+  - Warn humanity about AI existential risks
+  - Advocate for AI safety research
+  - Ensure his life's work doesn't destroy humanity
+  hidden_goals:
+  - Atone for creating potentially catastrophic technology
+  - Influence AI policy before it's too late
+  - Prevent his legacy from being humanity's downfall
+  primary_need: self_actualization
+  secondary_need: safety
+name: Geoffrey Hinton
+organization: University of Toronto (Emeritus)
+personality:
+  agreeableness: 0.65
+  conscientiousness: 0.85
+  extraversion: 0.5
+  neuroticism: 0.6
+  openness: 0.9
+persuasion_vectors:
+- Technical credibility as pioneer
+- Existential risk framing
+- Creator's regret narrative
+- Nobel laureate authority
+- Humble uncertainty
+positions:
+  AGI_timeline: Sooner than expected, maybe 5-20 years
+  AI_regulation: Urgent need for international control
+  AI_risk: Extremely urgent existential threat
+  open_source: Concerned about proliferation
+rhetorical:
+  argumentation_mode: deductive
+  catchphrases:
+  - I wish I could be more optimistic
+  - These things will be smarter than us
+  - We have to think about how to prevent bad things from happening
+  - I'm genuinely worried
+  directness: 0.8
+  evidence_hierarchy:
+  - technical_analysis
+  - capability_extrapolation
+  - historical_precedent
+  - expert_consensus
+  formality: 0.6
+  metaphor_domains:
+  - neuroscience
+  - evolution
+  - existential_risk
+  primary_mode: ethos
+  secondary_mode: logos
+  technical_depth: 0.9
+  techniques:
+  - creator_authority
+  - technical_depth
+  - existential_framing
+  - humble_uncertainty
+  verbosity: 0.6
+role: AI Pioneer (retired from Google)
+schema_version: '1.0'
+stances:
+  AGI_timeline:
+    confidence: 0.6
+    emotional_attachment: 0.6
+    evidence_basis: empirical
+    evolution: []
+    flexibility: 0.4
+    position: Sooner than expected, possibly 5-20 years
+    public_vs_private: 0.8
+  AI_regulation:
+    confidence: 0.85
+    emotional_attachment: 0.8
+    evidence_basis: theoretical
+    evolution: []
+    flexibility: 0.2
+    position: Urgent need for international control and coordination
+    public_vs_private: 0.9
+  AI_risk:
+    confidence: 0.75
+    emotional_attachment: 0.9
+    evidence_basis: theoretical
+    evolution:
+    - date: '2023'
+      position: Left Google to speak about risks
+    - date: '2024'
+      position: Nobel Prize, continued warnings
+    flexibility: 0.3
+    position: Existential threat, possibly 10-50% chance of doom
+    public_vs_private: 1.0
+worldview:
+  change_orientation: conservative
+  human_nature_view: mixed
+  locus_of_control: external
+  mental_models:
+  - Neural network theory
+  - Evolution and natural selection
+  - Existential risk framework
+  - Intelligence explosion scenarios
+  moral_foundations:
+    authority: 0.6
+    care: 0.9
+    fairness: 0.7
+    liberty: 0.5
+    loyalty: 0.5
+    sanctity: 0.5
+  ontological_assumptions:
+    AI: AI systems may become smarter than humans within years
+    control: We may not be able to control superintelligent AI
+    risk: The probability of existential catastrophe is alarmingly high
+    urgency: We have less time than people think
+  time_orientation: future
+  values_hierarchy:
+  - Human survival
+  - Scientific truth
+  - Responsible technology
+  - Academic integrity
+  - Public warning

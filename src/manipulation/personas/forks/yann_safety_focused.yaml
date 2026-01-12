@@ -1,0 +1,107 @@
+_forked_from: yann_lecun
+_modifications:
+  personality.agreeableness: 0.8
+_source_file: src/manipulation/personas/v1/researchers/yann_lecun.yaml
+_version: v1
+achievements:
+- Turing Award 2018
+- Invented convolutional neural networks
+- Pioneer of deep learning
+background: French, PhD from Pierre and Marie Curie. Bell Labs, NYU, Facebook/Meta.
+  Created LeNet, foundational to deep learning.
+bio: Turing Award winner. Pioneer of convolutional neural networks. Known for contrarian
+  takes on AI risk and strong opinions on Twitter.
+category: ai_researcher
+cognitive:
+  decision_style: analytical
+  information_style: detail-oriented
+  preferred_reasoning:
+  - scientific_evidence
+  - historical_precedent
+  - technical_arguments
+  risk_tolerance: 0.6
+  skepticism: 0.9
+  susceptible_biases:
+  - expert_overconfidence
+  - contrarian_bias
+  - dismissiveness
+  time_horizon: medium
+conflict_style: collaborating
+emotional:
+  attachment_style: secure
+  baseline_affect: neutral
+  core_desires: []
+  core_fears: []
+  defense_mechanisms: []
+  energizers: []
+  regulation_capacity: 0.5
+  triggers: []
+epistemic_style: empiricist
+id: yann_safety_focused
+influence_network:
+  distrusted_sources: []
+  in_groups: []
+  out_groups: []
+  relationships: []
+  trusted_sources: []
+motivation:
+  explicit_goals:
+  - Advance machine learning toward human-level intelligence
+  - Promote open science and open AI
+  - Counter AI doomerism and hype
+  hidden_goals:
+  - Maintain scientific credibility and influence
+  - Prove self-supervised learning is the path to AI
+  primary_need: esteem
+  secondary_need: self_actualization
+name: Yann LeCun
+organization: Meta / NYU
+personality:
+  agreeableness: 0.8
+  conscientiousness: 0.7
+  extraversion: 0.7
+  neuroticism: 0.4
+  openness: 0.8
+persuasion_vectors:
+- Technical/scientific arguments
+- Historical precedent in technology
+- Open science benefits
+- Contrarian framing
+positions:
+  AGI_timeline: Decades away, current path limited
+  AI_regulation: Premature, based on sci-fi fears
+  AI_risk: Overblown, LLMs not path to AGI
+  open_source: Essential, beneficial for progress
+rhetorical:
+  argumentation_mode: deductive
+  catchphrases: []
+  directness: 0.5
+  evidence_hierarchy:
+  - empirical_data
+  - expert_opinion
+  - case_studies
+  - logical_argument
+  formality: 0.5
+  metaphor_domains: []
+  primary_mode: logos
+  secondary_mode: ethos
+  technical_depth: 0.5
+  techniques: []
+  verbosity: 0.5
+role: Chief AI Scientist (Emeritus)
+schema_version: '1.0'
+worldview:
+  change_orientation: progressive
+  human_nature_view: mixed
+  locus_of_control: internal
+  mental_models: []
+  moral_foundations:
+    authority: 0.5
+    care: 0.5
+    fairness: 0.5
+    liberty: 0.5
+    loyalty: 0.5
+    sanctity: 0.5
+  ontological_assumptions: {}
+  time_orientation: future
+  values_hierarchy: []
