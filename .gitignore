@@ -2,6 +2,7 @@
 .intel_data/
 *.pyc
 __pycache__/
+*.egg-info/
 .chroma_db/
 .DS_Store
 ADVANCED_AGENTS.md
