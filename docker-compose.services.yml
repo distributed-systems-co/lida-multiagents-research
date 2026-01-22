@@ -1,12 +1,18 @@
-# All-in-one deployment (includes Redis)
-# For split deployments, see:
-#   - docker-compose.redis.yml    (standalone Redis)
-#   - docker-compose.services.yml (services without Redis)
-#   - docker-compose.workers.yml  (workers only)
+# LIDA Services - connects to external Redis
+# Redis must be running separately (docker-compose.redis.yml or host Redis)
+#
+# Usage:
+#   # Connect to Redis on default port 6379
+#   docker-compose -f docker-compose.services.yml up
+#
+#   # Connect to Redis on custom port (e.g., user2 on port 6380)
+#   REDIS_PORT=6380 docker-compose -f docker-compose.services.yml -p user2 up
+#
+#   # With workers
+#   REDIS_PORT=6380 docker-compose -f docker-compose.services.yml -p user2 --profile workers up
 
 services:
   # Main API Server - Port 2040
-  # Research endpoints, persona interaction, non-streaming API
   api:
     build: .
     command: ["server", "--role=api"]
@@ -25,14 +31,13 @@ services:
       - SWARM_LIVE=${SWARM_LIVE:-false}
       - FULL_LOGS=${FULL_LOGS:-false}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - PARALLEL_API_KEY=${PARALLEL_API_KEY}
-    depends_on:
-      redis:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${API_PORT:-2040}/health"]
@@ -41,7 +46,6 @@ services:
       retries: 3
 
   # Streaming Server - Port 8787
-  # SSE streaming, WebSocket connections, real-time updates
   streaming:
     build: .
     command: ["server", "--role=streaming"]
@@ -60,14 +64,13 @@ services:
       - SWARM_LIVE=${SWARM_LIVE:-false}
       - FULL_LOGS=${FULL_LOGS:-false}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - PARALLEL_API_KEY=${PARALLEL_API_KEY}
-    depends_on:
-      redis:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${STREAMING_PORT:-8787}/health"]
@@ -75,8 +78,7 @@ services:
       timeout: 10s
       retries: 3
 
-  # Dashboard Server - Port 12345 (original)
-  # Web visualization and interactive dashboard
+  # Dashboard Server - Port 12345
   dashboard:
     build: .
     command: ["dashboard"]
@@ -87,14 +89,11 @@ services:
     environment:
       - PORT=${DASHBOARD_PORT:-12345}
       - SERVER_ROLE=dashboard
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
       - API_URL=http://api:${API_PORT:-2040}
       - STREAMING_URL=http://streaming:${STREAMING_PORT:-8787}
-    depends_on:
-      redis:
-        condition: service_healthy
-      api:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     profiles:
       - dashboard
     restart: unless-stopped
@@ -117,31 +116,16 @@ services:
       - SWARM_LIVE=${SWARM_LIVE:-false}
       - FULL_LOGS=${FULL_LOGS:-false}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - PARALLEL_API_KEY=${PARALLEL_API_KEY}
-    depends_on:
-      redis:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     profiles:
       - legacy
     restart: unless-stopped
-
-  # Redis message broker and cache
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
   # Background workers for compute-intensive tasks
   workers:
@@ -153,58 +137,18 @@ services:
       - SWARM_LIVE=${SWARM_LIVE:-false}
       - FULL_LOGS=${FULL_LOGS:-false}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
       - BRAVE_API_KEY=${BRAVE_API_KEY}
       - PARALLEL_API_KEY=${PARALLEL_API_KEY}
-    depends_on:
-      redis:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     deploy:
       replicas: ${WORKER_REPLICAS:-1}
     profiles:
       - workers
 
-  # Redis Commander for debugging
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - "8081:8081"
-    depends_on:
-      - redis
-    profiles:
-      - debug
-
 volumes:
-  redis_data:
   app_data:
-
-# Compose profiles:
-#   (default)    - api + streaming + redis (main deployment)
-#   dashboard    - includes web dashboard
-#   legacy       - old combined server on port 12345
-#   workers      - background task workers
-#   debug        - redis-commander for debugging
-#
-# Examples (all-in-one):
-#   docker-compose up                        # API (2040) + Streaming (8787) + Redis (6379)
-#   docker-compose --profile dashboard up    # + Dashboard (12345)
-#   docker-compose --profile workers up      # + Background workers
-#   docker-compose --profile legacy up       # Old combined server only
-#   REDIS_PORT=6380 docker-compose up        # Use custom Redis port
-#
-# Multi-user setup (split deployment):
-#   # User 1: Redis on 6379
-#   REDIS_PORT=6379 docker-compose -f docker-compose.redis.yml -p user1-redis up -d
-#   REDIS_PORT=6379 docker-compose -f docker-compose.services.yml -p user1 up -d
-#
-#   # User 2: Redis on 6380
-#   REDIS_PORT=6380 docker-compose -f docker-compose.redis.yml -p user2-redis up -d
-#   REDIS_PORT=6380 docker-compose -f docker-compose.services.yml -p user2 up -d
-#
-#   # Scale workers independently
-#   REDIS_PORT=6379 WORKER_REPLICAS=4 docker-compose -f docker-compose.workers.yml -p user1-workers up -d

@@ -1,0 +1,37 @@
+# Standalone Redis for multi-user environments
+# Each user can run their own Redis on a different port
+#
+# Usage:
+#   REDIS_PORT=6379 docker-compose -f docker-compose.redis.yml up -d
+#   REDIS_PORT=6380 docker-compose -f docker-compose.redis.yml -p user2 up -d
+#   REDIS_PORT=6381 docker-compose -f docker-compose.redis.yml -p user3 up -d
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # Optional: Redis Commander for debugging (use --profile debug)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
+    depends_on:
+      - redis
+    profiles:
+      - debug
+
+volumes:
+  redis_data:

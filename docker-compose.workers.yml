@@ -1,0 +1,36 @@
+# Workers-only deployment - connects to external Redis
+# Use this to scale workers independently or run different worker configurations
+#
+# Usage:
+#   # Single worker instance connecting to Redis on port 6379
+#   docker-compose -f docker-compose.workers.yml up
+#
+#   # Multiple replicas
+#   WORKER_REPLICAS=4 docker-compose -f docker-compose.workers.yml up
+#
+#   # Connect to user-specific Redis on different port
+#   REDIS_PORT=6380 docker-compose -f docker-compose.workers.yml -p user2-workers up
+#
+#   # Scale dynamically
+#   docker-compose -f docker-compose.workers.yml up --scale workers=8
+
+services:
+  workers:
+    build: .
+    command: ["workers"]
+    environment:
+      - NUM_WORKERS=${NUM_WORKERS:-8}
+      - WORKER_CAPACITY=${WORKER_CAPACITY:-5}
+      - SWARM_LIVE=${SWARM_LIVE:-false}
+      - FULL_LOGS=${FULL_LOGS:-false}
+      - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - JINA_API_KEY=${JINA_API_KEY}
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - PARALLEL_API_KEY=${PARALLEL_API_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    deploy:
+      replicas: ${WORKER_REPLICAS:-1}
