@@ -1,6 +1,7 @@
 .gdelt_cache/
 .intel_data/
 *.pyc
+*.swp
 __pycache__/
 *.egg-info/
 .chroma_db/
