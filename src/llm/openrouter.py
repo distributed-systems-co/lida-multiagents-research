@@ -206,6 +206,7 @@ class OpenRouterClient:
         stream: bool = False,
         agent_id: Optional[str] = None,
         agent_name: Optional[str] = None,
+        deliberation_id: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse | AsyncIterator[str]:
         """
@@ -219,6 +220,7 @@ class OpenRouterClient:
             stream: Whether to stream the response
             agent_id: Optional agent ID for logging (overrides client's agent_id)
             agent_name: Optional agent name for logging (e.g., "Elon Musk")
+            deliberation_id: Optional deliberation ID for logging
             **kwargs: Additional parameters passed to the API
 
         Returns:
@@ -244,13 +246,15 @@ class OpenRouterClient:
 
         # Use provided agent_id or fall back to client's agent_id
         effective_agent_id = agent_id or self.agent_id
+        # Use provided deliberation_id or fall back to global
+        effective_delib_id = deliberation_id or _current_deliberation_id
 
         if stream:
-            return self._stream_complete(payload, effective_agent_id, agent_name)
+            return self._stream_complete(payload, effective_agent_id, agent_name, effective_delib_id)
         else:
-            return await self._complete(payload, effective_agent_id, agent_name)
+            return await self._complete(payload, effective_agent_id, agent_name, effective_delib_id)
 
-    async def _complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None) -> StreamingResponse:
+    async def _complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None, deliberation_id: Optional[str] = None) -> StreamingResponse:
         """Non-streaming completion."""
         client = await self._get_client()
 
@@ -291,7 +295,7 @@ class OpenRouterClient:
                     duration_ms=duration_ms,
                     full_logs=_is_full_logs(),
                     agent_name=agent_name,
-                    deliberation_id=_current_deliberation_id,
+                    deliberation_id=deliberation_id,
                 )
             except Exception as e:
                 logger.warning(f"Failed to log LLM response: {e}")
@@ -303,7 +307,7 @@ class OpenRouterClient:
             usage=usage,
         )
 
-    async def _stream_complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None) -> AsyncIterator[str]:
+    async def _stream_complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None, deliberation_id: Optional[str] = None) -> AsyncIterator[str]:
         """Streaming completion yielding content chunks."""
         client = await self._get_client()
 
@@ -341,6 +345,7 @@ class OpenRouterClient:
         on_chunk: Optional[Callable[[str], None]] = None,
         agent_id: Optional[str] = None,
         agent_name: Optional[str] = None,
+        deliberation_id: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse:
         """
@@ -351,6 +356,7 @@ class OpenRouterClient:
             on_chunk: Optional callback for each chunk
             agent_id: Optional agent ID for logging (overrides client's agent_id)
             agent_name: Optional agent name for logging (e.g., "Elon Musk")
+            deliberation_id: Optional deliberation ID for logging
             **kwargs: Passed to complete()
 
         Returns:
@@ -360,11 +366,12 @@ class OpenRouterClient:
         # Resolve model aliases for logging
         model_requested = MODELS.get(model, model) if model in MODELS else model
         effective_agent_id = agent_id or self.agent_id
+        effective_delib_id = deliberation_id or _current_deliberation_id
 
         response = StreamingResponse(model=model_requested)
 
         start_time = time.time()
-        async for chunk in await self.complete(messages, stream=True, agent_id=effective_agent_id, agent_name=agent_name, **kwargs):
+        async for chunk in await self.complete(messages, stream=True, agent_id=effective_agent_id, agent_name=agent_name, deliberation_id=effective_delib_id, **kwargs):
             response.content += chunk
             response.raw_chunks.append(chunk)
             if on_chunk:
@@ -390,7 +397,7 @@ class OpenRouterClient:
                     duration_ms=duration_ms,
                     full_logs=_is_full_logs(),
                     agent_name=agent_name,
-                    deliberation_id=_current_deliberation_id,
+                    deliberation_id=effective_delib_id,
                 )
             except Exception as e:
                 logger.warning(f"Failed to log streamed LLM response: {e}")
@@ -403,6 +410,7 @@ class OpenRouterClient:
         system: Optional[str] = None,
         agent_id: Optional[str] = None,
         agent_name: Optional[str] = None,
+        deliberation_id: Optional[str] = None,
         **kwargs,
     ) -> StreamingResponse:
         """
@@ -413,6 +421,7 @@ class OpenRouterClient:
             system: Optional system prompt
             agent_id: Optional agent ID for logging (overrides client's agent_id)
             agent_name: Optional agent name for logging (e.g., "Elon Musk")
+            deliberation_id: Optional deliberation ID for logging
             **kwargs: Passed to complete()
 
         Returns:
@@ -423,7 +432,7 @@ class OpenRouterClient:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
 
-        return await self.complete(messages, agent_id=agent_id, agent_name=agent_name, **kwargs)
+        return await self.complete(messages, agent_id=agent_id, agent_name=agent_name, deliberation_id=deliberation_id, **kwargs)
 
     async def stream_generate(
         self,

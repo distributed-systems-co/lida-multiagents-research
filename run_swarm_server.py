@@ -1564,7 +1564,7 @@ IMPORTANT - You are the PERSUADER in this debate:
             agent.status = "idle"
             await self.broadcast_agents_update()
 
-    async def generate_response(self, agent: Agent, prompt: str, use_tools: bool = False) -> str:
+    async def generate_response(self, agent: Agent, prompt: str, use_tools: bool = False, deliberation_id: Optional[str] = None) -> str:
         """Generate response using LLM or simulation."""
 
         # Tool-augmented generation
@@ -1602,6 +1602,7 @@ IMPORTANT - You are the PERSUADER in this debate:
                     max_tokens=500,
                     agent_id=agent.id,  # For LLM response logging
                     agent_name=agent.name,
+                    deliberation_id=deliberation_id,
                 )
                 return response.content
             except Exception as e:
@@ -1617,6 +1618,7 @@ IMPORTANT - You are the PERSUADER in this debate:
         discussion_summary: str,
         voting_round: int,
         is_final_round: bool = False,
+        deliberation_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Generate a vote decision using the agent's LLM.
 
@@ -1666,6 +1668,7 @@ REASONING: <one sentence only>"""
                     max_tokens=200,
                     agent_id=agent.id,
                     agent_name=agent.name,
+                    deliberation_id=deliberation_id,
                 )
                 text = response.content
 
@@ -1718,6 +1721,7 @@ REASONING: <one sentence only>"""
         agent: Agent,
         prompt: str,
         phase: str = "discussion",
+        deliberation_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Generate response with structured tool calling and streaming."""
 
@@ -1772,6 +1776,7 @@ When responding:
                     tools=DELIBERATION_TOOLS,
                     agent_id=agent.id,  # For LLM response logging
                     agent_name=agent.name,
+                    deliberation_id=deliberation_id,
                 )
 
                 # Stream simulation (actual streaming would need async generator)
@@ -2576,7 +2581,8 @@ Your confidence should change based on argument quality:
         # Update legacy state for backward compatibility
         self.current_topic = topic
         self.deliberation_active = True
-        self.consensus = {}
+        delib.consensus = {}  # Use per-deliberation consensus
+        self.consensus = delib.consensus  # Point legacy reference to it
         self.current_round = 0
         agents = list(self.agents.values())
 
@@ -2622,7 +2628,7 @@ Your confidence should change based on argument quality:
             agent.status = "speaking"
         await self.broadcast_agents_update()
 
-        # Generate all initial positions in parallel
+        # Generate all initial positions in parallel, adding messages as they complete
         async def get_initial_position(agent):
             prompt = f"""Topic: {topic}
 
@@ -2630,20 +2636,12 @@ Share your initial position on this topic. Be concise (2-3 sentences max).
 State your stance clearly and give one key reason."""
 
             if self.live_mode:
-                result = await self.generate_with_tools(agent, prompt, phase="position")
+                result = await self.generate_with_tools(agent, prompt, phase="position", deliberation_id=deliberation_id)
                 response = result["response"]
             else:
-                response = await self.generate_response(agent, prompt, use_tools=False)
+                response = await self.generate_response(agent, prompt, use_tools=False, deliberation_id=deliberation_id)
 
-            return agent, response
-
-        # Run all position generations in parallel
-        position_tasks = [get_initial_position(agent) for agent in agents]
-        position_results = await asyncio.gather(*position_tasks)
-
-        # Process results and broadcast
-        for agent, response in position_results:
-            # Register a claim for this position
+            # Register claim and add message immediately when this agent completes
             claim_result = self.tool_handler.handle_tool_call(
                 agent.id,
                 "make_claim",
@@ -2659,6 +2657,12 @@ State your stance clearly and give one key reason."""
             agent.current_thought = response[:60]
             self.add_message(agent.id, "broadcast", "position", response, agent.model,
                            deliberation_id=deliberation_id)
+
+            return agent, response
+
+        # Run all position generations in parallel
+        position_tasks = [get_initial_position(agent) for agent in agents]
+        await asyncio.gather(*position_tasks)
 
         await self.broadcast_agents_update()
         await self.broadcast_deliberation_state()
@@ -2702,7 +2706,7 @@ Discussion so far:
 Respond to the discussion, particularly addressing {a2.name}'s points. Be concise (2-3 sentences). State whether you agree or disagree and why."""
 
                 use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
-                response = await self.generate_response(a1, prompt, use_tools=use_tools)
+                response = await self.generate_response(a1, prompt, use_tools=use_tools, deliberation_id=deliberation_id)
                 a1.current_thought = response[:60]
                 self.add_message(a1.id, a2.id, "debate", response, a1.model,
                                deliberation_id=deliberation_id)
@@ -2740,7 +2744,8 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
             delib.phase = self.phase
             delib.current_round = voting_round
             await self.broadcast_deliberation()
-            self.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
+            delib.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
+            self.consensus = delib.consensus  # Point legacy reference to per-deliberation consensus
 
             discussion_summary = build_discussion_summary()
             round_votes = []
@@ -2757,6 +2762,7 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                     discussion_summary=discussion_summary,
                     voting_round=voting_round,
                     is_final_round=is_final_round,
+                    deliberation_id=deliberation_id,
                 )
 
                 vote = vote_data["vote"]
@@ -2767,11 +2773,11 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                 if vote == "continue_discussion":
                     any_continue = True
                     display_vote = "Continue"
-                    self.consensus["Continue"] += 1
+                    delib.consensus["Continue"] += 1
                 else:
                     display_vote = vote.title()
-                    if display_vote in self.consensus:
-                        self.consensus[display_vote] += 1
+                    if display_vote in delib.consensus:
+                        delib.consensus[display_vote] += 1
 
                 round_votes.append({"agent": agent, "vote": vote, "confidence": confidence, "reasoning": reasoning})
 
@@ -2856,7 +2862,7 @@ Some participants voted to continue discussion:
 
 Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
 
-                        response = await self.generate_response(a1, prompt, use_tools=False)
+                        response = await self.generate_response(a1, prompt, use_tools=False, deliberation_id=deliberation_id)
                         a1.current_thought = response[:60]
                         self.add_message(a1.id, a2.id, "debate", response, a1.model,
                                        deliberation_id=deliberation_id)
@@ -2888,10 +2894,10 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
 
         await asyncio.sleep(1)
 
-        winner = max(self.consensus.keys(), key=lambda k: self.consensus[k])
+        winner = max(delib.consensus.keys(), key=lambda k: delib.consensus[k])
         self.add_message(
             synthesizer.id, "broadcast", "synthesis",
-            f"Consensus: {winner} ({self.consensus[winner]}/{len(agents)} votes)",
+            f"Consensus: {winner} ({delib.consensus[winner]}/{len(agents)} votes)",
             synthesizer.model,
             deliberation_id=deliberation_id,
         )
@@ -2913,8 +2919,9 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
         # Update deliberation state
         delib.status = "completed"
         delib.phase = "complete"
-        delib.consensus = dict(self.consensus)
         delib.completed_at = time.time()
+        # Also update legacy self.consensus for backward compatibility
+        self.consensus = dict(delib.consensus)
 
         # Persist final state to database
         try:
@@ -2925,8 +2932,8 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
                 deliberation_id=deliberation_id,
                 status="completed",
                 phase="complete",
-                current_round=self.current_round,
-                consensus=dict(self.consensus),
+                current_round=delib.current_round,
+                consensus=dict(delib.consensus),
                 completed_at=datetime.now(timezone.utc).isoformat(),
             )
         except Exception as e:

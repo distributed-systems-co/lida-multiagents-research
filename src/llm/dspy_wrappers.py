@@ -262,6 +262,8 @@ class OpenRouterLM(BaseLM):
                         if msg.get("role") == "user":
                             prompt_text = msg.get("content", "")
                             break
+                    # Use passed deliberation_id or fall back to global
+                    delib_id = kwargs.get("deliberation_id") or get_current_deliberation_id()
                     llm_logger.log_llm_response(
                         agent_id=kwargs.get("agent_id"),
                         model_requested=model,
@@ -273,7 +275,7 @@ class OpenRouterLM(BaseLM):
                         duration_ms=int(result.latency_ms),
                         full_logs=_is_full_logs(),
                         agent_name=kwargs.get("agent_name"),
-                        deliberation_id=get_current_deliberation_id(),
+                        deliberation_id=delib_id,
                     )
             except Exception as e:
                 logger.warning(f"Failed to log LLM response: {e}")
