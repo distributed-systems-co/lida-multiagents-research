@@ -171,6 +171,9 @@ show_logs() {
     wait
 }
 
+# Ensure logs directory exists with local user ownership (before Docker creates it as root)
+mkdir -p logs
+
 case "$COMMAND" in
     start)
         log_info "Starting LIDA stack (Redis: ${REDIS_PORT}, API: ${API_PORT})"

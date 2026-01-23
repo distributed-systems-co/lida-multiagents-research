@@ -2675,7 +2675,7 @@ State your stance clearly and give one key reason."""
 
         # Helper to build full discussion context
         def build_discussion_context() -> str:
-            all_msgs = list(self.messages)
+            all_msgs = list(delib.messages)  # Use per-deliberation messages, not global
             relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate")]
             context_parts = []
             for msg in relevant_msgs:
@@ -2725,7 +2725,7 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
         # Build full discussion context from messages
         def build_discussion_summary() -> str:
             # Convert deque to list for iteration
-            all_msgs = list(self.messages)
+            all_msgs = list(delib.messages)  # Use per-deliberation messages, not global
             # Include position, debate, and previous vote messages
             relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate", "vote")]
             summary_parts = []
@@ -2829,7 +2829,7 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
 
                 # Helper to build full discussion context
                 def build_extended_context() -> str:
-                    all_msgs = list(self.messages)
+                    all_msgs = list(delib.messages)  # Use per-deliberation messages, not global
                     relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate", "vote")]
                     context_parts = []
                     for msg in relevant_msgs:
