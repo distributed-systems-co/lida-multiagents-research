@@ -91,30 +91,38 @@ def get_topic_from_scenario(scenario: str) -> str:
         return None
 
 
-def get_personas_from_scenario(scenario: str) -> list:
-    """Read the personas list from scenario YAML file."""
+def get_personas_from_scenario(scenario: str) -> tuple:
+    """Read the personas list and version from scenario YAML file.
+
+    Returns:
+        Tuple of (personas list, persona_version string)
+    """
     import yaml
     scenario_file = Path(f"scenarios/{scenario}.yaml")
     if not scenario_file.exists():
-        return None
+        return None, None
     try:
         with open(scenario_file) as f:
             config = yaml.safe_load(f)
-        return config.get("agents", {}).get("personas", [])
+        agents_cfg = config.get("agents", {})
+        return agents_cfg.get("personas", []), agents_cfg.get("persona_version", "v1")
     except Exception as e:
         print(f"Warning: Could not read personas from scenario file: {e}")
-        return None
+        return None, None
 
 
-def activate_personas(api_port: int, personas: list) -> bool:
+def activate_personas(api_port: int, personas: list, persona_version: str = "v1") -> bool:
     """Activate personas on the server via API call."""
     if not personas:
         return True  # Nothing to activate
 
     url = f"http://localhost:{api_port}/api/session/activate"
-    print(f">>> Activating {len(personas)} personas on server...", flush=True)
+    print(f">>> Activating {len(personas)} personas (version {persona_version}) on server...", flush=True)
     try:
-        resp = requests.post(url, json={"personas": personas}, timeout=30)
+        resp = requests.post(url, json={
+            "personas": personas,
+            "persona_version": persona_version,
+        }, timeout=30)
         if resp.status_code == 200:
             result = resp.json()
             print(f">>> Activated {result.get('count', 0)} agents", flush=True)
@@ -302,10 +310,10 @@ def main():
     print()
 
     # Activate personas from scenario if specified
-    personas = get_personas_from_scenario(args.scenario)
+    personas, persona_version = get_personas_from_scenario(args.scenario)
     if personas:
-        print(f"Found {len(personas)} personas in scenario: {args.scenario}")
-        if not activate_personas(args.port, personas):
+        print(f"Found {len(personas)} personas (version {persona_version}) in scenario: {args.scenario}")
+        if not activate_personas(args.port, personas, persona_version or "v1"):
             print("WARNING: Failed to activate personas, continuing anyway...")
         print()
 

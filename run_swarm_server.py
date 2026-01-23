@@ -4317,10 +4317,11 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         Activate specific personas for the current session.
         This rebuilds the agent roster with selected personas.
 
-        Body: {"personas": ["sam_altman", "yann_lecun", "chuck_schumer"]}
+        Body: {"personas": ["sam_altman", "yann_lecun", "chuck_schumer"], "persona_version": "v2"}
         """
         orch = app.state.orchestrator
         persona_ids = request.get("personas", [])
+        persona_version = request.get("persona_version", "v1")
 
         if not persona_ids:
             raise HTTPException(400, "At least one persona required")
@@ -4329,6 +4330,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         agents_cfg = CONFIG.get("agents", {})
         agents_cfg["personas"] = persona_ids
         agents_cfg["count"] = len(persona_ids)
+        agents_cfg["persona_version"] = persona_version
 
         # Clear existing agents and rebuild
         orch.agents.clear()
@@ -4342,6 +4344,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         return {
             "status": "activated",
             "count": len(orch.agents),
+            "persona_version": persona_version,
             "personas": [{"id": a.id, "name": a.name} for a in orch.agents.values()],
         }
 
