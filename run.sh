@@ -11,10 +11,10 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 usage() {
-    echo "Usage: $0 <port> [command]"
+    echo "Usage: $0 <redis_port> <api_port> [command]"
     echo ""
     echo "Commands:"
-    echo "  start     Start all services (redis, api, streaming, workers)"
+    echo "  start     Start all services (redis, api, workers)"
     echo "  restart   Restart services and workers (leave redis running)"
     echo "  stop      Stop all services including redis"
     echo "  stop-app  Stop services and workers (leave redis running)"
@@ -22,46 +22,50 @@ usage() {
     echo "  logs      Tail logs from all services"
     echo ""
     echo "Arguments:"
-    echo "  port      Required. Redis port number (e.g., 6379, 6380)"
+    echo "  redis_port  Required. Redis port number (e.g., 6379, 6380)"
+    echo "  api_port    Required. API server port (e.g., 2040, 2041)"
     echo ""
     echo "Environment variables:"
-    echo "  API_PORT        API server port (default: 2040)"
-    echo "  STREAMING_PORT  Streaming server port (default: 8787)"
     echo "  WORKER_REPLICAS Number of worker containers (default: 1)"
     echo "  NUM_WORKERS     Workers per container (default: 8)"
     echo ""
     echo "Examples:"
-    echo "  $0 6379 start           # Start everything on port 6379"
-    echo "  $0 6380 start           # Start everything on port 6380 (user 2)"
-    echo "  $0 6379 restart         # Restart services, keep redis"
-    echo "  $0 6379 stop            # Stop everything"
-    echo "  WORKER_REPLICAS=4 $0 6379 start  # Start with 4 worker containers"
+    echo "  $0 6379 2040 start      # Start everything (Redis 6379, API 2040)"
+    echo "  $0 6380 2041 start      # Start everything (Redis 6380, API 2041) - user 2"
+    echo "  $0 6379 2040 restart    # Restart services, keep redis"
+    echo "  $0 6379 2040 stop       # Stop everything"
+    echo "  WORKER_REPLICAS=4 $0 6379 2040 start  # Start with 4 worker containers"
     exit 1
 }
 
-# Check for required port argument
-if [ -z "$1" ]; then
-    echo -e "${RED}Error: Port number required${NC}"
+# Check for required arguments
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo -e "${RED}Error: Redis port and API port required${NC}"
     usage
 fi
 
 if ! [[ "$1" =~ ^[0-9]+$ ]]; then
-    echo -e "${RED}Error: Port must be a number${NC}"
+    echo -e "${RED}Error: Redis port must be a number${NC}"
     usage
 fi
 
-PORT=$1
-COMMAND=${2:-start}
+if ! [[ "$2" =~ ^[0-9]+$ ]]; then
+    echo -e "${RED}Error: API port must be a number${NC}"
+    usage
+fi
 
-# Project names based on port
-PROJECT_REDIS="lida-redis-${PORT}"
-PROJECT_SERVICES="lida-services-${PORT}"
-PROJECT_WORKERS="lida-workers-${PORT}"
+REDIS_PORT_ARG=$1
+API_PORT_ARG=$2
+COMMAND=${3:-start}
+
+# Project names based on ports
+PROJECT_REDIS="lida-redis-${REDIS_PORT_ARG}"
+PROJECT_SERVICES="lida-services-${REDIS_PORT_ARG}-${API_PORT_ARG}"
+PROJECT_WORKERS="lida-workers-${REDIS_PORT_ARG}-${API_PORT_ARG}"
 
 # Export environment
-export REDIS_PORT=$PORT
-export API_PORT=${API_PORT:-2040}
-export STREAMING_PORT=${STREAMING_PORT:-8787}
+export REDIS_PORT=$REDIS_PORT_ARG
+export API_PORT=$API_PORT_ARG
 export WORKER_REPLICAS=${WORKER_REPLICAS:-1}
 
 log_info() {
@@ -78,7 +82,7 @@ log_error() {
 
 check_redis_running() {
     # Check if redis is responding on the port
-    if redis-cli -p "$PORT" ping 2>/dev/null | grep -q PONG; then
+    if redis-cli -p "$REDIS_PORT" ping 2>/dev/null | grep -q PONG; then
         return 0
     fi
     # Fallback: check for container with project name
@@ -94,7 +98,7 @@ wait_for_redis() {
     local attempt=1
     while [ $attempt -le $max_attempts ]; do
         # Try connecting directly to the port
-        if redis-cli -p "$PORT" ping 2>/dev/null | grep -q PONG; then
+        if redis-cli -p "$REDIS_PORT" ping 2>/dev/null | grep -q PONG; then
             log_info "Redis is ready"
             return 0
         fi
@@ -115,16 +119,16 @@ wait_for_redis() {
 
 start_redis() {
     if check_redis_running; then
-        log_warn "Redis already running on port ${PORT}"
+        log_warn "Redis already running on port ${REDIS_PORT}"
     else
-        log_info "Starting Redis on port ${PORT}..."
+        log_info "Starting Redis on port ${REDIS_PORT}..."
         docker-compose -f docker-compose.redis.yml -p "$PROJECT_REDIS" up -d
         wait_for_redis
     fi
 }
 
 start_services() {
-    log_info "Starting services (API: ${API_PORT}, Streaming: ${STREAMING_PORT})..."
+    log_info "Starting API server on port ${API_PORT}..."
     docker-compose -f docker-compose.services.yml -p "$PROJECT_SERVICES" up -d
 }
 
@@ -150,10 +154,10 @@ stop_workers() {
 
 show_status() {
     echo ""
-    echo "=== Redis (port ${PORT}) ==="
+    echo "=== Redis (port ${REDIS_PORT}) ==="
     docker-compose -f docker-compose.redis.yml -p "$PROJECT_REDIS" ps 2>/dev/null || echo "Not running"
     echo ""
-    echo "=== Services ==="
+    echo "=== API (port ${API_PORT}) ==="
     docker-compose -f docker-compose.services.yml -p "$PROJECT_SERVICES" ps 2>/dev/null || echo "Not running"
     echo ""
     echo "=== Workers ==="
@@ -169,7 +173,7 @@ show_logs() {
 
 case "$COMMAND" in
     start)
-        log_info "Starting LIDA stack on Redis port ${PORT}"
+        log_info "Starting LIDA stack (Redis: ${REDIS_PORT}, API: ${API_PORT})"
         start_redis
         start_services
         start_workers
@@ -177,9 +181,9 @@ case "$COMMAND" in
         show_status
         ;;
     restart)
-        log_info "Restarting services (keeping Redis on port ${PORT})"
+        log_info "Restarting services (keeping Redis on port ${REDIS_PORT})"
         if ! check_redis_running; then
-            log_error "Redis is not running on port ${PORT}. Use 'start' instead."
+            log_error "Redis is not running on port ${REDIS_PORT}. Use 'start' instead."
             exit 1
         fi
         stop_workers
@@ -190,14 +194,14 @@ case "$COMMAND" in
         show_status
         ;;
     stop)
-        log_info "Stopping all services on port ${PORT}"
+        log_info "Stopping all services (Redis: ${REDIS_PORT}, API: ${API_PORT})"
         stop_workers
         stop_services
         stop_redis
         log_info "All services stopped"
         ;;
     stop-app)
-        log_info "Stopping services and workers (keeping Redis)"
+        log_info "Stopping services and workers (keeping Redis on ${REDIS_PORT})"
         stop_workers
         stop_services
         log_info "Services stopped, Redis still running"

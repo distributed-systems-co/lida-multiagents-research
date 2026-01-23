@@ -24,7 +24,7 @@ services:
       - SWARM_LIVE=${SWARM_LIVE:-false}
       - FULL_LOGS=${FULL_LOGS:-false}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
-      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:${REDIS_PORT:-6379}}
+      - REDIS_URL=redis://host.docker.internal:${REDIS_PORT}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - JINA_API_KEY=${JINA_API_KEY}
       - BRAVE_API_KEY=${BRAVE_API_KEY}

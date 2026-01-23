@@ -82,6 +82,11 @@ def create_app(
             return FileResponse(dashboard_path)
         return HTMLResponse(content=get_dashboard_html(), status_code=200)
 
+    @app.get("/health")
+    async def health_check():
+        """Health check endpoint."""
+        return {"status": "ok"}
+
     # ─────────────────────────────────────────────────────────────────────────
     # WebSocket routes
     # ─────────────────────────────────────────────────────────────────────────

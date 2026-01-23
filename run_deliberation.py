@@ -1,23 +1,38 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Run a deliberation scenario and capture results.
+Run a deliberation scenario against a running LIDA instance.
+
+The LIDA services must already be running (started via run.sh).
 
 Usage:
-    python run_deliberation.py [--scenario SCENARIO] [--timeout SECONDS] [--output FILE]
+    python run_deliberation.py --port PORT [--scenario SCENARIO] [--topic TOPIC] [--timeout SECONDS]
+
+Arguments:
+    --port PORT           API port of the running LIDA instance (required)
+    --scenario SCENARIO   Scenario name (default: quick_personas3)
+    --topic TOPIC         Deliberation topic (default: from scenario config)
+    --timeout SECONDS     Max seconds to wait (default: 600)
+    --output FILE         Output file for logs (default: deliberation_TIMESTAMP.log)
+    --poll-interval SECS  Seconds between status checks (default: 5)
 
 Example:
-    python run_deliberation.py --scenario quick_personas3 --timeout 300 --output results.log
+    # First start services:
+    ./run.sh 6379 2040 start
+
+    # Then run deliberation:
+    python run_deliberation.py --port 2040 --scenario quick_personas3 --timeout 300
+
+    # Or with a custom topic:
+    python run_deliberation.py --port 2040 --topic "Should AI be regulated?"
 
 Logs are saved to the logs/ subdirectory:
-    logs/deliberation_<scenario>_<timestamp>.log       - Console output
+    logs/deliberation_<scenario>_<timestamp>.log           - Status log
     logs/deliberation_<scenario>_<timestamp>.llm_logs.json - LLM API logs
 """
 
 import argparse
 import json
-import os
-import subprocess
 import sys
 import time
 import signal
@@ -27,15 +42,33 @@ from pathlib import Path
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run deliberation scenario")
-    parser.add_argument("--scenario", default="quick_personas3", help="Scenario name")
-    parser.add_argument("--topic", default=None, help="Deliberation topic (default: from scenario config)")
-    parser.add_argument("--timeout", type=int, default=600, help="Max seconds to wait (default: 600)")
-    parser.add_argument("--output", default=None, help="Output file for logs (default: deliberation_TIMESTAMP.log)")
-    parser.add_argument("--api-port", type=int, default=2040, help="API port (default: 2040)")
-    parser.add_argument("--poll-interval", type=int, default=5, help="Seconds between status checks (default: 5)")
-    parser.add_argument("--no-build", action="store_true", help="Skip --build flag")
-    parser.add_argument("--no-live", action="store_true", help="Disable live mode (no LLM calls)")
+    parser = argparse.ArgumentParser(
+        description="Run deliberation against a running LIDA instance"
+    )
+    parser.add_argument(
+        "--port", type=int, required=True,
+        help="API port of the running LIDA instance (required)"
+    )
+    parser.add_argument(
+        "--scenario", default="quick_personas3",
+        help="Scenario name (default: quick_personas3)"
+    )
+    parser.add_argument(
+        "--topic", default=None,
+        help="Deliberation topic (default: from scenario config)"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=600,
+        help="Max seconds to wait (default: 600)"
+    )
+    parser.add_argument(
+        "--output", default=None,
+        help="Output file for logs (default: deliberation_TIMESTAMP.log)"
+    )
+    parser.add_argument(
+        "--poll-interval", type=int, default=5,
+        help="Seconds between status checks (default: 5)"
+    )
     return parser.parse_args()
 
 
@@ -52,6 +85,20 @@ def get_topic_from_scenario(scenario: str) -> str:
     except Exception as e:
         print(f"Warning: Could not read scenario file: {e}")
         return None
+
+
+def check_health(api_port: int) -> bool:
+    """Check if the API is healthy."""
+    # Try /health first, then fall back to /api/stats or root
+    endpoints = ["/health", "/api/stats", "/"]
+    for endpoint in endpoints:
+        try:
+            resp = requests.get(f"http://localhost:{api_port}{endpoint}", timeout=5)
+            if resp.status_code == 200:
+                return True
+        except requests.exceptions.RequestException:
+            pass
+    return False
 
 
 def start_deliberation(api_port: int, topic: str) -> bool:
@@ -73,43 +120,6 @@ def start_deliberation(api_port: int, topic: str) -> bool:
         return False
 
 
-def fetch_llm_logs(api_port: int) -> dict:
-    """Fetch LLM logs from the API before shutdown."""
-    try:
-        resp = requests.get(f"http://localhost:{api_port}/api/llm/logs", timeout=10)
-        if resp.status_code == 200:
-            return resp.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Warning: Could not fetch LLM logs: {e}")
-    return None
-
-
-def check_api_key():
-    """Check if OPENROUTER_API_KEY is set for live mode."""
-    api_key = os.environ.get("OPENROUTER_API_KEY", "")
-    if not api_key:
-        print()
-        print("!" * 60)
-        print("!!! ERROR: OPENROUTER_API_KEY is not set !!!")
-        print("!" * 60)
-        print()
-        print("Live mode requires an OpenRouter API key.")
-        print()
-        print("To fix this, either:")
-        print("  1. Export the key:  export OPENROUTER_API_KEY='your-key-here'")
-        print("  2. Add to .env:     echo 'OPENROUTER_API_KEY=your-key' >> .env")
-        print("  3. Run without LLM: python3 run_deliberation.py --no-live")
-        print()
-        print("Get an API key at: https://openrouter.ai/keys")
-        print()
-        print("!" * 60)
-        sys.exit(1)
-    else:
-        # Show that key is set (masked)
-        masked = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else "***"
-        print(f"OPENROUTER_API_KEY: {masked}")
-
-
 def check_status(api_port: int) -> dict:
     """Check deliberation status via API."""
     try:
@@ -121,20 +131,26 @@ def check_status(api_port: int) -> dict:
     return None
 
 
-def wait_for_api(api_port: int, timeout: int = 120) -> bool:
-    """Wait for API to become available."""
-    print(f"Waiting for API on port {api_port}...")
-    start = time.time()
-    while time.time() - start < timeout:
-        try:
-            resp = requests.get(f"http://localhost:{api_port}/health", timeout=2)
-            if resp.status_code == 200:
-                print(f"API ready after {time.time() - start:.1f}s")
-                return True
-        except requests.exceptions.RequestException:
-            pass
-        time.sleep(2)
-    return False
+def fetch_llm_logs(api_port: int) -> dict:
+    """Fetch LLM logs from the API."""
+    try:
+        resp = requests.get(f"http://localhost:{api_port}/api/llm/logs", timeout=10)
+        if resp.status_code == 200:
+            return resp.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Warning: Could not fetch LLM logs: {e}")
+    return None
+
+
+def fetch_deliberation_logs(api_port: int) -> str:
+    """Fetch deliberation logs from the API if available."""
+    try:
+        resp = requests.get(f"http://localhost:{api_port}/api/deliberation/logs", timeout=10)
+        if resp.status_code == 200:
+            return resp.text
+    except requests.exceptions.RequestException:
+        pass
+    return None
 
 
 def main():
@@ -151,101 +167,70 @@ def main():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = logs_dir / f"deliberation_{args.scenario}_{timestamp}.log"
 
-    live_mode = not args.no_live
-
     # Get topic from args or scenario config
     topic = args.topic or get_topic_from_scenario(args.scenario)
     if not topic:
         print("ERROR: No topic specified. Use --topic or add auto_start_topic to scenario config.")
         sys.exit(1)
 
-    print(f"=" * 60)
-    print(f"Deliberation Runner")
-    print(f"=" * 60)
+    print("=" * 60)
+    print("Deliberation Runner (Client Mode)")
+    print("=" * 60)
+    print(f"API Port: {args.port}")
     print(f"Scenario: {args.scenario}")
     print(f"Topic: {topic}")
-    print(f"Live Mode: {live_mode}")
     print(f"Timeout: {args.timeout}s")
     print(f"Output: {output_file}")
-    print(f"API Port: {args.api_port}")
     print()
 
-    # Check API key if live mode
-    if live_mode:
-        check_api_key()
-    else:
-        print("Live mode disabled - using simulation")
+    # Check if API is running
+    print(f"Checking API health on port {args.port}...")
+    if not check_health(args.port):
+        print()
+        print("!" * 60)
+        print(f"ERROR: Cannot connect to API on port {args.port}")
+        print("!" * 60)
+        print()
+        print("Make sure the LIDA services are running:")
+        print(f"  ./run.sh <redis-port> start")
+        print()
+        print("Then set API_PORT if using non-default:")
+        print(f"  API_PORT={args.port} ./run.sh <redis-port> start")
+        print()
+        sys.exit(1)
+
+    print("API is healthy")
     print()
 
-    # Build docker-compose command
-    env = {
-        "SCENARIO": args.scenario,
-        "SWARM_LIVE": "true" if live_mode else "false",
-        "FULL_LOGS": "true",
-    }
-    env_str = " ".join(f"{k}={v}" for k, v in env.items())
-
-    cmd = ["docker-compose", "up"]
-    if not args.no_build:
-        cmd.append("--build")
-
-    print(f"Running: {env_str} {' '.join(cmd)}")
-    print()
-
-    # Build full environment
-    full_env = os.environ.copy()
-    full_env.update(env)
-
-    # Clean up any previous run to ensure fresh state (clears Redis locks)
-    print("Stopping any previous containers...")
-    subprocess.run(["docker-compose", "down"], capture_output=True, env=full_env)
-    print()
-
-    # Start docker-compose
-
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        env=full_env,
-        text=True,
-        bufsize=1,  # Line buffered
-    )
-
-    # Collect logs
-    logs = []
-    deliberation_triggered = False
+    # Track state
     deliberation_started = False
     deliberation_completed = False
     start_time = time.time()
-    last_status_check = -args.poll_interval  # Check immediately on first iteration
-
-    def cleanup():
-        print("\nStopping docker-compose...")
-        subprocess.run(["docker-compose", "down"], capture_output=True)
+    status_log = []
+    interrupted = False
 
     def signal_handler(sig, frame):
-        print("\nInterrupted!")
-        cleanup()
-        sys.exit(1)
+        nonlocal interrupted
+        print("\nInterrupted! Saving logs...")
+        interrupted = True
 
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    try:
-        # Read output in non-blocking way
-        import select
+    # Start the deliberation
+    print(f">>> Starting deliberation: {topic}", flush=True)
+    if not start_deliberation(args.port, topic):
+        print("ERROR: Failed to start deliberation")
+        sys.exit(1)
 
-        while True:
-            # Check if process has output
-            if process.stdout:
-                # Use select for non-blocking read on Unix
-                ready, _, _ = select.select([process.stdout], [], [], 0.1)
-                if ready:
-                    line = process.stdout.readline()
-                    if line:
-                        logs.append(line)
-                        print(line, end="")  # Echo to console
+    print()
+    print("Monitoring deliberation progress...")
+    print("-" * 60)
+
+    # Poll for status
+    try:
+        while not interrupted:
+            time.sleep(args.poll_interval)
 
             # Check timeout
             elapsed = time.time() - start_time
@@ -253,93 +238,113 @@ def main():
                 print(f"\nTimeout after {args.timeout}s")
                 break
 
-            # Check deliberation status periodically
-            if time.time() - last_status_check > args.poll_interval:
-                last_status_check = time.time()
+            # Check status
+            status = check_status(args.port)
 
-                # Try to start deliberation if not yet triggered
-                if not deliberation_triggered:
-                    print(f"\n>>> Starting deliberation: {topic}", flush=True)
-                    if start_deliberation(args.api_port, topic):
-                        deliberation_triggered = True
-                        print(">>> Deliberation triggered successfully", flush=True)
-                    else:
-                        print(">>> Failed to start deliberation, will retry...", flush=True)
+            if status:
+                status_entry = {
+                    "timestamp": datetime.now().isoformat(),
+                    "elapsed": elapsed,
+                    "status": status,
+                }
+                status_log.append(status_entry)
 
-                # Check status
-                status = check_status(args.api_port)
+                phase = status.get("phase", "unknown")
+                active = status.get("active", False)
+                messages = status.get("total_messages", 0)
 
-                if status:
-                    if status.get("active") and not deliberation_started:
-                        deliberation_started = True
-                        print(f"\n>>> Deliberation STARTED: {status.get('topic')}", flush=True)
-                        print(f">>> Phase: {status.get('phase')}", flush=True)
+                if active and not deliberation_started:
+                    deliberation_started = True
+                    print(f">>> Deliberation STARTED", flush=True)
 
-                    # Check for completion by looking at phase or completed flag
-                    phase = status.get("phase", "")
-                    is_complete = (
-                        (deliberation_started and not status.get("active")) or
-                        ("complete" in phase.lower()) or
-                        status.get("completed")
-                    )
+                # Also mark as started if we see messages (in case we missed the active=True)
+                if messages > 0 and not deliberation_started:
+                    deliberation_started = True
+                    print(f">>> Deliberation STARTED (detected via messages)", flush=True)
 
-                    if is_complete and not deliberation_completed:
-                        deliberation_completed = True
-                        print(f"\n>>> Deliberation COMPLETED", flush=True)
-                        print(f">>> Phase: {phase}", flush=True)
-                        print(f">>> Consensus: {status.get('consensus')}", flush=True)
-                        print(f">>> Messages: {status.get('total_messages')}", flush=True)
+                print(f"[{elapsed:6.1f}s] Phase: {phase:<20} Messages: {messages}", flush=True)
 
-                        # Give it a moment to finish logging
-                        time.sleep(3)
-                        break
+                # Check for completion - only if deliberation actually started
+                # Require either: we saw it start, OR there are messages, OR phase indicates completion
+                has_activity = deliberation_started or messages > 0
+                phase_complete = phase and "complete" in phase.lower()
 
-            # Check if process exited
-            if process.poll() is not None:
-                # Read remaining output
-                remaining = process.stdout.read() if process.stdout else ""
-                if remaining:
-                    logs.append(remaining)
-                    print(remaining, end="")
-                print(f"\nProcess exited with code {process.returncode}")
-                break
+                is_complete = has_activity and (
+                    (not active and (messages > 0 or phase_complete)) or
+                    phase_complete or
+                    (status.get("completed") and messages > 0)
+                )
 
-    finally:
-        # Fetch LLM logs before shutdown
-        print(f"\nFetching LLM logs from API...")
-        llm_logs = fetch_llm_logs(args.api_port)
+                if is_complete and not deliberation_completed:
+                    deliberation_completed = True
+                    print()
+                    print("=" * 60)
+                    print(">>> Deliberation COMPLETED", flush=True)
+                    print(f">>> Phase: {phase}", flush=True)
+                    print(f">>> Consensus: {status.get('consensus')}", flush=True)
+                    print(f">>> Messages: {messages}", flush=True)
+                    print("=" * 60)
+                    # Give it a moment to finish any final logging
+                    time.sleep(2)
+                    break
+            else:
+                print(f"[{elapsed:6.1f}s] (no status available)", flush=True)
 
-        llm_logs_file = output_file.with_suffix(".llm_logs.json")
-        if llm_logs:
-            print(f"Saving {len(llm_logs.get('logs', []))} LLM log entries to {llm_logs_file}...")
-            with open(llm_logs_file, "w") as f:
-                json.dump(llm_logs, f, indent=2)
-        else:
-            print("No LLM logs retrieved")
+    except Exception as e:
+        print(f"Error during monitoring: {e}")
 
-        # Save console logs
-        print(f"Saving console logs to {output_file}...")
-        with open(output_file, "w") as f:
-            f.write(f"# Deliberation Run: {args.scenario}\n")
-            f.write(f"# Started: {datetime.now().isoformat()}\n")
-            f.write(f"# Completed: {deliberation_completed}\n")
-            f.write(f"# Elapsed: {time.time() - start_time:.1f}s\n")
-            f.write(f"# LLM Logs: {llm_logs_file}\n")
-            f.write("#" + "=" * 59 + "\n\n")
-            f.writelines(logs)
+    # Fetch and save logs
+    print()
+    print("-" * 60)
+    print("Fetching logs...")
 
-        # Cleanup
-        cleanup()
+    # Fetch LLM logs
+    llm_logs = fetch_llm_logs(args.port)
+    llm_logs_file = output_file.with_suffix(".llm_logs.json")
+    if llm_logs:
+        print(f"Saving {len(llm_logs.get('logs', []))} LLM log entries to {llm_logs_file}...")
+        with open(llm_logs_file, "w") as f:
+            json.dump(llm_logs, f, indent=2)
+    else:
+        print("No LLM logs retrieved")
 
-        # Final status
-        print()
-        print("=" * 60)
-        print(f"Deliberation {'COMPLETED' if deliberation_completed else 'INCOMPLETE'}")
-        print(f"Console logs: {output_file}")
-        if llm_logs:
-            print(f"LLM logs: {llm_logs_file} ({len(llm_logs.get('logs', []))} entries)")
-        print(f"Total time: {time.time() - start_time:.1f}s")
-        print("=" * 60)
+    # Fetch deliberation logs if available
+    delib_logs = fetch_deliberation_logs(args.port)
+
+    # Save consolidated log file
+    print(f"Saving logs to {output_file}...")
+    with open(output_file, "w") as f:
+        f.write(f"# Deliberation Run: {args.scenario}\n")
+        f.write(f"# API Port: {args.port}\n")
+        f.write(f"# Topic: {topic}\n")
+        f.write(f"# Started: {datetime.now().isoformat()}\n")
+        f.write(f"# Completed: {deliberation_completed}\n")
+        f.write(f"# Elapsed: {time.time() - start_time:.1f}s\n")
+        f.write(f"# LLM Logs: {llm_logs_file}\n")
+        f.write("#" + "=" * 59 + "\n\n")
+
+        f.write("## Status Log\n\n")
+        for entry in status_log:
+            f.write(f"[{entry['elapsed']:6.1f}s] {json.dumps(entry['status'])}\n")
+
+        if delib_logs:
+            f.write("\n## Deliberation Logs\n\n")
+            f.write(delib_logs)
+
+    # Final summary
+    print()
+    print("=" * 60)
+    print(f"Deliberation {'COMPLETED' if deliberation_completed else 'INCOMPLETE'}")
+    print(f"Logs: {output_file}")
+    if llm_logs:
+        print(f"LLM logs: {llm_logs_file} ({len(llm_logs.get('logs', []))} entries)")
+    print(f"Total time: {time.time() - start_time:.1f}s")
+    print()
+    print("NOTE: Services are still running. To stop them:")
+    print(f"  ./run.sh <redis-port> stop")
+    print("=" * 60)
+
+    sys.exit(0 if deliberation_completed else 1)
 
 
 if __name__ == "__main__":

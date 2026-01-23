@@ -618,7 +618,7 @@ class SwarmOrchestrator:
         self.max_rounds = delib_cfg.get("max_rounds", int(os.getenv("MAX_ROUNDS", "7")))
         self.phase_delays = delib_cfg.get("phase_delays", {
             "analyzing": 0.5,
-            "discussing": 0.3,
+            "opening_statements": 0.3,
             "debating": 0.2,
             "voting": 0.4,
             "synthesizing": 0.6,
@@ -2498,26 +2498,36 @@ Your confidence should change based on argument quality:
 
         await asyncio.sleep(1)
 
-        # Phase 2: Initial positions with structured claims
-        self.phase = "💬 discussing"
+        # Phase 2: Initial positions with structured claims (parallel)
+        self.phase = "📢 opening statements"
         await self.broadcast_deliberation()
 
+        # Set all agents to speaking status
         for agent in agents:
             agent.status = "speaking"
-            await self.broadcast_agents_update()
+        await self.broadcast_agents_update()
 
+        # Generate all initial positions in parallel
+        async def get_initial_position(agent):
             prompt = f"""Topic: {topic}
 
 Share your initial position on this topic. Be concise (2-3 sentences max).
 State your stance clearly and give one key reason."""
 
             if self.live_mode:
-                # Use tool-based generation for streaming and structured output
-                result = await self.generate_with_tools(agent, prompt, phase="discussion")
+                result = await self.generate_with_tools(agent, prompt, phase="position")
                 response = result["response"]
             else:
                 response = await self.generate_response(agent, prompt, use_tools=False)
 
+            return agent, response
+
+        # Run all position generations in parallel
+        position_tasks = [get_initial_position(agent) for agent in agents]
+        position_results = await asyncio.gather(*position_tasks)
+
+        # Process results and broadcast
+        for agent, response in position_results:
             # Register a claim for this position
             claim_result = self.tool_handler.handle_tool_call(
                 agent.id,
@@ -2533,11 +2543,10 @@ State your stance clearly and give one key reason."""
 
             agent.current_thought = response[:60]
             self.add_message(agent.id, "broadcast", "position", response, agent.model)
-            await asyncio.sleep(0.2)
 
         await self.broadcast_agents_update()
         await self.broadcast_deliberation_state()
-        await asyncio.sleep(0.8)
+        await asyncio.sleep(0.5)
 
         # Phase 3: Debate
         self.phase = "🔄 debating"
@@ -3361,7 +3370,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             "consensus": {},
             "agent_count": len(orch.agents),
             "total_messages": 0,
-            "completed": True,
+            "completed": False,
         }
 
     @app.post("/api/inject")

@@ -2,6 +2,7 @@
 redis>=5.0.0
 pyyaml>=6.0
 jsonschema>=4.0.0
+requests>=2.31.0
 
 # Web server
 fastapi>=0.109.0

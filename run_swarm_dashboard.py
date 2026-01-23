@@ -132,9 +132,9 @@ class DeliberationContext:
     threshold: float = 0.5  # Vote threshold for approval
     phase_descriptions: Dict[str, str] = field(default_factory=lambda: {
         "initializing": "Setting up the deliberation framework",
-        "introduction": "Agents forming initial positions based on their expertise",
+        "opening": "Agents forming initial positions based on their expertise",
         "positions": "Each agent stating their initial stance publicly",
-        "discussion": "Agents exchanging arguments and updating beliefs",
+        "debating": "Agents exchanging arguments and updating beliefs",
         "voting": "Final votes being cast based on deliberation",
         "synthesis": "Aggregating votes and forming consensus",
         "complete": "Deliberation concluded with decision",
@@ -330,7 +330,7 @@ class SwarmDashboard:
         header.append(f"{avg_belief:+.2f}", style=belief_color)
         header.append(f" σ:{avg_conf:.0%}", style="dim")
         header.append(" │ ", style="dim")
-        phase_color = {"initializing": "dim", "introduction": "#06B6D4", "positions": "#F59E0B", "discussion": "#10B981", "voting": "#8B5CF6", "synthesis": "#EC4899", "complete": "#10B981"}.get(self.deliberation_phase, "white")
+        phase_color = {"initializing": "dim", "opening": "#06B6D4", "positions": "#F59E0B", "debating": "#10B981", "voting": "#8B5CF6", "synthesis": "#EC4899", "complete": "#10B981"}.get(self.deliberation_phase, "white")
         header.append(f"{self.deliberation_phase.upper()}", style=f"bold {phase_color}")
 
         return header
@@ -858,8 +858,8 @@ class SwarmDashboard:
 
         # ─── CURRENT PHASE ───
         phase_colors = {
-            "initializing": "#6B7280", "introduction": "#06B6D4",
-            "positions": "#F59E0B", "discussion": "#10B981",
+            "initializing": "#6B7280", "opening": "#06B6D4",
+            "positions": "#F59E0B", "debating": "#10B981",
             "voting": "#8B5CF6", "synthesis": "#EC4899", "complete": "#10B981"
         }
         lines.append(Text("─── PHASE ───", style=f"bold {phase_colors.get(self.deliberation_phase, '#FFFFFF')}"))
@@ -923,8 +923,16 @@ class SwarmSimulator:
         except Exception as e:
             console.print(f"[yellow]LLM unavailable: {e}[/]")
 
-    async def run_deliberation(self, topic: str, description: str = "", criterion: str = "majority"):
-        """Run a multi-agent deliberation on a topic with belief tracking."""
+    async def run_deliberation(self, topic: str, description: str = "", criterion: str = "majority", max_rounds: int = 5, max_voting_rounds: int = 3):
+        """Run a multi-agent deliberation on a topic with belief tracking.
+
+        Args:
+            topic: The topic to deliberate on
+            description: Additional context for the topic
+            criterion: Voting criterion (majority, supermajority, consensus, plurality)
+            max_rounds: Maximum discussion rounds
+            max_voting_rounds: Maximum voting rounds before forcing decision
+        """
         self.dashboard.topic = topic
         agents = list(self.dashboard.agents.values())
 
@@ -937,7 +945,7 @@ class SwarmSimulator:
         self.dashboard.context.key_arguments = []
 
         # Phase 1: Introduction - agents form initial beliefs
-        self.dashboard.deliberation_phase = "introduction"
+        self.dashboard.deliberation_phase = "opening"
         for agent in agents:
             self.dashboard.set_agent_status(agent.id, "thinking", f"Analyzing: {topic[:30]}...")
             # Initial belief based on personality
@@ -991,7 +999,7 @@ class SwarmSimulator:
         await asyncio.sleep(0.5)
 
         # Phase 3: Discussion - agents influence each other with CLEAR ARGUMENTS
-        self.dashboard.deliberation_phase = "discussion"
+        self.dashboard.deliberation_phase = "debating"
 
         # Define substantive arguments for/against
         arguments_for = [
@@ -1017,7 +1025,8 @@ class SwarmSimulator:
             "Timeline needs adjustment",
         ]
 
-        for round_num in range(12):
+        # Run discussion rounds (2 exchanges per round)
+        for round_num in range(max_rounds * 2):
             sender = random.choice(agents)
             recipient = random.choice([a for a in agents if a.id != sender.id])
 
@@ -1061,30 +1070,63 @@ class SwarmSimulator:
             self.dashboard.set_agent_status(sender.id, "thinking", f"Argued: {argument[:25]}...")
             await asyncio.sleep(0.25)
 
-        # Phase 4: Voting - votes reflect beliefs
-        self.dashboard.deliberation_phase = "voting"
-        self.dashboard.consensus = {}
+        # Phase 4: Voting with multiple rounds - can exit early on consensus
+        voting_round = 0
+        continue_discussion = True
 
-        for agent in agents:
-            self.dashboard.set_agent_status(agent.id, "voting")
+        while continue_discussion and voting_round < max_voting_rounds:
+            voting_round += 1
+            is_final_round = (voting_round >= max_voting_rounds)
 
-            # Vote based on belief position
-            pos = agent.belief_position
-            if pos > 0.4:
-                vote = "Support"
-            elif pos > 0:
-                vote = "Modify"
-            elif pos > -0.4:
-                vote = "Abstain"
+            self.dashboard.deliberation_phase = f"voting (round {voting_round}/{max_voting_rounds})"
+            self.dashboard.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
+
+            any_continue = False
+
+            for agent in agents:
+                self.dashboard.set_agent_status(agent.id, "voting")
+
+                # Vote based on belief position
+                pos = agent.belief_position
+                conf = agent.belief_confidence
+
+                # Low confidence agents may vote to continue (unless final round)
+                if not is_final_round and conf < 0.5 and random.random() < 0.3:
+                    vote = "Continue"
+                    any_continue = True
+                elif pos > 0.4:
+                    vote = "Support"
+                elif pos > 0:
+                    vote = "Modify"
+                elif pos > -0.4:
+                    vote = "Abstain"
+                else:
+                    vote = "Oppose"
+
+                self.dashboard.consensus[vote] += 1
+                self.dashboard.set_agent_vote(agent.id, "main_proposal", vote)
+                self.dashboard.add_message(agent.id, "all", "vote", f"Vote: {vote} (belief: {pos:+.2f}, conf: {conf:.0%})")
+
+                # Lock in confidence after voting
+                self.dashboard.update_agent_belief(agent.id, pos, min(1.0, conf + 0.1))
+                await asyncio.sleep(0.15)
+
+            # Check if we should continue
+            if any_continue and not is_final_round:
+                # Quick discussion round before next vote
+                self.dashboard.deliberation_phase = "addressing concerns"
+                for _ in range(2):
+                    sender = random.choice(agents)
+                    recipient = random.choice([a for a in agents if a.id != sender.id])
+                    self.dashboard.set_agent_status(sender.id, "speaking")
+                    self.dashboard.add_message(sender.id, recipient.id, "respond", "Addressing remaining concerns...")
+                    # Boost confidence slightly
+                    recipient.belief_confidence = min(1.0, recipient.belief_confidence + 0.1)
+                    await asyncio.sleep(0.2)
+                continue_discussion = True
             else:
-                vote = "Oppose"
-
-            self.dashboard.set_agent_vote(agent.id, "main_proposal", vote)
-            self.dashboard.add_message(agent.id, "all", "vote", f"Vote: {vote} (belief: {pos:+.2f})")
-
-            # Lock in confidence after voting
-            self.dashboard.update_agent_belief(agent.id, pos, min(1.0, agent.belief_confidence + 0.15))
-            await asyncio.sleep(0.2)
+                # No one wants to continue or final round - exit
+                continue_discussion = False
 
         # Phase 5: Synthesis
         self.dashboard.deliberation_phase = "synthesis"
@@ -1111,8 +1153,14 @@ class SwarmSimulator:
 
         await asyncio.sleep(2)
 
-    async def run_continuous(self):
-        """Run continuous swarm activity with rich topic context."""
+    async def run_continuous(self, max_rounds: int = 5, max_voting_rounds: int = 3, continuous: bool = False):
+        """Run swarm deliberation(s) with rich topic context.
+
+        Args:
+            max_rounds: Maximum discussion rounds per deliberation
+            max_voting_rounds: Maximum voting rounds before forcing decision
+            continuous: If True, loop forever picking new topics. If False, run once and exit.
+        """
         # Structured topics with descriptions and criteria
         topic_configs = [
             {
@@ -1163,7 +1211,11 @@ class SwarmSimulator:
                 topic=config["topic"],
                 description=config["description"],
                 criterion=config["criterion"],
+                max_rounds=max_rounds,
+                max_voting_rounds=max_voting_rounds,
             )
+            if not continuous:
+                break
             await asyncio.sleep(3)
 
 
@@ -1181,14 +1233,24 @@ async def main():
     import sys
     num_agents = 8
     use_llm = False
+    max_rounds = 5
+    max_voting_rounds = 3
+    continuous = False
 
     for arg in sys.argv[1:]:
         if arg.startswith("--agents="):
             num_agents = int(arg.split("=")[1])
+        elif arg.startswith("--max-rounds="):
+            max_rounds = int(arg.split("=")[1])
+        elif arg.startswith("--max-voting-rounds="):
+            max_voting_rounds = int(arg.split("=")[1])
         elif arg == "--llm":
             use_llm = True
+        elif arg == "--continuous":
+            continuous = True
 
     console.print(f"[cyan]Initializing swarm with {num_agents} agents...[/]")
+    console.print(f"[dim]Max rounds: {max_rounds}, Max voting rounds: {max_voting_rounds}, Continuous: {continuous}[/]")
 
     # Create dashboard and simulator
     dashboard = SwarmDashboard(num_agents=num_agents)
@@ -1202,7 +1264,11 @@ async def main():
     await asyncio.sleep(2)
 
     # Run simulation in background
-    sim_task = asyncio.create_task(simulator.run_continuous())
+    sim_task = asyncio.create_task(simulator.run_continuous(
+        max_rounds=max_rounds,
+        max_voting_rounds=max_voting_rounds,
+        continuous=continuous,
+    ))
 
     # Run dashboard
     try:
@@ -1212,11 +1278,15 @@ async def main():
             refresh_per_second=8,
             screen=True,
         ) as live:
-            while True:
+            while not sim_task.done():
                 live.update(dashboard.make_layout())
                 await asyncio.sleep(0.125)
+            # Show final state briefly
+            live.update(dashboard.make_layout())
+            await asyncio.sleep(2)
     except KeyboardInterrupt:
         sim_task.cancel()
+    finally:
         console.print("\n[yellow]Dashboard stopped.[/]")
 
 
