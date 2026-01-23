@@ -359,6 +359,40 @@ class BeliefState:
 
 
 @dataclass
+class Deliberation:
+    """Represents a single deliberation session."""
+    id: str
+    topic: str
+    status: str = "pending"  # pending, active, paused, completed, stopped
+    phase: str = ""
+    current_round: int = 0
+    max_rounds: int = 7
+    consensus: Dict[str, int] = field(default_factory=dict)
+    messages: deque = field(default_factory=lambda: deque(maxlen=500))
+    created_at: float = field(default_factory=time.time)
+    started_at: Optional[float] = None
+    completed_at: Optional[float] = None
+    scenario_name: Optional[str] = None
+    config: Optional[Dict] = None
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "topic": self.topic,
+            "status": self.status,
+            "phase": self.phase,
+            "current_round": self.current_round,
+            "max_rounds": self.max_rounds,
+            "consensus": dict(self.consensus),
+            "total_messages": len(self.messages),
+            "created_at": self.created_at,
+            "started_at": self.started_at,
+            "completed_at": self.completed_at,
+            "scenario_name": self.scenario_name,
+        }
+
+
+@dataclass
 class TacticResult:
     """Result of applying a persuasion tactic."""
     tactic_id: str
@@ -636,6 +670,10 @@ class SwarmOrchestrator:
         self.total_messages = 0
         self.total_tool_calls = 0
 
+        # Multi-deliberation support
+        self.deliberations: Dict[str, Deliberation] = {}
+        self.active_deliberation_id: Optional[str] = None
+
         # Redis client for cross-worker status sync
         redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
         try:
@@ -773,6 +811,17 @@ class SwarmOrchestrator:
         pm = get_personality_manager()
         agents_cfg = CONFIG.get("agents", {})
         models_cfg = CONFIG.get("models", {})
+
+        # Skip agent creation if explicitly disabled
+        if agents_cfg.get("skip_auto_load", False):
+            logger.info("Skipping agent auto-load (skip_auto_load=True)")
+            return
+
+        # Skip if no SCENARIO env var is set (start clean for multi-deliberation mode)
+        if not os.getenv("SCENARIO"):
+            logger.info("No SCENARIO env var set, starting with empty agent roster")
+            logger.info("Set SCENARIO=<name> to auto-load agents, or use /api/session/activate to load personas")
+            return
 
         # Get models from config or use defaults
         # Priority: models.agent_weights > models.default > agents.models > fallback
@@ -1451,6 +1500,10 @@ IMPORTANT - You are the PERSUADER in this debate:
         )
         self.messages.append(msg)
         self.total_messages += 1
+
+        # Also add to active deliberation's messages
+        if self.active_deliberation_id and self.active_deliberation_id in self.deliberations:
+            self.deliberations[self.active_deliberation_id].messages.append(msg)
 
         if sender_id in self.agents:
             self.agents[sender_id].messages_sent += 1
@@ -2460,8 +2513,65 @@ Your confidence should change based on argument quality:
         """Broadcast a private message (visible in persuader panel)."""
         await self.broadcast("private_message", {"message": msg.to_dict()})
 
-    async def run_deliberation(self, topic: str):
-        """Run a full deliberation cycle."""
+    async def run_deliberation(self, topic: str, deliberation_id: Optional[str] = None) -> str:
+        """Run a full deliberation cycle.
+
+        Args:
+            topic: The topic to deliberate
+            deliberation_id: Optional existing deliberation ID to resume
+
+        Returns:
+            The deliberation ID
+        """
+        import uuid as uuid_mod
+        from datetime import datetime, timezone
+
+        # Create or retrieve deliberation
+        if deliberation_id and deliberation_id in self.deliberations:
+            delib = self.deliberations[deliberation_id]
+            # Update existing deliberation
+            delib.topic = topic
+            delib.status = "active"
+        else:
+            # Use passed ID or generate new one
+            if not deliberation_id:
+                deliberation_id = str(uuid_mod.uuid4())
+
+            delib = Deliberation(
+                id=deliberation_id,
+                topic=topic,
+                status="active",
+                max_rounds=self.max_rounds,
+            )
+            self.deliberations[deliberation_id] = delib
+
+        # Persist to database (only for new deliberations)
+        try:
+            from src.api.datasets import DatasetStore
+            store = DatasetStore()
+            # Check if already exists
+            existing = store.get_deliberation(deliberation_id)
+            if not existing:
+                store.create_deliberation(
+                    topic=topic,
+                    max_rounds=self.max_rounds,
+                )
+        except Exception as e:
+            logger.warning(f"Failed to persist deliberation to database: {e}")
+
+        # Set as active deliberation
+        self.active_deliberation_id = deliberation_id
+        delib.status = "active"
+        delib.started_at = time.time()
+
+        # Set current deliberation ID for LLM logging
+        try:
+            from src.llm.openrouter import set_current_deliberation_id
+            set_current_deliberation_id(deliberation_id)
+        except ImportError:
+            pass
+
+        # Update legacy state for backward compatibility
         self.current_topic = topic
         self.deliberation_active = True
         self.consensus = {}
@@ -2472,6 +2582,7 @@ Your confidence should change based on argument quality:
 
         # Phase 1: Analysis
         self.phase = "🔍 analyzing"
+        delib.phase = self.phase
         await self.broadcast_deliberation()
 
         for agent in agents:
@@ -2500,6 +2611,7 @@ Your confidence should change based on argument quality:
 
         # Phase 2: Initial positions with structured claims (parallel)
         self.phase = "📢 opening statements"
+        delib.phase = self.phase
         await self.broadcast_deliberation()
 
         # Set all agents to speaking status
@@ -2550,6 +2662,7 @@ State your stance clearly and give one key reason."""
 
         # Phase 3: Debate
         self.phase = "🔄 debating"
+        delib.phase = self.phase
         await self.broadcast_deliberation()
 
         # Helper to build full discussion context
@@ -2619,6 +2732,8 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
             is_final_round = (voting_round >= max_voting_rounds)
 
             self.phase = f"🗳️ voting (round {voting_round}/{max_voting_rounds})"
+            delib.phase = self.phase
+            delib.current_round = voting_round
             await self.broadcast_deliberation()
             self.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
 
@@ -2696,6 +2811,7 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
             if any_continue and not is_final_round:
                 # Someone wants to continue - do another debate round
                 self.phase = "🔄 extended debate"
+                delib.phase = self.phase
                 await self.broadcast_deliberation()
                 logger.info(f"Continuing discussion (round {voting_round}) - agents requested more debate")
 
@@ -2754,6 +2870,7 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
 
         # Phase 5: Synthesis
         self.phase = "🔮 synthesizing"
+        delib.phase = self.phase
         await self.broadcast_deliberation()
 
         synthesizers = [a for a in agents if a.personality_type == "the_synthesizer"]
@@ -2773,6 +2890,7 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
 
         # Complete
         self.phase = "✅ complete"
+        delib.phase = self.phase
         await self.broadcast_deliberation()
 
         for agent in agents:
@@ -2783,7 +2901,31 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
         await asyncio.sleep(2)
 
         self.deliberation_active = False
+
+        # Update deliberation state
+        delib.status = "completed"
+        delib.phase = "complete"
+        delib.consensus = dict(self.consensus)
+        delib.completed_at = time.time()
+
+        # Persist final state to database
+        try:
+            from src.api.datasets import DatasetStore
+            from datetime import datetime, timezone
+            store = DatasetStore()
+            store.update_deliberation(
+                deliberation_id=deliberation_id,
+                status="completed",
+                phase="complete",
+                current_round=self.current_round,
+                consensus=dict(self.consensus),
+                completed_at=datetime.now(timezone.utc).isoformat(),
+            )
+        except Exception as e:
+            logger.warning(f"Failed to update deliberation in database: {e}")
+
         await self.broadcast_deliberation()
+        return deliberation_id
 
     async def decay_energy(self):
         """Background task to decay agent energy."""
@@ -2918,11 +3060,9 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         }
 
     @app.post("/api/deliberate")
-    async def start_deliberation(topic: str = Query(None)):
+    async def start_deliberation(topic: str = Query(None), deliberation_id: str = Query(None)):
         """Start a deliberation on a topic. If no topic provided, uses scenario topic or prompts user."""
         orch = app.state.orchestrator
-        if orch.deliberation_active:
-            raise HTTPException(400, "Deliberation already in progress")
 
         # Use scenario topic as default if available and no topic provided
         if not topic:
@@ -2931,8 +3071,250 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             else:
                 raise HTTPException(400, "No topic provided and no scenario topic configured")
 
-        asyncio.create_task(orch.run_deliberation(topic))
-        return {"status": "started", "topic": topic}
+        # Create deliberation ID if not provided
+        if not deliberation_id:
+            import uuid as uuid_mod
+            deliberation_id = str(uuid_mod.uuid4())
+
+        # Pre-create the Deliberation object so it's immediately available for status queries
+        if deliberation_id not in orch.deliberations:
+            delib = Deliberation(
+                id=deliberation_id,
+                topic=topic,
+                status="pending",
+                phase="starting",
+                max_rounds=orch.max_rounds,
+            )
+            orch.deliberations[deliberation_id] = delib
+
+        # Start the deliberation (runs concurrently)
+        asyncio.create_task(orch.run_deliberation(topic, deliberation_id))
+        return {"status": "started", "topic": topic, "deliberation_id": deliberation_id}
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Deliberation Management Endpoints
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @app.get("/api/deliberations")
+    async def list_deliberations(
+        status: Optional[str] = Query(None, description="Filter by status"),
+        limit: int = Query(100, ge=1, le=1000),
+        offset: int = Query(0, ge=0),
+    ):
+        """List all deliberations."""
+        orch = app.state.orchestrator
+
+        # Return in-memory deliberations
+        deliberations = list(orch.deliberations.values())
+
+        # Filter by status if provided
+        if status:
+            deliberations = [d for d in deliberations if d.status == status]
+
+        # Apply pagination
+        deliberations = deliberations[offset:offset + limit]
+
+        return {
+            "deliberations": [d.to_dict() for d in deliberations],
+            "total": len(orch.deliberations),
+        }
+
+    @app.post("/api/deliberations")
+    async def create_deliberation(
+        topic: str = Query(..., description="Deliberation topic"),
+        scenario_name: Optional[str] = Query(None, description="Optional scenario name"),
+        max_rounds: int = Query(7, ge=1, le=100, description="Maximum rounds"),
+        auto_start: bool = Query(False, description="Start immediately after creation"),
+    ):
+        """Create a new deliberation."""
+        import uuid as uuid_mod
+        orch = app.state.orchestrator
+
+        deliberation_id = str(uuid_mod.uuid4())
+        delib = Deliberation(
+            id=deliberation_id,
+            topic=topic,
+            status="pending",
+            max_rounds=max_rounds,
+            scenario_name=scenario_name,
+        )
+        orch.deliberations[deliberation_id] = delib
+
+        # Persist to database
+        try:
+            from src.api.datasets import DatasetStore
+            store = DatasetStore()
+            store.create_deliberation(
+                topic=topic,
+                scenario_name=scenario_name,
+                max_rounds=max_rounds,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to persist deliberation to database: {e}")
+
+        # Auto-start if requested
+        if auto_start:
+            asyncio.create_task(orch.run_deliberation(topic, deliberation_id))
+            delib.status = "active"
+
+        return delib.to_dict()
+
+    @app.get("/api/deliberations/{deliberation_id}")
+    async def get_deliberation(deliberation_id: str):
+        """Get a specific deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        return orch.deliberations[deliberation_id].to_dict()
+
+    @app.post("/api/deliberations/{deliberation_id}/start")
+    async def start_deliberation_by_id(deliberation_id: str):
+        """Start a pending deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        delib = orch.deliberations[deliberation_id]
+        if delib.status not in ("pending", "paused"):
+            raise HTTPException(400, f"Cannot start deliberation in '{delib.status}' status")
+
+        asyncio.create_task(orch.run_deliberation(delib.topic, deliberation_id))
+        return {"status": "started", "deliberation_id": deliberation_id}
+
+    @app.post("/api/deliberations/{deliberation_id}/pause")
+    async def pause_deliberation_by_id(deliberation_id: str):
+        """Pause a running deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        delib = orch.deliberations[deliberation_id]
+        if delib.status != "active":
+            raise HTTPException(400, f"Cannot pause deliberation in '{delib.status}' status")
+
+        delib.status = "paused"
+        orch.paused = True
+
+        # Update database
+        try:
+            from src.api.datasets import DatasetStore
+            store = DatasetStore()
+            store.update_deliberation(deliberation_id, status="paused")
+        except Exception as e:
+            logger.warning(f"Failed to update deliberation status: {e}")
+
+        await orch.broadcast("deliberation_paused", {"deliberation_id": deliberation_id})
+        return {"status": "paused", "deliberation_id": deliberation_id}
+
+    @app.post("/api/deliberations/{deliberation_id}/stop")
+    async def stop_deliberation_by_id(deliberation_id: str):
+        """Stop a deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        delib = orch.deliberations[deliberation_id]
+        delib.status = "stopped"
+        delib.completed_at = time.time()
+
+        # Clear active state if this was the active deliberation
+        if orch.active_deliberation_id == deliberation_id:
+            orch.deliberation_active = False
+            orch.active_deliberation_id = None
+            orch.paused = False
+
+        # Update database
+        try:
+            from src.api.datasets import DatasetStore
+            from datetime import datetime, timezone
+            store = DatasetStore()
+            store.update_deliberation(
+                deliberation_id,
+                status="stopped",
+                completed_at=datetime.now(timezone.utc).isoformat(),
+            )
+        except Exception as e:
+            logger.warning(f"Failed to update deliberation status: {e}")
+
+        await orch.broadcast("deliberation_stopped", {"deliberation_id": deliberation_id})
+        return {"status": "stopped", "deliberation_id": deliberation_id}
+
+    @app.delete("/api/deliberations/{deliberation_id}")
+    async def delete_deliberation(deliberation_id: str):
+        """Delete a deliberation and its logs."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        # Don't allow deleting active deliberation
+        delib = orch.deliberations[deliberation_id]
+        if delib.status == "active":
+            raise HTTPException(400, "Cannot delete an active deliberation. Stop it first.")
+
+        # Remove from memory
+        del orch.deliberations[deliberation_id]
+
+        # Delete from database (including logs)
+        try:
+            from src.api.datasets import DatasetStore
+            store = DatasetStore()
+            store.delete_deliberation(deliberation_id)
+        except Exception as e:
+            logger.warning(f"Failed to delete deliberation from database: {e}")
+
+        await orch.broadcast("deliberation_deleted", {"deliberation_id": deliberation_id})
+        return {"status": "deleted", "deliberation_id": deliberation_id}
+
+    @app.get("/api/deliberations/{deliberation_id}/logs")
+    async def get_deliberation_logs(
+        deliberation_id: str,
+        limit: int = Query(100, ge=1, le=1000),
+        offset: int = Query(0, ge=0),
+    ):
+        """Get logs for a specific deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        try:
+            from src.api.datasets import DatasetStore
+            store = DatasetStore()
+            logs = store.get_llm_logs(
+                limit=limit,
+                offset=offset,
+                deliberation_id=deliberation_id,
+            )
+            return {"logs": logs, "deliberation_id": deliberation_id}
+        except Exception as e:
+            raise HTTPException(500, f"Failed to fetch logs: {e}")
+
+    @app.get("/api/deliberations/{deliberation_id}/status")
+    async def get_deliberation_status(deliberation_id: str):
+        """Get status for a specific deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        delib = orch.deliberations[deliberation_id]
+        return {
+            "deliberation_id": deliberation_id,
+            "status": delib.status,
+            "phase": delib.phase,
+            "topic": delib.topic,
+            "current_round": delib.current_round,
+            "max_rounds": delib.max_rounds,
+            "consensus": dict(delib.consensus),
+            "total_messages": len(delib.messages),
+            "active": delib.status == "active",
+        }
 
     @app.get("/api/consensus")
     async def get_consensus():
@@ -3335,42 +3717,38 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         return {"status": "stopped"}
 
     @app.get("/api/deliberation/status")
-    async def get_deliberation_status():
-        """Get current deliberation status for polling."""
+    async def get_deliberation_status_legacy():
+        """Get status of all deliberations."""
         orch = app.state.orchestrator
 
-        # If this worker has an active deliberation, return local state
-        if orch.deliberation_active or orch.phase:
-            return {
-                "active": orch.deliberation_active,
-                "phase": orch.phase,
-                "topic": orch.current_topic,
-                "paused": getattr(orch, 'paused', False),
-                "consensus": orch.consensus,
-                "agent_count": len(orch.agents),
-                "total_messages": orch.total_messages,
-                "completed": not orch.deliberation_active and orch.phase in ("complete", "✅ complete", "stopped", "idle", ""),
-            }
+        # Build list of all deliberation statuses
+        deliberation_statuses = []
+        for delib_id, delib in orch.deliberations.items():
+            deliberation_statuses.append({
+                "deliberation_id": delib_id,
+                "active": delib.status == "active",
+                "status": delib.status,
+                "phase": delib.phase,
+                "topic": delib.topic,
+                "paused": delib.status == "paused",
+                "consensus": dict(delib.consensus),
+                "current_round": delib.current_round,
+                "max_rounds": delib.max_rounds,
+                "total_messages": len(delib.messages),
+                "completed": delib.status in ("completed", "stopped"),
+            })
 
-        # Otherwise, check Redis for status from another worker
-        redis_status = orch.get_status_from_redis()
-        if redis_status:
-            redis_status["completed"] = (
-                not redis_status.get("active") and
-                redis_status.get("phase", "") in ("complete", "stopped", "idle", "", "✅ complete")
-            )
-            return redis_status
-
-        # No deliberation running anywhere
+        # Return list format
         return {
-            "active": False,
-            "phase": "",
-            "topic": "",
-            "paused": False,
-            "consensus": {},
+            "deliberations": deliberation_statuses,
+            "active_deliberation_id": orch.active_deliberation_id,
             "agent_count": len(orch.agents),
-            "total_messages": 0,
-            "completed": True,  # Nothing running = completed/idle
+            "total_deliberations": len(deliberation_statuses),
+            # Legacy fields for backward compatibility (from active deliberation)
+            "active": orch.deliberation_active,
+            "phase": orch.phase,
+            "topic": orch.current_topic,
+            "total_messages": sum(len(d.messages) for d in orch.deliberations.values()),
         }
 
     @app.post("/api/inject")
@@ -3510,6 +3888,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         model: Optional[str] = Query(None, description="Filter by model name (partial match)"),
         start_time: Optional[str] = Query(None, description="Filter by start time (ISO format)"),
         end_time: Optional[str] = Query(None, description="Filter by end time (ISO format)"),
+        deliberation_id: Optional[str] = Query(None, description="Filter by deliberation ID"),
         format: str = Query("json", description="Output format: json or csv"),
     ):
         """Get LLM response logs with optional filters.
@@ -3521,6 +3900,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         - model: Filter by model name (partial match, e.g., 'claude' or 'gpt')
         - start_time: Filter logs after this time (ISO format)
         - end_time: Filter logs before this time (ISO format)
+        - deliberation_id: Filter by deliberation ID
         - format: 'json' (default) or 'csv'
         """
         try:
@@ -3534,6 +3914,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                 model=model,
                 start_time=start_time,
                 end_time=end_time,
+                deliberation_id=deliberation_id,
             )
             total = store.get_llm_log_count(agent_id=agent_id, model=model)
 

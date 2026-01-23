@@ -127,12 +127,32 @@ class DatasetStore:
                     tokens_in INTEGER,
                     tokens_out INTEGER,
                     timestamp TEXT NOT NULL,
-                    duration_ms INTEGER
+                    duration_ms INTEGER,
+                    deliberation_id TEXT
                 );
 
                 CREATE INDEX IF NOT EXISTS idx_llm_agent ON llm_response_log(agent_id);
                 CREATE INDEX IF NOT EXISTS idx_llm_model ON llm_response_log(model_actual);
                 CREATE INDEX IF NOT EXISTS idx_llm_timestamp ON llm_response_log(timestamp);
+                CREATE INDEX IF NOT EXISTS idx_llm_deliberation ON llm_response_log(deliberation_id);
+
+                CREATE TABLE IF NOT EXISTS deliberations (
+                    id TEXT PRIMARY KEY,
+                    topic TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'pending',
+                    phase TEXT,
+                    current_round INTEGER DEFAULT 0,
+                    max_rounds INTEGER DEFAULT 7,
+                    scenario_name TEXT,
+                    config_json TEXT,
+                    consensus_json TEXT,
+                    created_at TEXT NOT NULL,
+                    started_at TEXT,
+                    completed_at TEXT
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_deliberation_status ON deliberations(status);
+                CREATE INDEX IF NOT EXISTS idx_deliberation_created ON deliberations(created_at);
             """)
         logger.info(f"Database initialized at {self.db_path}")
 
@@ -388,6 +408,7 @@ class DatasetStore:
         duration_ms: Optional[int] = None,
         full_logs: bool = False,
         agent_name: Optional[str] = None,
+        deliberation_id: Optional[str] = None,
     ):
         """Log an LLM response.
 
@@ -402,6 +423,7 @@ class DatasetStore:
             duration_ms: Request duration in milliseconds
             full_logs: If True, store complete content; if False, truncate to 200 chars
             agent_name: Human-readable name of the agent (e.g., "Elon Musk")
+            deliberation_id: ID of the deliberation this log belongs to
         """
         log_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc).isoformat()
@@ -416,11 +438,11 @@ class DatasetStore:
                 """
                 INSERT INTO llm_response_log
                 (id, agent_id, agent_name, model_requested, model_actual, prompt, response,
-                 tokens_in, tokens_out, timestamp, duration_ms)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 tokens_in, tokens_out, timestamp, duration_ms, deliberation_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (log_id, agent_id, agent_name, model_requested, model_actual, prompt, response,
-                 tokens_in, tokens_out, now, duration_ms),
+                 tokens_in, tokens_out, now, duration_ms, deliberation_id),
             )
 
     def get_llm_logs(
@@ -431,6 +453,7 @@ class DatasetStore:
         model: Optional[str] = None,
         start_time: Optional[str] = None,
         end_time: Optional[str] = None,
+        deliberation_id: Optional[str] = None,
     ) -> list[dict]:
         """Get LLM response logs with optional filters.
 
@@ -441,6 +464,7 @@ class DatasetStore:
             model: Filter by model name (matches model_actual)
             start_time: Filter by timestamp >= start_time (ISO format)
             end_time: Filter by timestamp <= end_time (ISO format)
+            deliberation_id: Filter by deliberation ID
         """
         query = "SELECT * FROM llm_response_log WHERE 1=1"
         params: list[Any] = []
@@ -457,6 +481,9 @@ class DatasetStore:
         if end_time:
             query += " AND timestamp <= ?"
             params.append(end_time)
+        if deliberation_id:
+            query += " AND deliberation_id = ?"
+            params.append(deliberation_id)
 
         query += " ORDER BY timestamp DESC LIMIT ? OFFSET ?"
         params.extend([limit, offset])
@@ -477,6 +504,7 @@ class DatasetStore:
                 "tokens_out": row["tokens_out"],
                 "timestamp": row["timestamp"],
                 "duration_ms": row["duration_ms"],
+                "deliberation_id": row["deliberation_id"],
             }
             for row in rows
         ]
@@ -516,3 +544,198 @@ class DatasetStore:
             "logged_messages": messages,
             "llm_response_logs": llm_logs,
         }
+
+    # Deliberation operations
+    def create_deliberation(
+        self,
+        topic: str,
+        scenario_name: Optional[str] = None,
+        config: Optional[dict] = None,
+        max_rounds: int = 7,
+    ) -> dict:
+        """Create a new deliberation.
+
+        Args:
+            topic: The topic to deliberate
+            scenario_name: Optional scenario name
+            config: Optional configuration dict
+            max_rounds: Maximum number of rounds (default 7)
+
+        Returns:
+            The created deliberation as a dict
+        """
+        deliberation_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+
+        with self._transaction() as conn:
+            conn.execute(
+                """
+                INSERT INTO deliberations (id, topic, status, phase, current_round, max_rounds,
+                                          scenario_name, config_json, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    deliberation_id,
+                    topic,
+                    "pending",
+                    "",
+                    0,
+                    max_rounds,
+                    scenario_name,
+                    json.dumps(config) if config else None,
+                    now,
+                ),
+            )
+
+        logger.info(f"Created deliberation: {deliberation_id} - {topic[:50]}...")
+        return self.get_deliberation(deliberation_id)
+
+    def get_deliberation(self, deliberation_id: str) -> Optional[dict]:
+        """Get a deliberation by ID."""
+        with self._transaction() as conn:
+            row = conn.execute(
+                "SELECT * FROM deliberations WHERE id = ?", (deliberation_id,)
+            ).fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "id": row["id"],
+            "topic": row["topic"],
+            "status": row["status"],
+            "phase": row["phase"],
+            "current_round": row["current_round"],
+            "max_rounds": row["max_rounds"],
+            "scenario_name": row["scenario_name"],
+            "config": json.loads(row["config_json"]) if row["config_json"] else None,
+            "consensus": json.loads(row["consensus_json"]) if row["consensus_json"] else None,
+            "created_at": row["created_at"],
+            "started_at": row["started_at"],
+            "completed_at": row["completed_at"],
+        }
+
+    def list_deliberations(
+        self,
+        status: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[dict]:
+        """List deliberations with optional status filter.
+
+        Args:
+            status: Filter by status (pending, active, paused, completed, stopped)
+            limit: Maximum number of records to return
+            offset: Number of records to skip
+
+        Returns:
+            List of deliberation dicts
+        """
+        query = "SELECT * FROM deliberations WHERE 1=1"
+        params: list[Any] = []
+
+        if status:
+            query += " AND status = ?"
+            params.append(status)
+
+        query += " ORDER BY created_at DESC LIMIT ? OFFSET ?"
+        params.extend([limit, offset])
+
+        with self._transaction() as conn:
+            rows = conn.execute(query, params).fetchall()
+
+        return [
+            {
+                "id": row["id"],
+                "topic": row["topic"],
+                "status": row["status"],
+                "phase": row["phase"],
+                "current_round": row["current_round"],
+                "max_rounds": row["max_rounds"],
+                "scenario_name": row["scenario_name"],
+                "config": json.loads(row["config_json"]) if row["config_json"] else None,
+                "consensus": json.loads(row["consensus_json"]) if row["consensus_json"] else None,
+                "created_at": row["created_at"],
+                "started_at": row["started_at"],
+                "completed_at": row["completed_at"],
+            }
+            for row in rows
+        ]
+
+    def update_deliberation(
+        self,
+        deliberation_id: str,
+        status: Optional[str] = None,
+        phase: Optional[str] = None,
+        current_round: Optional[int] = None,
+        consensus: Optional[dict] = None,
+        started_at: Optional[str] = None,
+        completed_at: Optional[str] = None,
+    ) -> bool:
+        """Update a deliberation's state.
+
+        Args:
+            deliberation_id: The deliberation ID
+            status: New status (pending, active, paused, completed, stopped)
+            phase: Current phase
+            current_round: Current round number
+            consensus: Consensus dict
+            started_at: When deliberation started (ISO format)
+            completed_at: When deliberation completed (ISO format)
+
+        Returns:
+            True if updated, False if not found
+        """
+        updates = []
+        params: list[Any] = []
+
+        if status is not None:
+            updates.append("status = ?")
+            params.append(status)
+        if phase is not None:
+            updates.append("phase = ?")
+            params.append(phase)
+        if current_round is not None:
+            updates.append("current_round = ?")
+            params.append(current_round)
+        if consensus is not None:
+            updates.append("consensus_json = ?")
+            params.append(json.dumps(consensus))
+        if started_at is not None:
+            updates.append("started_at = ?")
+            params.append(started_at)
+        if completed_at is not None:
+            updates.append("completed_at = ?")
+            params.append(completed_at)
+
+        if not updates:
+            return False
+
+        params.append(deliberation_id)
+        query = f"UPDATE deliberations SET {', '.join(updates)} WHERE id = ?"
+
+        with self._transaction() as conn:
+            result = conn.execute(query, params)
+            return result.rowcount > 0
+
+    def delete_deliberation(self, deliberation_id: str) -> bool:
+        """Delete a deliberation and its associated logs.
+
+        Args:
+            deliberation_id: The deliberation ID
+
+        Returns:
+            True if deleted, False if not found
+        """
+        with self._transaction() as conn:
+            # Delete associated LLM logs
+            conn.execute(
+                "DELETE FROM llm_response_log WHERE deliberation_id = ?",
+                (deliberation_id,)
+            )
+            # Delete the deliberation
+            result = conn.execute(
+                "DELETE FROM deliberations WHERE id = ?",
+                (deliberation_id,)
+            )
+            return result.rowcount > 0

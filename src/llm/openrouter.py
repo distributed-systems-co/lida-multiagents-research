@@ -16,6 +16,18 @@ logger = logging.getLogger(__name__)
 
 # LLM response logging
 _llm_logger = None
+_current_deliberation_id = None
+
+
+def set_current_deliberation_id(deliberation_id: str):
+    """Set the current deliberation ID for LLM logging."""
+    global _current_deliberation_id
+    _current_deliberation_id = deliberation_id
+
+
+def get_current_deliberation_id() -> str:
+    """Get the current deliberation ID for LLM logging."""
+    return _current_deliberation_id
 
 
 def _is_full_logs() -> bool:
@@ -279,6 +291,7 @@ class OpenRouterClient:
                     duration_ms=duration_ms,
                     full_logs=_is_full_logs(),
                     agent_name=agent_name,
+                    deliberation_id=_current_deliberation_id,
                 )
             except Exception as e:
                 logger.warning(f"Failed to log LLM response: {e}")
@@ -377,6 +390,7 @@ class OpenRouterClient:
                     duration_ms=duration_ms,
                     full_logs=_is_full_logs(),
                     agent_name=agent_name,
+                    deliberation_id=_current_deliberation_id,
                 )
             except Exception as e:
                 logger.warning(f"Failed to log streamed LLM response: {e}")

@@ -253,7 +253,7 @@ class OpenRouterLM(BaseLM):
 
             # Log the LLM response
             try:
-                from src.llm.openrouter import _get_llm_logger, _is_full_logs
+                from src.llm.openrouter import _get_llm_logger, _is_full_logs, get_current_deliberation_id
                 llm_logger = _get_llm_logger()
                 if llm_logger:
                     # Extract prompt from messages
@@ -273,6 +273,7 @@ class OpenRouterLM(BaseLM):
                         duration_ms=int(result.latency_ms),
                         full_logs=_is_full_logs(),
                         agent_name=kwargs.get("agent_name"),
+                        deliberation_id=get_current_deliberation_id(),
                     )
             except Exception as e:
                 logger.warning(f"Failed to log LLM response: {e}")

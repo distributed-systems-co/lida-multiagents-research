@@ -12,7 +12,7 @@ Arguments:
     --port PORT           API port of the running LIDA instance (required)
     --scenario SCENARIO   Scenario name (default: quick_personas3)
     --topic TOPIC         Deliberation topic (default: from scenario config)
-    --timeout SECONDS     Max seconds to wait (default: 600)
+    --timeout SECONDS     Max seconds to wait, 0 for infinite (default: infinite)
     --output FILE         Output file for logs (default: deliberation_TIMESTAMP.log)
     --poll-interval SECS  Seconds between status checks (default: 5)
 
@@ -58,8 +58,8 @@ def parse_args():
         help="Deliberation topic (default: from scenario config)"
     )
     parser.add_argument(
-        "--timeout", type=int, default=600,
-        help="Max seconds to wait (default: 600)"
+        "--timeout", type=int, default=0,
+        help="Max seconds to wait, 0 for infinite (default: infinite)"
     )
     parser.add_argument(
         "--output", default=None,
@@ -68,6 +68,10 @@ def parse_args():
     parser.add_argument(
         "--poll-interval", type=int, default=5,
         help="Seconds between status checks (default: 5)"
+    )
+    parser.add_argument(
+        "--deliberation-id", default=None,
+        help="Existing deliberation ID to resume or track"
     )
     return parser.parse_args()
 
@@ -87,6 +91,42 @@ def get_topic_from_scenario(scenario: str) -> str:
         return None
 
 
+def get_personas_from_scenario(scenario: str) -> list:
+    """Read the personas list from scenario YAML file."""
+    import yaml
+    scenario_file = Path(f"scenarios/{scenario}.yaml")
+    if not scenario_file.exists():
+        return None
+    try:
+        with open(scenario_file) as f:
+            config = yaml.safe_load(f)
+        return config.get("agents", {}).get("personas", [])
+    except Exception as e:
+        print(f"Warning: Could not read personas from scenario file: {e}")
+        return None
+
+
+def activate_personas(api_port: int, personas: list) -> bool:
+    """Activate personas on the server via API call."""
+    if not personas:
+        return True  # Nothing to activate
+
+    url = f"http://localhost:{api_port}/api/session/activate"
+    print(f">>> Activating {len(personas)} personas on server...", flush=True)
+    try:
+        resp = requests.post(url, json={"personas": personas}, timeout=30)
+        if resp.status_code == 200:
+            result = resp.json()
+            print(f">>> Activated {result.get('count', 0)} agents", flush=True)
+            return True
+        else:
+            print(f">>> Failed to activate personas: {resp.status_code} {resp.text}", flush=True)
+            return False
+    except requests.exceptions.RequestException as e:
+        print(f">>> Error activating personas: {e}", flush=True)
+        return False
+
+
 def check_health(api_port: int) -> bool:
     """Check if the API is healthy."""
     # Try /health first, then fall back to /api/stats or root
@@ -101,29 +141,63 @@ def check_health(api_port: int) -> bool:
     return False
 
 
-def start_deliberation(api_port: int, topic: str) -> bool:
-    """Start a deliberation via API call."""
+def start_deliberation(api_port: int, topic: str, deliberation_id: str = None) -> tuple:
+    """Start a deliberation via API call.
+
+    Args:
+        api_port: The API port
+        topic: The deliberation topic
+        deliberation_id: Optional existing deliberation ID
+
+    Returns:
+        Tuple of (success: bool, deliberation_id: str or None)
+    """
     url = f"http://localhost:{api_port}/api/deliberate"
+    params = {"topic": topic}
+    if deliberation_id:
+        params["deliberation_id"] = deliberation_id
+
     print(f">>> Calling POST {url}?topic={topic[:50]}...", flush=True)
     try:
-        resp = requests.post(url, params={"topic": topic}, timeout=10)
+        resp = requests.post(url, params=params, timeout=10)
         print(f">>> Response: {resp.status_code}", flush=True)
         if resp.status_code == 200:
             result = resp.json()
+            delib_id = result.get("deliberation_id")
             print(f">>> Started deliberation: {result}", flush=True)
-            return True
+            return True, delib_id
         else:
             print(f">>> Failed to start deliberation: {resp.status_code} {resp.text}", flush=True)
-            return False
+            return False, None
     except requests.exceptions.RequestException as e:
         print(f">>> Error starting deliberation: {e}", flush=True)
-        return False
+        return False, None
 
 
-def check_status(api_port: int) -> dict:
-    """Check deliberation status via API."""
+def check_status(api_port: int, deliberation_id: str = None) -> dict:
+    """Check deliberation status via API.
+
+    Args:
+        api_port: The API port
+        deliberation_id: Optional deliberation ID for specific status
+
+    Returns:
+        Status dict or None
+    """
     try:
-        resp = requests.get(f"http://localhost:{api_port}/api/deliberation/status", timeout=5)
+        if deliberation_id:
+            # Try deliberation-specific endpoint first
+            url = f"http://localhost:{api_port}/api/deliberations/{deliberation_id}/status"
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 200:
+                return resp.json()
+            elif resp.status_code == 404:
+                # Deliberation not found in orchestrator memory, fall back to legacy
+                pass
+
+        # Use legacy endpoint (works for any active deliberation)
+        url = f"http://localhost:{api_port}/api/deliberation/status"
+        resp = requests.get(url, timeout=5)
         if resp.status_code == 200:
             return resp.json()
     except requests.exceptions.RequestException:
@@ -131,10 +205,26 @@ def check_status(api_port: int) -> dict:
     return None
 
 
-def fetch_llm_logs(api_port: int) -> dict:
-    """Fetch LLM logs from the API."""
+def fetch_llm_logs(api_port: int, deliberation_id: str = None) -> dict:
+    """Fetch LLM logs from the API.
+
+    Args:
+        api_port: The API port
+        deliberation_id: Optional deliberation ID to filter logs
+
+    Returns:
+        Logs dict or None
+    """
     try:
-        resp = requests.get(f"http://localhost:{api_port}/api/llm/logs", timeout=10)
+        params = {}
+        if deliberation_id:
+            params["deliberation_id"] = deliberation_id
+
+        resp = requests.get(
+            f"http://localhost:{api_port}/api/llm/logs",
+            params=params,
+            timeout=10
+        )
         if resp.status_code == 200:
             return resp.json()
     except requests.exceptions.RequestException as e:
@@ -160,18 +250,25 @@ def main():
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
 
-    # Output file
-    if args.output:
-        output_file = logs_dir / Path(args.output).name
-    else:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = logs_dir / f"deliberation_{args.scenario}_{timestamp}.log"
-
     # Get topic from args or scenario config
     topic = args.topic or get_topic_from_scenario(args.scenario)
     if not topic:
         print("ERROR: No topic specified. Use --topic or add auto_start_topic to scenario config.")
         sys.exit(1)
+
+    # Track deliberation ID
+    deliberation_id = args.deliberation_id
+
+    # Output file - include deliberation_id if known
+    if args.output:
+        output_file = logs_dir / Path(args.output).name
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        if deliberation_id:
+            short_id = deliberation_id[:8]
+            output_file = logs_dir / f"deliberation_{args.scenario}_{short_id}_{timestamp}.log"
+        else:
+            output_file = logs_dir / f"deliberation_{args.scenario}_{timestamp}.log"
 
     print("=" * 60)
     print("Deliberation Runner (Client Mode)")
@@ -179,8 +276,10 @@ def main():
     print(f"API Port: {args.port}")
     print(f"Scenario: {args.scenario}")
     print(f"Topic: {topic}")
-    print(f"Timeout: {args.timeout}s")
+    print(f"Timeout: {'infinite' if args.timeout == 0 else f'{args.timeout}s'}")
     print(f"Output: {output_file}")
+    if deliberation_id:
+        print(f"Deliberation ID: {deliberation_id}")
     print()
 
     # Check if API is running
@@ -192,15 +291,23 @@ def main():
         print("!" * 60)
         print()
         print("Make sure the LIDA services are running:")
-        print(f"  ./run.sh <redis-port> start")
+        print(f"  ./run.sh <redis-port> <api-port> start")
         print()
         print("Then set API_PORT if using non-default:")
-        print(f"  API_PORT={args.port} ./run.sh <redis-port> start")
+        print(f"  API_PORT={args.port} ./run.sh <redis-port> <api-port> start")
         print()
         sys.exit(1)
 
     print("API is healthy")
     print()
+
+    # Activate personas from scenario if specified
+    personas = get_personas_from_scenario(args.scenario)
+    if personas:
+        print(f"Found {len(personas)} personas in scenario: {args.scenario}")
+        if not activate_personas(args.port, personas):
+            print("WARNING: Failed to activate personas, continuing anyway...")
+        print()
 
     # Track state
     deliberation_started = False
@@ -219,9 +326,20 @@ def main():
 
     # Start the deliberation
     print(f">>> Starting deliberation: {topic}", flush=True)
-    if not start_deliberation(args.port, topic):
+    success, new_delib_id = start_deliberation(args.port, topic, deliberation_id)
+    if not success:
         print("ERROR: Failed to start deliberation")
         sys.exit(1)
+
+    # Update deliberation_id if we got one from the server
+    if new_delib_id:
+        deliberation_id = new_delib_id
+        print(f">>> Deliberation ID: {deliberation_id}", flush=True)
+        # Update output file name to include ID
+        if not args.output:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            short_id = deliberation_id[:8]
+            output_file = logs_dir / f"deliberation_{args.scenario}_{short_id}_{timestamp}.log"
 
     print()
     print("Monitoring deliberation progress...")
@@ -234,12 +352,12 @@ def main():
 
             # Check timeout
             elapsed = time.time() - start_time
-            if elapsed > args.timeout:
+            if args.timeout > 0 and elapsed > args.timeout:
                 print(f"\nTimeout after {args.timeout}s")
                 break
 
-            # Check status
-            status = check_status(args.port)
+            # Check status (use deliberation-specific endpoint if ID is known)
+            status = check_status(args.port, deliberation_id)
 
             if status:
                 status_entry = {
@@ -298,8 +416,8 @@ def main():
     print("-" * 60)
     print("Fetching logs...")
 
-    # Fetch LLM logs
-    llm_logs = fetch_llm_logs(args.port)
+    # Fetch LLM logs (filtered by deliberation_id if available)
+    llm_logs = fetch_llm_logs(args.port, deliberation_id)
     llm_logs_file = output_file.with_suffix(".llm_logs.json")
     if llm_logs:
         print(f"Saving {len(llm_logs.get('logs', []))} LLM log entries to {llm_logs_file}...")
@@ -315,6 +433,7 @@ def main():
     print(f"Saving logs to {output_file}...")
     with open(output_file, "w") as f:
         f.write(f"# Deliberation Run: {args.scenario}\n")
+        f.write(f"# Deliberation ID: {deliberation_id or 'N/A'}\n")
         f.write(f"# API Port: {args.port}\n")
         f.write(f"# Topic: {topic}\n")
         f.write(f"# Started: {datetime.now().isoformat()}\n")
@@ -335,6 +454,8 @@ def main():
     print()
     print("=" * 60)
     print(f"Deliberation {'COMPLETED' if deliberation_completed else 'INCOMPLETE'}")
+    if deliberation_id:
+        print(f"Deliberation ID: {deliberation_id}")
     print(f"Logs: {output_file}")
     if llm_logs:
         print(f"LLM logs: {llm_logs_file} ({len(llm_logs.get('logs', []))} entries)")

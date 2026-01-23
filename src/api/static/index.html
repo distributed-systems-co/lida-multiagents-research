@@ -794,13 +794,26 @@
     <div class="flex items-center justify-between mb-3 flex-shrink-0">
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
+                <button @click="showDeliberationsList = !showDeliberationsList"
+                        :class="['p-2 rounded transition-colors',
+                                showDeliberationsList ? 'bg-violet-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700']"
+                        title="View Deliberations">
+                    📋
+                </button>
                 <div class="text-2xl">{{ spinnerChar }}</div>
                 <h1 class="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">LIDA</h1>
                 <span class="text-sm text-gray-500">Swarm Intelligence</span>
             </div>
-            <div class="flex items-center gap-2" v-if="deliberation.phase">
-                <span class="px-2 py-1 rounded text-xs font-medium" :class="'phase-' + deliberation.phase.replace(/[^a-z]/g, '')">
+            <div class="flex items-center gap-2" v-if="activeDeliberationId || deliberation.topic">
+                <span v-if="activeDeliberationId" class="text-xs text-gray-500 font-mono">{{ activeDeliberationId?.slice(0, 8) }}</span>
+                <span v-if="deliberation.topic" class="text-xs text-gray-400 max-w-[200px] truncate" :title="deliberation.topic">{{ deliberation.topic }}</span>
+            </div>
+            <div class="flex items-center gap-2" v-if="deliberation.phase || deliberation.active">
+                <span v-if="deliberation.phase" class="px-2 py-1 rounded text-xs font-medium" :class="'phase-' + deliberation.phase.replace(/[^a-z]/g, '')">
                     {{ deliberation.phase }}
+                </span>
+                <span v-else-if="deliberation.active" class="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">
+                    Active
                 </span>
                 <span v-if="deliberation.round > 0" class="px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
                     Round {{ deliberation.round }}/{{ deliberation.max_rounds }}
@@ -1529,6 +1542,132 @@
         </div>
     </div>
 
+    <!-- Deliberations List Panel (Collapsible Sidebar) -->
+    <div v-if="showDeliberationsList"
+         class="fixed left-0 top-0 h-full w-80 bg-[#12121a] border-r border-gray-700 z-50 flex flex-col shadow-xl">
+        <div class="p-4 border-b border-gray-700 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                <span class="text-violet-400">📋</span> Deliberations
+            </h3>
+            <button @click="showDeliberationsList = false"
+                    class="p-1 rounded hover:bg-gray-700 text-gray-400">
+                ✕
+            </button>
+        </div>
+
+        <div class="p-3 border-b border-gray-700">
+            <button @click="showCreateDeliberationModal = true"
+                    class="w-full py-2 px-4 rounded bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                <span>+</span> New Deliberation
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto scroll-thin p-3 space-y-2">
+            <div v-for="delib in deliberations" :key="delib.id"
+                 @click="selectDeliberation(delib)"
+                 :class="['p-3 rounded cursor-pointer transition-all border',
+                         activeDeliberationId === delib.id
+                           ? 'bg-violet-900/30 border-violet-500'
+                           : 'bg-gray-800/50 border-transparent hover:bg-gray-700/50']">
+                <div class="flex items-start justify-between gap-2 mb-2">
+                    <span :class="['px-2 py-0.5 rounded text-xs font-medium', getDeliberationStatusClass(delib.status)]">
+                        {{ delib.status }}
+                    </span>
+                    <span class="text-xs text-gray-500">{{ delib.id?.slice(0, 8) }}</span>
+                </div>
+                <div class="text-sm text-white mb-1 line-clamp-2">{{ delib.topic }}</div>
+                <div class="text-xs text-gray-500">
+                    <span v-if="delib.current_round > 0">Round {{ delib.current_round }}<span v-if="delib.max_rounds">/{{ delib.max_rounds }}</span></span>
+                    <span v-if="delib.phase" :class="{'ml-2': delib.current_round > 0}">{{ delib.current_round > 0 ? '• ' : '' }}{{ delib.phase }}</span>
+                    <span v-if="!delib.current_round && !delib.phase">Pending</span>
+                </div>
+
+                <div v-if="delib.status !== 'completed' && delib.status !== 'stopped'"
+                     class="flex gap-1 mt-2 pt-2 border-t border-gray-700">
+                    <button v-if="delib.status === 'pending'"
+                            @click.stop="startDeliberationById(delib.id)"
+                            class="px-2 py-1 rounded bg-green-600 hover:bg-green-700 text-xs text-white">
+                        Start
+                    </button>
+                    <button v-if="delib.status === 'active'"
+                            @click.stop="pauseDeliberation(delib.id)"
+                            class="px-2 py-1 rounded bg-yellow-600 hover:bg-yellow-700 text-xs text-white">
+                        Pause
+                    </button>
+                    <button v-if="delib.status === 'paused'"
+                            @click.stop="startDeliberationById(delib.id)"
+                            class="px-2 py-1 rounded bg-green-600 hover:bg-green-700 text-xs text-white">
+                        Resume
+                    </button>
+                    <button v-if="delib.status === 'active' || delib.status === 'paused'"
+                            @click.stop="stopDeliberationById(delib.id)"
+                            class="px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-xs text-white">
+                        Stop
+                    </button>
+                </div>
+                <div v-else class="flex gap-1 mt-2 pt-2 border-t border-gray-700">
+                    <button @click.stop="deleteDeliberation(delib.id)"
+                            class="px-2 py-1 rounded bg-gray-700 hover:bg-red-700 text-xs text-gray-300">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+            <div v-if="deliberations.length === 0"
+                 class="text-center text-gray-500 py-8">
+                <div class="text-3xl mb-2">📋</div>
+                <div class="text-sm">No deliberations yet</div>
+                <div class="text-xs mt-1">Click + to create one</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Deliberation Modal -->
+    <div v-if="showCreateDeliberationModal" class="modal-overlay" @click.self="showCreateDeliberationModal = false">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">📋</span>
+                    <h3 class="text-lg font-semibold text-white">Create Deliberation</h3>
+                </div>
+                <button @click="showCreateDeliberationModal = false"
+                        class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Topic</label>
+                    <textarea v-model="newDeliberationForm.topic"
+                              class="form-textarea"
+                              placeholder="Enter the topic for deliberation..."
+                              rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Max Rounds</label>
+                    <input v-model.number="newDeliberationForm.maxRounds"
+                           type="number" min="1" max="100"
+                           class="form-input">
+                </div>
+                <div class="form-group flex items-center gap-3">
+                    <input v-model="newDeliberationForm.autoStart"
+                           type="checkbox" id="autoStart"
+                           class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-violet-600 focus:ring-violet-500">
+                    <label for="autoStart" class="text-sm text-gray-300">Start immediately after creation</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button @click="showCreateDeliberationModal = false"
+                        class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-sm transition-colors">
+                    Cancel
+                </button>
+                <button @click="createDeliberation"
+                        :disabled="!newDeliberationForm.topic.trim()"
+                        class="px-4 py-2 rounded bg-violet-600 hover:bg-violet-700 text-sm font-medium disabled:opacity-50 transition-colors">
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Agent Configuration Modal -->
     <div v-if="showAgentConfig" class="modal-overlay" @click.self="showAgentConfig = false">
         <div class="modal-content">
@@ -1859,6 +1998,17 @@ createApp({
         });
         const topicInput = ref('');
 
+        // Multi-deliberation state
+        const deliberations = ref([]);
+        const activeDeliberationId = ref(null);
+        const showDeliberationsList = ref(false);
+        const showCreateDeliberationModal = ref(false);
+        const newDeliberationForm = ref({
+            topic: '',
+            maxRounds: 7,
+            autoStart: true
+        });
+
         // Streaming and structured output state
         const streamingAgents = ref({});  // agent_id -> buffer
         const claims = ref([]);           // Array of claims
@@ -2142,8 +2292,54 @@ createApp({
                         phase: data.phase,
                         topic: data.topic,
                         round: data.round || 0,
-                        max_rounds: data.max_rounds || 5
+                        max_rounds: data.max_rounds || 5,
+                        deliberation_id: data.deliberation_id || activeDeliberationId.value
                     };
+                    // Update active deliberation ID if provided
+                    if (data.deliberation_id) {
+                        activeDeliberationId.value = data.deliberation_id;
+                    }
+                    // Update deliberation in list
+                    if (data.deliberation_id) {
+                        const idx = deliberations.value.findIndex(d => d.id === data.deliberation_id);
+                        if (idx >= 0) {
+                            deliberations.value[idx] = {
+                                ...deliberations.value[idx],
+                                status: data.active ? 'active' : (data.phase?.includes('complete') ? 'completed' : deliberations.value[idx].status),
+                                phase: data.phase,
+                                current_round: data.round
+                            };
+                        }
+                    }
+                    break;
+
+                case 'deliberation_created':
+                    deliberations.value.unshift(data);
+                    break;
+
+                case 'deliberation_deleted':
+                    deliberations.value = deliberations.value.filter(d => d.id !== data.deliberation_id);
+                    if (activeDeliberationId.value === data.deliberation_id) {
+                        activeDeliberationId.value = null;
+                    }
+                    break;
+
+                case 'deliberation_paused':
+                    {
+                        const idx = deliberations.value.findIndex(d => d.id === data.deliberation_id);
+                        if (idx >= 0) {
+                            deliberations.value[idx].status = 'paused';
+                        }
+                    }
+                    break;
+
+                case 'deliberation_stopped':
+                    {
+                        const idx = deliberations.value.findIndex(d => d.id === data.deliberation_id);
+                        if (idx >= 0) {
+                            deliberations.value[idx].status = 'stopped';
+                        }
+                    }
                     break;
 
                 case 'consensus_update':
@@ -2348,6 +2544,133 @@ createApp({
                 topic: topicInput.value
             }));
             topicInput.value = '';
+        };
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // Multi-Deliberation Management
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // Fetch all deliberations
+        const fetchDeliberations = async () => {
+            try {
+                const resp = await fetch('/api/deliberations');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    deliberations.value = data.deliberations || [];
+                }
+            } catch (err) {
+                console.error('Failed to fetch deliberations:', err);
+            }
+        };
+
+        // Create a new deliberation
+        const createDeliberation = async () => {
+            if (!newDeliberationForm.value.topic.trim()) return;
+
+            try {
+                const params = new URLSearchParams({
+                    topic: newDeliberationForm.value.topic,
+                    max_rounds: newDeliberationForm.value.maxRounds,
+                    auto_start: newDeliberationForm.value.autoStart
+                });
+                const resp = await fetch(`/api/deliberations?${params}`, { method: 'POST' });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    deliberations.value.unshift(data);
+                    activeDeliberationId.value = data.id;
+                    showCreateDeliberationModal.value = false;
+                    newDeliberationForm.value = { topic: '', maxRounds: 7, autoStart: true };
+                }
+            } catch (err) {
+                console.error('Failed to create deliberation:', err);
+            }
+        };
+
+        // Start a pending deliberation
+        const startDeliberationById = async (id) => {
+            try {
+                const resp = await fetch(`/api/deliberations/${id}/start`, { method: 'POST' });
+                if (resp.ok) {
+                    const idx = deliberations.value.findIndex(d => d.id === id);
+                    if (idx >= 0) {
+                        deliberations.value[idx].status = 'active';
+                    }
+                    activeDeliberationId.value = id;
+                }
+            } catch (err) {
+                console.error('Failed to start deliberation:', err);
+            }
+        };
+
+        // Pause a deliberation
+        const pauseDeliberation = async (id) => {
+            try {
+                const resp = await fetch(`/api/deliberations/${id}/pause`, { method: 'POST' });
+                if (resp.ok) {
+                    const idx = deliberations.value.findIndex(d => d.id === id);
+                    if (idx >= 0) {
+                        deliberations.value[idx].status = 'paused';
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to pause deliberation:', err);
+            }
+        };
+
+        // Stop a deliberation by ID
+        const stopDeliberationById = async (id) => {
+            try {
+                const resp = await fetch(`/api/deliberations/${id}/stop`, { method: 'POST' });
+                if (resp.ok) {
+                    const idx = deliberations.value.findIndex(d => d.id === id);
+                    if (idx >= 0) {
+                        deliberations.value[idx].status = 'stopped';
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to stop deliberation:', err);
+            }
+        };
+
+        // Delete a deliberation
+        const deleteDeliberation = async (id) => {
+            if (!confirm('Delete this deliberation and all its logs?')) return;
+            try {
+                const resp = await fetch(`/api/deliberations/${id}`, { method: 'DELETE' });
+                if (resp.ok) {
+                    deliberations.value = deliberations.value.filter(d => d.id !== id);
+                    if (activeDeliberationId.value === id) {
+                        activeDeliberationId.value = null;
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to delete deliberation:', err);
+            }
+        };
+
+        // Select a deliberation
+        const selectDeliberation = (delib) => {
+            activeDeliberationId.value = delib.id;
+            deliberation.value = {
+                active: delib.status === 'active',
+                phase: delib.phase || '',
+                topic: delib.topic,
+                round: delib.current_round || 0,
+                max_rounds: delib.max_rounds || 7,
+                deliberation_id: delib.id
+            };
+        };
+
+        // Get status badge class
+        const getDeliberationStatusClass = (status) => {
+            const classes = {
+                pending: 'bg-gray-600 text-gray-200',
+                active: 'bg-green-600 text-white',
+                paused: 'bg-yellow-600 text-white',
+                completed: 'bg-blue-600 text-white',
+                stopped: 'bg-red-600 text-white'
+            };
+            return classes[status] || 'bg-gray-600 text-gray-200';
         };
 
         // Select agent
@@ -3045,6 +3368,9 @@ createApp({
             connect();
             document.addEventListener('keydown', handleKeydown);
 
+            // Fetch existing deliberations
+            fetchDeliberations();
+
             // Spinner animation
             setInterval(() => {
                 spinnerIndex.value = (spinnerIndex.value + 1) % spinnerChars.length;
@@ -3110,8 +3436,25 @@ createApp({
             experimentPhase,
             experimentProgress,
 
+            // Multi-deliberation state
+            deliberations,
+            activeDeliberationId,
+            showDeliberationsList,
+            showCreateDeliberationModal,
+            newDeliberationForm,
+
             connect,
             startDeliberation,
+
+            // Multi-deliberation functions
+            fetchDeliberations,
+            createDeliberation,
+            startDeliberationById,
+            pauseDeliberation,
+            stopDeliberationById,
+            deleteDeliberation,
+            selectDeliberation,
+            getDeliberationStatusClass,
             selectAgent,
             sendChat,
             startPersuader,
