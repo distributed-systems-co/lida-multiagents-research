@@ -1,0 +1,43 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Quick Personas Scenario - Fast debates with real tech leaders
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Dependencies: persona files that this scenario uses
+# These are loaded from scenarios/personas/{persona_version}/
+_imports:
+  - personas/v2/tech_leaders.yaml      # elon_musk, satya_nadella, sundar_pichai, jensen_huang, mark_zuckerberg, tim_cook
+  - personas/v2/ai_researchers.yaml    # altman, lecun, yudkowsky, amodei, bengio, russell, andreessen, gebru, etc.
+
+simulation:
+  num_agents: 5
+  max_rounds_per_agent: 2
+  max_voting_rounds: 10  # Maximum rounds before forcing a final vote
+  auto_start_topic: "Will AGI arrive before 2030?"  # Optional: auto-start deliberation with this topic
+
+# Use the persona system
+agents:
+  use_real_personas: true
+  persona_version: "v2"
+  # Specify exact personas to use
+  # IDs must match the keys in the personas: section of the imported YAML files
+  personas:
+    - elon_musk      # from tech_leaders.yaml
+    - satya_nadella  # from tech_leaders.yaml
+    - altman         # from ai_researchers.yaml (Sam Altman)
+    - lecun          # from ai_researchers.yaml (Yann LeCun)
+    - bengio
+
+persuader:
+  model: "google/gemini-2.0-flash-001"
+
+models:
+  default: "google/gemini-2.0-flash-001"
+  agent_weights:
+    #"deepseek/deepseek-chat": 1.0
+    "google/gemini-2.0-flash-001": 1.0
+    #"meta-llama/llama-3.1-8b-instruct": 1.0
+
+topics:
+  - "RESOLVED: AI development should be paused until we have better alignment techniques."
+  - "RESOLVED: Open source AI is safer than closed AI development."
+  - "RESOLVED: AI companies should be strictly liable for harms caused by their systems."
