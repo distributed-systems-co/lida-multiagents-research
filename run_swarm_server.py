@@ -1487,6 +1487,7 @@ IMPORTANT - You are the PERSUADER in this debate:
         content: str,
         model: str = "",
         tool: Optional[str] = None,
+        deliberation_id: Optional[str] = None,
     ):
         """Add a message and broadcast it."""
         msg = Message(
@@ -1501,9 +1502,10 @@ IMPORTANT - You are the PERSUADER in this debate:
         self.messages.append(msg)
         self.total_messages += 1
 
-        # Also add to active deliberation's messages
-        if self.active_deliberation_id and self.active_deliberation_id in self.deliberations:
-            self.deliberations[self.active_deliberation_id].messages.append(msg)
+        # Add to specific deliberation's messages (use provided ID or fall back to active)
+        target_delib_id = deliberation_id or self.active_deliberation_id
+        if target_delib_id and target_delib_id in self.deliberations:
+            self.deliberations[target_delib_id].messages.append(msg)
 
         if sender_id in self.agents:
             self.agents[sender_id].messages_sent += 1
@@ -2602,7 +2604,8 @@ Your confidence should change based on argument quality:
                 if agent.available_tools:
                     tool = random.choice(agent.available_tools)
                     self.add_message(agent.id, "broadcast", "research",
-                                   f"Researching: {topic[:35]}...", agent.model, tool)
+                                   f"Researching: {topic[:35]}...", agent.model, tool,
+                                   deliberation_id=deliberation_id)
                     await self.execute_tool(agent.id, tool, {"query": topic[:50]})
 
                 await asyncio.sleep(0.3)
@@ -2654,7 +2657,8 @@ State your stance clearly and give one key reason."""
             await self.broadcast_structured_output(agent.id, "claim", claim_result)
 
             agent.current_thought = response[:60]
-            self.add_message(agent.id, "broadcast", "position", response, agent.model)
+            self.add_message(agent.id, "broadcast", "position", response, agent.model,
+                           deliberation_id=deliberation_id)
 
         await self.broadcast_agents_update()
         await self.broadcast_deliberation_state()
@@ -2700,7 +2704,8 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                 use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
                 response = await self.generate_response(a1, prompt, use_tools=use_tools)
                 a1.current_thought = response[:60]
-                self.add_message(a1.id, a2.id, "debate", response, a1.model)
+                self.add_message(a1.id, a2.id, "debate", response, a1.model,
+                               deliberation_id=deliberation_id)
 
                 a1.status = "idle"
                 await self.broadcast_agents_update()
@@ -2786,7 +2791,8 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
 
                 agent.current_vote = display_vote
                 agent.current_thought = f"Voted: {display_vote} ({confidence*100:.0f}%)"
-                self.add_message(agent.id, "broadcast", "vote", f"Casts vote: {display_vote} - {reasoning[:60]}...", agent.model)
+                self.add_message(agent.id, "broadcast", "vote", f"Casts vote: {display_vote} - {reasoning[:60]}...", agent.model,
+                               deliberation_id=deliberation_id)
 
                 # Map votes to positions for persuader game
                 vote_to_position = {
@@ -2852,7 +2858,8 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
 
                         response = await self.generate_response(a1, prompt, use_tools=False)
                         a1.current_thought = response[:60]
-                        self.add_message(a1.id, a2.id, "debate", response, a1.model)
+                        self.add_message(a1.id, a2.id, "debate", response, a1.model,
+                                       deliberation_id=deliberation_id)
 
                         a1.status = "idle"
                         await self.broadcast_agents_update()
@@ -2885,7 +2892,8 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
         self.add_message(
             synthesizer.id, "broadcast", "synthesis",
             f"Consensus: {winner} ({self.consensus[winner]}/{len(agents)} votes)",
-            synthesizer.model
+            synthesizer.model,
+            deliberation_id=deliberation_id,
         )
 
         # Complete
