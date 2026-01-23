@@ -7,6 +7,7 @@ The LIDA services must already be running (started via run.sh).
 
 Usage:
     python run_deliberation.py --port PORT [--scenario SCENARIO] [--topic TOPIC] [--timeout SECONDS]
+    python run_deliberation.py --port PORT --topic TOPIC --agent NAME [--agent NAME ...]
 
 Arguments:
     --port PORT           API port of the running LIDA instance (required)
@@ -15,16 +16,22 @@ Arguments:
     --timeout SECONDS     Max seconds to wait, 0 for infinite (default: infinite)
     --output FILE         Output file for logs (default: deliberation_TIMESTAMP.log)
     --poll-interval SECS  Seconds between status checks (default: 5)
+    --agent NAME          Agent name to include (can be repeated). Overrides --scenario personas.
+    --persona-version VER Persona version when using --agent (default: v2)
 
 Example:
     # First start services:
     ./run.sh 6379 2040 start
 
-    # Then run deliberation:
+    # Then run deliberation with scenario:
     python run_deliberation.py --port 2040 --scenario quick_personas3 --timeout 300
 
     # Or with a custom topic:
     python run_deliberation.py --port 2040 --topic "Should AI be regulated?"
+
+    # Or specify agents directly:
+    python run_deliberation.py --port 2040 --topic "AI regulation" \
+        --agent "Yann LeCun" --agent "Sam Altman" --agent "Geoffrey Hinton"
 
 Logs are saved to the logs/ subdirectory:
     logs/deliberation_<scenario>_<timestamp>.log           - Status log
@@ -73,6 +80,15 @@ def parse_args():
         "--deliberation-id", default=None,
         help="Existing deliberation ID to resume or track"
     )
+    parser.add_argument(
+        "--agent", action="append", dest="agents", metavar="NAME",
+        help="Agent name to include (can be specified multiple times). "
+             "Overrides --scenario personas. Examples: --agent 'Yann LeCun' --agent 'Sam Altman'"
+    )
+    parser.add_argument(
+        "--persona-version", default="v2",
+        help="Persona version to use when specifying --agent (default: v2)"
+    )
     return parser.parse_args()
 
 
@@ -109,6 +125,49 @@ def get_personas_from_scenario(scenario: str) -> tuple:
     except Exception as e:
         print(f"Warning: Could not read personas from scenario file: {e}")
         return None, None
+
+
+def name_to_persona_id(name: str) -> str:
+    """Convert a human-readable name to a persona ID.
+
+    Examples:
+        "Yann LeCun" -> "yann_lecun"
+        "Sam Altman" -> "sam_altman"
+        "Elon Musk" -> "elon_musk"
+    """
+    # Common aliases for shorter names
+    aliases = {
+        "lecun": "yann_lecun",
+        "altman": "sam_altman",
+        "musk": "elon_musk",
+        "bengio": "yoshua_bengio",
+        "hinton": "geoffrey_hinton",
+        "zuckerberg": "mark_zuckerberg",
+        "nadella": "satya_nadella",
+        "pichai": "sundar_pichai",
+        "huang": "jensen_huang",
+        "cook": "tim_cook",
+        "bezos": "jeff_bezos",
+        "amodei": "dario_amodei",
+        "sutskever": "ilya_sutskever",
+        "ng": "andrew_ng",
+        "russell": "stuart_russell",
+        "bostrom": "nick_bostrom",
+        "tegmark": "max_tegmark",
+        "yudkowsky": "eliezer_yudkowsky",
+        "marcus": "gary_marcus",
+        "gebru": "timnit_gebru",
+        "bender": "emily_bender",
+        "karpathy": "andrej_karpathy",
+    }
+
+    # Check if it's already an alias
+    name_lower = name.lower().strip()
+    if name_lower in aliases:
+        return aliases[name_lower]
+
+    # Convert "First Last" to "first_last"
+    return name_lower.replace(" ", "_").replace("-", "_")
 
 
 def activate_personas(api_port: int, personas: list, persona_version: str = "v1") -> bool:
@@ -282,7 +341,10 @@ def main():
     print("Deliberation Runner (Client Mode)")
     print("=" * 60)
     print(f"API Port: {args.port}")
-    print(f"Scenario: {args.scenario}")
+    if args.agents:
+        print(f"Agents: {len(args.agents)} specified via --agent")
+    else:
+        print(f"Scenario: {args.scenario}")
     print(f"Topic: {topic}")
     print(f"Timeout: {'infinite' if args.timeout == 0 else f'{args.timeout}s'}")
     print(f"Output: {output_file}")
@@ -309,10 +371,22 @@ def main():
     print("API is healthy")
     print()
 
-    # Activate personas from scenario if specified
-    personas, persona_version = get_personas_from_scenario(args.scenario)
+    # Determine personas to activate
+    if args.agents:
+        # Convert agent names to persona IDs
+        personas = [name_to_persona_id(name) for name in args.agents]
+        persona_version = args.persona_version
+        print(f"Using {len(personas)} agents from command line (version {persona_version}):")
+        for i, (name, pid) in enumerate(zip(args.agents, personas), 1):
+            print(f"  {i}. {name} -> {pid}")
+    else:
+        # Fall back to scenario personas
+        personas, persona_version = get_personas_from_scenario(args.scenario)
+        if personas:
+            print(f"Found {len(personas)} personas (version {persona_version}) in scenario: {args.scenario}")
+
+    # Activate personas
     if personas:
-        print(f"Found {len(personas)} personas (version {persona_version}) in scenario: {args.scenario}")
         if not activate_personas(args.port, personas, persona_version or "v1"):
             print("WARNING: Failed to activate personas, continuing anyway...")
         print()
