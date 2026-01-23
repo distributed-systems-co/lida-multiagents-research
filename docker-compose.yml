@@ -21,7 +21,7 @@ services:
       - SCENARIO=${SCENARIO:-default}
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
-      - FULL_LOGS=${FULL_LOGS:-false}
+      - FULL_LOGS=${FULL_LOGS:-true}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -76,7 +76,7 @@ services:
       - SCENARIO=${SCENARIO:-default}
       - MAX_ROUNDS=${MAX_ROUNDS:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
-      - FULL_LOGS=${FULL_LOGS:-false}
+      - FULL_LOGS=${FULL_LOGS:-true}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -112,7 +112,7 @@ services:
       - NUM_WORKERS=${NUM_WORKERS:-8}
       - WORKER_CAPACITY=${WORKER_CAPACITY:-5}
       - SWARM_LIVE=${SWARM_LIVE:-false}
-      - FULL_LOGS=${FULL_LOGS:-false}
+      - FULL_LOGS=${FULL_LOGS:-true}
       - CLEAR_LOGS_ON_START=${CLEAR_LOGS_ON_START:-true}
       - REDIS_URL=redis://redis:6379
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}

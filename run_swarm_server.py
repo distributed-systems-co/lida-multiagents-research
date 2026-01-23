@@ -3349,7 +3349,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
                 "consensus": orch.consensus,
                 "agent_count": len(orch.agents),
                 "total_messages": orch.total_messages,
-                "completed": not orch.deliberation_active and orch.phase in ("complete", "stopped", "idle", ""),
+                "completed": not orch.deliberation_active and orch.phase in ("complete", "✅ complete", "stopped", "idle", ""),
             }
 
         # Otherwise, check Redis for status from another worker
@@ -3370,7 +3370,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             "consensus": {},
             "agent_count": len(orch.agents),
             "total_messages": 0,
-            "completed": False,
+            "completed": True,  # Nothing running = completed/idle
         }
 
     @app.post("/api/inject")
@@ -4376,6 +4376,24 @@ def _create_default_app() -> FastAPI:
         """Initialize async components on startup."""
         logger.info(f"Startup event starting for worker {os.getpid()}")
         orch = app.state.orchestrator
+
+        # Clear stale deliberation status from previous run
+        orch.deliberation_active = False
+        orch.phase = ""
+        orch.current_topic = ""
+        orch.current_round = 0
+        orch.consensus = {}
+        orch.total_messages = 0
+        orch.paused = False
+        orch.messages.clear()
+
+        # Clear Redis status from previous run
+        if orch.redis_client:
+            try:
+                orch.redis_client.delete("delib:status")
+                logger.info("Cleared stale deliberation status from Redis")
+            except Exception as e:
+                logger.warning(f"Failed to clear Redis status: {e}")
 
         # Note: We don't clear stale locks here because ALL workers run this,
         # which would defeat the locking mechanism. Instead, we rely on the
