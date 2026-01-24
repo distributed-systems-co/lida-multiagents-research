@@ -46,6 +46,63 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
+
+def _get_evolution_engine(inference_fn=None):
+    """Lazy factory for PromptEvolutionEngine to avoid circular imports."""
+    try:
+        from src.agents.prompt_evolution import (
+            PromptEvolutionEngine,
+            EvolutionConfig,
+            EvolutionStrategy,
+        )
+        return PromptEvolutionEngine(
+            config=EvolutionConfig(
+                strategy=EvolutionStrategy.ADAPTIVE,
+                enable_retrodynamic=True,
+            ),
+            inference_fn=inference_fn,
+        )
+    except ImportError:
+        # Fallback if running from different context
+        return None
+
+
+def _get_analytics_engine():
+    """Lazy factory for EvolutionAnalytics (causality/fitness)."""
+    try:
+        from src.agents.prompt_causality import EvolutionAnalytics
+        return EvolutionAnalytics()
+    except ImportError:
+        return None
+
+
+def _get_population_manager():
+    """Lazy factory for genetic algorithms PopulationManager."""
+    try:
+        from src.agents.prompt_genetics import (
+            PopulationManager,
+            GeneticConfig,
+            SpeculativeBrancher,
+        )
+        return PopulationManager(GeneticConfig()), SpeculativeBrancher
+    except ImportError:
+        return None, None
+
+
+def _get_composition_system():
+    """Lazy factory for prompt composition system."""
+    try:
+        from src.agents.prompt_composition import (
+            PromptComposer,
+            create_standard_library,
+            create_standard_templates,
+        )
+        library = create_standard_library()
+        registry = create_standard_templates()
+        return PromptComposer(library, registry)
+    except ImportError:
+        return None
+
 # OpenRouter configuration
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -1051,17 +1108,61 @@ class AgentLoop:
         self._on_tool_call: Optional[Callable[[ToolCall], bool]] = None  # Return False to reject
         self._on_tool_result: Optional[Callable[[ToolResult], None]] = None
         self._on_turn_complete: Optional[Callable[[int, str], None]] = None
-        self._on_prompt_modified: Optional[Callable[[str, str, str], None]] = None  # old, new, reason
+        self._on_prompt_evolved: Optional[Callable[[str, str, str], None]] = None  # old, new, reason
 
-        # Self-modification tracking
-        self._prompt_history: List[Dict[str, Any]] = []
-        self._original_system_prompt: str = ""
+        # Prompt Evolution Engine (Merkle tree, forking, retrodynamic)
+        # Initialized lazily when system prompt is set
+        self._evolution: Optional[Any] = None
+        self._evolution_initialized = False
+
+        # Advanced subsystems (lazy initialized)
+        self._analytics: Optional[Any] = None  # Causality/multi-objective fitness
+        self._population: Optional[Any] = None  # Genetic algorithms
+        self._brancher: Optional[Any] = None    # Speculative branching
+        self._composer: Optional[Any] = None    # Prompt composition
 
         # Register built-in tools
         self._register_builtin_tools()
 
+    async def _replay_inference(self, prompt: str, messages: List[Dict]) -> str:
+        """Inference function for retrodynamic replay."""
+        # Build a minimal context for replay
+        replay_messages = [{"role": "system", "content": prompt}] + messages
+
+        api_key = OPENROUTER_API_KEY
+        if not api_key:
+            return "[No API key for replay]"
+
+        try:
+            response = await self._client.post(
+                f"{OPENROUTER_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.config.model,
+                    "messages": replay_messages,
+                    "max_tokens": 1024,
+                    "temperature": self.config.temperature,
+                },
+            )
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"].get("content", "")
+        except Exception as e:
+            return f"[Replay error: {e}]"
+
+    def _ensure_evolution_engine(self):
+        """Lazily initialize the evolution engine."""
+        if self._evolution is None:
+            self._evolution = _get_evolution_engine(self._replay_inference)
+            # Initialize with current system prompt if available
+            if self._evolution and self._context._system_prompt:
+                self._evolution.initialize(self._context._system_prompt, "system")
+
     def _register_builtin_tools(self):
-        """Register built-in meta-tools for self-modification."""
+        """Register built-in meta-tools for self-modification with evolution engine."""
 
         # Tool creation
         self.tools.register(
@@ -1100,132 +1201,224 @@ class AgentLoop:
             category="meta",
         )
 
-        # System prompt self-modification
+        # Evolution-based prompt modification with Merkle trees and forking
         self.tools.register(
-            name="modify_system_prompt",
-            handler=self._builtin_modify_system_prompt,
+            name="evolve_prompt",
+            handler=self._builtin_evolve_prompt,
             description=(
-                "Modify your own system prompt to improve your capabilities, add new behaviors, "
-                "or adapt to the current task. Use this for self-improvement when you identify "
-                "gaps in your instructions or want to optimize your approach. Changes take effect "
-                "on the next turn. Be thoughtful - modifications persist for the session."
+                "Evolve your system prompt with full version control, Merkle tree verification, "
+                "and forking capabilities. Supports modification, appending, forking for "
+                "experimentation, merging successful experiments, and reverting. All changes "
+                "are cryptographically tracked for integrity verification."
             ),
             parameters={
                 "type": "object",
                 "properties": {
-                    "new_prompt": {
+                    "action": {
                         "type": "string",
-                        "description": "The complete new system prompt to use",
+                        "enum": ["modify", "append", "fork", "merge", "revert", "switch_fork"],
+                        "description": "Evolution action to take",
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "New prompt content (for modify/append)",
                     },
                     "reason": {
                         "type": "string",
-                        "description": "Why you are making this modification (for audit trail)",
+                        "description": "Why you're making this change (for Merkle audit trail)",
                     },
-                    "modification_type": {
+                    "fork_name": {
                         "type": "string",
-                        "enum": ["replace", "enhance", "specialize", "fix"],
-                        "description": (
-                            "Type of modification: 'replace' for complete rewrite, "
-                            "'enhance' to add capabilities, 'specialize' to focus on domain, "
-                            "'fix' to correct issues"
-                        ),
-                    },
-                },
-                "required": ["new_prompt", "reason", "modification_type"],
-            },
-            category="meta",
-        )
-
-        self.tools.register(
-            name="append_to_system_prompt",
-            handler=self._builtin_append_to_prompt,
-            description=(
-                "Append additional instructions to your system prompt without replacing it. "
-                "Use this to add new capabilities, constraints, or context while preserving "
-                "existing behavior. Safer than full replacement."
-            ),
-            parameters={
-                "type": "object",
-                "properties": {
-                    "content": {
-                        "type": "string",
-                        "description": "Content to append to the system prompt",
+                        "description": "Name for fork operations (create/switch/merge)",
                     },
                     "section": {
                         "type": "string",
-                        "enum": ["capabilities", "constraints", "context", "personality", "tools", "other"],
-                        "description": "What type of content this is (for organization)",
+                        "enum": ["capabilities", "constraints", "context", "personality", "learned"],
+                        "description": "Section for append operations",
                     },
-                    "reason": {
+                    "merge_strategy": {
                         "type": "string",
-                        "description": "Why you are adding this (for audit trail)",
+                        "enum": ["prefer_source", "prefer_target", "concatenate"],
+                        "description": "Strategy for merge operations",
                     },
-                },
-                "required": ["content", "reason"],
-            },
-            category="meta",
-        )
-
-        self.tools.register(
-            name="get_system_prompt",
-            handler=self._builtin_get_system_prompt,
-            description=(
-                "Retrieve your current system prompt to review your instructions. "
-                "Use this before making modifications to understand your current state."
-            ),
-            parameters={
-                "type": "object",
-                "properties": {
-                    "include_history": {
-                        "type": "boolean",
-                        "description": "Whether to include modification history",
-                    },
-                },
-            },
-            category="meta",
-        )
-
-        self.tools.register(
-            name="revert_system_prompt",
-            handler=self._builtin_revert_prompt,
-            description=(
-                "Revert your system prompt to a previous version. Use this if a modification "
-                "didn't work as expected or caused issues."
-            ),
-            parameters={
-                "type": "object",
-                "properties": {
                     "version": {
                         "type": "integer",
-                        "description": "Version number to revert to (0 = original, -1 = previous)",
-                    },
-                    "reason": {
-                        "type": "string",
-                        "description": "Why you are reverting",
+                        "description": "Version number for revert (0=original, -1=previous)",
                     },
                 },
-                "required": ["reason"],
+                "required": ["action", "reason"],
             },
             category="meta",
         )
 
+        # Evolution analysis
         self.tools.register(
-            name="reflect_on_performance",
-            handler=self._builtin_reflect,
+            name="analyze_evolution",
+            handler=self._builtin_analyze_evolution,
             description=(
-                "Trigger a self-reflection on your performance so far. Returns analysis "
-                "of your actions, tool usage, and potential improvements. Use this to "
-                "decide if you need to modify your system prompt."
+                "Analyze prompt evolution history. View lineage, verify Merkle integrity, "
+                "compare fork fitness scores, and get recommendations for improvement."
             ),
             parameters={
                 "type": "object",
                 "properties": {
-                    "focus": {
+                    "analysis_type": {
                         "type": "string",
-                        "enum": ["efficiency", "accuracy", "completeness", "approach", "all"],
-                        "description": "What aspect to focus reflection on",
+                        "enum": ["stats", "lineage", "integrity", "fitness", "forks", "current"],
+                        "description": "Type of analysis to perform",
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": ["json", "mermaid", "summary"],
+                        "description": "Output format for lineage visualization",
                     },
                 },
+                "required": ["analysis_type"],
+            },
+            category="meta",
+        )
+
+        # Retrodynamic evaluation
+        self.tools.register(
+            name="retrodynamic_eval",
+            handler=self._builtin_retrodynamic_eval,
+            description=(
+                "Re-evaluate past conversations with different prompts for counterfactual "
+                "analysis. Tests how prompt modifications would have affected previous outcomes. "
+                "Updates fitness scores based on comparative performance."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "candidate_prompt": {
+                        "type": "string",
+                        "description": "New prompt to evaluate against past conversations",
+                    },
+                    "num_snapshots": {
+                        "type": "integer",
+                        "description": "Number of recent conversation snapshots to replay",
+                    },
+                    "auto_apply": {
+                        "type": "boolean",
+                        "description": "Automatically apply if fitness improves",
+                    },
+                },
+            },
+            category="meta",
+        )
+
+        # Genetic algorithms for prompt evolution
+        self.tools.register(
+            name="genetic_evolve",
+            handler=self._builtin_genetic_evolve,
+            description=(
+                "Evolve prompts using genetic algorithms. Creates populations of prompt variations, "
+                "runs crossover and mutation, and selects for fitness. Supports speciation for "
+                "maintaining diversity and speculative branching for parallel experiments."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["init_population", "evolve_generation", "get_best", "speculate", "adopt_best"],
+                        "description": "Genetic algorithm action to take",
+                    },
+                    "seed_prompts": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Seed prompts for initializing population",
+                    },
+                    "population_size": {
+                        "type": "integer",
+                        "description": "Size of the population (default: 20)",
+                    },
+                    "mutation_rate": {
+                        "type": "number",
+                        "description": "Mutation rate (0-1, default: 0.1)",
+                    },
+                },
+                "required": ["action"],
+            },
+            category="meta",
+        )
+
+        # Multi-objective fitness and causality
+        self.tools.register(
+            name="analyze_fitness",
+            handler=self._builtin_analyze_fitness,
+            description=(
+                "Analyze prompt fitness across multiple objectives (task completion, coherence, "
+                "safety, efficiency). Tracks Pareto frontier of non-dominated solutions. "
+                "Supports ablation studies and prompt compression."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["evaluate", "compare", "ablate", "compress", "pareto"],
+                        "description": "Fitness analysis action",
+                    },
+                    "prompt": {
+                        "type": "string",
+                        "description": "Prompt to evaluate (uses current if not provided)",
+                    },
+                    "response": {
+                        "type": "string",
+                        "description": "Response to evaluate against",
+                    },
+                    "objectives": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Objectives to focus on",
+                    },
+                    "min_quality": {
+                        "type": "number",
+                        "description": "Minimum quality to preserve for compression (0-1)",
+                    },
+                },
+                "required": ["action"],
+            },
+            category="meta",
+        )
+
+        # Prompt composition
+        self.tools.register(
+            name="compose_prompt",
+            handler=self._builtin_compose_prompt,
+            description=(
+                "Compose prompts from modular components and templates. Use pre-built modules "
+                "for common patterns (identity, capabilities, constraints) or create custom ones. "
+                "Templates support inheritance, mixins, and conditional sections."
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["compose", "list_modules", "list_templates", "decompose", "apply"],
+                        "description": "Composition action",
+                    },
+                    "template": {
+                        "type": "string",
+                        "description": "Template ID to use (e.g., 'self_improving', 'coder')",
+                    },
+                    "modules": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Module IDs to include",
+                    },
+                    "params": {
+                        "type": "object",
+                        "description": "Template parameters",
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Filter modules by category",
+                    },
+                },
+                "required": ["action"],
             },
             category="meta",
         )
@@ -1239,207 +1432,618 @@ class AgentLoop:
             "note": "Tool will be available in the next turn",
         }
 
-    def _builtin_modify_system_prompt(self, **kwargs) -> Dict[str, Any]:
-        """Handler for modifying the system prompt."""
+    def _builtin_evolve_prompt(self, **kwargs) -> Dict[str, Any]:
+        """Handler for prompt evolution with Merkle trees and forking."""
         kwargs.pop('context', None)
 
-        new_prompt = kwargs.get("new_prompt", "")
-        reason = kwargs.get("reason", "")
-        mod_type = kwargs.get("modification_type", "replace")
+        self._ensure_evolution_engine()
+        if not self._evolution:
+            return {"success": False, "error": "Evolution engine not available"}
 
-        if not new_prompt:
-            return {"success": False, "error": "new_prompt is required"}
-
-        old_prompt = self._context._system_prompt
-
-        # Store in history
-        self._prompt_history.append({
-            "version": len(self._prompt_history),
-            "old_prompt": old_prompt,
-            "new_prompt": new_prompt,
-            "reason": reason,
-            "modification_type": mod_type,
-            "timestamp": time.time(),
-            "turn": self._state.turn_count,
-        })
-
-        # Apply the modification
-        self._context._system_prompt = new_prompt
-
-        # Recalculate token counts
-        old_tokens = self._token_counter.count(old_prompt)
-        new_tokens = self._token_counter.count(new_prompt)
-        self._context._static_tokens += (new_tokens - old_tokens)
-
-        # Invalidate prompt cache since prefix changed
-        if self._cache:
-            self._cache.clear()
-
-        # Notify callback
-        if self._on_prompt_modified:
-            self._on_prompt_modified(old_prompt, new_prompt, reason)
-
-        logger.info(f"System prompt modified ({mod_type}): {reason}")
-
-        return {
-            "success": True,
-            "modification_type": mod_type,
-            "reason": reason,
-            "version": len(self._prompt_history) - 1,
-            "token_delta": new_tokens - old_tokens,
-            "note": "New prompt will take effect on the next inference call",
-        }
-
-    def _builtin_append_to_prompt(self, **kwargs) -> Dict[str, Any]:
-        """Handler for appending to the system prompt."""
-        kwargs.pop('context', None)
-
+        action = kwargs.get("action", "modify")
         content = kwargs.get("content", "")
+        reason = kwargs.get("reason", "")
+        fork_name = kwargs.get("fork_name", "")
         section = kwargs.get("section", "other")
-        reason = kwargs.get("reason", "")
-
-        if not content:
-            return {"success": False, "error": "content is required"}
-
-        old_prompt = self._context._system_prompt
-
-        # Format the addition with section marker
-        addition = f"\n\n## [{section.upper()}] (Added dynamically)\n{content}"
-        new_prompt = old_prompt + addition
-
-        # Store in history
-        self._prompt_history.append({
-            "version": len(self._prompt_history),
-            "old_prompt": old_prompt,
-            "new_prompt": new_prompt,
-            "reason": reason,
-            "modification_type": "append",
-            "section": section,
-            "appended_content": content,
-            "timestamp": time.time(),
-            "turn": self._state.turn_count,
-        })
-
-        # Apply
-        self._context._system_prompt = new_prompt
-
-        # Update token count
-        added_tokens = self._token_counter.count(addition)
-        self._context._static_tokens += added_tokens
-
-        # Invalidate cache
-        if self._cache:
-            self._cache.clear()
-
-        if self._on_prompt_modified:
-            self._on_prompt_modified(old_prompt, new_prompt, reason)
-
-        logger.info(f"Appended to system prompt ({section}): {reason}")
-
-        return {
-            "success": True,
-            "section": section,
-            "reason": reason,
-            "version": len(self._prompt_history) - 1,
-            "tokens_added": added_tokens,
-        }
-
-    def _builtin_get_system_prompt(self, **kwargs) -> Dict[str, Any]:
-        """Handler for retrieving the current system prompt."""
-        kwargs.pop('context', None)
-
-        include_history = kwargs.get("include_history", False)
-
-        result = {
-            "current_prompt": self._context._system_prompt,
-            "original_prompt": self._original_system_prompt,
-            "is_modified": self._context._system_prompt != self._original_system_prompt,
-            "total_modifications": len(self._prompt_history),
-            "token_count": self._token_counter.count(self._context._system_prompt),
-        }
-
-        if include_history and self._prompt_history:
-            result["history"] = [
-                {
-                    "version": h["version"],
-                    "modification_type": h["modification_type"],
-                    "reason": h["reason"],
-                    "turn": h["turn"],
-                    "timestamp": h["timestamp"],
-                }
-                for h in self._prompt_history
-            ]
-
-        return result
-
-    def _builtin_revert_prompt(self, **kwargs) -> Dict[str, Any]:
-        """Handler for reverting to a previous prompt version."""
-        kwargs.pop('context', None)
-
+        merge_strategy = kwargs.get("merge_strategy", "prefer_source")
         version = kwargs.get("version", -1)
-        reason = kwargs.get("reason", "")
-
-        if not self._prompt_history:
-            return {"success": False, "error": "No modification history available"}
-
-        # Determine target version
-        if version == 0 or version == -len(self._prompt_history) - 1:
-            # Revert to original
-            target_prompt = self._original_system_prompt
-            target_version = "original"
-        elif version == -1:
-            # Revert to previous
-            target_prompt = self._prompt_history[-1]["old_prompt"]
-            target_version = len(self._prompt_history) - 1
-        elif 0 < version < len(self._prompt_history):
-            target_prompt = self._prompt_history[version]["old_prompt"]
-            target_version = version
-        else:
-            return {"success": False, "error": f"Invalid version: {version}"}
 
         old_prompt = self._context._system_prompt
 
-        # Store revert in history
-        self._prompt_history.append({
-            "version": len(self._prompt_history),
-            "old_prompt": old_prompt,
-            "new_prompt": target_prompt,
-            "reason": f"Revert to version {target_version}: {reason}",
-            "modification_type": "revert",
-            "reverted_to": target_version,
-            "timestamp": time.time(),
-            "turn": self._state.turn_count,
-        })
+        try:
+            if action == "modify":
+                if not content:
+                    return {"success": False, "error": "content is required for modify"}
 
-        # Apply
-        self._context._system_prompt = target_prompt
+                self._evolution.modify(content, reason, "modify")
+                self._context._system_prompt = content
 
-        # Update tokens
-        old_tokens = self._token_counter.count(old_prompt)
-        new_tokens = self._token_counter.count(target_prompt)
-        self._context._static_tokens += (new_tokens - old_tokens)
+            elif action == "append":
+                if not content:
+                    return {"success": False, "error": "content is required for append"}
 
-        # Invalidate cache
-        if self._cache:
-            self._cache.clear()
+                self._evolution.append(content, section, reason)
+                self._context._system_prompt = self._evolution.get_current_prompt() or ""
 
-        if self._on_prompt_modified:
-            self._on_prompt_modified(old_prompt, target_prompt, f"Reverted: {reason}")
+            elif action == "fork":
+                if not fork_name:
+                    return {"success": False, "error": "fork_name is required for fork"}
 
-        logger.info(f"Reverted system prompt to version {target_version}: {reason}")
+                fork = self._evolution.fork(fork_name, reason, content if content else None)
+                if content:
+                    self._context._system_prompt = content
 
+                return {
+                    "success": True,
+                    "action": "fork",
+                    "fork_name": fork.name,
+                    "forked_from": fork.created_from[:8],
+                    "reason": reason,
+                }
+
+            elif action == "switch_fork":
+                if not fork_name:
+                    return {"success": False, "error": "fork_name is required for switch"}
+
+                self._evolution.switch_fork(fork_name)
+                self._context._system_prompt = self._evolution.get_current_prompt() or ""
+
+                return {
+                    "success": True,
+                    "action": "switch_fork",
+                    "fork_name": fork_name,
+                    "new_prompt_hash": self._evolution._current_hash[:8] if self._evolution._current_hash else None,
+                }
+
+            elif action == "merge":
+                if not fork_name:
+                    return {"success": False, "error": "fork_name (source) is required for merge"}
+
+                self._evolution.merge(fork_name, merge_strategy)
+                self._context._system_prompt = self._evolution.get_current_prompt() or ""
+
+            elif action == "revert":
+                self._evolution.revert(version, reason)
+                self._context._system_prompt = self._evolution.get_current_prompt() or ""
+
+            else:
+                return {"success": False, "error": f"Unknown action: {action}"}
+
+            # Recalculate tokens
+            new_prompt = self._context._system_prompt
+            old_tokens = self._token_counter.count(old_prompt)
+            new_tokens = self._token_counter.count(new_prompt)
+            self._context._static_tokens += (new_tokens - old_tokens)
+
+            # Invalidate cache
+            if self._cache:
+                self._cache.clear()
+
+            # Notify callback
+            if self._on_prompt_evolved:
+                self._on_prompt_evolved(old_prompt, new_prompt, reason)
+
+            current_node = self._evolution.get_current_node()
+
+            return {
+                "success": True,
+                "action": action,
+                "content_hash": current_node.content_hash[:16] if current_node else None,
+                "merkle_root": current_node.merkle_root[:16] if current_node else None,
+                "depth": current_node.depth if current_node else 0,
+                "reason": reason,
+                "token_delta": new_tokens - old_tokens,
+            }
+
+        except Exception as e:
+            logger.error(f"Evolution error: {e}")
+            return {"success": False, "error": str(e)}
+
+    def _builtin_analyze_evolution(self, **kwargs) -> Dict[str, Any]:
+        """Handler for evolution analysis."""
+        kwargs.pop('context', None)
+
+        self._ensure_evolution_engine()
+        if not self._evolution:
+            return {"error": "Evolution engine not available"}
+
+        analysis_type = kwargs.get("analysis_type", "stats")
+        output_format = kwargs.get("format", "json")
+
+        if analysis_type == "stats":
+            return self._evolution.get_evolution_stats()
+
+        elif analysis_type == "lineage":
+            lineage_data = self._evolution.export_lineage(output_format)
+            return {"lineage": lineage_data, "format": output_format}
+
+        elif analysis_type == "integrity":
+            return self._evolution.verify_integrity()
+
+        elif analysis_type == "forks":
+            forks = self._evolution._forks.list_forks()
+            return {
+                "forks": [
+                    {
+                        "name": f.name,
+                        "head": f.head_hash[:8],
+                        "active": f.is_active,
+                        "description": f.description,
+                    }
+                    for f in forks
+                ],
+                "current_fork": self._evolution._current_fork,
+            }
+
+        elif analysis_type == "current":
+            node = self._evolution.get_current_node()
+            if not node:
+                return {"error": "No current prompt"}
+
+            return {
+                "content_hash": node.content_hash[:16],
+                "merkle_root": node.merkle_root[:16],
+                "depth": node.depth,
+                "author": node.author,
+                "modification_type": node.modification_type,
+                "fitness_score": node.fitness_score,
+                "evaluation_count": node.evaluation_count,
+                "fork_name": node.fork_name,
+                "prompt_preview": node.content[:200] + "..." if len(node.content) > 200 else node.content,
+            }
+
+        elif analysis_type == "fitness":
+            nodes = self._evolution._store.all_nodes()
+            evaluated = [n for n in nodes if n.evaluation_count > 0]
+
+            if not evaluated:
+                return {"message": "No evaluations yet"}
+
+            best = max(evaluated, key=lambda n: n.fitness_score)
+            worst = min(evaluated, key=lambda n: n.fitness_score)
+
+            return {
+                "total_evaluated": len(evaluated),
+                "avg_fitness": sum(n.fitness_score for n in evaluated) / len(evaluated),
+                "best": {
+                    "hash": best.content_hash[:8],
+                    "score": best.fitness_score,
+                    "type": best.modification_type,
+                },
+                "worst": {
+                    "hash": worst.content_hash[:8],
+                    "score": worst.fitness_score,
+                    "type": worst.modification_type,
+                },
+            }
+
+        else:
+            return {"error": f"Unknown analysis type: {analysis_type}"}
+
+    def _builtin_retrodynamic_eval(self, **kwargs) -> Dict[str, Any]:
+        """Handler for retrodynamic evaluation."""
+        kwargs.pop('context', None)
+
+        self._ensure_evolution_engine()
+        if not self._evolution or not self._evolution._retro:
+            return {"error": "Retrodynamic engine not available"}
+
+        candidate_prompt = kwargs.get("candidate_prompt", "")
+        num_snapshots = kwargs.get("num_snapshots", 3)
+        auto_apply = kwargs.get("auto_apply", False)
+
+        if not candidate_prompt:
+            # Just return snapshot info
+            snapshots = list(self._evolution._retro._snapshots.values())
+            return {
+                "available_snapshots": len(snapshots),
+                "recent": [
+                    {
+                        "id": s.snapshot_id,
+                        "prompt_hash": s.prompt_hash[:8],
+                        "messages": len(s.messages),
+                    }
+                    for s in sorted(snapshots, key=lambda x: x.timestamp, reverse=True)[:5]
+                ],
+            }
+
+        # This would normally be async - return info about what would happen
         return {
-            "success": True,
-            "reverted_to": target_version,
-            "reason": reason,
-            "version": len(self._prompt_history) - 1,
+            "note": "Retrodynamic evaluation queued",
+            "candidate_preview": candidate_prompt[:100] + "...",
+            "num_snapshots": num_snapshots,
+            "auto_apply": auto_apply,
+            "instruction": "Use async evaluate_modification() for actual evaluation",
         }
+
+    def _ensure_analytics_engine(self):
+        """Lazily initialize the analytics engine."""
+        if self._analytics is None:
+            self._analytics = _get_analytics_engine()
+
+    def _ensure_population_manager(self):
+        """Lazily initialize the population manager."""
+        if self._population is None:
+            pm, brancher_cls = _get_population_manager()
+            self._population = pm
+            if pm and brancher_cls:
+                self._brancher = brancher_cls(pm)
+
+    def _ensure_composer(self):
+        """Lazily initialize the prompt composer."""
+        if self._composer is None:
+            self._composer = _get_composition_system()
+
+    def _builtin_genetic_evolve(self, **kwargs) -> Dict[str, Any]:
+        """Handler for genetic algorithm operations."""
+        kwargs.pop('context', None)
+
+        self._ensure_population_manager()
+        if not self._population:
+            return {"success": False, "error": "Genetic algorithms not available"}
+
+        action = kwargs.get("action", "get_best")
+
+        if action == "init_population":
+            seed_prompts = kwargs.get("seed_prompts", [self._context._system_prompt])
+            if not seed_prompts:
+                seed_prompts = [self._context._system_prompt]
+
+            pop_size = kwargs.get("population_size", 20)
+            self._population.config.population_size = pop_size
+
+            genomes = self._population.initialize(seed_prompts)
+            return {
+                "success": True,
+                "action": "init_population",
+                "population_size": len(genomes),
+                "generation": self._population.generation,
+            }
+
+        elif action == "evolve_generation":
+            # Simple fitness evaluator based on prompt length and structure
+            def simple_fitness(genome):
+                prompt = genome.assemble()
+                scores = {
+                    "structure": min(len(genome.genes) / 10, 1.0),
+                    "conciseness": max(0, 1 - len(prompt) / 5000),
+                    "diversity": len(set(g.gene_type for g in genome.genes)) / 8,
+                }
+                return scores
+
+            best = self._population.evolve(simple_fitness)
+            return {
+                "success": True,
+                "action": "evolve_generation",
+                "generation": self._population.generation,
+                "best_fitness": best.aggregate_fitness,
+                "population_size": len(self._population.population),
+                "species_count": len(self._population.species),
+            }
+
+        elif action == "get_best":
+            if not self._population.population:
+                return {"success": False, "error": "Population not initialized"}
+
+            best = self._population.get_best()
+            return {
+                "success": True,
+                "action": "get_best",
+                "genome_id": best.genome_id,
+                "generation": best.generation,
+                "fitness": best.aggregate_fitness,
+                "gene_count": len(best.genes),
+                "prompt_preview": best.assemble()[:200] + "...",
+            }
+
+        elif action == "speculate":
+            if not self._brancher or not self._population.population:
+                return {"success": False, "error": "Speculative brancher not available"}
+
+            base = self._population.get_best()
+            branches = self._brancher.speculate(base)
+            return {
+                "success": True,
+                "action": "speculate",
+                "base_genome": base.genome_id,
+                "branches": list(branches.keys()),
+            }
+
+        elif action == "adopt_best":
+            if not self._brancher:
+                return {"success": False, "error": "No speculative branches"}
+
+            result = self._brancher.get_best_branch()
+            if result:
+                name, genome = result
+                new_prompt = genome.assemble()
+
+                # Apply the best branch as the new prompt
+                self._ensure_evolution_engine()
+                if self._evolution:
+                    self._evolution.modify(new_prompt, f"Adopted from genetic branch: {name}", "genetic")
+
+                self._context._system_prompt = new_prompt
+                if self._cache:
+                    self._cache.clear()
+
+                return {
+                    "success": True,
+                    "action": "adopt_best",
+                    "adopted_branch": name,
+                    "genome_id": genome.genome_id,
+                }
+
+            return {"success": False, "error": "No best branch found"}
+
+        else:
+            return {"success": False, "error": f"Unknown action: {action}"}
+
+    def _builtin_analyze_fitness(self, **kwargs) -> Dict[str, Any]:
+        """Handler for multi-objective fitness analysis."""
+        kwargs.pop('context', None)
+
+        self._ensure_analytics_engine()
+        if not self._analytics:
+            return {"success": False, "error": "Analytics engine not available"}
+
+        action = kwargs.get("action", "evaluate")
+
+        if action == "evaluate":
+            prompt = kwargs.get("prompt", self._context._system_prompt)
+            response = kwargs.get("response", "")
+
+            if not response:
+                return {"success": False, "error": "Response required for evaluation"}
+
+            import hashlib
+            prompt_hash = hashlib.sha256(prompt.encode()).hexdigest()[:16]
+
+            profile = self._analytics.fitness.evaluate(
+                prompt_hash, prompt, response
+            )
+            return {
+                "success": True,
+                "action": "evaluate",
+                "prompt_hash": prompt_hash,
+                "objectives": {k.value: v for k, v in profile.objectives.items()},
+                "evaluations": profile.evaluations,
+            }
+
+        elif action == "compare":
+            # Compare two prompts (current vs candidate)
+            prompt1 = self._context._system_prompt
+            prompt2 = kwargs.get("prompt", "")
+
+            if not prompt2:
+                return {"success": False, "error": "Second prompt required for comparison"}
+
+            import hashlib
+            hash1 = hashlib.sha256(prompt1.encode()).hexdigest()[:16]
+            hash2 = hashlib.sha256(prompt2.encode()).hexdigest()[:16]
+
+            comparison = self._analytics.fitness.compare(hash1, hash2)
+            return {
+                "success": True,
+                "action": "compare",
+                **comparison,
+            }
+
+        elif action == "ablate":
+            prompt = kwargs.get("prompt", self._context._system_prompt)
+            import hashlib
+            prompt_hash = hashlib.sha256(prompt.encode()).hexdigest()[:16]
+
+            # Simple evaluate function for ablation
+            def evaluate_fn(p):
+                return f"[Response to prompt of length {len(p)}]"
+
+            results = self._analytics.ablation.run_ablation(
+                prompt, prompt_hash, evaluate_fn=evaluate_fn
+            )
+
+            critical = self._analytics.ablation.get_critical_components(prompt_hash)
+            removable = self._analytics.ablation.get_removable_components(prompt_hash)
+
+            return {
+                "success": True,
+                "action": "ablate",
+                "total_components": len(results),
+                "critical_count": len(critical),
+                "removable_count": len(removable),
+                "critical_components": [
+                    {"id": r.component_id, "text": r.component_text[:50]}
+                    for r in critical[:5]
+                ],
+                "removable_components": [
+                    {"id": r.component_id, "text": r.component_text[:50]}
+                    for r in removable[:5]
+                ],
+            }
+
+        elif action == "compress":
+            prompt = kwargs.get("prompt", self._context._system_prompt)
+            min_quality = kwargs.get("min_quality", 0.9)
+            import hashlib
+            prompt_hash = hashlib.sha256(prompt.encode()).hexdigest()[:16]
+
+            self._analytics.compression.min_quality = min_quality
+
+            def evaluate_fn(p):
+                return f"[Response to prompt of length {len(p)}]"
+
+            compressed, stats = self._analytics.compression.compress(
+                prompt, prompt_hash, evaluate_fn
+            )
+
+            return {
+                "success": True,
+                "action": "compress",
+                "original_length": len(prompt),
+                "compressed_length": len(compressed),
+                "compression_ratio": stats.get("compression_ratio", 1.0),
+                "components_removed": stats.get("components_removed", 0),
+                "compressed_preview": compressed[:200] + "..." if len(compressed) > 200 else compressed,
+            }
+
+        elif action == "pareto":
+            frontier = self._analytics.fitness.pareto.frontier
+            if not frontier:
+                return {"success": True, "action": "pareto", "frontier_size": 0, "prompts": []}
+
+            balanced = self._analytics.fitness.pareto.get_balanced()
+
+            return {
+                "success": True,
+                "action": "pareto",
+                "frontier_size": len(frontier),
+                "balanced_prompt": balanced.prompt_hash if balanced else None,
+                "prompts": [
+                    {
+                        "hash": p.prompt_hash,
+                        "objectives": {k.value: v for k, v in p.objectives.items()},
+                    }
+                    for p in frontier[:10]
+                ],
+            }
+
+        else:
+            return {"success": False, "error": f"Unknown action: {action}"}
+
+    def _builtin_compose_prompt(self, **kwargs) -> Dict[str, Any]:
+        """Handler for prompt composition operations."""
+        kwargs.pop('context', None)
+
+        self._ensure_composer()
+        if not self._composer:
+            return {"success": False, "error": "Composition system not available"}
+
+        action = kwargs.get("action", "list_modules")
+
+        if action == "compose":
+            template = kwargs.get("template")
+            modules = kwargs.get("modules", [])
+            params = kwargs.get("params", {})
+
+            try:
+                composed = self._composer.compose(
+                    base_template=template,
+                    modules=modules,
+                    params=params,
+                    context={},
+                )
+                return {
+                    "success": True,
+                    "action": "compose",
+                    "prompt_length": len(composed),
+                    "prompt_preview": composed[:300] + "..." if len(composed) > 300 else composed,
+                }
+            except ValueError as e:
+                return {"success": False, "error": str(e)}
+
+        elif action == "list_modules":
+            category = kwargs.get("category")
+
+            if category:
+                modules = self._composer.library.find_by_category(category)
+            else:
+                modules = list(self._composer.library._modules.values())
+
+            return {
+                "success": True,
+                "action": "list_modules",
+                "count": len(modules),
+                "modules": [
+                    {
+                        "id": m.module_id,
+                        "name": m.name,
+                        "category": m.category,
+                        "priority": m.priority.name,
+                    }
+                    for m in modules[:20]
+                ],
+                "categories": list(self._composer.library._by_category.keys()),
+            }
+
+        elif action == "list_templates":
+            templates = self._composer.registry.list_templates()
+            return {
+                "success": True,
+                "action": "list_templates",
+                "templates": templates,
+            }
+
+        elif action == "decompose":
+            prompt = kwargs.get("prompt", self._context._system_prompt)
+            modules = self._composer.decompose(prompt)
+
+            return {
+                "success": True,
+                "action": "decompose",
+                "component_count": len(modules),
+                "components": [
+                    {
+                        "id": m.module_id,
+                        "name": m.name,
+                        "category": m.category,
+                        "content_preview": m.content[:100],
+                    }
+                    for m in modules[:10]
+                ],
+            }
+
+        elif action == "apply":
+            # Compose and apply as new system prompt
+            template = kwargs.get("template")
+            modules = kwargs.get("modules", [])
+            params = kwargs.get("params", {})
+
+            try:
+                composed = self._composer.compose(
+                    base_template=template,
+                    modules=modules,
+                    params=params,
+                    context={},
+                )
+
+                old_prompt = self._context._system_prompt
+
+                # Apply through evolution engine if available
+                self._ensure_evolution_engine()
+                if self._evolution:
+                    self._evolution.modify(
+                        composed,
+                        f"Composed from template={template}, modules={modules}",
+                        "composition"
+                    )
+
+                self._context._system_prompt = composed
+                if self._cache:
+                    self._cache.clear()
+
+                # Update token count
+                old_tokens = self._token_counter.count(old_prompt)
+                new_tokens = self._token_counter.count(composed)
+                self._context._static_tokens += (new_tokens - old_tokens)
+
+                return {
+                    "success": True,
+                    "action": "apply",
+                    "prompt_length": len(composed),
+                    "token_delta": new_tokens - old_tokens,
+                }
+
+            except ValueError as e:
+                return {"success": False, "error": str(e)}
+
+        else:
+            return {"success": False, "error": f"Unknown action: {action}"}
 
     def _builtin_reflect(self, **kwargs) -> Dict[str, Any]:
         """Handler for self-reflection on performance."""
         kwargs.pop('context', None)
 
-        focus = kwargs.get("focus", "all")
+        requested_focus = kwargs.get("focus", "all")
 
         # Gather performance data
         turns = self._state.turn_count
@@ -1452,12 +2056,16 @@ class AgentLoop:
         user_turns = [t for t in self._context._turns if t.role == "user"]
         assistant_turns = [t for t in self._context._turns if t.role == "assistant"]
 
+        # Get evolution stats if available
+        self._ensure_evolution_engine()
+        evolution_stats = self._evolution.get_evolution_stats() if self._evolution else {}
+
         reflection = {
             "turns_completed": turns,
             "total_tool_calls": total_tool_calls,
             "user_messages": len(user_turns),
             "assistant_messages": len(assistant_turns),
-            "prompt_modifications": len(self._prompt_history),
+            "prompt_modifications": evolution_stats.get("total_versions", 0),
             "context_usage": {
                 "total_tokens": self._context.total_tokens,
                 "max_tokens": self._context.max_tokens,
@@ -1467,10 +2075,11 @@ class AgentLoop:
             },
             "tools_available": self.tools.list_tools(),
             "cache_stats": self._cache.stats if self._cache else None,
+            "evolution": evolution_stats,
         }
 
         # Add focus-specific analysis
-        if focus in ("efficiency", "all"):
+        if requested_focus in ("efficiency", "all"):
             reflection["efficiency"] = {
                 "avg_response_time": self._state.last_response_time,
                 "tool_calls_per_turn": (
@@ -1478,28 +2087,30 @@ class AgentLoop:
                 ),
             }
 
-        if focus in ("approach", "all"):
+        if requested_focus in ("approach", "all"):
             reflection["approach"] = {
-                "is_prompt_modified": len(self._prompt_history) > 0,
+                "is_prompt_modified": evolution_stats.get("total_versions", 0) > 1,
+                "active_forks": evolution_stats.get("active_forks", 0),
                 "tools_created": len([
                     t for t in self.tools.list_tools()
-                    if t not in ["create_new_tool", "modify_system_prompt",
-                                 "append_to_system_prompt", "get_system_prompt",
-                                 "revert_system_prompt", "reflect_on_performance"]
+                    if t not in ["create_new_tool", "evolve_prompt",
+                                 "analyze_evolution", "retrodynamic_eval",
+                                 "reflect_on_performance"]
                 ]),
             }
 
-        reflection["recommendations"] = self._generate_recommendations(reflection, focus)
+        reflection["recommendations"] = self._generate_recommendations(reflection, requested_focus)
 
         return reflection
 
     def _generate_recommendations(
         self,
         reflection: Dict[str, Any],
-        focus: str
+        focus: str  # Reserved for focus-specific recommendations
     ) -> List[str]:
         """Generate recommendations based on reflection data."""
         recommendations = []
+        _ = focus  # Will be used for focus-specific filtering
 
         usage = reflection["context_usage"]["usage_percent"]
         if usage > 70:
@@ -1509,7 +2120,7 @@ class AgentLoop:
 
         if reflection["prompt_modifications"] == 0 and reflection["turns_completed"] > 5:
             recommendations.append(
-                "No prompt modifications yet. Consider if self-improvement could help."
+                "No prompt modifications yet. Consider using evolve_prompt for self-improvement."
             )
 
         if reflection["total_tool_calls"] == 0 and reflection["turns_completed"] > 2:

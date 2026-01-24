@@ -569,14 +569,14 @@ class RetrodynamicEngine:
         original_prompt_hash: str,
         new_prompt_hash: str,
         snapshot_id: str,
-        snapshot: ConversationSnapshot,
+        snapshot: ConversationSnapshot,  # noqa: ARG002 - reserved for advanced evaluation
     ) -> EvaluationResult:
         """Evaluate and compare two responses."""
         # Simple similarity (in production, use embeddings)
         similarity = self._text_similarity(original_response, new_response)
 
-        # Tool call difference
-        tool_call_diff = 0  # Would need new tool calls to compare
+        # Tool call difference (would compare with snapshot.tool_calls in production)
+        tool_call_diff = len(snapshot.tool_calls) if snapshot.tool_calls else 0
 
         # Simple heuristics for quality (in production, use model-based eval)
         coherence = min(1.0, len(new_response) / max(1, len(original_response)))
@@ -742,7 +742,7 @@ class PromptEvolutionEngine:
         messages: List[Dict],
     ) -> str:
         """Placeholder inference function."""
-        return f"[Replayed with prompt of length {len(prompt)}]"
+        return f"[Replayed with prompt of length {len(prompt)}, {len(messages)} messages]"
 
     def initialize(self, genesis_prompt: str, author: str = "system") -> PromptNode:
         """Initialize with a genesis prompt."""
@@ -1047,19 +1047,27 @@ class PromptEvolutionEngine:
 
     def verify_integrity(self) -> Dict[str, Any]:
         """Verify the integrity of all stored prompts."""
+        all_nodes = self._store.all_nodes()
         results = {
-            "total_nodes": len(self._store.all_nodes()),
+            "total_nodes": len(all_nodes),
+            "nodes_checked": len(all_nodes),
             "verified": 0,
             "failed": 0,
             "failures": [],
+            "valid": True,  # Will be set to False if any fail
         }
 
-        for node in self._store.all_nodes():
+        for node in all_nodes:
             if self._store.verify_lineage(node.content_hash):
                 results["verified"] += 1
             else:
                 results["failed"] += 1
                 results["failures"].append(node.content_hash)
+                results["valid"] = False
+
+        # If no nodes, still valid
+        if not all_nodes:
+            results["valid"] = True
 
         return results
 
@@ -1068,12 +1076,15 @@ class PromptEvolutionEngine:
         nodes = self._store.all_nodes()
         forks = self._forks.list_forks()
 
+        current_node = self.get_current_node()
+        current_depth = current_node.depth if current_node is not None else 0
+
         return {
             "total_versions": len(nodes),
             "total_forks": len(forks),
             "active_forks": len([f for f in forks if f.is_active]),
             "current_fork": self._current_fork,
-            "current_depth": self.get_current_node().depth if self.get_current_node() else 0,
+            "current_depth": current_depth,
             "avg_fitness": (
                 sum(n.fitness_score for n in nodes if n.evaluation_count > 0) /
                 max(1, len([n for n in nodes if n.evaluation_count > 0]))
