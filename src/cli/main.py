@@ -7,6 +7,9 @@ and managing the research platform.
 
 Usage:
     lida run <scenario>           Run a debate scenario
+    lida simulate <scenario>      Run policy simulation (chip_war, agi_crisis, etc.)
+    lida quorum [--event "..."]   Run multi-agent quorum deliberation
+    lida debate [--scenario <id>] Run AI safety debate
     lida experiment <config>      Run a full experiment with analysis
     lida analyze <results>        Analyze experiment results
     lida serve                    Start the API server
@@ -14,6 +17,10 @@ Usage:
     lida export <results>         Export results to LaTeX/figures
     lida status                   Show running experiments
     lida list                     List available scenarios/personas
+    lida demo [--type <type>]     Run demos (live, streaming, quick)
+    lida logs <logfile>           Interactive log viewer
+    lida workers [--count N]      Run worker pool
+    lida chat <p1> <p2>           Two personas conversation
 """
 
 from __future__ import annotations
@@ -657,6 +664,215 @@ def cmd_model(args):
         print("Unknown subcommand. Use: assign, get, list, remove")
 
 
+def cmd_simulate(args):
+    """Run policy simulation."""
+    print(f"Running policy simulation: {args.scenario}")
+
+    # Import simulation components
+    try:
+        from src.agents.simulation_engine import (
+            SimulationMode,
+            create_chip_war_simulation,
+            create_agi_crisis_simulation,
+            create_bilateral_negotiation,
+        )
+    except ImportError as e:
+        print(f"Error importing simulation engine: {e}")
+        sys.exit(1)
+
+    persona_dir = _PROJECT_ROOT / "persona_pipeline" / "personas"
+
+    # Setup inference function if API key available
+    api_key = os.environ.get("OPENROUTER_API_KEY", "")
+    inference_fn = None
+
+    if api_key:
+        import httpx
+
+        async def openrouter_inference(system_prompt: str, user_message: str, model: str = "anthropic/claude-sonnet-4.5") -> str:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": model,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_message},
+                        ],
+                        "max_tokens": 2048,
+                        "temperature": 0.7,
+                    },
+                )
+                response.raise_for_status()
+                return response.json()["choices"][0]["message"]["content"]
+
+        inference_fn = openrouter_inference
+    else:
+        print("Warning: OPENROUTER_API_KEY not set. Using rule-based agents.")
+
+    async def run_simulation():
+        # Create simulation based on scenario
+        if args.scenario == "chip_war":
+            engine = create_chip_war_simulation(persona_dir, inference_fn=inference_fn)
+        elif args.scenario == "agi_crisis":
+            engine = create_agi_crisis_simulation(persona_dir, inference_fn=inference_fn)
+        elif args.scenario == "negotiation":
+            engine = create_bilateral_negotiation(
+                persona_dir,
+                args.agent_a or "xi_jinping",
+                args.agent_b or "gina_raimondo",
+                inference_fn=inference_fn,
+            )
+        else:
+            print(f"Unknown scenario: {args.scenario}")
+            print("Available: chip_war, agi_crisis, negotiation")
+            sys.exit(1)
+
+        print(f"Agents: {list(engine.agents.keys())}")
+        print(f"Running {args.ticks} ticks...")
+        print()
+
+        await engine.run(max_ticks=args.ticks)
+
+        summary = engine.get_summary()
+        print(json.dumps(summary, indent=2, default=str))
+
+    asyncio.run(run_simulation())
+
+
+def cmd_quorum(args):
+    """Run multi-agent quorum deliberation."""
+    print("Running quorum deliberation...")
+
+    event = args.event or "Major AI breakthrough announced"
+    backend = args.backend or "openrouter"
+
+    async def run_quorum():
+        if backend == "mlx":
+            # Try MLX backend
+            try:
+                # Import from run_mlx_quorum
+                sys.path.insert(0, str(_PROJECT_ROOT))
+                from run_mlx_quorum import run_mlx_quorum as _run_mlx
+                await _run_mlx(event)
+            except ImportError:
+                print("MLX backend not available. Install mlx-lm.")
+                sys.exit(1)
+        else:
+            # OpenRouter backend
+            try:
+                sys.path.insert(0, str(_PROJECT_ROOT))
+                from run_openrouter_quorum import run_simple_demo
+                await run_simple_demo()
+            except ImportError as e:
+                print(f"Error loading quorum module: {e}")
+                sys.exit(1)
+
+    asyncio.run(run_quorum())
+
+
+def cmd_debate(args):
+    """Run AI safety debate."""
+    print("Running AI safety debate...")
+
+    async def run_debate():
+        sys.path.insert(0, str(_PROJECT_ROOT))
+
+        if args.interactive:
+            from run_interactive_debate import main as interactive_main
+            await interactive_main()
+        elif args.scenario:
+            from run_comprehensive_debates import run_single_debate
+            # Load scenario
+            result = await run_single_debate({"id": args.scenario}, use_llm=not args.no_llm)
+            print(json.dumps(result, indent=2, default=str))
+        else:
+            from run_ai_safety_debate import main as debate_main
+            debate_main()
+
+    asyncio.run(run_debate())
+
+
+def cmd_demo(args):
+    """Run demonstration."""
+    demo_type = args.type or "quick"
+    print(f"Running {demo_type} demo...")
+
+    async def run_demo():
+        sys.path.insert(0, str(_PROJECT_ROOT))
+
+        if demo_type == "live":
+            from run_live_demo import run_live_demo
+            await run_live_demo()
+        elif demo_type == "streaming":
+            from run_live_streaming_demo import run_live_streaming_demo
+            await run_live_streaming_demo()
+        elif demo_type == "quick":
+            from run_quick_stream_demo import main as quick_main
+            await quick_main()
+        elif demo_type == "swarm":
+            from run_live_swarm import main as swarm_main
+            await swarm_main()
+        else:
+            print(f"Unknown demo type: {demo_type}")
+            print("Available: live, streaming, quick, swarm")
+            sys.exit(1)
+
+    asyncio.run(run_demo())
+
+
+def cmd_logs(args):
+    """Interactive log viewer."""
+    logfile = args.logfile
+
+    if not Path(logfile).exists():
+        print(f"Log file not found: {logfile}")
+        sys.exit(1)
+
+    sys.path.insert(0, str(_PROJECT_ROOT))
+    from view_logs import main as logs_main
+    sys.argv = ["view_logs", logfile]
+    logs_main()
+
+
+def cmd_workers(args):
+    """Run worker pool."""
+    count = args.count or 4
+    print(f"Starting worker pool with {count} workers...")
+
+    async def run_workers():
+        sys.path.insert(0, str(_PROJECT_ROOT))
+        from run_workers import main as workers_main
+        sys.argv = ["run_workers", "--count", str(count)]
+        await workers_main()
+
+    asyncio.run(run_workers())
+
+
+def cmd_chat(args):
+    """Run personality conversation between two personas."""
+    persona1 = args.persona1
+    persona2 = args.persona2
+    topic = args.topic or "the future of AI"
+    turns = args.turns or 5
+
+    print(f"Starting conversation between {persona1} and {persona2}")
+    print(f"Topic: {topic}")
+    print(f"Turns: {turns}")
+    print()
+
+    async def run_chat():
+        sys.path.insert(0, str(_PROJECT_ROOT))
+        from personality_conversation import run_conversation
+        await run_conversation(persona1, persona2, topic, turns)
+
+    asyncio.run(run_chat())
+
+
 def cmd_version(args):
     """Show version information."""
     from src.data.manager import DataManager
@@ -675,6 +891,9 @@ def cmd_version(args):
     print("  - Counterfactual Analysis")
     print("  - Mechanism Discovery")
     print("  - Paper Export")
+    print("  - Policy Simulation Engine")
+    print("  - Multi-Agent Quorum")
+    print("  - AI Safety Debate")
     print()
     print("Data:")
     print(f"  - {exp_summary.get('count', 0)} experiments")
@@ -690,16 +909,19 @@ def main():
 Examples:
   lida run ai_xrisk                    Run the AI x-risk debate scenario
   lida run ai_xrisk --no-live          Run without LLM calls (simulation)
+  lida simulate chip_war --ticks 20    Run chip war policy simulation
+  lida simulate negotiation --agent-a xi_jinping --agent-b gina_raimondo
+  lida quorum --event "AGI announced"  Run multi-agent quorum deliberation
+  lida debate --interactive            Interactive AI safety debate
+  lida demo --type streaming           Run streaming demo
+  lida chat sam_altman elon_musk       Two personas conversation
   lida experiment config.yaml          Run full experiment from config
   lida analyze results.json --all      Run all analyses on results
   lida serve --port 8080               Start API server on port 8080
   lida export results.json             Export to LaTeX tables/figures
   lida list --scenarios                List available scenarios
-  lida list --experiments              List past experiments
-  lida data summary                    Show data summary
-  lida data experiment mega_timeline   Show experiment details
-  lida data persona yann_lecun         Show persona details with history
-  lida data history geoffrey_hinton    Show participant's experiment history
+  lida logs .llm_logs.json             Interactive log viewer
+  lida workers --count 8               Run worker pool
         """
     )
 
@@ -716,6 +938,56 @@ Examples:
     run_parser.add_argument("--no-live", action="store_true", help="Disable LLM calls")
     run_parser.add_argument("--output", help="Output directory")
     run_parser.set_defaults(func=cmd_run)
+
+    # simulate command (policy simulation)
+    sim_parser = subparsers.add_parser("simulate", help="Run policy simulation")
+    sim_parser.add_argument("scenario", nargs="?", default="chip_war",
+                           help="Scenario: chip_war, agi_crisis, negotiation")
+    sim_parser.add_argument("--ticks", type=int, default=10, help="Number of simulation ticks")
+    sim_parser.add_argument("--agent-a", help="First agent for negotiation")
+    sim_parser.add_argument("--agent-b", help="Second agent for negotiation")
+    sim_parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+    sim_parser.set_defaults(func=cmd_simulate)
+
+    # quorum command
+    quorum_parser = subparsers.add_parser("quorum", help="Run multi-agent quorum deliberation")
+    quorum_parser.add_argument("--event", "-e", help="Event headline to analyze")
+    quorum_parser.add_argument("--backend", choices=["openrouter", "mlx"], default="openrouter",
+                              help="LLM backend to use")
+    quorum_parser.add_argument("--cycles", type=int, default=5, help="Number of deliberation cycles")
+    quorum_parser.set_defaults(func=cmd_quorum)
+
+    # debate command
+    debate_parser = subparsers.add_parser("debate", help="Run AI safety debate")
+    debate_parser.add_argument("--scenario", "-s", help="Specific debate scenario ID")
+    debate_parser.add_argument("--interactive", "-i", action="store_true", help="Interactive mode")
+    debate_parser.add_argument("--no-llm", action="store_true", help="Run without LLM calls")
+    debate_parser.add_argument("--list", action="store_true", help="List available scenarios")
+    debate_parser.set_defaults(func=cmd_debate)
+
+    # demo command
+    demo_parser = subparsers.add_parser("demo", help="Run demonstrations")
+    demo_parser.add_argument("--type", "-t", choices=["live", "streaming", "quick", "swarm"],
+                            default="quick", help="Demo type to run")
+    demo_parser.set_defaults(func=cmd_demo)
+
+    # logs command
+    logs_parser = subparsers.add_parser("logs", help="Interactive log viewer")
+    logs_parser.add_argument("logfile", help="Path to .llm_logs.json file")
+    logs_parser.set_defaults(func=cmd_logs)
+
+    # workers command
+    workers_parser = subparsers.add_parser("workers", help="Run worker pool")
+    workers_parser.add_argument("--count", "-n", type=int, default=4, help="Number of workers")
+    workers_parser.set_defaults(func=cmd_workers)
+
+    # chat command
+    chat_parser = subparsers.add_parser("chat", help="Two personas conversation")
+    chat_parser.add_argument("persona1", help="First persona key")
+    chat_parser.add_argument("persona2", help="Second persona key")
+    chat_parser.add_argument("--topic", "-t", help="Conversation topic")
+    chat_parser.add_argument("--turns", type=int, default=5, help="Number of turns")
+    chat_parser.set_defaults(func=cmd_chat)
 
     # experiment command
     exp_parser = subparsers.add_parser("experiment", help="Run full experiment")
