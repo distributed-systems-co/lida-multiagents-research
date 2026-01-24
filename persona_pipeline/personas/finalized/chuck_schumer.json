@@ -322,5 +322,8 @@
     "sources": 378,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Charles Ellis Schumer",
+  "current_role": "U.S. Senate Minority Leader",
+  "category": "Political"
 }

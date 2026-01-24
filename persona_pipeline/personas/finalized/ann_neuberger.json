@@ -306,5 +306,8 @@
     "sources": 200,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Anne Neuberger",
+  "current_role": "Special Advisor at Andreessen Horowitz (a16z)",
+  "category": "Intelligence"
 }

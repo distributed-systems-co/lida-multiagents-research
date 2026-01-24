@@ -253,5 +253,8 @@
     "sources": 255,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Young Kim",
+  "current_role": "U.S. Representative for California's 40th Congressional District and Chair of House Foreign Affairs East Asia and Pacific Subcommittee",
+  "category": "Political"
 }

@@ -224,5 +224,8 @@
     "sources": 266,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Kathleen Hicks",
+  "current_role": "Distinguished Fellow at Chicago Council on Global Affairs and Henry A. Kissinger Center for Global Affairs at Johns Hopkins SAIS",
+  "category": "Military"
 }

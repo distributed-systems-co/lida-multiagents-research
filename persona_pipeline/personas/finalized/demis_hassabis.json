@@ -288,5 +288,8 @@
     "sources": 277,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Demis Hassabis",
+  "current_role": "CEO of Google DeepMind and Isomorphic Labs",
+  "category": "Technology"
 }

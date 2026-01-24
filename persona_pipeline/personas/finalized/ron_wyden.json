@@ -310,5 +310,8 @@
     "sources": 338,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Ron Wyden",
+  "current_role": "U.S. Senator from Oregon, Ranking Member of the Senate Finance Committee",
+  "category": "Political"
 }

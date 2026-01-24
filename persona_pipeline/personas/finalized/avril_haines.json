@@ -284,5 +284,8 @@
     "sources": 223,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Avril Haines",
+  "current_role": "Former Director of National Intelligence",
+  "category": "Intelligence"
 }

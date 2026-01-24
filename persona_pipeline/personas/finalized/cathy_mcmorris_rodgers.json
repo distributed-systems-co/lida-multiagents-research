@@ -289,5 +289,8 @@
     "sources": 275,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Cathy McMorris Rodgers",
+  "current_role": "Former U.S. Representative for Washington's 5th Congressional District (retired 2025)",
+  "category": "Political"
 }

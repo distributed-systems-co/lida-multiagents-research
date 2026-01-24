@@ -275,5 +275,8 @@
     "sources": 307,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Maria Cantwell",
+  "current_role": "U.S. Senator from Washington, Ranking Member of Senate Commerce Committee",
+  "category": "Political"
 }

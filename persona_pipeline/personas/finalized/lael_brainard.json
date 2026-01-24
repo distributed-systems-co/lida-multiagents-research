@@ -225,5 +225,8 @@
     "sources": 249,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Lael Brainard",
+  "current_role": "Distinguished Fellow at Georgetown University Psaros Center and Senior Fellow at Harvard Kennedy School",
+  "category": "Economic"
 }

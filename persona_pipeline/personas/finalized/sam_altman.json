@@ -322,5 +322,8 @@
     "sources": 379,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Sam Altman",
+  "current_role": "CEO of OpenAI",
+  "category": "Technology"
 }

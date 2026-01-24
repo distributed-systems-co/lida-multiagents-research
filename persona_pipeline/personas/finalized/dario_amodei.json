@@ -359,5 +359,8 @@
     "sources": 283,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Dario Amodei",
+  "current_role": "CEO and Co-founder, Anthropic",
+  "category": "Technology"
 }

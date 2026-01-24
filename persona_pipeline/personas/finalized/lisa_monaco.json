@@ -269,5 +269,8 @@
     "sources": 220,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Lisa Monaco",
+  "current_role": "President of Global Affairs at Microsoft",
+  "category": "Political"
 }

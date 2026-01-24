@@ -386,5 +386,8 @@
     "sources": 453,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Mark Zuckerberg",
+  "current_role": "CEO and Co-founder of Meta Platforms (formerly Facebook)",
+  "category": "Technology"
 }

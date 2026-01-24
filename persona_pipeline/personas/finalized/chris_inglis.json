@@ -249,5 +249,8 @@
     "sources": 234,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Chris Inglis",
+  "current_role": "Strategic Advisor at Paladin Capital Group, Visiting Professor at U.S. Air Force and Naval Academies, Board Member at MITRE",
+  "category": "Intelligence"
 }

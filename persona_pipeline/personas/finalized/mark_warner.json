@@ -315,5 +315,8 @@
     "sources": 301,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Mark Warner",
+  "current_role": "U.S. Senator from Virginia and Vice Chairman of the Senate Intelligence Committee",
+  "category": "Political"
 }

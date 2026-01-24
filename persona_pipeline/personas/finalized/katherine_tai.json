@@ -247,5 +247,8 @@
     "sources": 238,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Katherine Tai",
+  "current_role": "Resident Fellow at Harvard Institute of Politics",
+  "category": "Economic"
 }

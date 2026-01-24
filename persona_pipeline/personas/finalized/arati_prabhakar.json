@@ -258,5 +258,8 @@
     "sources": 193,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Arati Prabhakar",
+  "current_role": "Former Director of White House Office of Science and Technology Policy (OSTP) and Assistant to President Biden for Science and Technology (2022-2025)",
+  "category": "Technology"
 }

@@ -298,5 +298,8 @@
     "sources": 344,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Josh Hawley",
+  "current_role": "U.S. Senator from Missouri",
+  "category": "Political"
 }

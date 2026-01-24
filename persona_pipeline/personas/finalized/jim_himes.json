@@ -241,5 +241,8 @@
     "sources": 280,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Jim Himes",
+  "current_role": "Ranking Member, House Permanent Select Committee on Intelligence; U.S. Representative, Connecticut's 4th District",
+  "category": "Political"
 }

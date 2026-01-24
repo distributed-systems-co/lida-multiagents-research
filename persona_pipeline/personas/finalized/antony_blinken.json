@@ -329,5 +329,8 @@
     "sources": 313,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Antony Blinken",
+  "current_role": "Former 71st U.S. Secretary of State (2021-2025)",
+  "category": "Political"
 }

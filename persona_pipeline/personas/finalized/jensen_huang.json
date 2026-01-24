@@ -359,5 +359,8 @@
     "sources": 349,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Jensen Huang",
+  "current_role": "CEO and Co-founder of Nvidia",
+  "category": "Technology"
 }

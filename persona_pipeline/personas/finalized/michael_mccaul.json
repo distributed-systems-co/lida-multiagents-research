@@ -298,5 +298,8 @@
     "sources": 282,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Michael McCaul",
+  "current_role": "Chairman Emeritus of House Foreign Affairs Committee, U.S. House of Representatives",
+  "category": "Political"
 }

@@ -311,5 +311,8 @@
     "sources": 380,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Sundar Pichai",
+  "current_role": "CEO of Alphabet Inc. and Google",
+  "category": "Technology"
 }

@@ -464,5 +464,8 @@
     "sources": 462,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Elon Reeve Musk",
+  "current_role": "CEO of Tesla, SpaceX, and X (formerly Twitter); CTO of X",
+  "category": "Technology"
 }

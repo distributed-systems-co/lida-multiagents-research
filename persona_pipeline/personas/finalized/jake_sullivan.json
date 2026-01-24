@@ -890,5 +890,8 @@
     "model": "anthropic/claude-opus-4.5",
     "role": "National Security Advisor",
     "max_tokens": 16000
-  }
+  },
+  "name": "Jake Sullivan",
+  "current_role": "United States National Security Advisor",
+  "category": "Political"
 }

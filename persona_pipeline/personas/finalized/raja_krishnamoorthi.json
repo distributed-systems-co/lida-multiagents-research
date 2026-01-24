@@ -279,5 +279,8 @@
     "sources": 318,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Raja Krishnamoorthi",
+  "current_role": "U.S. Representative for Illinois's 8th congressional district",
+  "category": "Political"
 }

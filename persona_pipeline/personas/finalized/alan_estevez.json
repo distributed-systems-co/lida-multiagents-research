@@ -231,5 +231,8 @@
     "sources": 204,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Alan Estevez",
+  "current_role": "Senior Advisor at Covington & Burling LLP and Board Member at Almonty Industries",
+  "category": "Economic"
 }

@@ -267,5 +267,8 @@
     "sources": 288,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Lisa Su",
+  "current_role": "President and CEO of AMD (Advanced Micro Devices)",
+  "category": "Technology"
 }

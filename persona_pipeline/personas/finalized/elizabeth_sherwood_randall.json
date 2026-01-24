@@ -292,5 +292,8 @@
     "sources": 154,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Elizabeth Sherwood-Randall",
+  "current_role": "Homeland Security Advisor and Deputy National Security Advisor to President Biden",
+  "category": "Political"
 }

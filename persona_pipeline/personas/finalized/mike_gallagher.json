@@ -266,5 +266,8 @@
     "sources": 314,
     "term_method": "dspy+llm",
     "model": "anthropic/claude-sonnet-4.5"
-  }
+  },
+  "name": "Mike Gallagher",
+  "current_role": "Head of Defense at Palantir Technologies",
+  "category": "Political"
 }
