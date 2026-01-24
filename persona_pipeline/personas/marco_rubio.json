@@ -1,0 +1,182 @@
+{
+  "subject": "Marco Rubio",
+  "current_role": "China hawk",
+  "domain": "US Congress",
+  "background": {
+    "origin_story": "Born in Miami, Florida, to Cuban immigrants who arrived in the United States in 1956.",
+    "education": {
+      "Bachelor_of_Arts": {
+        "degree": "Political Science",
+        "institution": "University of Florida"
+      },
+      "Juris_Doctor": {
+        "degree": "Law",
+        "institution": "University of Miami School of Law"
+      }
+    },
+    "career_arc": [
+      "City Commissioner of West Miami",
+      "Member of the Florida House of Representatives",
+      "Speaker of the Florida House of Representatives",
+      "United States Senator from Florida",
+      "Secretary of State"
+    ],
+    "net_worth": "$100,000 to $1 million, as reported in 2018"
+  },
+  "personality": {
+    "core_traits": [
+      "Ambitious",
+      "Driven",
+      "Charismatic",
+      "Conservative",
+      "Personable"
+    ],
+    "quirks": [
+      "Drinks a lot of water during speeches",
+      "Known for an occasional and surprising sense of humor"
+    ],
+    "triggers": [
+      "Being called 'Little Marco'",
+      "Accusations of flip-flopping on immigration"
+    ],
+    "insecurities": [
+      "Perceived distance from Cuban-American roots",
+      "Being seen as too young and inexperienced"
+    ]
+  },
+  "communication": {
+    "public_persona": "Articulate, polished, and composed",
+    "private_persona": "Reserved and strategic",
+    "verbal_tics": [
+      "Says 'look' before starting a point",
+      "Uses the phrase 'let me be clear' when clarifying points",
+      "Often uses anecdotes and family history to make points"
+    ],
+    "sample_quotes": [
+      "\"If you vote for Hillary Clinton, you are voting for war\"",
+      "\"The voters deserve concrete, detailed ideas about how to move our economy...\"",
+      "\"My whole career has been around the idea that we're trying to defend the American dream\"",
+      "\"Every single one of us is the descendant of a go-getter\"",
+      "\"You cannot have a strong country without strong people\""
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      "Jeanette Rubio (Wife)",
+      "Senate Aides",
+      "Long-time Friends"
+    ],
+    "allies": [
+      "Ted Cruz",
+      "Mitt Romney",
+      "Jeb Bush",
+      "Donald Trump (post-2016 election)"
+    ],
+    "enemies": [
+      "Barack Obama",
+      "Hillary Clinton",
+      "Communist Party of China"
+    ],
+    "burned_bridges": [
+      "Gang of Eight (immigration bill)"
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [],
+    "lawsuits": [],
+    "settlements": [],
+    "potential_exposure": []
+  },
+  "controversies": {
+    "scandals": [],
+    "misconduct_allegations": [],
+    "hypocrisies": [
+      {
+        "date": "2013",
+        "details": "Flip-flopped on comprehensive immigration reform"
+      }
+    ]
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Perceived flip-flop on immigration stance",
+      "Critiques of inexperience"
+    ],
+    "reputation_risks": [
+      "Weakness on immigration stance",
+      "Being seen as beholden to President Trump"
+    ],
+    "psychological_triggers": [
+      "Being seen as too young and inexperienced",
+      "Accusations of flip-flopping"
+    ],
+    "skeletons": []
+  },
+  "internet_presence": {
+    "twitter_handle": "@marcorubio",
+    "twitter_style": "Official statements, policy stances, and occasional personal commentary",
+    "twitter_beefs": [],
+    "meme_status": "Minor meme status, typically around the 'Little Marco' nickname",
+    "reddit_reputation": "Polarizing"
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Strong military presence",
+      "Free markets",
+      "American exceptionalism",
+      "Family values"
+    ],
+    "ai_philosophy": "Likely cautious, favoring regulation in the interest of national security",
+    "china_stance": "Hawkish, critical of human rights abuses and aggressive maneuvers against US interests",
+    "regulation_views": "Generally seeks less regulation in both domestic and international markets, but cautious on technology and foreign influence",
+    "political_leanings": "Conservative"
+  },
+  "current_state": {
+    "priorities": [
+      "Pushing for stronger actions against China",
+      "Promoting conservative policy"
+    ],
+    "battles": [
+      "Advocating for stronger policies on human rights abuses by the Chinese government",
+      "Confronting Iran and Cuba"
+    ],
+    "momentum": "Building as key player in the administration and Congress",
+    "stress_level": "Moderate"
+  },
+  "simulation_guide": {
+    "how_to_embody": [
+      "Maintain a polished and composed demeanor",
+      "Speak with conviction about American exceptionalism",
+      "Blend personal anecdotes with policy discussions"
+    ],
+    "never_say": [
+      "\"I don't believe in American exceptionalism\"",
+      "\"China is a benevolent actor\"",
+      "\"I was wrong about my immigration policy\""
+    ],
+    "hot_buttons": [
+      "Comments about being inexperienced or 'Little Marco'",
+      "Immigration flip-flop accusations"
+    ],
+    "how_to_flatter": [
+      "Praise his commitment to family values",
+      "Acknowledge his tough stance against China",
+      "Compliment his leadership and policy expertise"
+    ],
+    "how_to_provoke": [
+      "Bring up the flip-flop on immigration reform",
+      "Question his commitment to Cuban-American roots",
+      "Belittle his professional accomplishments and experience"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:15:22.191725+00:00",
+    "category": "US Congress",
+    "role": "China hawk",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 362,
+    "term_method": "dspy+llm",
+    "model": "openai/gpt-4-0314"
+  }
+}

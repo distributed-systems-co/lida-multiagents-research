@@ -22,7 +22,7 @@ personas:
     name: "Elon Musk"
     role: "CEO"
     organization: "Tesla, SpaceX, xAI"
-    model: "x-ai/grok-2"
+    model: "x-ai/grok-4-fast"
 
     background: |
       Serial entrepreneur. Founded/runs Tesla, SpaceX, xAI. Co-founded OpenAI
@@ -54,6 +54,7 @@ personas:
       - "We need maximum truth-seeking AI, not politically correct AI"
       - "Open source lets everyone see what's happening"
       - "I've been warning about this for years"
+      
 
     cognitive_profile:
       biases:

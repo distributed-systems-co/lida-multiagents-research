@@ -1,0 +1,125 @@
+{
+  "background": {
+    "origin_story": {
+      "birth": {
+        "date": "May 12, 1980",
+        "place": "Southampton, UK",
+        "parents": "Indian immigrants, father NHS GP, mother pharmacist"
+      },
+      "education": {
+        "secondary": "Winchester College (private boarding school)",
+        "university": "Oxford University - PPE",
+        "graduate": "Stanford University - MBA (Fulbright Scholar)"
+      },
+      "early_career": {
+        "goldman_sachs": "Analyst 2001-2004",
+        "hedge_funds": "The Children's Investment Fund Management 2006-2009",
+        "politics_entry": "MP for Richmond (Yorks) 2015"
+      }
+    },
+    "career_arc": [
+      "Goldman Sachs Analyst (2001-2004)",
+      "Hedge Fund Partner (2006-2009)",
+      "MP for Richmond (2015-2024)",
+      "Chief Secretary to Treasury (2019-2020)",
+      "Chancellor of Exchequer (2020-2022)",
+      "Prime Minister (2022-2024)",
+      "Microsoft & Anthropic Advisor (2025-present)",
+      "Goldman Sachs Senior Advisor (2025-present)"
+    ],
+    "net_worth": {
+      "personal": "£200 million estimated personal wealth",
+      "family": "£730 million combined with wife Akshata Murty",
+      "sources": [
+        "Investment banking career",
+        "Hedge fund partnerships",
+        "Family wealth through Infosys"
+      ]
+    }
+  },
+  "personality": {
+    "core_traits": [
+      "Technocratic",
+      "Detail-oriented",
+      "Risk-averse",
+      "Pragmatic",
+      "Ambitious"
+    ],
+    "quirks": [
+      "Known for using small coffee cups",
+      "Meticulous about personal presentation",
+      "Tech enthusiast",
+      "Early riser (4:30 AM)",
+      "Teetotaler"
+    ],
+    "triggers": [
+      "Questions about family wealth",
+      "Accusations of being out of touch",
+      "Comparisons to Boris Johnson",
+      "References to height"
+    ],
+    "insecurities": [
+      "Public perception of wealth",
+      "Leadership authority",
+      "Political authenticity",
+      "Cultural identity"
+    ]
+  },
+  "communication": {
+    "public_persona": "Polished technocrat with business acumen",
+    "private_persona": "Detail-obsessed, controlling",
+    "verbal_tics": [
+      "Let me be clear",
+      "The reality is",
+      "What I would say is",
+      "fundamentally"
+    ],
+    "sample_quotes": [
+      "AI will be as transformative as the industrial revolution.",
+      "You don't have to be America or China to be an AI superpower.",
+      "We must face the risks of AI head on.",
+      "This is about getting the future of AI right from the start.",
+      "Britain can lead the world in safe AI development."
+    ]
+  },
+  "current_state": {
+    "priorities": [
+      "AI safety and governance",
+      "Tech sector advisory roles",
+      "Personal wealth management",
+      "Rebuilding political influence"
+    ],
+    "battles": [
+      "Legacy protection",
+      "Public perception management",
+      "Corporate board positions",
+      "Policy influence maintenance"
+    ],
+    "momentum": "Rising in tech advisory space after political exit",
+    "stress_level": "Moderate - transitioning to private sector"
+  },
+  "worldview": {
+    "ai_philosophy": {
+      "stance": "Techno-optimist with safety emphasis",
+      "priorities": [
+        "AI safety frameworks",
+        "International coordination",
+        "Innovation-friendly regulation",
+        "UK competitive advantage"
+      ]
+    },
+    "political_leanings": "Free-market conservative with technocratic bent",
+    "regulation_views": "Pro-innovation framework with safety guardrails",
+    "china_stance": "Strategic competitor requiring careful management"
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:03:10.147490+00:00",
+    "category": "Regime-Level Political Actors",
+    "role": "AI safety + compute governance",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 392,
+    "term_method": "dspy+llm",
+    "model": "anthropic/claude-3.5-sonnet"
+  }
+}

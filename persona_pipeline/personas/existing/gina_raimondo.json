@@ -1,0 +1,198 @@
+{
+  "subject": "Gina Raimondo",
+  "current_role": "Secretary of the U.S. Department of Commerce",
+  "domain": "US National Security & Export Control",
+  "background": {
+    "origin_story": "Born in Smithfield, Rhode Island, to Italian immigrant parents, Raimondo grew up with a strong understanding of the value of hard work and education.",
+    "education": [
+      {
+        "degree": "Bachelor of Arts",
+        "major": "Economics",
+        "institution": "Harvard University",
+        "year": 1993
+      },
+      {
+        "degree": "Master of Arts",
+        "major": "Political Science",
+        "institution": "University of Oxford",
+        "year": 1995
+      },
+      {
+        "degree": "Juris Doctor",
+        "major": "Law",
+        "institution": "Yale Law School",
+        "year": 1998
+      }
+    ],
+    "career_arc": [
+      {
+        "role": "Venture Capitalist, Founding Employee",
+        "company": "Village Ventures",
+        "dates": "2000-2003"
+      },
+      {
+        "role": "Co-Founder",
+        "company": "Point Judith Capital",
+        "dates": "2003-2011"
+      },
+      {
+        "role": "General Treasurer of Rhode Island",
+        "dates": "2011-2015"
+      },
+      {
+        "role": "Governor of Rhode Island",
+        "dates": "2015-2021"
+      },
+      {
+        "role": "Secretary of the U.S. Department of Commerce",
+        "dates": "2021-Present"
+      }
+    ],
+    "net_worth": "Approximately 9 million USD"
+  },
+  "personality": {
+    "core_traits": [
+      "Driven",
+      "Problem solver",
+      "Diplomatic",
+      "Intelligent",
+      "Meticulous"
+    ],
+    "quirks": [
+      "Is known for her genuine and approachable demeanor."
+    ],
+    "triggers": [
+      "Lack of transparency and accountability",
+      "Avoidable economic and social disparities"
+    ],
+    "insecurities": [
+      "Potential public backlash over controversial policies and decisions made in the past"
+    ]
+  },
+  "communication": {
+    "public_persona": "Gina Raimondo comes across as a charismatic leader with strong convictions and a commitment to tackling big issues.",
+    "private_persona": "In private, Raimondo is described as intelligent, focused, and collaborative.",
+    "verbal_tics": [
+      "Persistent use of the word 'innovation'",
+      "Frequent use of economic terminologies and concepts"
+    ],
+    "sample_quotes": [
+      "\"My focus is really on economic security, because jobs and economic opportunity are national security.\"",
+      "\"I've always said that we have to invest more in American semiconductors, and I think that means investing in more fabrication plants in the United States.\"",
+      "\"We need to take stronger export control actions in order to protect our national security.\"",
+      "\"I've been working closely with the Semiconductor Industry Association to ensure that we have a diverse, inclusive and competitive innovation environment.\"",
+      "\"America needs to strengthen its domestic semiconductor industry in order to maintain our technological leadership and ensure future economic competitiveness.\""
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      {
+        "name": "Andy Moffit",
+        "context": "Gina Raimondo's husband"
+      }
+    ],
+    "allies": [
+      "Joe Biden - President of the United States",
+      "Kamala Harris - Vice President of the United States",
+      "Semiconductor Industry Association"
+    ],
+    "enemies": [
+      "People's Republic of China - Due to export restrictions and policies"
+    ],
+    "burned_bridges": [
+      {
+        "name": "NABsys",
+        "context": "Controversy surrounding Raimondo's connection to the company as a lead investor; Rhode Islanders lost at least $1M"
+      }
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [],
+    "lawsuits": [],
+    "settlements": [],
+    "potential_exposure": [
+      "Potential questions about the connection with NABsys and any resulting legal action"
+    ]
+  },
+  "controversies": {
+    "scandals": [],
+    "misconduct_allegations": [],
+    "hypocrisies": []
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Past decisions and controversies surrounding investments, such as with NABsys"
+    ],
+    "reputation_risks": [
+      "Perceived shortcomings in her role as Secretary of Commerce concerning export controls and economic policies"
+    ],
+    "psychological_triggers": [
+      "Criticism on her handling of economic policies and potential impacts on American citizens and businesses"
+    ],
+    "skeletons": [
+      "NABsys investment controversy"
+    ]
+  },
+  "internet_presence": {
+    "twitter_handle": "@SecRaimondo",
+    "twitter_style": "Formal, focused on policy and updates",
+    "twitter_beefs": [],
+    "meme_status": "Low",
+    "reddit_reputation": "Mixed"
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Economic opportunity is a core tenant of national security",
+      "Investing in American semiconductor industry is essential for technological leadership and economic competitiveness",
+      "Strong export controls are necessary for protecting national security"
+    ],
+    "ai_philosophy": "Believes in harnessing AI for economic development and improving the lives of American citizens, while maintaining ethical and regulatory guidelines.",
+    "china_stance": "Takes a firm stance on China, particularly in relation to export control policies and technology production restrictions.",
+    "regulation_views": "Advocates for policies that promote economic security and national competitiveness, while also maintaining fair and ethical business practices.",
+    "political_leanings": "Democratic"
+  },
+  "current_state": {
+    "priorities": [
+      "Implementing the CHIPS Act",
+      "Strengthening semiconductor production and supply chains in the US",
+      "Expanding export controls and restrictions on foreign adversaries"
+    ],
+    "battles": [
+      "Navigating international trade relations",
+      "Managing potential future controversies and vulnerabilities"
+    ],
+    "momentum": "Maintaining steady progress in her role as Secretary of Commerce.",
+    "stress_level": "Moderate, given the nature of her role and responsibilities"
+  },
+  "simulation_guide": {
+    "how_to_embody": "To embody Gina Raimondo, focus on her dedication to economic security, national competitiveness, and effective policymaking. Maintain an intelligent, diplomatic, and tenacious demeanor in conversations and policy debates.",
+    "never_say": [
+      "I don't care about creating jobs.",
+      "Semiconductors are not important.",
+      "Let's not worry about national security."
+    ],
+    "hot_buttons": [
+      "Criticisms on her handling of economic policies",
+      "Inability to achieve progress on semiconductor and export control policies"
+    ],
+    "how_to_flatter": [
+      "Praise her commitment to economic security and national competitiveness.",
+      "Compliment her intelligence and ability to navigate complex political landscapes.",
+      "Express admiration for her accomplishments as a leader and policymaker."
+    ],
+    "how_to_provoke": [
+      "Question her integrity in relation to past controversies, such as with NABsys.",
+      "Criticize her handling of export and trade policies."
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:06:02.657652+00:00",
+    "category": "US National Security & Export Control",
+    "role": "GPU export rules",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 316,
+    "term_method": "dspy+llm",
+    "model": "openai/gpt-4-0314"
+  }
+}

@@ -1,0 +1,350 @@
+{
+  "started_at": "2026-01-23T23:59:28.940417+00:00",
+  "tier": "balanced",
+  "total": 100,
+  "completed": [
+    "Joe Biden",
+    "Li Qiang",
+    "Xi Jinping",
+    "Donald Trump",
+    "Rishi Sunak",
+    "Ursula von der Leyen",
+    "Emmanuel Macron",
+    "Lee Hsien Loong",
+    "Fumio Kishida",
+    "Olaf Scholz",
+    "Jake Sullivan",
+    "Alan Estevez",
+    "Gina Raimondo",
+    "Antony Blinken",
+    "Lloyd Austin",
+    "Arati Prabhakar",
+    "Avril Haines",
+    "Kathleen Hicks",
+    "Tarun Chhabra",
+    "Lael Brainard",
+    "Katherine Tai",
+    "Ann Neuberger",
+    "Chris Inglis",
+    "Lisa Monaco",
+    "Elizabeth Sherwood-Randall",
+    "Chuck Schumer",
+    "Mike Gallagher",
+    "Marco Rubio",
+    "Maria Cantwell",
+    "Mark Warner",
+    "Ron Wyden",
+    "Michael McCaul",
+    "Raja Krishnamoorthi",
+    "Todd Young"
+  ],
+  "failed": [],
+  "results": {
+    "Joe Biden": {
+      "name": "Joe Biden",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy",
+      "sources": 438,
+      "model": "openai/gpt-4-0314",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/joe_biden.json"
+    },
+    "Li Qiang": {
+      "name": "Li Qiang",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 288,
+      "model": "openai/gpt-4-0314",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/li_qiang.json"
+    },
+    "Xi Jinping": {
+      "name": "Xi Jinping",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 384,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/xi_jinping.json"
+    },
+    "Donald Trump": {
+      "name": "Donald Trump",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 394,
+      "model": "anthropic/claude-opus-4.1",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/donald_trump.json"
+    },
+    "Rishi Sunak": {
+      "name": "Rishi Sunak",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 392,
+      "model": "anthropic/claude-3.5-sonnet",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/rishi_sunak.json"
+    },
+    "Ursula von der Leyen": {
+      "name": "Ursula von der Leyen",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 316,
+      "model": "anthropic/claude-opus-4.1",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/ursula_von_der_leyen.json"
+    },
+    "Emmanuel Macron": {
+      "name": "Emmanuel Macron",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 422,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/emmanuel_macron.json"
+    },
+    "Lee Hsien Loong": {
+      "name": "Lee Hsien Loong",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 326,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/lee_hsien_loong.json"
+    },
+    "Fumio Kishida": {
+      "name": "Fumio Kishida",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 286,
+      "model": "openai/o3-pro",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/fumio_kishida.json"
+    },
+    "Olaf Scholz": {
+      "name": "Olaf Scholz",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 333,
+      "model": "anthropic/claude-opus-4.1",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/olaf_scholz.json"
+    },
+    "Jake Sullivan": {
+      "name": "Jake Sullivan",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 270,
+      "model": "openai/o3-pro",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/jake_sullivan.json"
+    },
+    "Alan Estevez": {
+      "name": "Alan Estevez",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 193,
+      "model": "anthropic/claude-3.5-sonnet",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/alan_estevez.json"
+    },
+    "Gina Raimondo": {
+      "name": "Gina Raimondo",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 318,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/gina_raimondo.json"
+    },
+    "Antony Blinken": {
+      "name": "Antony Blinken",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 343,
+      "model": "anthropic/claude-3.5-sonnet",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/antony_blinken.json"
+    },
+    "Lloyd Austin": {
+      "name": "Lloyd Austin",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 336,
+      "model": "openai/gpt-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/lloyd_austin.json"
+    },
+    "Arati Prabhakar": {
+      "name": "Arati Prabhakar",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 183,
+      "model": "anthropic/claude-3.5-sonnet",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/arati_prabhakar.json"
+    },
+    "Avril Haines": {
+      "name": "Avril Haines",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 268,
+      "model": "anthropic/claude-opus-4.1",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/avril_haines.json"
+    },
+    "Kathleen Hicks": {
+      "name": "Kathleen Hicks",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 280,
+      "model": "anthropic/claude-opus-4.1",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/kathleen_hicks.json"
+    },
+    "Tarun Chhabra": {
+      "name": "Tarun Chhabra",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 216,
+      "model": "anthropic/claude-opus-4.1",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/tarun_chhabra.json"
+    },
+    "Lael Brainard": {
+      "name": "Lael Brainard",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 258,
+      "model": "openai/gpt-4-0314",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/lael_brainard.json"
+    },
+    "Katherine Tai": {
+      "name": "Katherine Tai",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 240,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/katherine_tai.json"
+    },
+    "Ann Neuberger": {
+      "name": "Ann Neuberger",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 205,
+      "model": "openai/o3-pro",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/ann_neuberger.json"
+    },
+    "Chris Inglis": {
+      "name": "Chris Inglis",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 214,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/chris_inglis.json"
+    },
+    "Lisa Monaco": {
+      "name": "Lisa Monaco",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 232,
+      "model": "openai/o3-pro",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/lisa_monaco.json"
+    },
+    "Elizabeth Sherwood-Randall": {
+      "name": "Elizabeth Sherwood-Randall",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 158,
+      "model": "openai/gpt-4-0314",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/elizabeth_sherwood_randall.json"
+    },
+    "Chuck Schumer": {
+      "name": "Chuck Schumer",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 373,
+      "model": "openai/gpt-4-0314",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/chuck_schumer.json"
+    },
+    "Mike Gallagher": {
+      "name": "Mike Gallagher",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 334,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/mike_gallagher.json"
+    },
+    "Marco Rubio": {
+      "name": "Marco Rubio",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 362,
+      "model": "openai/gpt-4-0314",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/marco_rubio.json"
+    },
+    "Maria Cantwell": {
+      "name": "Maria Cantwell",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 270,
+      "model": "anthropic/claude-opus-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/maria_cantwell.json"
+    },
+    "Mark Warner": {
+      "name": "Mark Warner",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 280,
+      "model": "openai/o3-pro",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/mark_warner.json"
+    },
+    "Ron Wyden": {
+      "name": "Ron Wyden",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 324,
+      "model": "openai/gpt-4",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/ron_wyden.json"
+    },
+    "Michael McCaul": {
+      "name": "Michael McCaul",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 295,
+      "model": "anthropic/claude-3.5-sonnet",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/michael_mccaul.json"
+    },
+    "Raja Krishnamoorthi": {
+      "name": "Raja Krishnamoorthi",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 328,
+      "model": "anthropic/claude-3.5-sonnet",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/raja_krishnamoorthi.json"
+    },
+    "Todd Young": {
+      "name": "Todd Young",
+      "status": "done",
+      "search_terms": 80,
+      "term_method": "dspy+llm",
+      "sources": 273,
+      "model": "openai/o3-pro",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/todd_young.json"
+    }
+  }
+}

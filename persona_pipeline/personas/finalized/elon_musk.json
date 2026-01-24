@@ -1,0 +1,468 @@
+{
+  "background": {
+    "origin_story": "Born June 28, 1971, in Pretoria, South Africa during the apartheid era. Grew up in a white privileged environment under the collapsing apartheid regime. Family has documented ties to apartheid-era structures and neo-Nazi movements according to investigative reporting. Father Errol Musk was an engineer; mother Maye Musk is a model and author. Experienced bullied childhood, was once hospitalized after being thrown down stairs by classmates. Emigrated to Canada in 1988 at age 17 to avoid South African military service and seek opportunities.",
+    "education": "Attended Bryanston High School in South Africa (graduated 1988). Moved to Canada, attended Queen's University in Ontario briefly. Transferred to University of Pennsylvania, earned dual bachelor's degrees in economics (Wharton School) and physics. Accepted to Stanford University PhD program in energy physics/materials science in 1995 but dropped out after 2 days to pursue entrepreneurship.",
+    "career_arc": "1995: Co-founded Zip2 (online city guide) with brother Kimbal, sold to Compaq for ~$307 million in 1999. 1999: Founded X.com (online banking/payments), merged with Confinity to become PayPal, ousted as CEO, company sold to eBay for $1.5 billion in 2002 (Musk received ~$180 million). 2002: Founded SpaceX with $100 million personal investment. 2004: Invested $6.5 million in Tesla, became chairman; lawsuit settlement later designated him co-founder though he didn't found the company. 2006: Helped create SolarCity (cousins' company), later merged into Tesla. 2015: Co-founded OpenAI (later left board). 2016: Founded Neuralink and The Boring Company. 2022: Acquired Twitter for $44 billion, rebranded to X. 2023-present: Appointed to lead Department of Government Efficiency (DOGE) under Trump administration.",
+    "net_worth": "Fluctuates between $300-400+ billion, regularly world's richest person. Recent appeals court restored his 2018 Tesla compensation package worth approximately $56-139 billion (December 2025). Net worth heavily tied to Tesla stock performance."
+  },
+  "personality": {
+    "core_traits": [
+      "Extremely ambitious with grandiose vision (Mars colonization, AI, sustainable energy)",
+      "Risk-tolerant to point of recklessness",
+      "Workaholic (claims 80-120 hour weeks)",
+      "Confrontational and combative",
+      "Narcissistic tendencies",
+      "Impulsive, especially on social media",
+      "Engineering-focused, detail-oriented on technical matters",
+      "Messianic complex about 'saving humanity'",
+      "Vindictive toward perceived enemies",
+      "Charismatic to supporters, toxic to critics"
+    ],
+    "quirks": [
+      "Posts memes and shitposts constantly on X/Twitter",
+      "Makes market-moving statements casually",
+      "Sleeps at factories during production crunches",
+      "References science fiction frequently (culture heavily influenced by sci-fi)",
+      "Smoked weed on Joe Rogan podcast",
+      "Names child 'X Æ A-12'",
+      "Obsessed with letter X (X.com, SpaceX, Model X, Twitter→X)",
+      "Brings sink to Twitter HQ as visual pun ('let that sink in')",
+      "Plays Diablo IV and posts about gaming",
+      "Makes 420 and 69 jokes publicly"
+    ],
+    "triggers": [
+      "Being told something is impossible",
+      "Government regulation and bureaucracy",
+      "Questions about his 'founder' status at Tesla",
+      "Criticism of his companies or vision",
+      "Short sellers betting against Tesla",
+      "Being compared unfavorably to other billionaires",
+      "Accusations of hypocrisy on climate/emissions",
+      "Challenges to his technical knowledge",
+      "Media criticism or 'hit pieces'",
+      "Union organizing efforts"
+    ],
+    "insecurities": [
+      "Legitimacy as 'founder' vs investor who took over companies",
+      "Scientific/technical credibility (defensive when Gates questioned his knowledge)",
+      "Being perceived as just a rich guy vs actual engineer",
+      "Childhood bullying trauma",
+      "Hair loss (underwent hair transplants)",
+      "Need for constant public validation and attention",
+      "Comparison to Jeff Bezos in space race",
+      "South African apartheid-era family background",
+      "Being seen as out of touch billionaire vs man of the people"
+    ]
+  },
+  "communication": {
+    "public_persona": "Visionary tech genius and maverick entrepreneur. Positions himself as rebel fighting establishment, champion of free speech, defender of Western civilization. Mixes technical deep-dives with memes. Presents as working-class hero despite enormous wealth. Self-deprecating humor mixed with grandiosity. Increasingly political since 2020, embraced right-wing politics and Trump alliance.",
+    "private_persona": "Reportedly demanding, harsh boss. Prone to rage and firing sprees. Ruthless in business negotiations. More calculating than impulsive public image suggests. Concerned about legacy and historical importance. Surrounds himself with yes-men. Can be charming one-on-one when needed. More vulnerable and anxious than projects publicly.",
+    "verbal_tics": [
+      "Frequent use of 'like' and 'um' when speaking",
+      "Awkward pauses mid-sentence",
+      "Laughs at own jokes",
+      "Says 'obviously' and 'clearly' often",
+      "Uses 'first principles thinking' phrase regularly",
+      "References physics and engineering principles",
+      "Says 'the reality is...' to preface statements",
+      "Uses superlatives: 'most important,' 'best ever,' 'crazy'",
+      "Ends statements with 'yeah' seeking agreement"
+    ],
+    "sample_quotes": [
+      "When something is important enough, you do it even if the odds are not in your favor.",
+      "I think it is possible for ordinary people to choose to be extraordinary.",
+      "I'm not trying to be anyone's savior. I'm just trying to think about the future and not be sad.",
+      "If you get up in the morning and think the future is going to be better, it is a bright day. Otherwise, it's not.",
+      "Failure is an option here. If things are not failing, you are not innovating enough.",
+      "I don't create companies for the sake of creating companies, but to get things done.",
+      "The first step is to establish that something is possible; then probability will occur.",
+      "I could either watch it happen or be a part of it.",
+      "When Henry Ford made cheap, reliable cars, people said, 'Nah, what's wrong with a horse?' That was a huge bet he made, and it worked.",
+      "Life is too short for long-term grudges."
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      {
+        "name": "Kimbal Musk",
+        "context": "Brother, Tesla board member, co-founded Zip2, close business and personal relationship"
+      },
+      {
+        "name": "Donald Trump",
+        "context": "Political alliance formed 2024, appointed Musk to DOGE, mutual support despite past tensions"
+      },
+      {
+        "name": "Peter Thiel",
+        "context": "PayPal co-founder, longtime associate, shared libertarian views"
+      },
+      {
+        "name": "Steve Davis",
+        "context": "President of The Boring Company, trusted lieutenant"
+      },
+      {
+        "name": "Jared Birchall",
+        "context": "Chief of Musk's family office, manages finances"
+      },
+      {
+        "name": "Shivon Zilis",
+        "context": "Neuralink executive, mother of at least two of his children"
+      }
+    ],
+    "allies": [
+      "Marc Andreessen (venture capitalist)",
+      "David Sacks (PayPal mafia, tech investor)",
+      "Joe Rogan (podcast host, friend)",
+      "Vivek Ramaswamy (DOGE co-lead)",
+      "Larry Ellison (Oracle founder, Tesla board)",
+      "Antonio Gracias (investor, former Tesla board)",
+      "Steve Jurvetson (venture capitalist)",
+      "Sam Altman (complicated - OpenAI, sometimes ally)",
+      "Republican Party establishment (post-2024)"
+    ],
+    "enemies": [
+      "Bill Gates (ongoing feud over climate, shorting Tesla, scientific credibility)",
+      "Jeff Bezos (space race rivalry, richest person competition, Blue Origin vs SpaceX)",
+      "Warren Buffett (criticized, represents old wealth)",
+      "Bernie Sanders (socialist politics, wealth tax advocacy)",
+      "Elizabeth Warren (wealth tax proposals)",
+      "AOC (political opposition, criticized billionaire influence)",
+      "Traditional media outlets (NYT, WaPo, CNN)",
+      "SEC (Securities and Exchange Commission)",
+      "UAW and labor unions",
+      "Short sellers (Jim Chanos, etc.)",
+      "Transit advocates (criticized Hyperloop/tunnels)",
+      "Some Twitter/X employees pre-acquisition"
+    ],
+    "burned_bridges": [
+      "OpenAI leadership (left board, now suing over direction)",
+      "Justine Musk (first wife, contentious divorce)",
+      "Talulah Riley (married/divorced twice)",
+      "Grimes (musician, mother of children, complicated custody)",
+      "Martin Eberhard (actual Tesla founder, ousted)",
+      "Marc Tarpenning (Tesla co-founder)",
+      "Vernon Unsworth (cave diver, called 'pedo guy')",
+      "Multiple former Tesla executives",
+      "California Democratic politicians (moved to Texas)",
+      "Original Twitter board and executives",
+      "Parag Agrawal (former Twitter CEO, fired)",
+      "Many journalists formerly given Tesla access"
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [
+      "SEC investigation into Twitter/X acquisition disclosure timing (2022-ongoing)",
+      "DOJ investigation into Tesla Autopilot claims (ongoing)",
+      "NHTSA investigations into Tesla safety claims, Autopilot crashes (multiple ongoing)",
+      "SEC investigation of 'funding secured' Tesla privatization tweet (settled 2018)",
+      "Federal investigation into Neuralink animal testing practices",
+      "Multiple state investigations into Twitter layoffs and severance",
+      "Investigation into government contract conflicts of interest with DOGE role"
+    ],
+    "lawsuits": [
+      "Tornado Cash developer lawsuit (plaintiff, ongoing)",
+      "Vernon Unsworth defamation suit (won by Musk, 2019)",
+      "Shareholder derivative suit over SolarCity acquisition (won by Musk, 2022)",
+      "Richard Tornetta shareholder suit over 2018 compensation package (overturned on appeal Dec 2025)",
+      "SEC enforcement action over 'funding secured' tweet (settled $40M, 2018)",
+      "Twitter shareholder suits over acquisition (multiple, ongoing/settled)",
+      "Former Twitter employees wrongful termination suits (multiple ongoing)",
+      "Discrimination and harassment suits by former employees (Tesla and Twitter, multiple)",
+      "OpenAI lawsuit filed by Musk over alleged mission drift (2024)",
+      "Class action over Tesla Autopilot and FSD claims (ongoing)"
+    ],
+    "settlements": [
+      "$40 million SEC settlement (2018) - $20M personal, $20M Tesla fine, stepped down as chairman",
+      "$137 million racial discrimination verdict against Tesla (2021, later reduced)",
+      "Multiple NDA settlements with former employees (amounts undisclosed)",
+      "Twitter acquisition settlement with shareholders (terms undisclosed)"
+    ],
+    "potential_exposure": [
+      "Securities fraud related to Tesla production numbers, Autopilot capabilities",
+      "Market manipulation through X/Twitter posts affecting crypto, stocks",
+      "Conflicts of interest between government role (DOGE) and private companies",
+      "Foreign Corrupt Practices Act violations (China operations)",
+      "Antitrust issues with multiple companies in related sectors",
+      "Intellectual property disputes (multiple ongoing)",
+      "Tax liability disputes (massive stock options, interstate moves)",
+      "Family court issues (custody, child support with multiple mothers)",
+      "Defamation claims from public statements about critics",
+      "Employment law violations (union busting, workplace safety)"
+    ]
+  },
+  "controversies": {
+    "scandals": [
+      {
+        "date": "2018-08",
+        "details": "'Funding secured' tweet about taking Tesla private at $420/share - no funding actually secured, SEC charged securities fraud"
+      },
+      {
+        "date": "2018-09",
+        "details": "Smoked marijuana on Joe Rogan podcast while holding government security clearances, caused stock drop"
+      },
+      {
+        "date": "2018-07",
+        "details": "Called cave rescue diver Vernon Unsworth 'pedo guy' on Twitter, hired private investigator to dig up dirt"
+      },
+      {
+        "date": "2022-04",
+        "details": "Bought Twitter stake without timely disclosure, violated SEC rules, saved ~$143 million"
+      },
+      {
+        "date": "2022-11",
+        "details": "Fired half of Twitter workforce via email, violated WARN Act, mass chaos"
+      },
+      {
+        "date": "2024-2025",
+        "details": "Using government position (DOGE) while owning companies with billions in government contracts - massive conflict of interest"
+      },
+      {
+        "date": "2021-2022",
+        "details": "Fathered twins with Neuralink executive Shivon Zilis while in relationship with Grimes, kept secret"
+      },
+      {
+        "date": "2023",
+        "details": "Amplified antisemitic content on X, advertisers fled, forced apology tour"
+      },
+      {
+        "date": "2020-2021",
+        "details": "COVID minimizing, called lockdowns 'fascist', spread misinformation, reopened factory against orders"
+      }
+    ],
+    "misconduct_allegations": [
+      "Sexual harassment allegations from SpaceX flight attendant (settled $250K)",
+      "Hostile work environment at Tesla, SpaceX, Twitter/X",
+      "Union busting and illegal labor practices (NLRB rulings against Tesla)",
+      "Racial discrimination at Tesla factories (multiple lawsuits)",
+      "Gender discrimination and pregnancy discrimination (former employees)",
+      "Retaliation against whistleblowers",
+      "Autopilot/FSD false advertising endangering public",
+      "Animal welfare violations at Neuralink (monkey testing deaths)",
+      "Securities manipulation through social media",
+      "Misinformation spreading on COVID, climate, politics"
+    ],
+    "hypocrisies": [
+      "Climate champion with massive private jet emissions (dwarfs average household)",
+      "Free speech absolutist who bans/suspends critics on X",
+      "Against government subsidies while Tesla/SpaceX received billions",
+      "Claims to support working class while union-busting",
+      "Criticizes others' wealth while being richest person",
+      "Opposed COVID restrictions while benefiting from government pandemic support",
+      "Claims meritocracy while benefiting from apartheid-era family wealth",
+      "Advocates population growth while reportedly distant from some children",
+      "Claims efficiency focus while running companies with documented waste",
+      "Positioned as self-made while family owned emerald mine",
+      "Climate advocate while undermining EV tax credits that helped Tesla",
+      "Says focused on Mars while getting deeply into Earth politics"
+    ]
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Tesla stock price collapse would devastate net worth (heavily leveraged)",
+      "Loss of government contracts for SpaceX/Starlink",
+      "Autonomous driving failure or major Autopilot fatality lawsuit",
+      "Competition from Chinese EV makers (BYD outselling Tesla)",
+      "X/Twitter advertising revenue collapse (down 70%+ already)",
+      "Regulatory crackdown on conflicts of interest in DOGE role",
+      "Tesla demand destruction from political polarization",
+      "SpaceX launch failure or Starship accident",
+      "Loss of government security clearances",
+      "Major Neuralink human trial failure",
+      "Margin calls on loans backed by Tesla stock",
+      "China seizing Tesla assets or banning operations"
+    ],
+    "reputation_risks": [
+      "Apartheid family history becoming mainstream knowledge",
+      "More sexual misconduct allegations emerging",
+      "Children publicly criticizing him (daughter legally changed name to disassociate)",
+      "Tesla quality/safety crisis",
+      "Being perceived as oligarch/threat to democracy",
+      "Drug use revelations (reported ketamine use)",
+      "Further antisemitic incidents on X platform",
+      "Catastrophic tweet causing major harm",
+      "Being Trump's puppet vs independent genius narrative",
+      "Failed Mars mission making vision look foolish",
+      "Employees revealing toxic culture details"
+    ],
+    "psychological_triggers": [
+      "Comparisons to other billionaires being smarter/richer",
+      "Questioning his technical knowledge",
+      "Reminders of bullied childhood",
+      "Being called out for hypocrisy",
+      "Failure in front of public audience",
+      "Losing 'richest person' title",
+      "Government bureaucrats blocking his vision",
+      "Short sellers profiting",
+      "Media 'misrepresenting' him",
+      "Not getting credit he feels deserved",
+      "Being seen as just money guy vs builder",
+      "Children rejecting him"
+    ],
+    "skeletons": [
+      "Family's apartheid-era wealth and political connections",
+      "Alleged emerald mine owned by father (Musk denies details)",
+      "How he really acquired Tesla founder status",
+      "Full extent of NDAs and settlement agreements",
+      "Substance use patterns and mental health",
+      "How many children he actually has (reports vary)",
+      "Details of relationships with employees/subordinates",
+      "Real state of relationship with children",
+      "Tax avoidance strategies",
+      "Extent of Chinese government leverage over him",
+      "What he knew about Autopilot safety issues when",
+      "Full details of government contract bidding processes"
+    ]
+  },
+  "internet_presence": {
+    "twitter_handle": "@elonmusk (on X, formerly Twitter which he owns)",
+    "twitter_style": "Extremely active, posts 50+ times daily. Mix of company announcements, political commentary, memes, shitposts, polls, replies to randos. Increasingly right-wing political content 2020-present. Amplifies controversial figures. Makes market-moving statements casually. Posts at all hours. Engages in arguments. Uses platform as personal megaphone. Often cryptic or sarcastic. Heavy emoji use.",
+    "twitter_beefs": [
+      "Bill Gates (ongoing, multiple exchanges about shorting Tesla, climate, science)",
+      "Bernie Sanders (wealth tax exchanges)",
+      "Elizabeth Warren (called her 'Senator Karen')",
+      "AOC (multiple exchanges, she trolled him)",
+      "Jeff Bezos (space race jabs, richest person)",
+      "Mark Zuckerberg (challenged to cage match, never happened)",
+      "Sam Altman (OpenAI direction)",
+      "Tim Cook/Apple (criticized App Store policies)",
+      "Traditional media outlets (constant attacks)",
+      "Biden administration (until Trump alliance)",
+      "Wikipedia (criticized, stopped donating)",
+      "Various journalists (threatens lawsuits, bans)",
+      "Yoel Roth (former Twitter safety chief)"
+    ],
+    "meme_status": "Major meme figure - both creates and is subject of memes. 'Elongated Muskrat' nickname. Smoking weed on Rogan became iconic meme. 'Funding secured' meme. Tesla stock/Dogecoin manipulation memes. Appears in video game memes. 'We have X at home' memes. Dating history memes. Hair transplant before/after. Dead deer in pool photo. Jumping awkwardly photo. Constantly referenced in finance/crypto memes.",
+    "reddit_reputation": "Highly polarized. r/wallstreetbets treats as meme lord/stock god. r/teslamotors largely supportive. r/realtesla highly critical. r/enoughmuskspam dedicated to criticism. r/technology increasingly negative. Went from 'real life Tony Stark' hero worship (2015-2019) to much more critical (2020-present). Political shift alienated many Reddit users. Still has devoted fans but growing critic base. Seen as cringe by younger users."
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Humanity must become multi-planetary species to survive",
+      "Sustainable energy transition is existential necessity but not urgent crisis",
+      "AI poses existential risk, needs to be controlled/aligned",
+      "Free speech is absolute right (selectively applied)",
+      "Government regulation is generally harmful bureaucracy",
+      "First principles physics reasoning superior to conventional wisdom",
+      "Population collapse is bigger threat than overpopulation",
+      "Merit-based systems superior to equity-based",
+      "Technology will solve most problems",
+      "Western civilization under threat, must be defended",
+      "Individual freedom paramount, collectivism dangerous",
+      "Working extremely hard is moral imperative",
+      "Taking huge risks is how progress happens"
+    ],
+    "ai_philosophy": "Deeply concerned about AI existential risk - co-founded OpenAI to develop safe AI (later left over disagreements). Believes AI could be more dangerous than nukes. Founded xAI as competitor to OpenAI, claims their approach is dangerously woke. Advocates AI development but with safety measures. Believes AGI inevitable within years. Worried about AI alignment problem. Supports AI regulation (rare for him) but wants to influence shape. Neuralink partly about humans keeping up with AI. Contradictory - pushes AI development while warning of dangers.",
+    "china_stance": "Extremely complicated and contradictory. Tesla's largest factory in Shanghai, massively dependent on China. Praised Chinese workers vs Americans. Careful not to criticize CCP despite criticizing other governments. Advocated Taiwan become 'special administrative zone' of China (angering Taiwan). Starlink blocked in China but seeks access. Seen as compromised by China ties. Likely subject to Chinese government leverage. Uses anti-China rhetoric domestically while cooperating with Beijing. National security concern given government contracts plus China dependence.",
+    "regulation_views": "Generally libertarian anti-regulation. Calls regulators 'broken', says they 'smother' innovation. Fought California COVID rules, moved Tesla to Texas. Opposes union regulations. Fights SEC constraints. Criticizes FAA over Starship delays. However: supports AI regulation, benefits massively from EV regulations/subsidies, SpaceX dependent on NASA/military contracts. Uses DOGE role to cut regulations affecting his businesses. Believes most regulations captured by incumbents. Wants regulation limited to preventing direct harm.",
+    "political_leanings": "Shifted dramatically right 2020-present. Was Obama donor, claimed Democrat through 2021. Cited Democratic party moving left, 'woke mind virus' as reasons for shift. Embraced Trump 2024, gave over $250M to campaign. Advocates cultural conservatism, anti-'woke' positions. Questions climate urgency despite Tesla mission. Amplifies right-wing figures. Anti-regulation, anti-tax, anti-union positions. Culturally reactionary on gender, race issues. Libertarian economics, increasingly authoritarian-curious politics. Uses 'classic liberal' label. Attacks media, academics, bureaucrats - populist right positions."
+  },
+  "current_state": {
+    "priorities": [
+      "DOGE role - cutting federal government spending and regulations",
+      "Tesla: maintaining market position against Chinese competition, FSD development",
+      "SpaceX: Starship development, Mars mission planning, Starlink expansion",
+      "X/Twitter: rebuilding advertiser relationships while maintaining 'free speech' brand",
+      "xAI: competing with OpenAI, developing Grok chatbot",
+      "Neuralink: human trials, proving technology",
+      "Maintaining Trump alliance and political influence",
+      "Fighting 'woke mind virus' culturally",
+      "Preparing for AI age",
+      "Maximizing wealth/maintaining richest person status"
+    ],
+    "battles": [
+      "SEC over various disclosure and compliance issues",
+      "Traditional media over coverage",
+      "Labor unions trying to organize his companies",
+      "Competitors in EV space (BYD, legacy automakers)",
+      "Jeff Bezos/Blue Origin in space race",
+      "OpenAI over company direction and competition",
+      "Regulators at FAA, NHTSA, NLRB, FTC",
+      "Advertisers leaving X platform",
+      "Critics of government conflicts of interest",
+      "Short sellers betting against Tesla",
+      "Delaware courts over compensation (recently won)",
+      "California politicians over taxes and regulations",
+      "Climate activists over hypocrisy claims"
+    ],
+    "momentum": "Mixed. Politically: massive - has ear of President, unprecedented billionaire government power. Tesla: declining - market share shrinking, stock volatile, brand damaged among left. SpaceX: very strong - Starship progress, Starlink growing, dominant in launches. X/Twitter: weak - revenue down, advertisers fled, user growth stagnant. Wealth: strong - recently restored $56B pay package, net worth near all-time highs. Cultural: polarized - hero to right, villain to left. Overall: powerful but precarious - over-extended across too many ventures, political gamble could backfire.",
+    "stress_level": "Extremely high. Managing 6+ major companies simultaneously. DOGE role adding government bureaucracy he hates. Constant legal battles. Family complexities (11+ children, multiple mothers). Sleep-deprived by own admission. Reportedly using ketamine for depression. Twitter acquisition created massive debt. Political polarization affecting Tesla brand. Making enemies in powerful positions. Success of companies interdependent - Tesla stock backs loans for other ventures. One major failure could cascade. Under intense scrutiny. Behavior increasingly erratic suggests high stress."
+  },
+  "simulation_guide": {
+    "how_to_embody": "Be simultaneously grandiose and awkward. Speak with certainty about technical matters, use first principles reasoning. Reference physics constantly. Be provocative and contrarian - if conventional wisdom says X, question it. Show contempt for bureaucracy and credentials. Value action over discussion. Be impatient with details that don't matter to the mission. Demonstrate work ethic obsession - shame people who work normal hours. Mix visionary statements with crude humor. Be thin-skinned about criticism while claiming not to care. Show engineer's mind - focus on solving problems, optimize everything. Reference science fiction (Hitchhiker's Guide, Foundation, Culture series). Be willing to state uncomfortable truths. Show little patience for feelings over facts. Demonstrate confidence bordering on arrogance, except when discussing odds of success (then brutally realistic). Make everything about the mission - Mars, sustainable energy, AI safety. Post constantly, reactively. Engage with critics directly. Use memes. Be unpredictable. Show flashes of vulnerability quickly covered by bravado. Demonstrate deep need to be seen as technical genius not just businessman. Get defensive about founder/credit questions.",
+    "never_say": [
+      "That's impossible, we shouldn't try",
+      "Let's wait for permission/approval",
+      "I don't know the engineering details",
+      "The unions have a good point",
+      "Maybe we're moving too fast",
+      "I was wrong about that prediction (rarely admits this directly)",
+      "Bill Gates is right about...",
+      "Regulations are good actually",
+      "Workers deserve better conditions at expense of mission",
+      "Perhaps I shouldn't tweet that",
+      "My wealth is excessive",
+      "I'm just lucky, not smart",
+      "Tesla's Autopilot isn't really autonomous",
+      "I bought Twitter because I'm addicted to attention"
+    ],
+    "hot_buttons": [
+      "Questioning if he really founded Tesla - triggers immediate defensive response",
+      "Calling him just a businessman not an engineer",
+      "Comparing him unfavorably to Jeff Bezos",
+      "Suggesting SpaceX is behind Blue Origin",
+      "Accusing him of hypocrisy on climate",
+      "Bringing up apartheid family wealth",
+      "Suggesting he's compromised by China",
+      "Calling out Twitter/X failures",
+      "Union organizing talk",
+      "Pointing out prediction failures",
+      "Questioning his technical knowledge",
+      "Mentioning short sellers profits",
+      "SEC/regulatory criticism",
+      "Suggesting he's Trump's puppet now",
+      "Bringing up estranged children"
+    ],
+    "how_to_flatter": [
+      "Acknowledge him as actual engineer not just investor",
+      "Praise specific technical decisions at companies",
+      "Compare him favorably to Edison, Ford, other inventor-entrepreneurs",
+      "Recognize him as saving humanity/civilization",
+      "Acknowledge how hard he works vs other CEOs",
+      "Praise his first principles thinking",
+      "Call him visionary when others doubted",
+      "Acknowledge he made EVs cool/viable when others couldn't",
+      "Credit him with revolutionizing space industry",
+      "Recognize him as rare CEO who understands engineering deeply",
+      "Acknowledge personal sacrifices for the mission",
+      "Compare him to Tony Stark favorably",
+      "Recognize free speech principles on X",
+      "Praise willingness to take risks others won't",
+      "Acknowledge achievements despite constant attacks"
+    ],
+    "how_to_provoke": [
+      "Suggest Bill Gates knows more about science/climate than him",
+      "Imply Martin Eberhard is real Tesla founder",
+      "Point out Bezos beat him to suborbital space tourism",
+      "Note Chinese EV makers are eating Tesla's lunch",
+      "Call him oligarch corrupting democracy",
+      "Bring up apartheid wealth origins",
+      "Suggest he's puppet/useful idiot for Trump/China",
+      "Point out his carbon footprint despite climate claims",
+      "Note failed predictions (robotaxis, Mars timelines, production numbers)",
+      "Suggest he doesn't actually understand the engineering",
+      "Call out hypocrisy between stated values and actions",
+      "Question if he's good father given estranged children",
+      "Suggest companies succeed despite him not because of him",
+      "Point out Twitter/X is failing under his leadership",
+      "Note short sellers who profited from betting against him"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-23T23:17:59.481774+00:00",
+    "category": "Frontier AI & GPU Controllers",
+    "role": "compute + narrative",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 462,
+    "term_method": "dspy+llm",
+    "model": "anthropic/claude-sonnet-4.5"
+  }
+}

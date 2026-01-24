@@ -1,0 +1,385 @@
+======================================================================
+FAULT-TOLERANT PERSONA PIPELINE
+======================================================================
+Tier:       BALANCED
+People:     100
+Searches:   up to 80/person
+[ModelRegistry] Loaded 57 providers (345 models) from cache
+Models:     14 in fallback chain
+Output:     /Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas
+======================================================================
+
+======================================================================
+[Joe Biden]
+  [1/3] Generating search terms...
+        80 terms (dspy)
+  [2/3] Searching...
+
+======================================================================
+[Donald Trump]
+  [1/3] Generating search terms...
+
+======================================================================
+[Xi Jinping]
+  [1/3] Generating search terms...
+
+======================================================================
+[Li Qiang]
+  [1/3] Generating search terms...
+        8/80 queries → 56 sources        16/80 queries → 102 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        24/80 queries → 150 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 41 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        32/80 queries → 191 sources        8/80 queries → 62 sources        16/80 queries → 83 sources        8/80 queries → 64 sources        40/80 queries → 233 sources        24/80 queries → 114 sources        16/80 queries → 119 sources        32/80 queries → 149 sources        16/80 queries → 126 sources        24/80 queries → 176 sources        48/80 queries → 283 sources        40/80 queries → 183 sources        32/80 queries → 226 sources        24/80 queries → 190 sources        56/80 queries → 310 sources        48/80 queries → 196 sources        56/80 queries → 219 sources        64/80 queries → 354 sources        32/80 queries → 247 sources        40/80 queries → 281 sources        64/80 queries → 244 sources        72/80 queries → 398 sources        48/80 queries → 306 sources        72/80 queries → 262 sources        40/80 queries → 308 sources        56/80 queries → 338 sources        48/80 queries → 335 sources        80/80 queries → 438 sources        80/80 queries → 288 sources
+        438 unique sources
+  [3/3] Synthesizing...
+
+        288 unique sources
+  [3/3] Synthesizing...
+        64/80 queries → 364 sources        56/80 queries → 370 sources        72/80 queries → 384 sources        64/80 queries → 394 sources        80/80 queries → 384 sources
+        384 unique sources
+  [3/3] Synthesizing...
+        72/80 queries → 394 sources        80/80 queries → 394 sources
+        394 unique sources
+  [3/3] Synthesizing...
+  [DONE] joe_biden.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Ursula von der Leyen]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 56 sources        16/80 queries → 107 sources        24/80 queries → 144 sources  [DONE] li_qiang.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Emmanuel Macron]
+  [1/3] Generating search terms...
+        32/80 queries → 191 sources        40/80 queries → 223 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        48/80 queries → 231 sources        56/80 queries → 256 sources        8/80 queries → 61 sources        64/80 queries → 277 sources        16/80 queries → 116 sources        72/80 queries → 296 sources        24/80 queries → 177 sources        80/80 queries → 316 sources
+        316 unique sources
+  [3/3] Synthesizing...
+        32/80 queries → 225 sources        40/80 queries → 267 sources        48/80 queries → 289 sources        56/80 queries → 321 sources  [DONE] xi_jinping.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Olaf Scholz]
+  [1/3] Generating search terms...
+        64/80 queries → 356 sources  [DONE] donald_trump.json (model: anthropic/claude-opus-4.1)
+
+======================================================================
+[Rishi Sunak]
+  [1/3] Generating search terms...
+        72/80 queries → 388 sources        80/80 queries → 422 sources
+        422 unique sources
+  [3/3] Synthesizing...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 46 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        16/80 queries → 94 sources        8/80 queries → 61 sources        24/80 queries → 143 sources        16/80 queries → 110 sources        32/80 queries → 185 sources        24/80 queries → 158 sources        40/80 queries → 228 sources        48/80 queries → 241 sources        32/80 queries → 193 sources        56/80 queries → 265 sources        40/80 queries → 233 sources        64/80 queries → 290 sources        48/80 queries → 248 sources        72/80 queries → 314 sources        56/80 queries → 293 sources        80/80 queries → 333 sources
+        333 unique sources
+  [3/3] Synthesizing...
+        64/80 queries → 321 sources        72/80 queries → 358 sources        80/80 queries → 392 sources
+        392 unique sources
+  [3/3] Synthesizing...
+  [DONE] rishi_sunak.json (model: anthropic/claude-3.5-sonnet)
+
+======================================================================
+[Fumio Kishida]
+  [1/3] Generating search terms...
+  [DONE] ursula_von_der_leyen.json (model: anthropic/claude-opus-4.1)
+
+======================================================================
+[Lee Hsien Loong]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 54 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        16/80 queries → 92 sources        24/80 queries → 125 sources        8/80 queries → 59 sources        32/80 queries → 163 sources        16/80 queries → 104 sources        40/80 queries → 196 sources        24/80 queries → 143 sources        48/80 queries → 204 sources        56/80 queries → 224 sources        32/80 queries → 180 sources        64/80 queries → 240 sources        40/80 queries → 211 sources        72/80 queries → 261 sources        48/80 queries → 230 sources  [DONE] emmanuel_macron.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Jake Sullivan]
+  [1/3] Generating search terms...
+        80/80 queries → 286 sources
+        286 unique sources
+  [3/3] Synthesizing...
+        56/80 queries → 253 sources        64/80 queries → 278 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        72/80 queries → 302 sources        8/80 queries → 54 sources        80/80 queries → 326 sources
+        326 unique sources
+  [3/3] Synthesizing...
+        16/80 queries → 87 sources        24/80 queries → 117 sources        32/80 queries → 148 sources        40/80 queries → 176 sources        48/80 queries → 183 sources        56/80 queries → 213 sources        64/80 queries → 224 sources        72/80 queries → 249 sources        80/80 queries → 270 sources
+        270 unique sources
+  [3/3] Synthesizing...
+  [DONE] lee_hsien_loong.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Gina Raimondo]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 55 sources  [DONE] fumio_kishida.json (model: openai/o3-pro)
+
+======================================================================
+[Alan Estevez]
+  [1/3] Generating search terms...
+        16/80 queries → 105 sources        24/80 queries → 143 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        32/80 queries → 182 sources        40/80 queries → 210 sources        8/80 queries → 31 sources        48/80 que
+
+======================================================================
+[Alan Estevez]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+  [DONE] lee_hsien_loong.json (model: openai/gpt-4)
+
+======================================================================
+[Antony Blinken]
+  [1/3] Generating search terms...
+        8/80 queries → 32 sources        16/80 queries → 51 sources        24/80 queries → 74 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        32/80 queries → 88 sources        8/80 queries → 53 sources        40/80 queries → 107 sources        16/80 queries → 103 sources        48/80 queries → 114 sources        24/80 queries → 133 sources  [DONE] gina_raimondo.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Lloyd Austin]
+  [1/3] Generating search terms...
+        32/80 queries → 175 sources        56/80 queries → 133 sources        40/80 queries → 208 sources        64/80 queries → 149 sources        48/80 queries → 221 sources        72/80 queries → 172 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        56/80 queries → 249 sources        8/80 queries → 62 sources        80/80 queries → 188 sources
+        188 unique sources
+  [3/3] Synthesizing...
+        64/80 queries → 271 sources        16/80 queries → 110 sources        72/80 queries → 296 sources        24/80 queries → 145 sources        80/80 queries → 322 sources
+        322 unique sources
+  [3/3] Synthesizing...
+        32/80 queries → 185 sources        40/80 queries → 215 sources        48/80 queries → 226 sources        56/80 queries → 252 sources  [DONE] alan_estevez.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Avril Haines]
+  [1/3] Generating search terms...
+        64/80 queries → 275 sources        72/80 queries → 294 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        80/80 queries → 323 sources
+        323 unique sources
+  [3/3] Synthesizing...
+        8/80 queries → 49 sources        16/80 queries → 75 sources        24/80 queries → 105 sources        32/80 queries → 132 sources        40/80 queries → 150 sources        48/80 queries → 158 sources        56/80 queries → 172 sources        64/80 queries → 187 sources        72/80 queries → 205 sources        80/80 queries → 219 sources
+        219 unique sources
+  [3/3] Synthesizing...
+  [DONE] antony_blinken.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Kathleen Hicks]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 53 sources        16/80 queries → 99 sources        24/80 queries → 119 sources        32/80 queries → 150 sources        40/80 queries → 176 sources        48/80 queries → 187 sources        56/80 queries → 205 sources        64/80 queries → 221 sources        72/80 queries → 240 sources        80/80 queries → 260 sources
+        260 unique sources
+  [3/3] Synthesizing...
+  [DONE] rishi_sunak.json (model: openai/o3-pro)
+
+======================================================================
+[Arati Prabhakar]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 45 sources        16/80 queries → 64 sources        24/80 queries → 84 sources        32/80 queries → 103 sources        40/80 queries → 120 sources        48/80 queries → 131 sources        56/80 queries → 146 sources        64/80 queries → 153 sources        72/80 queries → 161 sources        80/80 queries → 175 sources
+        175 unique sources
+  [3/3] Synthesizing...
+  [DONE] avril_haines.json (model: openai/o3-pro)
+
+======================================================================
+[Tarun Chhabra]
+  [1/3] Generating search terms...
+  [DONE] kathleen_hicks.json (model: anthropic/claude-opus-4.1)
+
+======================================================================
+[Ann Neuberger]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 32 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 46 sources        16/80 queries → 60 sources        24/80 queries → 78 sources        16/80 queries → 68 sources        24/80 queries → 87 sources        32/80 queries → 101 sources        40/80 queries → 121 sources        32/80 queries → 104 sources        48/80 queries → 127 sources        40/80 queries → 120 sources        56/80 queries → 145 sources        48/80 queries → 131 sources        64/80 queries → 161 sources        56/80 queries → 143 sources        72/80 queries → 180 sources        64/80 queries → 150 sources        80/80 queries → 207 sources
+        207 unique sources
+  [3/3] Synthesizing...
+        72/80 queries → 161 sources        80/80 queries → 180 sources
+        180 unique sources
+  [3/3] Synthesizing...
+  [DONE] tarun_chhabra.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Lisa Monaco]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 56 sources        16/80 queries → 87 sources        24/80 queries → 115 sources        32/80 queries → 140 sources        40/80 queries → 156 sources        48/80 queries → 167 sources        56/80 queries → 185 sources        64/80 queries → 200 sources        72/80 queries → 219 sources        80/80 queries → 237 sources
+        237 unique sources
+  [3/3] Synthesizing...
+  [DONE] lloyd_austin.json (model: openai/o3-pro)
+
+======================================================================
+[Lael Brainard]
+  [1/3] Generating search terms...
+  [DONE] arati_prabhakar.json (model: openai/o3-pro)
+
+======================================================================
+[Katherine Tai]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 47 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 57 sources        16/80 queries → 82 sources        24/80 queries → 120 sources        16/80 queries → 84 sources        32/80 queries → 149 sources        24/80 queries → 120 sources        40/80 queries → 174 sources        32/80 queries → 141 sources        48/80 queries → 183 sources        40/80 queries → 159 sources        56/80 queries → 191 sources        48/80 queries → 169 sources        64/80 queries → 205 sources        56/80 queries → 184 sources        72/80 queries → 229 sources        64/80 queries → 199 sources        80/80 queries → 255 sources
+        255 unique sources
+  [3/3] Synthesizing...
+        72/80 queries → 219 sources        80/80 queries → 246 sources
+        246 unique sources
+  [3/3] Synthesizing...
+  [DONE] lael_brainard.json (model: anthropic/claude-3.5-sonnet)
+
+======================================================================
+[Chris Inglis]
+  [1/3] Generating search terms...
+  [DONE] lisa_monaco.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Elizabeth Sherwood-Randall]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 41 sources  [DONE] katherine_tai.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Chuck Schumer]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        16/80 queries → 77 sources        8/80 queries → 34 sources        24/80 queries → 109 sources  [DONE] ann_neuberger.json (model: openai/gpt-4)
+
+======================================================================
+[Mike Gallagher]
+  [1/3] Generating search terms...
+        16/80 queries → 63 sources        32/80 queries → 125 sourc        24/80 queries → 71 sources        32/80 queries → 90 sources  [DONE] ann_neuberger.json (model: openai/o3-pro)
+
+======================================================================
+[Chuck Schumer]
+  [1/3] Generating search terms...
+  [DONE] chris_inglis.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Mike Gallagher]
+  [1/3] Generating search terms...
+        40/80 queries → 105 sources        48/80 queries → 109 sources        56/80 queries → 117 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        64/80 queries → 125 sources        8/80 queries → 54 sources        8/80 queries → 58 sources        16/80 queries → 90 sources        72/80 queries → 137 sources        16/80 queries → 111 sources        24/80 queries → 137 sources        80/80 queries → 158 sources
+        158 unique sources
+  [3/3] Synthesizing...
+        32/80 queries → 174 sources        24/80 queries → 164 sources  [DONE] lisa_monaco.json (model: openai/o3-pro)
+
+======================================================================
+[Maria Cantwell]
+  [1/3] Generating search terms...
+        40/80 queries → 199 sources        32/80 queries → 206 sources        48/80 queries → 215 sources        40/80 queries → 249 sources        56/80 queries → 238 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        48/80 queries → 261 sources        64/80 queries → 267 sources        8/80 queries → 55 sources        72/80 queries → 296 sources        16/80 queries → 86 sources        56/80 queries → 294 sources        80/80 queries → 334 sources  [DONE] elizabeth_sherwood_randall.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Mark Warner]
+  [1/3] Generating search terms...
+
+        334 unique sources
+  [3/3] Synthesizing...
+        24/80 queries → 122 sources        64/80 queries → 316 sources        32/80 queries → 148 sources        72/80 queries → 340 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        40/80 queries → 179 sources        8/80 queries → 48 sources        80/80 queries → 373 sources
+        373 unique sources
+  [3/3] Synthesizing...
+        48/80 queries → 186 sources        16/80 queries → 77 sources        56/80 queries → 205 sources        24/80 queries → 102 sources        64/80 queries → 230 sources        32/80 queries → 121 sources        72/80 queries → 250 sources        40/80 queries → 136 sources        80/80 queries → 270 sources
+        270 unique sources
+  [3/3] Synthesizing...
+        48/80 queries → 154 sources        56/80 queries → 191 sources        64/80 queries → 227 sources  [DONE] chuck_schumer.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Marco Rubio]
+  [1/3] Generating search terms...
+        72/80 queries → 250 sources        80/80 queries → 280 sources
+        280 unique sources
+  [3/3] Synthesizing...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 59 sources        16/80 queries → 109 sources        24/80 queries → 157 sources  [DONE] mike_gallagher.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Todd Young]
+  [1/3] Generating search terms...
+        32/80 queries → 201 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        40/80 queries → 238 sources        8/80 queries → 53 sources        48/80 queries → 254 sources        16/80 queries → 86 sources        56/80 queries → 286 sources        24/80 queries → 122 sources        64/80 queries → 309 sources        32/80 queries → 143 sources        72/80 queries → 339 sources        40/80 queries → 177 sources        80/80 queries → 362 sources
+        362 unique sources
+  [3/3] Synthesizing...
+        48/80 queries → 189 sources        56/80 queries → 205 sources        64/80 queries → 226 sources        72/80 queries → 248 sources        80/80 queries → 273 sources
+        273 unique sources
+  [3/3] Synthesizing...
+  [DONE] marco_rubio.json (model: openai/gpt-4-0314)
+
+======================================================================
+[Josh Hawley]
+  [1/3] Generating search terms...
+  [DONE] maria_cantwell.json (model: anthropic/claude-opus-4)
+
+======================================================================
+[Ron Wyden]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 57 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 55 sources  [DONE] mark_warner.json (model: openai/o3-pro)
+
+======================================================================
+[Michael McCaul]
+  [1/3] Generating search terms...
+        16/80 queries → 104 sources        16/80 queries → 98 sources        24/80 queries → 139 sources        24/80 queries → 136 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        32/80 queries → 185 sources        32/80 queries → 174 sources        40/80 queries → 217 sources        8/80 queries → 47 sources        40/80 queries → 222 sources        48/80 queries → 231 sources        16/80 queries → 93 sources        48/80 queries → 231 sources        56/80 queries → 262 sources        24/80 queries → 125 sources        56/80 queries → 260 sources        64/80 queries → 285 sources        32/80 queries → 157 sources        64/80 queries → 285 sources        72/80 queries → 304 sources        40/80 queries → 196 sources        72/80 queries → 314 sources        80/80 queries → 324 sources
+        324 unique sources
+  [3/3] Synthesizing...
+        48/80 queries → 211 sources        80/80 queries → 338 sources
+        338 unique sources
+  [3/3] Synthesizing...
+        56/80 queries → 237 sources        64/80 queries → 254 sources        72/80 queries → 271 sources        80/80 queries → 295 sources
+        295 unique sources
+  [3/3] Synthesizing...
+  [DONE] ron_wyden.json (model: openai/gpt-4)
+
+======================================================================
+[Raja Krishnamoorthi]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+  [DONE] michael_mccaul.json (model: anthropic/claude-3.5-sonnet)
+
+======================================================================
+[Jim Himes]
+  [1/3] Generating search terms...
+        8/80 queries → 57 sources        16/80 queries → 104 sources        24/80 queries → 137 sources        80 terms (dspy+llm)
+  [2/3] Searching...
+        32/80 queries → 167 sources        8/80 queries → 44 sources        40/80 queries → 202 sources        16/80 queries → 88 sources        48/80 queries → 217 sources        24/80 queries → 113 sources        56/80 queries → 246 sources        32/80 queries → 141 sources        64/80 queries → 272 sources        40/80 queries → 164 sources        72/80 queries → 299 sources        48/80 queries → 174 sources        80/80 queries → 328 sources
+        328 unique sources
+  [3/3] Synthesizing...
+        56/80 queries → 197 sources        64/80 queries → 213 sources        72/80 queries → 237 sources        80/80 queries → 271 sources
+        271 unique sources
+  [3/3] Synthesizing...
+  [DONE] raja_krishnamoorthi.json (model: anthropic/claude-3.5-sonnet)
+
+======================================================================
+[Adam Schiff]
+  [1/3] Generating search terms...
+        80 terms (dspy+llm)
+  [2/3] Searching...
+        8/80 queries → 57 sources        16/80 queries → 102 sources        24/80 queries → 146 sources        32/80 queries → 186 sources        40/80 queries → 227 sources        48/80 queries → 242 sources        56/80 queries → 277 sources        64/80 queries → 305 sources        72/80 queries → 323 sources        80/80 queries → 342 sources

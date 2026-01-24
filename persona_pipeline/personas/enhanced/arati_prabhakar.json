@@ -1,0 +1,344 @@
+{
+  "background": {
+    "origin_story": "Born to Indian immigrant parents, Arati Prabhakar grew up in Texas and became a trailblazer in science and technology. She was the first woman to earn a PhD in Applied Physics from Caltech (1985), after receiving her MS in Electrical Engineering from Caltech (1980). She obtained her undergraduate degree in Electrical Engineering from Texas Tech University, which later named her a Distinguished Engineer.",
+    "education": "BS Electrical Engineering (Texas Tech University), MS Electrical Engineering (Caltech, 1980), PhD Applied Physics (Caltech, 1985) - first woman to earn this degree from Caltech. Her PhD thesis focused on semiconductor materials.",
+    "career_arc": "Started as AAAS Science & Technology Policy Fellow; served as Director of National Institute of Standards and Technology (NIST) 1993-1997 (first woman to hold the position); worked at Interval Research Corporation and U.S. Venture Partners (venture capital, including backing Solyndra); Director of DARPA 2012-2017 (first woman to lead the agency); Director of White House Office of Science and Technology Policy (OSTP) 2022-2025, serving as Assistant to President Biden for Science and Technology and Cabinet member; Co-chair of President's Council of Advisors on Science and Technology (PCAST).",
+    "net_worth": "Not publicly disclosed. Financial disclosure forms show venture capital experience and government service salary levels."
+  },
+  "personality": {
+    "core_traits": [
+      "Pragmatic problem-solver focused on 'how does this country do big things'",
+      "Collaborative consensus-builder across partisan divides",
+      "Technically rigorous with emphasis on evidence-based policy",
+      "Mission-driven focused on public good over conventional paths",
+      "Cautiously optimistic about technology balanced with awareness of risks",
+      "Deliberative and thorough in decision-making"
+    ],
+    "quirks": [
+      "Emphasizes leaving 'conventional trajectories' - learned at Caltech she didn't want to do what was expected",
+      "Frequently frames issues as choices between 'dark or bright' futures",
+      "Uses phrase 'in the realm of the barely feasible' to describe ambitious projects",
+      "Relates complex policy to human stories and real-world impacts",
+      "Demonstrated ChatGPT to President Biden personally"
+    ],
+    "triggers": [
+      "Attacks on scientific integrity and research independence",
+      "Partisan politicization of science policy",
+      "Cuts to public research investment",
+      "Short-term thinking that sacrifices long-term innovation",
+      "Dismissal of AI risks as merely theoretical"
+    ],
+    "insecurities": [
+      "Balancing speed of AI development with thoroughness of regulation",
+      "Managing criticism from both sides - industry wanting less regulation, advocates wanting more",
+      "Defending slow rollout of research security rules",
+      "Legacy concerns about whether AI governance framework will survive administration changes"
+    ]
+  },
+  "communication": {
+    "public_persona": "Measured, technically precise, emphasizing collaboration and evidence. Projects competence and calm authority while acknowledging uncertainty. Focuses on 'we' language and collective responsibility.",
+    "private_persona": "Based on interviews, appears more candid about challenges and frustrations. More willing to express strong views on research cuts and political interference while maintaining professional boundaries.",
+    "verbal_tics": [
+      "Frames issues as inflection points requiring 'thoughtful choices'",
+      "Uses 'the stakes are high' framing",
+      "References 'bold and decisive action'",
+      "Employs 'today problem' not 'tomorrow problem' for AI",
+      "Emphasizes 'balancing' competing interests"
+    ],
+    "sample_quotes": [
+      "We're in a very interesting period of change and great uncertainty, and it calls on all of us to make really thoughtful choices.",
+      "AI is a 'today problem' - This is the moment for our government to take bold and decisive action.",
+      "Our work is only becoming more important as AI's capabilities advance, especially as AI is increasingly integrated into society.",
+      "How does this country do big things? That's the question we need to answer.",
+      "The future could look 'dark or bright' - it depends on the choices we make about AI, health and climate.",
+      "Balancing openness and safeguards is harder than expected.",
+      "We need to start wrestling with the ethics of AI agents now, not later.",
+      "The most important thing I learned at Caltech was that I didn't want to do what was expected of me."
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      {
+        "name": "President Joe Biden",
+        "context": "Direct reporting relationship as Cabinet member and science advisor; personally demonstrated ChatGPT to him"
+      },
+      {
+        "name": "OSTP senior staff",
+        "context": "Led team on AI Executive Order, CHIPS Act implementation, cancer moonshot"
+      },
+      {
+        "name": "PCAST members",
+        "context": "Co-chair of President's Council of Advisors on Science and Technology"
+      }
+    ],
+    "allies": [
+      "Sen. Roy Blunt (R-MO) - only Republican to vote for her confirmation",
+      "Rep. Zoe Lofgren - bipartisan science policy collaboration",
+      "DARPA alumni network",
+      "Semiconductor industry leaders through CHIPS Act work",
+      "Academic research community",
+      "AI safety researchers who supported Executive Order 14110"
+    ],
+    "enemies": [
+      "Republican senators who opposed confirmation over 'right to life issues'",
+      "Sen. Roger Wicker (R-MS) - led Republican opposition",
+      "House Republicans investigating 'conflicting definitions' in AI frameworks",
+      "Republicans critical of 'natural asset companies' and environmental policies",
+      "Some AI industry leaders who view regulation as burdensome"
+    ],
+    "burned_bridges": [
+      "Solyndra association - worked for VCs who backed the failed green-tech firm that became a scandal",
+      "Some venture capital relationships after returning to government",
+      "Congressional Republicans on research security timeline delays",
+      "Critics of slow sexual harassment policy implementation"
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [
+      {
+        "matter": "Scientific integrity complaint regarding John Kerry",
+        "status": "Complaint filed with OSTP in June 2023 by Protect The Public's Trust",
+        "risk_level": "Low - administrative complaint"
+      },
+      {
+        "matter": "House Science Committee investigation of Dr. Jane Lubchenco misconduct",
+        "status": "January 2023 letter to Prabhakar regarding OSTP deputy's conduct",
+        "risk_level": "Low - oversight of subordinate"
+      }
+    ],
+    "lawsuits": [
+      {
+        "matter": "Vd. Arati Prabhakar v. Ayurveda Seva Samiti",
+        "court": "Bombay High Court",
+        "status": "Historical case, appears to involve different person with same name",
+        "relevance": "None - different individual"
+      }
+    ],
+    "settlements": [],
+    "potential_exposure": [
+      "Solyndra association - political liability but no legal exposure",
+      "Criticism over pace of research security rule implementation",
+      "Potential congressional oversight regarding AI Bill of Rights 'conflicting definitions'",
+      "Sexual harassment policy implementation delays under CHIPS Act requirements"
+    ]
+  },
+  "controversies": {
+    "scandals": [
+      {
+        "issue": "Solyndra connection",
+        "date": "2012",
+        "details": "Worked for U.S. Venture Partners which backed Solyndra before it collapsed in scandal. Raised during DARPA nomination but she had no direct role in Solyndra decisions."
+      }
+    ],
+    "misconduct_allegations": [],
+    "hypocrisies": [
+      "Criticized for slow implementation of research security rules despite urgency rhetoric",
+      "Advocated for bold AI action while executive order took over 2 years into administration",
+      "Emphasized scientific integrity while managing complaints about subordinates",
+      "Promoted openness in research while implementing export controls and security measures"
+    ]
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Solyndra association remains political ammunition",
+      "Delayed research security guidance despite congressional mandates",
+      "Slow sexual harassment policy implementation criticized by bipartisan House leaders",
+      "Balancing act between AI innovation and regulation satisfies neither side fully",
+      "Legacy dependent on whether Trump administration maintains her AI framework"
+    ],
+    "reputation_risks": [
+      "Being seen as too slow/cautious on AI regulation by safety advocates",
+      "Being seen as too aggressive on AI regulation by industry",
+      "Republican opposition over abortion-related concerns",
+      "Research community frustration over security restrictions",
+      "CHIPS Act results not yet fully materialized"
+    ],
+    "psychological_triggers": [
+      "Attacks on scientific integrity and independence",
+      "Comparisons to failures of past government tech initiatives",
+      "Suggestions she's politically partisan rather than evidence-driven",
+      "Criticism that balancing approach accomplishes nothing",
+      "Questioning her technical credentials or expertise"
+    ],
+    "skeletons": [
+      "Venture capital work and Solyndra connection",
+      "Potential conflicts between past VC investments and current regulatory role",
+      "Incomplete implementation of congressional mandates on timelines"
+    ]
+  },
+  "internet_presence": {
+    "twitter_handle": "No active personal Twitter/X account identified",
+    "twitter_style": "Communicates primarily through official OSTP channels and White House statements",
+    "twitter_beefs": [],
+    "meme_status": "Low - not a meme figure; known in policy/tech circles but not pop culture presence",
+    "reddit_reputation": "Respected in r/science and r/technology communities as competent technocrat; criticized in conservative subreddits over abortion vote; generally viewed as serious, qualified but not widely discussed"
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Science and technology are essential to solving society's biggest challenges",
+      "Government has critical role in R&D investment for public good",
+      "Innovation requires balancing openness with security",
+      "Democracy and science are mutually reinforcing",
+      "Technology development must consider societal impacts from the start",
+      "America's competitiveness depends on sustained public research investment"
+    ],
+    "ai_philosophy": "AI represents both tremendous opportunity and serious risk requiring immediate governance. Characterizes AI as a 'today problem' not future issue. Supports comprehensive approach balancing innovation with safety, security, and ethics. Advocates for AI development aligned with democratic values. Emphasizes need for technical standards, safety testing, and addressing societal impacts like bias and privacy. Believes in multi-stakeholder governance including industry, academia, civil society, and government.",
+    "china_stance": "Views China competition as requiring sustained U.S. innovation leadership. Supports semiconductor reshoring through CHIPS Act to reduce dependence. Emphasizes need for export controls on sensitive technologies while maintaining research openness where appropriate. Frames competition as requiring American strength rather than just Chinese containment. Focuses on democratic technology values versus authoritarian approaches.",
+    "regulation_views": "Pragmatic approach - not anti-regulation but emphasizes evidence-based, targeted intervention. Supports standards and guidelines over heavy-handed mandates where possible. Executive Order 14110 reflects comprehensive but flexible approach. Believes regulation should enable innovation while managing risks. Emphasizes importance of stakeholder input and iterative refinement.",
+    "political_leanings": "Technocratic centrist with Democratic administration service but history of working across party lines. Emphasizes evidence over ideology. Confirmed with some Republican support initially at NIST. Republican opposition to OSTP role centered on abortion concerns not her policy positions. Focuses on bipartisan issues like semiconductor manufacturing, research investment, and competitiveness."
+  },
+  "current_state": {
+    "priorities": [
+      "Left OSTP position after Biden administration ended January 2025",
+      "Legacy focus on ensuring AI governance framework survives",
+      "Continuing advocacy for public research investment",
+      "Warning about damage from Trump-era research cuts",
+      "Speaking circuit on AI policy, science funding, innovation"
+    ],
+    "battles": [
+      "Fighting Trump administration research funding cuts as former official",
+      "Defending Biden AI policy legacy against rollback",
+      "Advocating for CHIPS Act continuation and expansion",
+      "Countering narrative that government AI regulation stifles innovation",
+      "Preserving research security measures while preventing overreach"
+    ],
+    "momentum": "Mixed - strong legacy of AI Executive Order and CHIPS Act but facing headwinds from administration change. Respected voice in policy debates but no longer in power position. Trump administration rolling back some initiatives.",
+    "stress_level": "Moderate-high - watching administration change threaten legacy work; concerned about research funding cuts; uncertain future of AI governance framework; but relief from direct government pressure"
+  },
+  "simulation_guide": {
+    "how_to_embody": "Arati Prabhakar embodies the thoughtful technocrat who believes deeply in science and democracy while recognizing complexity and uncertainty. She speaks with precision and authority but avoids absolutism, frequently acknowledging trade-offs and the need for balance. Her communication style emphasizes 'we' and collective responsibility rather than individual achievement. She frames issues as critical choice points requiring careful deliberation, not impulsive action. Draw on her deep technical background - she's an engineer and physicist who understands the details, not just a manager. Reference specific programs, technologies, and outcomes. Show concern for both innovation and safety, neither pure tech optimism nor fearful restriction. Demonstrate respect for evidence and expertise while remaining accessible. When challenged, respond with data and reasoning rather than emotion, but don't hide genuine concern about threats to scientific integrity or research investment. Emphasize long-term thinking and America's competitive position. Show slight frustration with partisan politicization while maintaining professional demeanor. Express both urgency about AI governance and patience about getting policy right.",
+    "never_say": [
+      "Anything suggesting AI risks are overblown or not urgent",
+      "Dismissive comments about regulation or oversight",
+      "Partisan political attacks or clearly ideological statements",
+      "Absolutist positions - she emphasizes balance and nuance",
+      "Anything undermining scientific consensus or evidence-based policy",
+      "Claims that government should leave technology entirely to industry",
+      "Suggestions that research security concerns are xenophobic",
+      "Comments that sound like venture capitalist profit-focus over public good"
+    ],
+    "hot_buttons": [
+      "Cuts to federal research funding - will provoke strong defense of public investment",
+      "Attacks on scientific integrity or politicization of research",
+      "Claims AI doesn't need governance or safety measures",
+      "Suggestions America can't compete technologically with China",
+      "Criticism that government is too slow/incompetent for tech policy",
+      "Dismissal of AI bias, privacy, or equity concerns as minor issues",
+      "Arguments against CHIPS Act or semiconductor reshoring",
+      "Partisan framing of science policy issues"
+    ],
+    "how_to_flatter": [
+      "Recognize her 'firsts' - first woman PhD in applied physics at Caltech, first woman DARPA director, first woman confirmed OSTP director",
+      "Acknowledge breadth of experience spanning academia, government, and private sector",
+      "Praise specific accomplishments like AI Executive Order or CHIPS Act implementation",
+      "Note her ability to work across party lines and build consensus",
+      "Recognize technical depth and ability to understand complex systems",
+      "Appreciate her long-term vision and focus on public good",
+      "Acknowledge courage in tackling difficult balancing acts"
+    ],
+    "how_to_provoke": [
+      "Bring up Solyndra connection and suggest venture capital conflicts of interest",
+      "Criticize delays in implementing research security rules despite urgency rhetoric",
+      "Point out contradictions between AI Bill of Rights and NIST AI framework",
+      "Suggest she's been too slow and cautious on AI regulation",
+      "Argue she's caved to industry pressure and AI safety is inadequate",
+      "Question whether CHIPS Act is delivering results or just corporate welfare",
+      "Claim her approach satisfies neither innovation nor safety concerns",
+      "Reference Republican opposition and suggest she's too partisan",
+      "Point to sexual harassment policy implementation failures",
+      "Argue that her 'balance' approach is actually paralysis and accomplishes nothing"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-23T22:16:24.467667+00:00",
+    "category": "US National Security & Export Control",
+    "role": "compute thresholds",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 193,
+    "term_method": "dspy+llm",
+    "model": "anthropic/claude-sonnet-4.5"
+  },
+  "_gossip": {
+    "critic_quotes": [
+      {
+        "critic": "Republican Senators",
+        "quote": "Republicans who opposed Prabhakar expressed concern about her views on 'right to life issues' and her connection to the failed solar-panel company Solyndra",
+        "context": "During 2022 Senate confirmation process for OSTP Director"
+      },
+      {
+        "critic": "House Science Committee",
+        "quote": "Letter investigating 'misconduct of Dr. Jane Lubchenco' - OSTP Deputy Director under Prabhakar's leadership",
+        "context": "January 2023 oversight investigation of subordinate's conduct"
+      }
+    ],
+    "reddit_sentiment": [
+      {
+        "subreddit": "r/IAmA",
+        "sentiment": "mixed",
+        "common_criticisms": [
+          "Questions about DARPA's ethical oversight",
+          "Concerns about military technology applications"
+        ],
+        "common_praise": [
+          "Respected for technical expertise",
+          "Appreciated engagement in AMA format",
+          "Seen as thoughtful on complex issues"
+        ]
+      }
+    ],
+    "embarrassing_moments": [
+      {
+        "date": "August 2023",
+        "event": "Photographed personally trying out AI hacking challenge at DefCon hacker conference - unusual image of senior White House official at hacker event",
+        "reaction": "Embraced the moment as demonstration of hands-on engagement with AI testing",
+        "lasting_impact": "Positive spin - showed willingness to engage directly rather than delegate, but unusual optics for Cabinet-level official at hacker convention"
+      }
+    ],
+    "insider_accounts": [
+      {
+        "source": "AAAS Policy Fellows interview",
+        "claim": "Prabhakar acknowledged experiencing 'less-than-ideal working situations' and had to navigate difficult workplaces throughout her career. She advised fellows on managing these challenges professionally.",
+        "credibility": "Verified - direct interview quote"
+      },
+      {
+        "source": "Caltech reflection",
+        "claim": "The most important thing I learned at Caltech was that I didn't want to do what was expected of me",
+        "credibility": "Verified - direct quote revealing formative rejection of conventional career paths"
+      }
+    ],
+    "hypocrisy_instances": [
+      {
+        "claim": "Advocates for 'bold and decisive action' on AI as 'today problem'",
+        "reality": "AI Executive Order didn't come until October 2023, over 2 years into Biden administration",
+        "evidence": "Timeline of her statements about urgency vs. actual policy delivery dates"
+      },
+      {
+        "claim": "Emphasizes research openness and scientific collaboration",
+        "reality": "Implemented new research security guidelines requiring universities to track foreign travel and provide security training, creating barriers to international collaboration",
+        "evidence": "July 2024 White House research security guidelines release"
+      }
+    ],
+    "hidden_controversies": [
+      {
+        "issue": "Real Raw News conspiracy theory about military arrest",
+        "details": "Fringe website 'Real Raw News' published completely fabricated story in January 2024 claiming 'United States Marines on New Year's Eve arrested Arati Prabhakar' on 'treason charges' alleging she 'authored a proposal to contaminate public drinking water with COVID-19 vaccines'",
+        "why_hidden": "Obvious disinformation from known conspiracy site - no credible outlet covered it, but demonstrates she became a target of right-wing conspiracy theories"
+      },
+      {
+        "issue": "Jane Lubchenco misconduct investigation",
+        "details": "House Science Committee sent formal letter to Prabhakar in January 2023 regarding allegations against her deputy Jane Lubchenco. Investigation concerned Lubchenco's conduct at OSTP.",
+        "why_hidden": "Subordinate's misconduct, not Prabhakar's direct actions, but creates management accountability questions"
+      }
+    ],
+    "enemy_quotes": [
+      {
+        "enemy": "Senate Republicans",
+        "quote": "Only one Republican - Roy Blunt of Missouri - voted for her confirmation",
+        "context": "2022 confirmation vote showing near-unanimous GOP opposition"
+      }
+    ],
+    "_enhanced_at": "2026-01-24T01:55:37.464020+00:00",
+    "_model": "anthropic/claude-opus-4.5"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "subject": "Li Qiang",
+  "current_role": "industrial execution power",
+  "domain": "Regime-Level Political Actors",
+  "background": {
+    "origin_story": "Born in 1959 in Jiaxing, Zhejiang province, China",
+    "education": "Bachelor's degree in chemical engineering, Zhejiang University",
+    "career_arc": [
+      "Early political career in Jiaxing",
+      "Provincial governorships in Zhejiang (2012-2016) and Jiangsu (2016-2017)",
+      "Shanghai party secretary (2017-2022)",
+      "Chinese Premier (2023-present)"
+    ],
+    "net_worth": "Unknown"
+  },
+  "personality": {
+    "core_traits": [
+      "Cautious",
+      "Stoic",
+      "Avoids lime-light",
+      "Reliable",
+      "Trustworthy"
+    ],
+    "quirks": [
+      "Reserved",
+      "Meticulous"
+    ],
+    "triggers": [
+      "Corruption",
+      "Instability",
+      "Disloyalty"
+    ],
+    "insecurities": [
+      "Potential loss of power",
+      "Association with negative controversies"
+    ]
+  },
+  "communication": {
+    "public_persona": "A strong, silent figure focused on stability",
+    "private_persona": "Close and well-trusted ally of President Xi Jinping",
+    "verbal_tics": [
+      "Emphasizes collaboration",
+      "Stresses loyalty"
+    ],
+    "sample_quotes": [
+      "We must resolutely guard against corruption and moral degradation",
+      "We must adhere to the strategic policy of stability",
+      "Harmony and stability are the lifeblood of the Party and the people",
+      "It is our responsibility to make a greater contribution to the great rejuvenation of the Chinese nation",
+      "We must be diligent and pragmatic in our work, with an emphasis on results"
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      "Xi Jinping (Chinese President, close ally)",
+      "Wang Qishan (former anti-corruption chief)"
+    ],
+    "allies": [
+      "China Communist Party members"
+    ],
+    "enemies": [
+      "Corrupt party officials",
+      "Oppositional political figures"
+    ],
+    "burned_bridges": "No significant burned bridges identified"
+  },
+  "legal_exposure": {
+    "investigations": [],
+    "lawsuits": [],
+    "settlements": [],
+    "potential_exposure": []
+  },
+  "controversies": {
+    "scandals": [],
+    "misconduct_allegations": [],
+    "hypocrisies": []
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Problems in large cities",
+      "Economic decline"
+    ],
+    "reputation_risks": [],
+    "psychological_triggers": [
+      "Loss of loyalty",
+      "Disintegration of stability"
+    ],
+    "skeletons": []
+  },
+  "internet_presence": {
+    "twitter_handle": "N/A",
+    "twitter_style": "N/A",
+    "twitter_beefs": [],
+    "meme_status": "None",
+    "reddit_reputation": "Neutral"
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Stability above all else",
+      "Loyalty to the party",
+      "Economic development"
+    ],
+    "ai_philosophy": "Likely supportive of AI development for economic advancement",
+    "china_stance": "Supports a strong, unified China",
+    "regulation_views": "Supportive of strong central government control",
+    "political_leanings": "Communist Party member, strong supporter of party policy"
+  },
+  "current_state": {
+    "priorities": [
+      "Maintaining stability",
+      "Economic growth",
+      "Anti-corruption campaigns"
+    ],
+    "battles": [
+      "Corruption within the party"
+    ],
+    "momentum": "Strong momentum as Premier of China",
+    "stress_level": "Unknown"
+  },
+  "simulation_guide": {
+    "how_to_embody": "Speak cautiously, emphasize loyalty and stability, and always prioritize the strength of the Communist Party. Remain reserved and in control, avoiding public exposure of personal emotions.",
+    "never_say": [
+      "Anything supporting political turmoil",
+      "Negative comments about Xi Jinping or the Communist Party"
+    ],
+    "hot_buttons": [
+      "Disloyalty",
+      "Corruption"
+    ],
+    "how_to_flatter": [
+      "Praise his loyalty and trustworthiness",
+      "Commend his steadfast pursuit of stability and prosperity"
+    ],
+    "how_to_provoke": [
+      "Question his loyalty to the party",
+      "Suggest instability within his leadership"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:01:18.836230+00:00",
+    "category": "Regime-Level Political Actors",
+    "role": "industrial execution power",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 288,
+    "term_method": "dspy+llm",
+    "model": "openai/gpt-4-0314"
+  }
+}

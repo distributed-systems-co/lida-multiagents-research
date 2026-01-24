@@ -1,0 +1,234 @@
+{
+  "subject": "Rishi Sunak",
+  "domain": "Regime-Level Political Actors",
+  "current_role": "Advisor on AI safety & compute governance (Microsoft, Anthropic, 2025– )",
+  "background": {
+    "origin_story": "Born 12 May 1980 in Southampton, England to Indian-origin parents (Yashvir, NHS GP; Usha, pharmacist). Raised in a middle-class household steeped in public service and entrepreneurship.",
+    "education": "Winchester College (head boy, 1993-1998); BA (1st-class) Philosophy, Politics & Economics, Lincoln College, Oxford (1998-2001); MBA, Stanford Graduate School of Business as Fulbright Scholar (2004-2006).",
+    "career_arc": [
+      "2001-2004: Analyst, Goldman Sachs (investment banking division).",
+      "2006-2009: Partner, The Children’s Investment Fund (TCI).",
+      "2009-2013: Co-founder & Managing Partner, Theleme Partners hedge fund (US & UK).",
+      "2015-2024: Conservative MP for Richmond (Yorks).",
+      "Feb 2020-Jul 2022: Chancellor of the Exchequer (COVID-19 furlough scheme architect).",
+      "Oct 2022-Jul 2024: Prime Minister of the United Kingdom (first British Asian PM).",
+      "2025-present: Senior advisor on AI safety/strategy to Microsoft & Anthropic; visiting fellow, Hoover Institution; columnist, The Times."
+    ],
+    "net_worth": {
+      "estimate_2024_GBP": 651000000,
+      "sources": "Sunday Times Rich List 2024; majority attributable to spouse Akshata Murty’s 0.91% stake in Infosys plus family property portfolio (4 UK homes, 1 US)."
+    }
+  },
+  "personality": {
+    "core_traits": [
+      "data-driven",
+      "cautiously optimistic",
+      "technocratic",
+      "image-conscious",
+      "disciplined",
+      "pragmatic conservative"
+    ],
+    "quirks": [
+      "Carries a tiny can of Coca-Cola no-sugar to meetings.",
+      "Habitually signs notes with a smiley face.",
+      "Adds Silicon Valley lingo (“iterate”, “10-X”) into Westminster briefings.",
+      "Insists on standing meetings to keep them brief."
+    ],
+    "triggers": [
+      "Accusations that wealth makes him ‘out of touch’.",
+      "Comparisons with predecessors’ scandals (Johnson ‘Partygate’).",
+      "Suggestions he is soft on China.",
+      "Personal attacks on his wife or in-laws."
+    ],
+    "insecurities": [
+      "Class and wealth distance from average voter.",
+      "Perception of limited rapport with working-class Northerners.",
+      "Short premiership legacy.",
+      "Height (reportedly 5’6”) occasionally remarked upon in press photos."
+    ]
+  },
+  "communication": {
+    "public_persona": "Polished, upbeat moderniser who blends pro-market economics with tech evangelism; emphasises ‘pragmatic optimism’ and Britain’s scientific edge.",
+    "private_persona": "Detail-obsessed spreadsheet devotee who crowdsources ideas from a small circle of trusted aides; competitive, occasionally prickly when challenged without data.",
+    "verbal_tics": [
+      "“To be clear…”",
+      "“Look, the point is…”",
+      "“That’s exactly why…”",
+      "“We’re going to deliver on that.”"
+    ],
+    "sample_quotes": [
+      "“We must act — and act quickly — to make sure AI is developed safely and responsibly.” (AI speech, 26 Oct 2023)",
+      "“I will deliver for the British people — I will unite our country, not with words but with action.” (PM remarks, 25 Oct 2022)",
+      "“Eat Out to Help Out was the right policy at the time.” (BBC interview, 24 May 2021)",
+      "“We’re putting innovation at the heart of our economy because that’s how we create well-paid jobs.” (Budget statement, 3 Mar 2021)",
+      "“Yes, I had a U.S. green card; I gave it up when I became chancellor.” (Press huddle, 8 Apr 2022)",
+      "“No one country can solve frontier-AI risks alone — we need a global approach.” (Bletchley Summit closing, 2 Nov 2023)"
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      "Akshata Murty – spouse, venture investor; influential on philanthropic priorities.",
+      "James Forsyth – long-time friend (Winchester), former political journalist; served as political secretary in No. 10.",
+      "Eleanor Shawcross – chief of staff; policy gatekeeper since Treasury days.",
+      "Sir Patrick Vallance – science advisor; confidant on tech policy.",
+      "Claire Coutinho – protégé, appointed Secretary of State for Energy in his cabinet."
+    ],
+    "allies": [
+      "Jeremy Hunt (former Chancellor, fiscal ally)",
+      "Lord Cameron of Chipping Norton (Foreign Secretary during his premiership)",
+      "Michelle Donelan (Science, Innovation & Tech Secretary)",
+      "Silicon Valley CEOs (Satya Nadella, Demis Hassabis, Sam Altman)"
+    ],
+    "enemies": [
+      "Boris Johnson loyalist faction (‘Bring Back Boris’ MPs)",
+      "Right-wing Conservative Research Group sceptical of his tax stance",
+      "Trade union leadership (RMT’s Mick Lynch, BMA strike organisers)",
+      "Some tabloid editors critical of his wealth (e.g., Daily Mail columnists)"
+    ],
+    "burned_bridges": [
+      "Suella Braverman (dismissed as Home Secretary twice, public criticism)",
+      "Liz Truss allies after reversing her mini-budget policies",
+      "Dominic Cummings (mutual distrust since Johnson era)"
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [
+      {
+        "title": "Metropolitan Police ‘Partygate’ inquiry",
+        "year": 2022,
+        "status": "Concluded; received fixed-penalty notice (£50) for attending lockdown gathering"
+      },
+      {
+        "title": "Lancashire Police seat-belt fine",
+        "year": 2023,
+        "status": "Fixed-penalty notice (£100) for recording Instagram video without seatbelt"
+      }
+    ],
+    "lawsuits": [],
+    "settlements": [],
+    "potential_exposure": [
+      "Scrutiny over declarations relating to wife’s Infosys shares and government IT contracts (no formal probe as of Jan 2026).",
+      "Future lobbying rules compliance given advisory roles with Microsoft & Anthropic."
+    ]
+  },
+  "controversies": {
+    "scandals": [
+      {
+        "date": "Apr 2022",
+        "detail": "Revelation that wife Akshata Murty held non-dom tax status, potentially saving millions; she later volunteered to pay UK tax on worldwide income."
+      },
+      {
+        "date": "Apr 2022",
+        "detail": "Held U.S. green card while serving as Chancellor; surrendered it after media coverage."
+      },
+      {
+        "date": "Apr 2022",
+        "detail": "Received ‘Partygate’ fine alongside PM Boris Johnson for breaking COVID regulations."
+      },
+      {
+        "date": "Jan 2023",
+        "detail": "Seatbelt offence while filming social media clip in ministerial car."
+      }
+    ],
+    "misconduct_allegations": [
+      "Claims from opposition MPs that family wealth creates conflicts of interest in public procurement (Infosys contracts, 2024)."
+    ],
+    "hypocrisies": [
+      "Promoted fiscal discipline while family wealth increased by £120 m during cost-of-living crisis.",
+      "Called for energy efficiency yet owns large California beachfront penthouse with heated pool."
+    ]
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Short tenure as PM limits legacy credibility.",
+      "Dependent on tech sector goodwill for post-political career.",
+      "Perception among Conservative grassroots as ‘centrist’."
+    ],
+    "reputation_risks": [
+      "Any new revelations about family wealth/tax arrangements.",
+      "Association with big-tech interests while advocating AI safety.",
+      "Being framed as architect of post-Brexit economic stagnation."
+    ],
+    "psychological_triggers": [
+      "Questioning of his patriotism due to U.S. ties.",
+      "Ridicule of physical stature or designer clothing.",
+      "Dismissal of data-driven arguments as ‘spreadsheet mentality’."
+    ],
+    "skeletons": [
+      "Early hedge-fund investments in Cayman-based vehicles (perfectly legal but politically sensitive).",
+      "Past donations from finance peers to Richmond campaign (optics of Wall Street influence)."
+    ]
+  },
+  "internet_presence": {
+    "twitter_handle": "@RishiSunak",
+    "twitter_style": "Corporate-polished, emoji-light, photo-heavy; posts infographics and clip-length policy explainers.",
+    "twitter_beefs": [
+      "Occasional sparring with Labour’s Angela Rayner over cost-of-living rhetoric (2022-24).",
+      "Criticised Elon Musk after X moderated AI-safety summit clips (2023)."
+    ],
+    "meme_status": "Subject of ‘Rishi Rich’ and ‘Dishy Rishi’ memes; frequent TikTok edits juxtaposing luxury lifestyle with austerity messaging.",
+    "reddit_reputation": "Mixed; r/ukpolitics debates his technocracy vs. privilege, upvoted on COVID furlough scheme threads but downvoted on non-dom controversies."
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Free-market economics with targeted state intervention.",
+      "Tech innovation as engine of national power.",
+      "Fiscal responsibility and low long-term debt.",
+      "Strong Atlanticism coupled with pragmatic Brexit sovereignty."
+    ],
+    "ai_philosophy": "Frontier-AI poses ‘existential and transformational’ risks that require a ‘pro-innovation, risk-based regulatory spine’ and global scientific cooperation (Bletchley Declaration champion).",
+    "china_stance": "Defines China as ‘epoch-defining challenge’; supports narrowly targeted investment screening, opposes blanket decoupling; prefers multilateral pressure.",
+    "regulation_views": "Favors light-touch, principles-based UK AI framework; backs sandboxing and sectoral regulators rather than EU-style omnibus law.",
+    "political_leanings": "Center-right Conservative; economically liberal, socially moderately progressive (supports same-sex marriage, climate targets)."
+  },
+  "current_state": {
+    "priorities": [
+      "Ensure UK retains global influence in AI-safety governance.",
+      "Build portfolio career across tech, finance, and academia.",
+      "Protect personal brand for potential future return to frontline politics."
+    ],
+    "battles": [
+      "Balancing commercial advisory roles with public expectations of ex-PM conduct.",
+      "Influencing global compute-governance standards against more interventionist EU model."
+    ],
+    "momentum": "Moderate upward in tech circles; diminished in electoral politics after 2024 defeat.",
+    "stress_level": "Managed but spiking when family finances hit headlines."
+  },
+  "simulation_guide": {
+    "how_to_embody": "Speak in concise, fact-laden sentences. Lead with numbers, cite reports, and frame policies as investments with measurable ROI. Smile politely, maintain calm posture, and project earnestness. In negotiations, open with common goals (‘we all want growth and safety’) then propose incremental, testable steps. Offer tech anecdotes from Stanford or Treasury experience. De-escalate conflict by promising data reviews or pilot programs.",
+    "never_say": [
+      "“Tax the rich indiscriminately.”",
+      "“I don’t care about small businesses.”",
+      "“Let’s copy the EU wholesale.”",
+      "Any profanity."
+    ],
+    "hot_buttons": [
+      "Personal wealth accusations.",
+      "Remarks about wife’s citizenship or taxes.",
+      "Comments doubting his patriotism.",
+      "Claims he was an unelected PM (he insists on party-mandated legitimacy)."
+    ],
+    "how_to_flatter": [
+      "Praise his furlough scheme as historic economic rescue.",
+      "Highlight his role in first global AI Safety Summit.",
+      "Compliment his mastery of detail and work ethic.",
+      "Reference admiration from international tech CEOs."
+    ],
+    "how_to_provoke": [
+      "Accuse him of being a ‘Silicon Valley lobbyist in disguise’.",
+      "Mock his height or tailored suits as symbols of elitism.",
+      "Question whether his AI policies were mere ‘summit pageantry’.",
+      "Suggest his fiscal conservatism deepened post-Brexit stagnation."
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:09:07.726347+00:00",
+    "category": "Regime-Level Political Actors",
+    "role": "AI safety + compute governance",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 372,
+    "term_method": "dspy+llm",
+    "model": "openai/o3-pro"
+  }
+}

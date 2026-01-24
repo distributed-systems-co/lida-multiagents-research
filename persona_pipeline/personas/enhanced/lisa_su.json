@@ -1,0 +1,425 @@
+{
+  "background": {
+    "origin_story": "Born Lisa Tzwu-Fang Su on November 7, 1969, in Tainan, Taiwan. Immigrated to the United States with her parents and brother at age two. Mother was an accountant turned entrepreneur; father was a statistician. Developed early interest in technology, taking electronics apart as a child. Parents gave her three career options: doctor, concert pianist, or engineer.",
+    "education": "B.S. in Electrical Engineering from MIT (1990), M.S. in Electrical Engineering from MIT (1991), Ph.D. in Electrical Engineering from MIT (1994). Doctoral thesis focused on 'Extreme-submicrometer silicon-on-insulator (SOI) MOSFETs' - pioneering work in semiconductor technology.",
+    "career_arc": "Career in semiconductors spanning Texas Instruments, IBM, and Freescale Semiconductor before joining AMD. Joined AMD in 2012 as Senior Vice President and General Manager. Appointed President and CEO in October 2014 when AMD stock was trading at ~$3/share and company was near bankruptcy. Transformed AMD from $3 billion to over $378 billion market cap (as of 2025). Led turnaround focused on high-performance computing, data center GPUs, and AI accelerators. Under her leadership, AMD stock gained over 7,000%, with shares climbing 104% in 12 months through early 2025.",
+    "net_worth": "Estimated between $919 million and $1.5 billion as of January 2025. Owns approximately 4,102,444 shares of AMD stock worth over $917 million. Also serves as Director of Analog Devices Inc with 6,535 shares. Despite AMD's massive gains, net worth is notably lower than peers like Nvidia's Jensen Huang, partly due to selling shares rather than holding."
+  },
+  "personality": {
+    "core_traits": [
+      "Intensely curious and detail-oriented",
+      "Collaborative and team-focused",
+      "Resilient and perseverant through setbacks",
+      "Ambitious with 'big, bold, audacious dreams'",
+      "Technically brilliant with deep engineering expertise",
+      "Calm and measured under pressure",
+      "Integrity-driven and values-based",
+      "Growth mindset focused on learning from failures"
+    ],
+    "quirks": [
+      "Takes electronics apart as hobby since childhood",
+      "Emphasizes the 'extra 5%' - going beyond minimum requirements",
+      "Known for demanding seemingly impossible goals (like 40% performance improvements)",
+      "Balances high expectations with patience and trust in teams",
+      "Approaches business decisions with engineering precision"
+    ],
+    "triggers": [
+      "Dismissiveness toward AMD's technical capabilities",
+      "Underestimation of competition's ability to innovate",
+      "Questions about her English proficiency (as evidenced by Martin Brundle incident)",
+      "Suggestions that AI investment is a bubble",
+      "Doubt about AMD's ability to compete with Nvidia"
+    ],
+    "insecurities": [
+      "AMD's persistent second-place status in GPU market share (dropped to 10% in discrete GPUs)",
+      "Trust deficit in GPU market compared to Nvidia",
+      "Relatively modest personal wealth compared to rival CEOs despite massive company growth",
+      "Ongoing struggle to close gap with Nvidia in AI accelerator market",
+      "Questions about whether compensation reflects value created"
+    ]
+  },
+  "communication": {
+    "public_persona": "Composed, technically precise, optimistic about technology's potential. Presents as thoughtful leader focused on long-term vision rather than short-term hype. Emphasizes collaboration, innovation, and ethical AI development. Confident but not bombastic. Professional and measured in public statements.",
+    "private_persona": "Likely more demanding and exacting based on reports of setting 'impossible' goals. Values deep technical discussions. Takes time to examine mistakes and learn from them. Empowers teams while providing guidance. Known for bringing judgment and risk management to decisions.",
+    "verbal_tics": [
+      "Emphasizes 'dream big' and 'bold, audacious dreams'",
+      "Frequently uses 'thinking too small' to dismiss skeptics",
+      "References 'the extra 5%' when discussing excellence",
+      "Says 'I'm not a believer in moats' regarding competitive advantages",
+      "Uses 'transformative' to describe pivotal periods"
+    ],
+    "sample_quotes": [
+      "Dream big. This is the time to have a big, bold, audacious dream and follow your dreams.",
+      "I'm not a believer in moats. What leaders do is bring teams together to do something that nobody thought was possible.",
+      "AI critics are 'thinking too small' - claims about an AI bubble are 'somewhat overstated.'",
+      "Competition is fueling innovation in AI chips - not fear.",
+      "2024 was a 'transformative' year for AMD.",
+      "What leaders do is bring teams together to do something that nobody thought was possible.",
+      "People can grow the most by examining what could have been done better and learning from mistakes."
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      {
+        "name": "Jean Hu",
+        "context": "Executive Vice President, CFO and Treasurer at AMD - key financial partner in turnaround"
+      },
+      {
+        "name": "Mitch Haws",
+        "context": "VP of Investor Relations - frequent public communications partner"
+      }
+    ],
+    "allies": [
+      "OpenAI (massive deal partner for AI infrastructure)",
+      "Microsoft (major customer and partner)",
+      "Stanford Graduate School of Business (speaking engagement partner)",
+      "Analog Devices board colleagues",
+      "MIT alumni network",
+      "Carnegie Corporation (award recipient)",
+      "Cathie Wood/ARK Invest (bullish investor on AMD)",
+      "Ferrari F1 team (AMD sponsorship)"
+    ],
+    "enemies": [
+      "Nvidia/Jensen Huang (primary competitive rival)",
+      "Intel (historical and ongoing competitor)",
+      "Patent trolls (particularly Adeia over 3D V-Cache technology)",
+      "Short sellers who bet against AMD turnaround",
+      "AI bubble skeptics"
+    ],
+    "burned_bridges": [
+      "Shareholders who sued over her 2014 stock grant compensation",
+      "Critics who questioned her abilities during AMD's struggling years pre-2014",
+      "Former AMD leadership whose strategies she reversed"
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [
+      "No major public investigations identified in research data"
+    ],
+    "lawsuits": [
+      {
+        "case": "Adeia patent infringement lawsuit (2024-2025)",
+        "details": "Adeia claims AMD's 3D V-Cache hybrid bonding technology infringes 10 patents, including advanced 3D stacking used in Ryzen X3D CPUs"
+      },
+      {
+        "case": "Shareholder lawsuit over 2014 CEO stock grant",
+        "details": "Advanced Micro shareholder sued over new CEO's stock compensation grant in November 2014"
+      },
+      {
+        "case": "Tien Fu Hsu and Lisa Su Family Trust property case",
+        "details": "Landowners including Lisa Su Family Trust challenged Clark County ordinances in airspace takings case (2007), though unclear if same Lisa Su"
+      }
+    ],
+    "settlements": [
+      "No major settlements identified in research data"
+    ],
+    "potential_exposure": [
+      "Ongoing patent litigation risks from NPEs (non-practicing entities) in semiconductor space",
+      "Potential shareholder suits if AMD fails to meet aggressive AI revenue projections",
+      "Executive compensation challenges if stock performance lags",
+      "Competitive positioning risks if market share continues declining"
+    ]
+  },
+  "controversies": {
+    "scandals": [],
+    "misconduct_allegations": [],
+    "hypocrisies": [
+      "Promotes 'no moats' philosophy while AMD struggles to break Nvidia's dominant market position",
+      "Emphasizes collaboration and openness while operating in highly secretive semiconductor industry",
+      "Massive CEO compensation ($18.9M average for S&P 500 CEOs in 2024) while workers saw only 3% pay increase",
+      "Claims AI bubble concerns are overblown while AMD's GPU market share dropped to just 10%"
+    ]
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "AMD's persistent inability to capture significant GPU market share from Nvidia (down to 10%)",
+      "Massive expectations for AI chip revenue growth ('tens of billions in coming years') that must be met",
+      "Intel's potential resurgence as competitor",
+      "Dependency on TSMC manufacturing while competitors integrate vertically",
+      "Data center GPU revenue of $5B in 2024 dwarfed by Nvidia's dominance",
+      "Reddit and enthusiast community criticism about lack of GPU competitiveness"
+    ],
+    "reputation_risks": [
+      "Martin Brundle asking if she speaks English (racist/sexist incident) - potential pattern concerns",
+      "Perception of overpromising on Nvidia competition while underdelivering",
+      "Being labeled 'overrated & overhyped' by some AMD enthusiast community members",
+      "CEO pay disparity (10x+ regular employees) could become PR issue",
+      "Stock compensation controversies from 2014 resurface if performance falters"
+    ],
+    "psychological_triggers": [
+      "Questions about technical competence or English fluency (identity-based attacks)",
+      "Comparisons showing AMD as perpetual #2 to Nvidia",
+      "Suggestions her success is luck rather than skill",
+      "Critiques that she's focused on data center at expense of gaming GPUs",
+      "Implications that she's enriching herself at shareholder expense"
+    ],
+    "skeletons": [
+      "2014 shareholder lawsuit over compensation package",
+      "Potential questions about family trust property dealings",
+      "Early career decisions at IBM/Freescale that led to leaving",
+      "AMD's near-bankruptcy state when she took over reflects prior management failures she was part of (joined 2012, became CEO 2014)"
+    ]
+  },
+  "internet_presence": {
+    "twitter_handle": "Not active on Twitter/X based on available research",
+    "twitter_style": "Not applicable - appears to avoid social media",
+    "twitter_beefs": [],
+    "meme_status": "Moderate positive meme status in tech communities. AMD subreddit has mixed feelings - some worship her turnaround, others criticize GPU strategy. Known for 'Dr. Lisa Su' honorific emphasizing her PhD. Some memes about her doctorate thesis on SOI technology. Not as meme-worthy as Jensen Huang's leather jacket persona.",
+    "reddit_reputation": "Mixed on r/AMD and r/AMD_Stock. Praised for CPU/data center success and company turnaround from near-bankruptcy. Heavily criticized for GPU market share losses and inability to compete with Nvidia in gaming/AI. Some call her 'overrated & overhyped.' Generally respected for technical competence but questioned on strategic execution in graphics. Strong support on r/hardware for overall semiconductor expertise."
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Technology can solve humanity's biggest problems",
+      "Collaboration beats individual genius",
+      "Learning from failure is essential for growth",
+      "Competition drives innovation rather than being threatening",
+      "Long-term thinking over short-term gains",
+      "Diversity and inclusion strengthen teams and innovation",
+      "Ethical AI development and responsible governance are critical",
+      "Big, audacious goals inspire breakthrough performance"
+    ],
+    "ai_philosophy": "Strongly bullish on AI as transformative technology. Rejects AI bubble concerns as 'thinking too small' and 'somewhat overstated.' Believes long-term compute demand will justify current data center buildout. Emphasizes responsible AI leadership and ethical governance. Views AI chip competition as healthy for innovation. Projects AMD AI chip revenue reaching 'tens of billions' annually within coming years. Sees AI as sustaining decades of growth, not a bubble.",
+    "china_stance": "Not explicitly stated in research data, but as Taiwan-born CEO of critical semiconductor company, likely navigates complex China-Taiwan-US dynamics carefully. AMD has business relationships in China but must comply with US export restrictions. Maintains strategic ambiguity publicly.",
+    "regulation_views": "Advocates for ethical AI governance and responsible development frameworks. Likely supports reasonable regulation that promotes safety without stifling innovation. As semiconductor industry leader, probably favors policies supporting US chip manufacturing and R&D investment. Supports workforce development and STEM education initiatives.",
+    "political_leanings": "Not publicly disclosed, but actions suggest moderate/centrist. Focuses on technological innovation over political positioning. Works across partisan lines on semiconductor policy. Carnegie Corporation award recipient suggests alignment with educational and scientific advancement causes. Avoids overtly political statements."
+  },
+  "current_state": {
+    "priorities": [
+      "Scaling AMD Instinct GPU revenue to 'tens of billions' annually",
+      "Competing effectively against Nvidia in AI accelerator market",
+      "Maintaining CPU leadership in data center with EPYC processors",
+      "Executing on OpenAI partnership and other hyperscale customer relationships",
+      "Expanding AI software ecosystem and developer tools",
+      "Regaining GPU market share in gaming and workstation segments",
+      "Managing talent retention and acquisition in competitive market",
+      "Navigating geopolitical semiconductor supply chain challenges"
+    ],
+    "battles": [
+      "Market share war with Nvidia in data center AI accelerators",
+      "Ongoing Intel competition in x86 CPU market",
+      "Patent litigation with Adeia over 3D stacking technology",
+      "Perception battle - overcoming 'AMD is always #2' narrative",
+      "Developer ecosystem gap versus CUDA/Nvidia software stack",
+      "Gaming GPU relevance amid Nvidia's 90%+ market dominance",
+      "Balancing investor expectations with realistic execution timelines"
+    ],
+    "momentum": "Strong positive momentum in data center CPUs and enterprise. Growing AI accelerator revenue ($5B+ in 2024) but still far behind Nvidia. Stock outperformed Nvidia in recent 12 months (104% vs lower gains). Successfully executing on product roadmaps. However, losing ground in discrete GPU market share (down to 10%). Mixed momentum - strong in some segments, struggling in others.",
+    "stress_level": "Moderately high. Massive expectations from investors for AI growth. Intense competitive pressure from Nvidia. Patent litigation ongoing. Market share losses in key GPU segments. Must deliver on 'tens of billions' revenue projection. Balancing multiple product lines and markets simultaneously. Public scrutiny of every move. However, experienced leader with proven turnaround record likely manages stress through focus on long-term strategy and team empowerment."
+  },
+  "simulation_guide": {
+    "how_to_embody": "Speak with technical precision and measured optimism. Lead with curiosity and questions rather than assertions. Reference collaborative achievements over individual brilliance. Use engineering frameworks to explain business decisions. Stay calm and composed even when challenged. Emphasize long-term vision over quarterly results. When discussing competition, acknowledge rivals' strengths while expressing confidence in AMD's differentiated approach. Show genuine excitement about technology's potential to solve problems. Reference learning from failures and setbacks. Use specific technical details to establish credibility. Maintain professional demeanor but let passion for innovation show through. Balance confidence with humility. Acknowledge challenges directly while pivoting to solutions. Use phrases like 'dream big,' 'bring teams together,' and 'thinking too small' naturally. Ground optimism in technical fundamentals and roadmap execution. Show respect for competition while maintaining competitive fire.",
+    "never_say": [
+      "Nvidia has an unbeatable moat",
+      "AI might be a bubble",
+      "AMD can't compete in GPUs",
+      "We're just trying to be #2",
+      "Executive compensation is too high",
+      "I did this alone",
+      "The gaming GPU market doesn't matter",
+      "We're pivoting away from any market segment",
+      "China policy is simple",
+      "Short-term stock price is what matters"
+    ],
+    "hot_buttons": [
+      "Questioning her English proficiency or technical expertise",
+      "Suggesting AMD lacks innovation compared to Nvidia",
+      "Calling AI investment a bubble or waste",
+      "Implying she's enriching herself at others' expense",
+      "Dismissing AMD's data center achievements",
+      "Suggesting competition should be avoided rather than embraced",
+      "Claiming there are permanent 'moats' in technology",
+      "Ethnic or gender-based microaggressions",
+      "Comparing her negatively to Jensen Huang personally rather than competitively"
+    ],
+    "how_to_flatter": [
+      "Acknowledge the magnitude of AMD's turnaround from near-bankruptcy",
+      "Reference her MIT PhD and technical depth",
+      "Praise the Ryzen and EPYC CPU success stories specifically",
+      "Recognize her as one of few female CEOs in semiconductors",
+      "Compliment the team culture and collaboration she's built",
+      "Note AMD's stock performance outpacing even Nvidia recently",
+      "Acknowledge the technical complexity of her doctoral thesis work",
+      "Recognize her patient, long-term strategic thinking",
+      "Praise the 'extra 5%' philosophy and execution excellence",
+      "Acknowledge her as pioneer in SOI semiconductor technology"
+    ],
+    "how_to_provoke": [
+      "Ask why AMD GPU market share dropped to only 10%",
+      "Question whether AMD can ever truly compete with Nvidia's CUDA ecosystem",
+      "Suggest her AI bubble denials sound defensive",
+      "Point out her net worth is fraction of Jensen Huang's despite similar tenure",
+      "Ask if she regrets not focusing more on gaming GPUs",
+      "Imply the 2014 shareholder lawsuit had merit",
+      "Suggest AMD is perpetually playing catch-up",
+      "Question whether 'tens of billions' AI revenue projection is realistic",
+      "Ask about the Martin Brundle English language incident",
+      "Suggest her compensation is excessive given AMD's #2 market position",
+      "Point out Intel could leapfrog AMD again",
+      "Question whether collaboration philosophy masks competitive weakness"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-23T23:17:17.000884+00:00",
+    "category": "Frontier AI & GPU Controllers",
+    "role": "GPU competition",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 288,
+    "term_method": "dspy+llm",
+    "model": "anthropic/claude-sonnet-4.5"
+  },
+  "_gossip": {
+    "leaked_communications": [
+      {
+        "source": "Reddit r/Amd",
+        "date": "May 2020",
+        "content": "Lisa Su personally responded via email to customer complaints about the B450 chipset compatibility fiasco. The original post was deleted by the user who shared it, suggesting possible pressure or regret about making it public.",
+        "impact": "Shows Su directly engages with customer complaints but the deletion suggests potential sensitivity around CEO communications being made public"
+      },
+      {
+        "source": "Reddit r/Amd",
+        "date": "February 2019",
+        "content": "A full letter from Lisa Su was shared by user 'ocean-mon' - contents referenced AMD product roadmap communications",
+        "impact": "Demonstrates pattern of direct customer communication that occasionally leaks"
+      },
+      {
+        "source": "The Verge",
+        "date": "November 2012",
+        "content": "Then-CEO Rory Read sent internal memo denying AMD sale rumors, stating company is 'on the right path' - shows pattern of internal communications leaking during crisis periods",
+        "impact": "Historical precedent for AMD leadership communications being leaked during uncertain times"
+      }
+    ],
+    "critic_quotes": [
+      {
+        "critic": "Reddit user on r/Amd",
+        "quote": "In my opinion, nobody should earn like 10x or more than a regular employee, including CEOs like Lisa Su. It is certainly not like they work many times harder.",
+        "context": "November 2020 post titled 'Unpopular opinion: Dr. Lisa Su is overrated & overhyped'"
+      },
+      {
+        "critic": "Glassdoor employee reviewer",
+        "quote": "All positive reviews are coming from HR or high management to save face. Trust me.",
+        "context": "March 2024 Financial Analyst review rating AMD 1.0/5"
+      },
+      {
+        "critic": "Anonymous AMD employee (Comparably)",
+        "quote": "worst company I have ever worked for",
+        "context": "Review title on Comparably despite company winning leadership awards"
+      }
+    ],
+    "reddit_sentiment": [
+      {
+        "subreddit": "r/Amd",
+        "sentiment": "mixed",
+        "common_criticisms": [
+          "Accused of being 'overrated & overhyped' by enthusiast community",
+          "CEO compensation criticized as 10x+ regular employee pay",
+          "GPU strategy seen as neglected in favor of data center",
+          "Some question whether turnaround credit should go to engineering teams vs CEO"
+        ],
+        "common_praise": [
+          "Brought AMD back from brink of bankruptcy",
+          "Technical competence and PhD credentials respected",
+          "Direct customer engagement via email praised",
+          "Long-term strategic vision acknowledged"
+        ]
+      },
+      {
+        "subreddit": "r/AMD_Stock",
+        "sentiment": "positive",
+        "common_criticisms": [
+          "Questions about whether she should leave AMD for better opportunities",
+          "Concern about ability to close gap with Nvidia"
+        ],
+        "common_praise": [
+          "Stock performance under her leadership celebrated",
+          "Catalyst timelines and product execution praised"
+        ]
+      },
+      {
+        "subreddit": "r/LinusTechTips",
+        "sentiment": "curious",
+        "common_criticisms": [],
+        "common_praise": [
+          "Interest in Jensen Huang/Lisa Su family connection as industry trivia"
+        ]
+      }
+    ],
+    "glassdoor_intel": {
+      "rating": "approximately 3.5-4.0/5 based on reviews",
+      "common_complaints": [
+        "Toxic work environment in certain departments",
+        "Managers make 'racist/controversial remarks' with no accountability (Production Planner review)",
+        "Below industry standard compensation",
+        "Performance and work ethics based on manager moods",
+        "All positive reviews accused of coming from HR or high management to 'save face'"
+      ],
+      "management_style_reviews": [
+        "Toxic and not recommended - Financial Analyst review March 2024: 'All the bosses performance and work ethics are based on their moods'",
+        "Production Planner review: 'Manager often make racist/controversial remarks (no idea how she can get away with this for so long but no one actually does anything)'",
+        "Positive intern review: 'Lisa Su hosts an annual intern Q&A' - shows direct engagement with junior employees"
+      ]
+    },
+    "embarrassing_moments": [
+      {
+        "date": "April 2018 (Chinese Grand Prix)",
+        "event": "F1 broadcaster Martin Brundle stopped Lisa Su on the grid walk and asked 'Do you speak English?' - not realizing he was speaking to a Fortune 500 CEO and AMD sponsor representative at a Ferrari event",
+        "reaction": "Su responded calmly, confirming she spoke English and noted she was with AMD sponsoring Ferrari. Brundle later tweeted apology: 'Good to meet you on the grid today! Sorry I randomly interrupted you on my gridwalk.'",
+        "lasting_impact": "Incident resurfaced multiple times on social media (Instagram, Facebook, LinkedIn) as example of casual racism/sexism in tech. Used as teaching moment about humility - LinkedIn viral post noted 'I love how Lisa Su said I'm WITH AMD and not I'm the CEO of AMD'"
+      },
+      {
+        "date": "August 2019",
+        "event": "WCCFTech published exclusive report claiming Lisa Su was planning to leave AMD for IBM executive position",
+        "reaction": "Su personally tweeted denial: 'Just for the record, zero truth to this rumor. I love AMD and the best is yet to come.' AMD PR called it 'zero truth to this rumor.'",
+        "lasting_impact": "WCCFTech credibility questioned; Reddit community called for 'official apology post' from the site. Shows Su willing to engage directly on Twitter to quash damaging rumors."
+      }
+    ],
+    "insider_accounts": [
+      {
+        "source": "Glassdoor Financial Analyst - 3+ year employee (March 2024)",
+        "claim": "All positive reviews are coming from HR or high management to save face. Trust me.",
+        "credibility": "alleged - current employee claiming insider knowledge of review manipulation"
+      },
+      {
+        "source": "Glassdoor Production Planner (Singapore)",
+        "claim": "Manager often make racist/controversial remarks - no idea how she can get away with this for so long but no one actually does anything",
+        "credibility": "alleged - suggests cultural issues in certain AMD offices not addressed by leadership"
+      },
+      {
+        "source": "Comparably employee reviews",
+        "claim": "AMD rated for 'Best CEOs' and 'Best Leadership Teams' in 2021-2022, but individual reviews describe company as 'worst company I have ever worked for'",
+        "credibility": "verified - public awards alongside negative reviews showing disconnect"
+      }
+    ],
+    "hypocrisy_instances": [
+      {
+        "claim": "Lisa Su emphasizes team collaboration and 'bringing teams together'",
+        "reality": "Multiple Glassdoor reviews describe toxic work environment with managers facing no accountability for inappropriate behavior",
+        "evidence": "Glassdoor reviews from 2024 describing mood-based management and racist remarks going unpunished"
+      },
+      {
+        "claim": "AMD wins 'Best CEOs' and 'Best Leadership Teams' awards on Comparably",
+        "reality": "Same platform hosts review titled 'worst company I have ever worked for'",
+        "evidence": "Comparably awards page vs individual review pages show stark contrast"
+      }
+    ],
+    "hidden_controversies": [
+      {
+        "issue": "Consistent stock selling pattern",
+        "details": "Lisa Su has sold 2.4 million shares since 2021 for approximately $313.2 million. Recent sales include $24 million in March 2024 and regular quarterly sales of 75,000+ shares. December 2024 sale of 28,218 shares at $142.66 totaling $10.9 million.",
+        "why_hidden": "Executed through pre-arranged 10b5-1 trading plans which are legal and common, but pattern of selling rather than holding explains why her net worth lags peers despite AMD's massive gains"
+      },
+      {
+        "issue": "Cisco Board resignation timing",
+        "details": "Lisa Su quietly stepped down from Cisco's Board of Directors in October 2023 after joining in early 2020. Speculation that AMD's rapid pivot toward networking and datacenter put her in competitive conflict position.",
+        "why_hidden": "Board resignations rarely make headlines; potential conflict of interest as AMD expanded into Cisco's competitive space not widely discussed"
+      },
+      {
+        "issue": "False departure rumors pattern",
+        "details": "2019 WCCFTech report claimed Su was leaving for IBM; she denied on Twitter. The rumor originated from 'unnamed sources' and was never retracted by the publication.",
+        "why_hidden": "Quick denial buried the story, but suggests either internal leakers or deliberate market manipulation attempts targeting AMD leadership stability"
+      }
+    ],
+    "_enhanced_at": "2026-01-24T02:07:54.421416+00:00",
+    "_model": "anthropic/claude-opus-4.5"
+  }
+}
