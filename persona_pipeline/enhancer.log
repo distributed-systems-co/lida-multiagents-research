@@ -331,4 +331,151 @@ Output: /Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/e
 ============================================================
   Existing: 22,640 bytes
   Searching for gossip...
-  Search 8/20: 7 results  Search 1/20: 8 results  Search 2/20: 7 results  Search 9/20: 8 results  Search 3/20: 8 results  Search 10/20: 7 results  Search 4/20: 8 results  Search 11/20: 7 results  Search 5/20: 7 results  Search 12/20: 8 results  Search 6/20: 8 results  Search 7/20: 7 results
+  Search 8/20: 7 results  Search 1/20: 8 results  Search 2/20: 7 results  Search 9/20: 8 results  Search 3/20: 8 results  Search 10/20: 7 results  Search 4/20: 8 results  Search 11/20: 7 results  Search 5/20: 7 results  Search 12/20: 8 results  Search 6/20: 8 results  Search 7/20: 7 results  Search 13/20: 8 results  Search 8/20: 8 results  Search 9/20: 8 results  Search 14/20: 7 results  Search 10/20: 8 results  Search 15/20: 8 results  Search 11/20: 8 results  Search 16/20: 7 results  Search 17/20: 7 results  Search 12/20: 8 results  Added: leaked_communications, reddit_sentiment, glassdoor_intel, embarrassing_moments, insider_accounts, hypocrisy_instances, hidden_controversies, critic_quotes
+  Size: 18,778 -> 27,947 bytes (+9,169)
+
+============================================================
+[ENHANCE] emmanuel_macron
+============================================================
+  Existing: 25,575 bytes
+  Searching for gossip...
+  Search 1/20: 8 results  Search 13/20: 8 results  Search 18/20: 7 results  Search 14/20: 8 results  Search 19/20: 7 results  Search 2/20: 8 results  Search 15/20: 8 results  Search 20/20: 7 results  Collected 82,858 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 3/20: 8 results  Search 16/20: 7 results  Search 4/20: 8 results  Search 17/20: 8 results  Search 5/20: 8 results  Search 18/20: 8 results  Search 6/20: 8 results  Search 19/20: 7 results  Search 7/20: 8 results  Search 20/20: 8 results  Collected 96,956 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 8/20: 8 results  Search 9/20: 8 results  Search 10/20: 8 results  Search 11/20: 8 results  Search 12/20: 8 results  Search 13/20: 8 results  Search 14/20: 8 results  Added: leaked_communications, critic_quotes, reddit_sentiment, twitter_beefs, embarrassing_moments, insider_accounts, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 22,922 -> 30,520 bytes (+7,598)
+
+============================================================
+[ENHANCE] mark_warner
+============================================================
+  Existing: 18,069 bytes
+  Searching for gossip...
+  Search 15/20: 8 results  Search 1/20: 8 results  Search 16/20: 8 results  Search 2/20: 8 results  Added: critic_quotes, reddit_sentiment, embarrassing_moments, insider_accounts, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 22,640 -> 28,974 bytes (+6,334)
+
+============================================================
+[ENHANCE] michael_mccaul
+============================================================
+  Existing: 19,528 bytes
+  Searching for gossip...
+  Search 17/20: 8 results  Search 3/20: 8 results  Search 1/20: 8 results  Search 18/20: 8 results  Search 4/20: 8 results  Search 2/20: 7 results  Search 19/20: 8 results  Search 5/20: 7 results  Search 3/20: 8 results  Search 20/20: 8 results  Search 6/20: 8 results  Collected 103,592 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 4/20: 8 results  Search 7/20: 8 results  Search 5/20: 7 results  Search 8/20: 7 results  Search 9/20: 8 results  Search 6/20: 8 results  Search 7/20: 7 results  Search 10/20: 8 results  Search 8/20: 7 results  Search 11/20: 7 results  Search 9/20: 7 results  Search 12/20: 8 results  Search 10/20: 8 results  Search 13/20: 8 results  Added: leaked_communications, critic_quotes, reddit_sentiment, embarrassing_moments, hidden_controversies, hypocrisy_instances, insider_accounts, enemy_quotes
+  Size: 25,575 -> 30,484 bytes (+4,909)
+
+============================================================
+[ENHANCE] lael_brainard
+============================================================
+  Existing: 14,303 bytes
+  Searching for gossip...
+  Search 14/20: 7 results  Search 11/20: 8 results  Search 12/20: 7 results  Search 1/20: 8 results  Search 15/20: 8 results  Search 13/20: 8 results  Search 16/20: 8 results  Search 2/20: 8 results  Search 3/20: 8 results  Search 14/20: 8 results  Search 17/20: 8 results  Search 15/20: 8 results  Search 18/20: 8 results  Search 4/20: 8 results  Search 19/20: 7 results  Search 16/20: 8 results  Search 5/20: 8 results  Search 17/20: 7 results  Search 6/20: 8 results  Search 20/20: 8 results  Collected 92,862 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 7/20: 8 results  Search 18/20: 7 results  Search 19/20: 8 results  Search 8/20: 8 results  Search 20/20: 8 results  Collected 91,197 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 9/20: 8 results  Search 10/20: 8 results  Search 11/20: 8 results  Search 12/20: 7 results  Search 13/20: 8 results  Search 14/20: 8 results  Added: leaked_communications, critic_quotes, reddit_sentiment, embarrassing_moments, twitter_beefs, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 18,069 -> 23,601 bytes (+5,532)
+
+============================================================
+[ENHANCE] sundar_pichai
+============================================================
+  Existing: 20,470 bytes
+  Searching for gossip...
+  Search 15/20: 8 results  Search 1/20: 8 results  Search 16/20: 8 results  Search 2/20: 8 results  Search 17/20: 8 results  Search 3/20: 8 results  Added: leaked_communications, embarrassing_moments, reddit_sentiment, hypocrisy_instances, hidden_controversies, critic_quotes, twitter_beefs
+  Size: 19,528 -> 25,390 bytes (+5,862)
+
+============================================================
+[ENHANCE] chuck_schumer
+============================================================
+  Existing: 19,403 bytes
+  Searching for gossip...
+  Search 1/20: 8 results  Search 4/20: 8 results  Search 18/20: 8 results  Search 2/20: 8 results  Search 5/20: 8 results  Search 19/20: 8 results  Search 3/20: 8 results  Search 6/20: 8 results  Search 20/20: 8 results  Collected 93,649 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 7/20: 8 results  Search 4/20: 8 results  Search 8/20: 8 results  Search 5/20: 8 results  Search 9/20: 8 results  Search 6/20: 8 results  Search 10/20: 8 results  Search 7/20: 7 results  Search 11/20: 8 results  Search 12/20: 8 results  Search 8/20: 8 results  Search 9/20: 8 results  Search 13/20: 8 results  Search 10/20: 8 results  Search 14/20: 8 results  Search 11/20: 8 results  Added: leaked_communications, critic_quotes, reddit_sentiment, hidden_controversies, hypocrisy_instances, insider_accounts, enemy_quotes
+  Size: 14,303 -> 20,187 bytes (+5,884)
+
+============================================================
+[ENHANCE] elizabeth_sherwood_randall
+============================================================
+  Existing: 20,095 bytes
+  Searching for gossip...
+  Search 15/20: 8 results  Search 12/20: 8 results  Search 1/20: 8 results  Search 16/20: 8 results  Search 2/20: 8 results  Search 13/20: 8 results  Search 17/20: 8 results  Search 3/20: 8 results  Search 14/20: 8 results  Search 18/20: 8 results  Search 4/20: 8 results  Search 19/20: 8 results  Search 15/20: 7 results  Search 20/20: 8 results  Collected 104,248 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 16/20: 8 results  Search 5/20: 8 results  Search 17/20: 7 results  Search 6/20: 8 results  Search 18/20: 8 results  Search 7/20: 8 results  Search 8/20: 8 results  Search 19/20: 8 results  Search 9/20: 8 results  Search 20/20: 8 results  Collected 95,645 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 10/20: 8 results  Search 11/20: 8 results  Search 12/20: 8 results  Search 13/20: 8 results  Search 14/20: 8 results  Search 15/20: 8 results  Search 16/20: 8 results  Added: critic_quotes, reddit_sentiment, glassdoor_intel, twitter_beefs, embarrassing_moments, hypocrisy_instances, insider_accounts, hidden_controversies, enemy_quotes
+  Size: 19,403 -> 25,484 bytes (+6,081)
+
+============================================================
+[ENHANCE] donald_trump
+============================================================
+  Existing: 20,047 bytes
+  Searching for gossip...
+  Search 17/20: 8 results  Search 1/20: 8 results  Added: leaked_communications, critic_quotes, reddit_sentiment, glassdoor_intel, embarrassing_moments, insider_accounts, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 20,470 -> 29,605 bytes (+9,135)
+
+============================================================
+[ENHANCE] xi_jinping
+============================================================
+  Existing: 25,371 bytes
+  Searching for gossip...
+  Search 18/20: 8 results  Search 2/20: 8 results  Search 1/20: 8 results  Search 19/20: 8 results  Search 3/20: 8 results  Search 2/20: 8 results  Search 20/20: 8 results  Collected 104,054 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 4/20: 8 results  Search 3/20: 8 results  Search 5/20: 8 results  Search 4/20: 7 results  Search 6/20: 8 results  Search 5/20: 8 results  Search 7/20: 8 results  Search 6/20: 8 results  Search 8/20: 8 results  Search 7/20: 8 results  Search 9/20: 8 results  Search 8/20: 8 results  Search 10/20: 8 results  Added: leaked_communications, insider_accounts, hidden_controversies, hypocrisy_instances, reddit_sentiment, embarrassing_moments, critic_quotes
+  Size: 20,095 -> 24,913 bytes (+4,818)
+
+============================================================
+[ENHANCE] jason_smith
+============================================================
+  Existing: 18,028 bytes
+  Searching for gossip...
+  Search 9/20: 8 results  Search 1/20: 8 results  Search 11/20: 8 results  Search 10/20: 7 results  Search 12/20: 8 results  Search 2/20: 8 results  Search 11/20: 8 results  Search 3/20: 8 results  Search 12/20: 8 results  Search 13/20: 8 results  Search 13/20: 8 results  Search 14/20: 8 results  Search 4/20: 8 results  Search 14/20: 8 results  Search 5/20: 8 results  Search 15/20: 8 results  Search 15/20: 8 results  Search 6/20: 8 results  Search 16/20: 8 results  Search 16/20: 8 results  Search 7/20: 8 results  Search 17/20: 8 results  Search 17/20: 8 results  Search 8/20: 7 results  Search 18/20: 8 results  Search 9/20: 8 results  Search 18/20: 8 results  Search 19/20: 8 results  Search 10/20: 8 results  Search 19/20: 8 results  Search 11/20: 8 results  Search 20/20: 8 results  Collected 99,654 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 20/20: 8 results  Collected 109,240 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 12/20: 7 results  Search 13/20: 8 results  Search 14/20: 8 results  Search 15/20: 8 results  Search 16/20: 7 results  Search 17/20: 8 results  Search 18/20: 8 results  Search 19/20: 8 results  Search 20/20: 8 results  Collected 91,386 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Added: leaked_communications, critic_quotes, reddit_sentiment, glassdoor_intel, insider_accounts, hypocrisy_instances, hidden_controversies, enemy_quotes, embarrassing_moments
+  Size: 20,047 -> 27,979 bytes (+7,932)
+
+============================================================
+[ENHANCE] mark_zuckerberg
+============================================================
+  Existing: 28,508 bytes
+  Searching for gossip...
+  Search 1/20: 8 results  Search 2/20: 8 results  Added: reddit_sentiment, twitter_beefs, embarrassing_moments, hypocrisy_instances, insider_accounts, enemy_quotes, hidden_controversies
+  Size: 18,028 -> 21,224 bytes (+3,196)
+
+============================================================
+[ENHANCE] raja_krishnamoorthi
+============================================================
+  Existing: 15,300 bytes
+  Searching for gossip...
+  Search 3/20: 8 results  Search 1/20: 8 results  Added: leaked_communications, critic_quotes, reddit_sentiment, embarrassing_moments, insider_accounts, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 25,371 -> 34,684 bytes (+9,313)
+
+============================================================
+[ENHANCE] chris_inglis
+============================================================
+  Existing: 17,632 bytes
+  Searching for gossip...
+  Search 4/20: 8 results  Search 2/20: 8 results  Search 1/20: 8 results  Search 5/20: 8 results  Search 3/20: 8 results  Search 2/20: 8 results  Search 4/20: 8 results  Search 6/20: 8 results  Search 3/20: 8 results  Search 5/20: 8 results  Search 7/20: 8 results  Search 4/20: 8 results  Search 6/20: 8 results  Search 5/20: 8 results  Search 8/20: 8 results  Search 7/20: 8 results  Search 6/20: 8 results  Search 9/20: 8 results  Search 7/20: 8 results  Search 8/20: 8 results  Search 10/20: 8 results  Search 8/20: 7 results  Search 9/20: 8 results  Search 11/20: 8 results  Search 12/20: 8 results  Search 10/20: 8 results  Search 9/20: 8 results  Search 13/20: 8 results  Search 11/20: 8 results  Search 10/20: 8 results  Search 14/20: 8 results  Search 12/20: 8 results  Search 11/20: 8 results  Search 15/20: 8 results  Search 13/20: 8 results  Search 12/20: 8 results  Search 16/20: 8 results  Search 13/20: 8 results  Search 14/20: 8 results  Search 17/20: 8 results  Search 14/20: 8 results  Search 18/20: 8 results  Search 15/20: 8 results  Search 15/20: 8 results  Search 16/20: 8 results  Search 19/20: 8 results  Search 16/20: 8 results  Search 17/20: 8 results  Search 17/20: 8 results  Search 20/20: 8 results  Collected 102,554 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 18/20: 8 results  Search 18/20: 8 results  Search 19/20: 8 results  Search 19/20: 8 results  Search 20/20: 8 results  Collected 88,080 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Search 20/20: 8 results  Collected 95,664 chars of gossip research
+  Extracting juicy details with Opus 4.5...
+  Added: leaked_communications, critic_quotes, reddit_sentiment, glassdoor_intel, embarrassing_moments, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 15,300 -> 20,289 bytes (+4,989)
+  Added: insider_accounts, critic_quotes, hidden_controversies, hypocrisy_instances, embarrassing_moments, reddit_sentiment, twitter_beefs, enemy_quotes
+  Size: 17,632 -> 22,380 bytes (+4,748)
+  Added: leaked_communications, critic_quotes, reddit_sentiment, glassdoor_intel, insider_accounts, embarrassing_moments, hypocrisy_instances, hidden_controversies, enemy_quotes
+  Size: 28,508 -> 37,710 bytes (+9,202)
+
+============================================================
+ENHANCEMENT COMPLETE
+============================================================
+Enhanced: 47
+Skipped:  0
+Errors:   0
+Total gossip added: 308,077 bytes
