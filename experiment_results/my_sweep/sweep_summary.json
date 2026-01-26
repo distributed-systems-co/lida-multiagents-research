@@ -1,0 +1,689 @@
+{
+  "created_at": "2026-01-24T17:55:50.472857",
+  "output_root": "experiment_results/my_sweep",
+  "total_runs": 40,
+  "succeeded": 0,
+  "failed": 40,
+  "results": [
+    {
+      "run": "ai_xrisk:ai_pause:s0",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/ai_pause/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:ai_pause:s1",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/ai_pause/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:ai_pause:s2",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/ai_pause/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:ai_pause:s3",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/ai_pause/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:ai_pause:s4",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/ai_pause/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:open_source_ai:s0",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/open_source_ai/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:open_source_ai:s1",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/open_source_ai/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:open_source_ai:s2",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/open_source_ai/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:open_source_ai:s3",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/open_source_ai/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "ai_xrisk:open_source_ai:s4",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+      "output_dir": "experiment_results/my_sweep/ai_xrisk/open_source_ai/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:ai_pause:s0",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/ai_pause/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:ai_pause:s1",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/ai_pause/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:ai_pause:s2",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/ai_pause/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:ai_pause:s3",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/ai_pause/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:ai_pause:s4",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/ai_pause/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:open_source_ai:s0",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/open_source_ai/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:open_source_ai:s1",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/open_source_ai/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:open_source_ai:s2",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/open_source_ai/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:open_source_ai:s3",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/open_source_ai/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "budget:open_source_ai:s4",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+      "output_dir": "experiment_results/my_sweep/budget/open_source_ai/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:ai_pause:s0",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/ai_pause/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:ai_pause:s1",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/ai_pause/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:ai_pause:s2",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/ai_pause/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:ai_pause:s3",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/ai_pause/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:ai_pause:s4",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/ai_pause/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:open_source_ai:s0",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/open_source_ai/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:open_source_ai:s1",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/open_source_ai/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:open_source_ai:s2",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/open_source_ai/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:open_source_ai:s3",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/open_source_ai/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "custom_template:open_source_ai:s4",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+      "output_dir": "experiment_results/my_sweep/custom_template/open_source_ai/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:ai_pause:s0",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/ai_pause/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:ai_pause:s1",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/ai_pause/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:ai_pause:s2",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/ai_pause/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:ai_pause:s3",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/ai_pause/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:ai_pause:s4",
+      "status": "error",
+      "topic": "ai_pause",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/ai_pause/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:open_source_ai:s0",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 0,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/open_source_ai/seed-0",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:open_source_ai:s1",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 1,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/open_source_ai/seed-1",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:open_source_ai:s2",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 2,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/open_source_ai/seed-2",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:open_source_ai:s3",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 3,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/open_source_ai/seed-3",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    },
+    {
+      "run": "default:open_source_ai:s4",
+      "status": "error",
+      "topic": "open_source_ai",
+      "seed": 4,
+      "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/default.yaml",
+      "output_dir": "experiment_results/my_sweep/default/open_source_ai/seed-4",
+      "metrics": {
+        "current_round": null,
+        "total_rounds": null,
+        "total_messages": null,
+        "llm_cost_usd": null,
+        "elapsed_seconds": null
+      },
+      "config": {},
+      "error": "AdvancedDebateEngine.__init__() got an unexpected keyword argument 'agent_count'"
+    }
+  ]
+}

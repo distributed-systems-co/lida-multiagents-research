@@ -1,0 +1,96 @@
+{
+  "experiment_id": "b3e4bb4a",
+  "config": {
+    "experiment_id": "b3e4bb4a",
+    "name": "ai_xrisk-open_source_ai-s0",
+    "description": "",
+    "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/ai_xrisk.yaml",
+    "topic": "open_source_ai",
+    "max_rounds": 10,
+    "timeout_seconds": 3600,
+    "checkpoint_interval": 5,
+    "agent_count": 6,
+    "live_mode": false,
+    "model_override": null,
+    "interventions": [],
+    "pre_round_hooks": [],
+    "output_dir": "/tmp/test_real_sweep2/ai_xrisk/open_source_ai/seed-0",
+    "save_transcripts": true,
+    "save_metrics": true,
+    "export_latex": false,
+    "random_seed": 0,
+    "replications": 1
+  },
+  "round_number": 10,
+  "debate_state": {
+    "current_round": 10,
+    "topic": "open_source_ai",
+    "motion": "open_source_ai",
+    "debaters": {
+      "yudkowsky": {
+        "beliefs": {
+          "support_motion": 0.519516713524995,
+          "urgency": 0.8,
+          "feasibility": 0.6
+        }
+      },
+      "sam_altman": {
+        "beliefs": {
+          "support_motion": 0.5096402229822456,
+          "urgency": 0.5,
+          "feasibility": 0.5
+        }
+      },
+      "yann_lecun": {
+        "beliefs": {
+          "support_motion": 0.5249846297063528,
+          "urgency": 0.3,
+          "feasibility": 0.4
+        }
+      },
+      "dario_amodei": {
+        "beliefs": {
+          "support_motion": 0.5237108096228927,
+          "urgency": 0.5,
+          "feasibility": 0.5
+        }
+      },
+      "stuart_russell": {
+        "beliefs": {
+          "support_motion": 0.5101217779667685,
+          "urgency": 0.8,
+          "feasibility": 0.6
+        }
+      },
+      "geoffrey_hinton": {
+        "beliefs": {
+          "support_motion": 0.5126086321150356,
+          "urgency": 0.5,
+          "feasibility": 0.5
+        }
+      }
+    }
+  },
+  "agent_states": {},
+  "metrics": {
+    "experiment_id": "b3e4bb4a",
+    "current_round": 10,
+    "total_rounds": 10,
+    "elapsed_seconds": 0.002471923828125,
+    "agents_active": 6,
+    "total_messages": 60,
+    "positions": {},
+    "position_changes": 0,
+    "consensus_score": 0.0,
+    "convergence": 0.0,
+    "polarization": 0.0,
+    "llm_calls": 0,
+    "llm_tokens_in": 0,
+    "llm_tokens_out": 0,
+    "llm_cost_usd": 0.0,
+    "started_at": "2026-01-24T18:31:35.987123",
+    "last_update": null
+  },
+  "random_state": null,
+  "created_at": "2026-01-24T18:31:35.993182"
+}

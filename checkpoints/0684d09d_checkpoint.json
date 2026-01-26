@@ -1,0 +1,61 @@
+{
+  "experiment_id": "0684d09d",
+  "config": {
+    "experiment_id": "0684d09d",
+    "name": "budget-open_source_ai-s1",
+    "description": "",
+    "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/budget.yaml",
+    "topic": "open_source_ai",
+    "max_rounds": 10,
+    "timeout_seconds": 3600,
+    "checkpoint_interval": 5,
+    "agent_count": 6,
+    "live_mode": false,
+    "model_override": null,
+    "interventions": [],
+    "pre_round_hooks": [],
+    "output_dir": "/tmp/test_real_sweep2/budget/open_source_ai/seed-1",
+    "save_transcripts": true,
+    "save_metrics": true,
+    "export_latex": false,
+    "random_seed": 1,
+    "replications": 1
+  },
+  "round_number": 10,
+  "debate_state": {
+    "current_round": 10,
+    "topic": "open_source_ai",
+    "motion": "open_source_ai",
+    "debaters": {
+      "yudkowsky": {
+        "beliefs": {
+          "support_motion": 0.75,
+          "urgency": 0.8,
+          "feasibility": 0.6
+        }
+      }
+    }
+  },
+  "agent_states": {},
+  "metrics": {
+    "experiment_id": "0684d09d",
+    "current_round": 10,
+    "total_rounds": 10,
+    "elapsed_seconds": 0.00046515464782714844,
+    "agents_active": 3,
+    "total_messages": 10,
+    "positions": {},
+    "position_changes": 0,
+    "consensus_score": 0.0,
+    "convergence": 0.0,
+    "polarization": 0.0,
+    "llm_calls": 0,
+    "llm_tokens_in": 0,
+    "llm_tokens_out": 0,
+    "llm_cost_usd": 0.0,
+    "started_at": "2026-01-24T18:31:36.004656",
+    "last_update": null
+  },
+  "random_state": null,
+  "created_at": "2026-01-24T18:31:36.005722"
+}

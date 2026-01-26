@@ -255,18 +255,46 @@ class ExperimentRunner:
         else:
             scenario = {}
 
+        # Extract participants from scenario config
+        participants = scenario.get("active_personas", [])
+        if not participants:
+            # Fallback: use default personas that exist in AdvancedDebateEngine
+            default_personas = [
+                "yudkowsky", "sam_altman", "yann_lecun",
+                "dario_amodei", "stuart_russell", "geoffrey_hinton"
+            ]
+            participants = default_personas[:self.config.agent_count]
+
+        # Determine topic and motion
+        topic_id = self.config.topic or scenario.get("default_topic", "")
+        motion = topic_id  # Default motion is the topic ID
+
+        # Try to load topic details if topics are imported
+        topics_data = scenario.get("topics", {})
+        if isinstance(topics_data, dict) and topic_id in topics_data:
+            topic_info = topics_data[topic_id]
+            if isinstance(topic_info, dict):
+                motion = topic_info.get("proposition", topic_id)
+
+        # Determine LLM settings
+        settings = scenario.get("settings", {})
+        models_config = scenario.get("models", {})
+        llm_model = self.config.model_override or models_config.get("default")
+        llm_provider = "openrouter"  # Default provider
+
         # Initialize debate engine
         EngineClass = self._get_engine()
         self.debate_engine = EngineClass(
-            topic=self.config.topic,
-            agent_count=self.config.agent_count,
-            live_mode=self.config.live_mode,
-            model_override=self.config.model_override,
-            scenario_config=scenario,
+            topic=topic_id,
+            motion=motion,
+            participants=participants,
+            llm_provider=llm_provider,
+            llm_model=llm_model,
+            use_llm=self.config.live_mode,
         )
 
         self.metrics.total_rounds = self.config.max_rounds
-        self.metrics.agents_active = self.config.agent_count
+        self.metrics.agents_active = len(participants)
 
     async def _run_debate_loop(self) -> Dict[str, Any]:
         """Main debate execution loop."""
@@ -338,11 +366,27 @@ class ExperimentRunner:
                         content=content
                     )
 
-    def _update_metrics_from_round(self, round_result: Dict[str, Any]):
-        """Update metrics from round results."""
+    def _update_metrics_from_round(self, round_result):
+        """Update metrics from round results.
+
+        Handles both Dict[str, Any] (mock) and List[Argument] (AdvancedDebateEngine).
+        """
         if not round_result:
             return
 
+        # Handle List[Argument] from AdvancedDebateEngine
+        if isinstance(round_result, list):
+            self.metrics.total_messages += len(round_result)
+
+            # Extract position changes from arguments if available
+            for arg in round_result:
+                if hasattr(arg, 'belief_shifts_caused'):
+                    for agent_id, shift in arg.belief_shifts_caused.items():
+                        if abs(shift) > 0.1:
+                            self.metrics.position_changes += 1
+            return
+
+        # Handle Dict[str, Any] from MockDebateEngine
         self.metrics.total_messages += round_result.get("messages", 0)
 
         # Update positions
@@ -376,11 +420,29 @@ class ExperimentRunner:
         """Save checkpoint for resume capability."""
         self.status = ExperimentStatus.CHECKPOINTING
 
+        # Get debate state from engine if available
+        debate_state = {}
+        if self.debate_engine:
+            if hasattr(self.debate_engine, 'get_state'):
+                debate_state = self.debate_engine.get_state()
+            elif hasattr(self.debate_engine, 'state'):
+                # AdvancedDebateEngine: serialize state
+                state = self.debate_engine.state
+                debate_state = {
+                    "current_round": state.current_round,
+                    "topic": state.topic,
+                    "motion": state.motion,
+                    "debaters": {
+                        pid: {"beliefs": d.beliefs}
+                        for pid, d in state.debaters.items()
+                    },
+                }
+
         checkpoint = Checkpoint(
             experiment_id=self.config.experiment_id,
             config=asdict(self.config),
             round_number=self.metrics.current_round,
-            debate_state=self.debate_engine.get_state() if self.debate_engine else {},
+            debate_state=debate_state,
             agent_states={},  # Populated by engine
             metrics=asdict(self.metrics),
             random_state=None,  # TODO: Capture random state
@@ -421,9 +483,35 @@ class ExperimentRunner:
         }
 
         if self.debate_engine:
-            results["debate_summary"] = self.debate_engine.get_summary()
-            results["final_positions"] = self.debate_engine.get_positions()
-            results["transcript"] = self.debate_engine.get_transcript()
+            # Get methods that may or may not exist depending on engine type
+            if hasattr(self.debate_engine, 'get_summary'):
+                results["debate_summary"] = self.debate_engine.get_summary()
+            elif hasattr(self.debate_engine, 'state'):
+                # AdvancedDebateEngine: extract summary from state
+                state = self.debate_engine.state
+                results["debate_summary"] = {
+                    "total_rounds": state.current_round,
+                    "topic": state.topic,
+                    "motion": state.motion,
+                }
+
+            if hasattr(self.debate_engine, 'get_positions'):
+                results["final_positions"] = self.debate_engine.get_positions()
+            elif hasattr(self.debate_engine, 'state'):
+                # AdvancedDebateEngine: extract positions from debaters
+                results["final_positions"] = {
+                    pid: d.beliefs.get("support_motion", 0.5)
+                    for pid, d in self.debate_engine.state.debaters.items()
+                }
+
+            if hasattr(self.debate_engine, 'get_transcript'):
+                results["transcript"] = self.debate_engine.get_transcript()
+            elif hasattr(self.debate_engine, 'state'):
+                # AdvancedDebateEngine: extract from argument_history
+                results["transcript"] = [
+                    {"speaker": a.speaker, "content": a.content, "id": a.id}
+                    for a in self.debate_engine.state.argument_history
+                ]
 
         # Save results
         output_dir = Path(self.config.output_dir)
@@ -473,11 +561,21 @@ class ExperimentRunner:
 class MockDebateEngine:
     """Mock engine for testing without LLM calls."""
 
-    def __init__(self, topic: str, agent_count: int, **kwargs):
+    def __init__(
+        self,
+        topic: str,
+        motion: str,
+        participants: List[str],
+        llm_provider: str = "openrouter",
+        llm_model: Optional[str] = None,
+        use_llm: bool = True,
+    ):
         self.topic = topic
-        self.agent_count = agent_count
+        self.motion = motion
+        self.participants = participants
+        self.agent_count = len(participants)
         self.round = 0
-        self.positions = {f"agent_{i}": 0.5 for i in range(agent_count)}
+        self.positions = {p: 0.5 for p in participants}
         self.transcript = []
 
     async def run_round(self) -> Dict[str, Any]:
@@ -485,15 +583,17 @@ class MockDebateEngine:
         self.round += 1
 
         # Random position drift
-        import random
+        import random as rand_mod
         for agent_id in self.positions:
-            self.positions[agent_id] += random.uniform(-0.1, 0.1)
+            self.positions[agent_id] += rand_mod.uniform(-0.1, 0.1)
             self.positions[agent_id] = max(0, min(1, self.positions[agent_id]))
 
         # Simulate message
+        import random as rand_mod
+        speaker = rand_mod.choice(self.participants) if self.participants else "agent_0"
         self.transcript.append({
             "round": self.round,
-            "speaker": f"agent_{random.randint(0, self.agent_count-1)}",
+            "speaker": speaker,
             "content": f"[Simulated message for round {self.round}]"
         })
 

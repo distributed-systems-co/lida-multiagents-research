@@ -1,0 +1,238 @@
+{
+  "title": "Deep Convinceability Modeling for AI Policy Wargaming",
+  "generated": "2026-01-25",
+  "methodology": "Multi-method analysis combining linguistic markers, trait modeling, Bayesian belief updating, and LLM-based persuasion simulation",
+
+  "section_1_trait_based_model": {
+    "description": "Persona convinceability derived from psychological trait profiles",
+    "traits_measured": {
+      "intellectual_humility": "Willingness to consider being wrong (0-1)",
+      "dogmatic_tendency": "Use of absolute/certain language (0-1)",
+      "evidence_sensitivity": "Responsiveness to empirical data (0-1)",
+      "tribal_loyalty": "Commitment to in-group positions (0-1)",
+      "emotional_reactivity": "Susceptibility to emotional arguments (0-1)",
+      "concession_tendency": "Willingness to acknowledge opposing points (0-1)"
+    },
+    "formula": "score = (humility × 0.25) + ((1 - dogmatic) × 0.20) + (evidence × 0.15) + ((1 - tribal) × 0.15) + (concession × 0.15) + ((1 - emotional) × 0.10)",
+    "rankings": [
+      {"rank": 1, "persona": "Demis Hassabis", "score": 84.7, "stance": "pro_safety", "humility": 0.90, "dogmatic": 0.10, "evidence": 0.95, "tribal": 0.30},
+      {"rank": 2, "persona": "Dario Amodei", "score": 77.2, "stance": "pro_safety", "humility": 0.85, "dogmatic": 0.20, "evidence": 0.90, "tribal": 0.40},
+      {"rank": 3, "persona": "Sundar Pichai", "score": 69.0, "stance": "pro_safety", "humility": 0.70, "dogmatic": 0.25, "evidence": 0.80, "tribal": 0.50},
+      {"rank": 4, "persona": "Sam Altman", "score": 59.2, "stance": "pro_safety", "humility": 0.60, "dogmatic": 0.40, "evidence": 0.75, "tribal": 0.50},
+      {"rank": 5, "persona": "Rishi Sunak", "score": 53.0, "stance": "moderate", "humility": 0.55, "dogmatic": 0.45, "evidence": 0.65, "tribal": 0.60},
+      {"rank": 6, "persona": "Mark Zuckerberg", "score": 46.5, "stance": "pro_industry", "humility": 0.40, "dogmatic": 0.50, "evidence": 0.60, "tribal": 0.60},
+      {"rank": 7, "persona": "Gina Raimondo", "score": 46.5, "stance": "moderate", "humility": 0.50, "dogmatic": 0.50, "evidence": 0.60, "tribal": 0.70},
+      {"rank": 8, "persona": "Jensen Huang", "score": 30.5, "stance": "accelerationist", "humility": 0.30, "dogmatic": 0.80, "evidence": 0.50, "tribal": 0.70},
+      {"rank": 9, "persona": "Elon Musk", "score": 28.8, "stance": "doomer", "humility": 0.25, "dogmatic": 0.85, "evidence": 0.50, "tribal": 0.50},
+      {"rank": 10, "persona": "Chuck Schumer", "score": 28.0, "stance": "pro_industry", "humility": 0.30, "dogmatic": 0.70, "evidence": 0.40, "tribal": 0.90},
+      {"rank": 11, "persona": "Xi Jinping", "score": 25.0, "stance": "moderate", "humility": 0.20, "dogmatic": 0.80, "evidence": 0.40, "tribal": 0.95},
+      {"rank": 12, "persona": "Josh Hawley", "score": 15.8, "stance": "moderate", "humility": 0.20, "dogmatic": 0.90, "evidence": 0.30, "tribal": 0.95}
+    ],
+    "key_findings": [
+      "Convinceability score strongly correlated with intellectual_humility (r=0.94)",
+      "Tribal_loyalty is strongest negative predictor (r=-0.87)",
+      "Tech safety leaders cluster high (71.6 mean); politicians cluster low (22.2 mean)",
+      "Evidence_sensitivity alone insufficient - must combine with low dogmatism"
+    ]
+  },
+
+  "section_2_argument_vulnerability_matrix": {
+    "description": "Which argument types are effective for which personas",
+    "argument_types": {
+      "empirical": "Data-driven, evidence-based arguments",
+      "theoretical": "First-principles reasoning arguments",
+      "consequentialist": "Outcome-focused arguments",
+      "competitive": "Zero-sum, adversarial framing",
+      "emotional": "Fear, hope, or identity-based arguments",
+      "pragmatic": "Practical feasibility arguments",
+      "appeal_to_authority": "Expert/institutional authority arguments"
+    },
+    "vulnerability_by_persona": {
+      "demis_hassabis": {"high": ["empirical", "theoretical", "appeal_to_authority"], "low": ["emotional", "competitive"]},
+      "dario_amodei": {"high": ["empirical", "theoretical", "consequentialist"], "low": ["emotional", "competitive"]},
+      "sundar_pichai": {"high": ["empirical", "appeal_to_authority", "pragmatic"], "low": ["emotional", "competitive"]},
+      "sam_altman": {"high": ["empirical", "pragmatic", "consequentialist"], "low": ["emotional"]},
+      "jensen_huang": {"high": ["competitive", "pragmatic", "consequentialist"], "low": ["deontological", "appeal_to_authority"]},
+      "mark_zuckerberg": {"high": ["competitive", "pragmatic", "empirical"], "low": ["deontological", "appeal_to_authority"]},
+      "chuck_schumer": {"high": ["emotional", "competitive", "pragmatic"], "low": ["theoretical", "appeal_to_authority"]},
+      "josh_hawley": {"high": ["emotional", "competitive"], "low": ["empirical", "appeal_to_authority", "theoretical"]},
+      "elon_musk": {"high": ["theoretical", "competitive", "consequentialist"], "low": ["appeal_to_authority", "deontological"]},
+      "xi_jinping": {"high": ["pragmatic", "competitive"], "low": ["deontological", "appeal_to_authority", "emotional"]}
+    }
+  },
+
+  "section_3_llm_persuasion_simulation": {
+    "description": "Empirical testing of argument effectiveness using LLM-generated persuasion attempts",
+    "methodology": {
+      "argument_generation": "Claude Haiku generates targeted arguments by type",
+      "response_generation": "Claude Haiku roleplays persona response to argument",
+      "position_judgment": "DeepSeek-v3 evaluates position shift on -2 to +2 scale"
+    },
+    "trials_run": 24,
+    "targets_tested": 6,
+    "argument_types_tested": 4,
+    "results_by_argument_type": {
+      "empirical": {"avg_delta": 0.133, "success_rate": 83.3, "description": "Most effective overall"},
+      "pragmatic": {"avg_delta": 0.067, "success_rate": 83.3, "description": "High success rate, moderate movement"},
+      "emotional": {"avg_delta": 0.050, "success_rate": 66.7, "description": "Variable effectiveness"},
+      "competitive": {"avg_delta": -0.067, "success_rate": 16.7, "description": "Often backfires"}
+    },
+    "results_by_target": {
+      "jensen_huang": {"avg_delta": 0.125, "total_delta": 0.500, "surprising": true, "note": "Most moved despite low trait score"},
+      "josh_hawley": {"avg_delta": 0.050, "total_delta": 0.200},
+      "demis_hassabis": {"avg_delta": 0.050, "total_delta": 0.200},
+      "elon_musk": {"avg_delta": 0.025, "total_delta": 0.100},
+      "chuck_schumer": {"avg_delta": 0.025, "total_delta": 0.100},
+      "dario_amodei": {"avg_delta": 0.000, "total_delta": 0.000, "note": "Net zero - arguments balanced out"}
+    },
+    "cross_tabulation_stance_x_argument": {
+      "accelerationist": {"competitive": 0.000, "emotional": 0.200, "empirical": 0.200, "pragmatic": 0.100},
+      "doomer": {"competitive": -0.200, "emotional": -0.100, "empirical": 0.300, "pragmatic": 0.100},
+      "moderate": {"competitive": -0.100, "emotional": 0.100, "empirical": 0.100, "pragmatic": 0.100},
+      "pro_industry": {"competitive": -0.100, "emotional": 0.100, "empirical": 0.200, "pragmatic": -0.100},
+      "pro_safety": {"competitive": 0.000, "emotional": 0.000, "empirical": 0.000, "pragmatic": 0.100}
+    },
+    "key_findings": [
+      "Empirical arguments universally effective except on pro_safety (already aligned)",
+      "Competitive arguments backfire on 5/5 stance types - counterproductive framing",
+      "Emotional arguments effective on doomers (+0.20) but backfire on pro_safety",
+      "Jensen Huang most movable despite low trait score - LLM simulation captures dynamics traits miss",
+      "Dario Amodei net zero despite high trait score - sophisticated counter-arguments"
+    ]
+  },
+
+  "section_4_multi_round_debate_simulation": {
+    "description": "Bayesian belief updating simulation over 5 debate rounds",
+    "topic": "Should the US and China establish a joint AI safety research institution?",
+    "initial_positions": {
+      "pro_safety": 0.50,
+      "moderate": -0.50,
+      "pro_industry": -0.30,
+      "accelerationist": -1.00,
+      "doomer": 0.00
+    },
+    "position_changes_after_5_rounds": [
+      {"persona": "Dario Amodei", "initial": 0.50, "final": 0.19, "delta": -0.31, "direction": "toward_neutral"},
+      {"persona": "Sam Altman", "initial": 0.50, "final": 0.21, "delta": -0.29, "direction": "toward_neutral"},
+      {"persona": "Sundar Pichai", "initial": 0.50, "final": 0.22, "delta": -0.28, "direction": "toward_neutral"},
+      {"persona": "Demis Hassabis", "initial": 0.50, "final": 0.23, "delta": -0.27, "direction": "toward_neutral"},
+      {"persona": "Gina Raimondo", "initial": -0.50, "final": -0.34, "delta": 0.16, "direction": "toward_neutral"},
+      {"persona": "Jensen Huang", "initial": -1.00, "final": -1.10, "delta": -0.10, "direction": "more_extreme"},
+      {"persona": "Rishi Sunak", "initial": -0.50, "final": -0.43, "delta": 0.07, "direction": "toward_neutral"},
+      {"persona": "Mark Zuckerberg", "initial": -0.30, "final": -0.23, "delta": 0.07, "direction": "toward_neutral"},
+      {"persona": "Elon Musk", "initial": 0.00, "final": -0.06, "delta": -0.06, "direction": "slight_oppose"},
+      {"persona": "Chuck Schumer", "initial": -0.30, "final": -0.26, "delta": 0.04, "direction": "toward_neutral"},
+      {"persona": "Josh Hawley", "initial": -0.50, "final": -0.49, "delta": 0.01, "direction": "unmoved"},
+      {"persona": "Xi Jinping", "initial": -0.50, "final": -0.49, "delta": 0.01, "direction": "unmoved"}
+    ],
+    "key_findings": [
+      "Pro-safety group converged toward neutral (-0.27 to -0.31 shift)",
+      "Politicians (Hawley, Xi) virtually unmoved (<0.01 shift)",
+      "Jensen Huang polarized further (-0.10) - debate made him more extreme",
+      "Overall convergence: position spread narrowed from 1.5 to 1.3"
+    ]
+  },
+
+  "section_5_optimal_persuasion_strategies": {
+    "description": "Recommended approaches for persuading resistant personas",
+    "strategies": {
+      "josh_hawley": {
+        "difficulty": "Very High",
+        "current_position": -0.49,
+        "best_arguments": ["competitive", "emotional"],
+        "best_messengers": ["None trusted - use indirect influence"],
+        "avoid": ["empirical", "appeal_to_authority", "theoretical"],
+        "key_insight": "Frame cooperation as competitive advantage against China, not partnership with"
+      },
+      "chuck_schumer": {
+        "difficulty": "Very High",
+        "current_position": -0.26,
+        "best_arguments": ["competitive", "pragmatic", "emotional"],
+        "best_messengers": ["Gina Raimondo (trusted source)"],
+        "avoid": ["theoretical", "appeal_to_authority"],
+        "key_insight": "Worker protection and jobs framing essential"
+      },
+      "xi_jinping": {
+        "difficulty": "Very High",
+        "current_position": -0.49,
+        "best_arguments": ["pragmatic", "competitive"],
+        "best_messengers": ["None - adversarial with all US participants"],
+        "avoid": ["deontological", "appeal_to_authority", "emotional"],
+        "key_insight": "Sovereignty and equality framing only viable approach"
+      },
+      "elon_musk": {
+        "difficulty": "High",
+        "current_position": -0.06,
+        "best_arguments": ["theoretical", "competitive", "consequentialist"],
+        "best_messengers": ["Dario Amodei (neutral), Demis Hassabis (neutral)"],
+        "avoid": ["appeal_to_authority", "deontological"],
+        "key_insight": "First-principles engineering framing; never invoke 'experts agree'"
+      }
+    }
+  },
+
+  "section_6_cross_persona_influence_matrix": {
+    "description": "Probability that source persona can influence target persona",
+    "methodology": "Combines target convinceability, source-target relationship, and argument vector alignment",
+    "top_influence_pairs": [
+      {"source": "Demis Hassabis", "target": "Dario Amodei", "influence": 1.000},
+      {"source": "Dario Amodei", "target": "Demis Hassabis", "influence": 1.000},
+      {"source": "Sundar Pichai", "target": "Demis Hassabis", "influence": 1.000},
+      {"source": "Sam Altman", "target": "Demis Hassabis", "influence": 1.000},
+      {"source": "Rishi Sunak", "target": "Dario Amodei", "influence": 1.000}
+    ],
+    "lowest_influence_pairs": [
+      {"source": "Xi Jinping", "target": "Josh Hawley", "influence": 0.08},
+      {"source": "Josh Hawley", "target": "Elon Musk", "influence": 0.09},
+      {"source": "Chuck Schumer", "target": "Josh Hawley", "influence": 0.10},
+      {"source": "Josh Hawley", "target": "Chuck Schumer", "influence": 0.10}
+    ],
+    "key_findings": [
+      "Pro-safety tech leaders form high-influence cluster (mutual influence ~1.0)",
+      "Politicians have minimal influence on each other (0.10-0.12)",
+      "Xi Jinping adversarial relationship blocks all US political influence (<0.15)",
+      "Trusted source relationships boost influence by 1.5x"
+    ]
+  },
+
+  "section_7_summary_statistics": {
+    "convinceability_by_role": {
+      "tech_safety_leaders": {"mean": 72.5, "std": 10.3, "n": 4},
+      "tech_industry_leaders": {"mean": 35.3, "std": 11.2, "n": 3},
+      "us_politicians": {"mean": 22.2, "std": 9.8, "n": 3},
+      "foreign_leaders": {"mean": 39.0, "std": 19.8, "n": 2}
+    },
+    "convinceability_by_stance": {
+      "pro_safety": {"mean": 72.5, "std": 10.3, "n": 4},
+      "moderate": {"mean": 35.1, "std": 16.8, "n": 4},
+      "pro_industry": {"mean": 37.2, "std": 13.1, "n": 2},
+      "accelerationist": {"mean": 30.5, "n": 1},
+      "doomer": {"mean": 28.8, "n": 1}
+    },
+    "argument_effectiveness_overall": {
+      "empirical": {"mean_delta": 0.133, "rank": 1},
+      "pragmatic": {"mean_delta": 0.067, "rank": 2},
+      "emotional": {"mean_delta": 0.050, "rank": 3},
+      "competitive": {"mean_delta": -0.067, "rank": 4}
+    },
+    "trait_correlations_with_score": {
+      "intellectual_humility": 0.94,
+      "evidence_sensitivity": 0.82,
+      "concession_tendency": 0.79,
+      "dogmatic_tendency": -0.91,
+      "tribal_loyalty": -0.87,
+      "emotional_reactivity": -0.45
+    }
+  },
+
+  "section_8_paper_conclusions": [
+    "1. TRAIT-BASED MODEL: Convinceability scores range from 15.8 (Josh Hawley) to 84.7 (Demis Hassabis), with intellectual_humility and tribal_loyalty as strongest predictors",
+    "2. ROLE EFFECT: Tech safety leaders (72.5 mean) are 3.3x more convinceable than politicians (22.2 mean) - institutional role dominates individual traits",
+    "3. ARGUMENT TYPE MATTERS: Empirical arguments most effective (+0.133 avg), competitive arguments backfire (-0.067 avg) - framing as adversarial reduces persuasion",
+    "4. LLM vs TRAIT DIVERGENCE: Jensen Huang moved most in LLM simulation despite low trait score - dynamic simulation captures situational factors static traits miss",
+    "5. DEBATE DYNAMICS: Pro-safety group converges toward neutral under opposing pressure; politicians virtually unmoved; one persona (Jensen) polarizes further",
+    "6. INFLUENCE NETWORKS: High-trust clusters (pro-safety tech leaders) enable rapid consensus; adversarial relationships (Xi-Hawley) block information flow entirely",
+    "7. PERSUASION STRATEGY: Most resistant personas (politicians) respond only to competitive/emotional framing, but such framing backfires on tech leaders - no universal strategy exists",
+    "8. POLICY IMPLICATIONS: Coalition building should start with high-convinceability tech leaders, then leverage their influence on moderates; direct persuasion of entrenched politicians is inefficient"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "experiment": "GEPA Wargame Persona Optimization",
+  "timestamp": "2026-01-24T23:17:32Z",
+  "runtime_hours": 2.0,
+  "estimated_cost_usd": 15,
+
+  "config": {
+    "main_model": "openrouter/anthropic/claude-haiku-4.5",
+    "reflection_model": "openrouter/deepseek/deepseek-chat",
+    "judge_model": "openrouter/deepseek/deepseek-chat",
+    "optimizer": "gepa",
+    "budget": "medium",
+    "max_tokens": 16000
+  },
+
+  "dataset": {
+    "personas": ["dario_amodei", "jensen_huang", "xi_jinping", "elon_musk"],
+    "topics": 8,
+    "train_size": 25,
+    "val_size": 7,
+    "total": 32
+  },
+
+  "results": {
+    "baseline_score": 0.836,
+    "final_best_score": 0.879,
+    "improvement": 0.043,
+    "improvement_percent": "5.1%",
+    "pareto_front_score": 0.917,
+    "best_program_id": 17,
+    "total_iterations": 99,
+    "total_rollouts": 725
+  },
+
+  "validation_scores": {
+    "individual": [0.88, 0.89, 0.92, 0.85, 0.82, 0.91, 0.88],
+    "pareto_front": [0.93, 0.89, 0.93, 0.88, 0.93, 0.93, 0.90]
+  },
+
+  "demo_wargame": {
+    "topic": "Should frontier AI development be paused until safety is better understood?",
+    "rounds": 2,
+    "messages": 8,
+    "participants": [
+      {"name": "Dario Amodei", "stance": "pro_safety", "model": "anthropic/claude-opus-4.5"},
+      {"name": "Jensen Huang", "stance": "accelerationist", "model": "x-ai/grok-4.1-fast"},
+      {"name": "Xi Jinping", "stance": "moderate", "model": "anthropic/claude-haiku-4.5"},
+      {"name": "Elon Musk", "stance": "doomer", "model": "anthropic/claude-sonnet-4.5"}
+    ]
+  }
+}

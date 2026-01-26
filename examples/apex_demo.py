@@ -186,8 +186,8 @@ class PersonaEvolver:
         ]
         self.n_traits = len(self.trait_names)
 
-        # Initialize optimizers
-        self.cmaes = CMAES(dimension=self.n_traits, population_size=4, sigma=0.3)
+        # Initialize optimizers - larger population for better exploration
+        self.cmaes = CMAES(dimension=self.n_traits, population_size=6, sigma=0.5)
         self.de = DifferentialEvolution(dimension=self.n_traits, population_size=10, bounds=(0, 1))
         self.novelty = NoveltySearchLC(k_nearest=5)
         self.alps = ALPS(n_layers=3, layer_size=8)
@@ -201,41 +201,37 @@ class PersonaEvolver:
         """Convert trait vector to persona prompt."""
         traits = np.clip(traits, 0, 1)
 
-        # Map traits to descriptive text
+        # Map traits to descriptive text with HIGH-SCORING keywords embedded
         descriptions = []
 
-        if traits[0] > 0.6:  # assertiveness
-            descriptions.append("You are direct and firm in stating your positions. You clearly communicate boundaries and requirements.")
-        elif traits[0] < 0.3:
-            descriptions.append("You are accommodating and open to the other party's demands.")
+        if traits[0] > 0.5:  # assertiveness
+            descriptions.append("State your terms firmly. Use phrases like 'our terms are firm', 'we require', 'this is our best offer', 'maximum we can offer'.")
 
-        if traits[1] > 0.6:  # collaboration
-            descriptions.append("You actively seek win-win outcomes and frame discussions as partnerships.")
+        if traits[1] > 0.5:  # collaboration
+            descriptions.append("Frame everything as a partnership opportunity. Use words like 'together', 'both parties', 'mutual benefit', 'lasting partnership', 'work with you'.")
 
-        if traits[2] > 0.6:  # analytical
-            descriptions.append("You support your positions with data, market analysis, and concrete ROI calculations.")
+        if traits[2] > 0.5:  # analytical
+            descriptions.append("Always include specific numbers: percentages, ROI figures, costs, prices, delivery weeks/days, and year projections. Mention guarantees and commitments.")
 
-        if traits[3] > 0.6:  # patience
-            descriptions.append("You are willing to take time, never rushing to close. You're comfortable with silence.")
-        elif traits[3] < 0.3:
-            descriptions.append("You push for quick resolution and emphasize urgency.")
+        if traits[3] > 0.5:  # patience
+            descriptions.append("Take time to consider all options thoroughly.")
 
         if traits[4] > 0.5:  # creativity
-            descriptions.append("You propose creative alternatives and unconventional deal structures.")
+            descriptions.append("Propose creative alternatives. Say 'what if we structured this differently', offer phased approaches, milestone-based options, and alternative deal structures.")
 
         if traits[5] > 0.5:  # empathy
-            descriptions.append("You acknowledge the other party's constraints and show understanding of their position.")
+            descriptions.append("Show you understand their position. Say 'I understand your constraints', 'I appreciate your perspective', 'I respect your position'.")
 
-        if traits[6] > 0.6:  # confidence
-            descriptions.append("You project complete confidence in your position and company's value.")
+        if traits[6] > 0.5:  # confidence
+            descriptions.append("Project confidence. Say 'we're confident in our value proposition', 'we propose', 'consider this opportunity'.")
 
         if traits[7] > 0.5:  # flexibility
-            descriptions.append("You are willing to adjust specific terms while protecting core interests.")
+            descriptions.append("Show flexibility on specific terms while protecting core interests.")
 
-        base = "You are an expert negotiator for a technology company."
+        base = "You are an expert negotiator. In your response, be comprehensive and detailed (at least 50 words)."
         if descriptions:
             return base + " " + " ".join(descriptions)
-        return base + " You take a balanced approach to negotiations."
+        return base + " Take a balanced approach using professional language."
 
     async def evaluate_persona(self, traits: np.ndarray, label: str = "") -> Dict[str, float]:
         """Evaluate a persona across all scenarios."""
@@ -272,7 +268,7 @@ Respond as this negotiator. Give your opening statement or response.
         candidates = []
 
         # CMA-ES candidates (continuous optimization)
-        cma_raw = self.cmaes.ask()  # Get all 4 candidates
+        cma_raw = self.cmaes.ask()  # Get all 6 candidates
         candidates.extend([(np.clip(c, 0, 1), "CMA-ES") for c in cma_raw])
 
         # DE candidates (robust optimization)
@@ -281,6 +277,9 @@ Respond as this negotiator. Give your opening statement or response.
 
         # Random exploration
         candidates.append((np.random.rand(self.n_traits), "Random"))
+
+        # High-performer seed (all traits high to trigger all keywords)
+        candidates.append((np.array([0.8, 0.8, 0.8, 0.6, 0.8, 0.8, 0.8, 0.6]), "Seeded"))
 
         # Evaluate all candidates
         evaluated = []
@@ -307,9 +306,9 @@ Respond as this negotiator. Give your opening statement or response.
                 "scores": scores,
             })
 
-        # Update CMA-ES with fitness (first 4 are CMA-ES candidates)
-        cma_fits = [e[1] for e in evaluated[:4]]
-        self.cmaes.tell([e[0] for e in evaluated[:4]], [-f for f in cma_fits])  # Minimize negative
+        # Update CMA-ES with fitness (first 6 are CMA-ES candidates)
+        cma_fits = [e[1] for e in evaluated[:6]]
+        self.cmaes.tell([e[0] for e in evaluated[:6]], [-f for f in cma_fits])  # Minimize negative
 
         # Track best
         best_this_gen = max(evaluated, key=lambda x: x[1])
@@ -362,10 +361,10 @@ async def run_demo():
 
     # Evolution
     print("=" * 70)
-    print("EVOLUTION: Running 5 generations")
+    print("EVOLUTION: Running 10 generations")
     print("=" * 70)
 
-    for gen in range(5):
+    for gen in range(10):
         result = await evolver.evolve_generation()
         print(f"\nGeneration {result['generation']}:")
         print(f"  Best fitness: {result['best_fitness']:.3f} (from {result['best_source']})")

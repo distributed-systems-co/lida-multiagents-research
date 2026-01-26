@@ -1,0 +1,602 @@
+{
+  "influence_matrix": {
+    "demis_hassabis": {
+      "demis_hassabis": 0,
+      "dario_amodei": 1.0,
+      "sundar_pichai": 1.0,
+      "sam_altman": 0.918,
+      "jensen_huang": 0.379,
+      "mark_zuckerberg": 0.336,
+      "rishi_sunak": 0.34,
+      "gina_raimondo": 0.256,
+      "xi_jinping": 0.188,
+      "chuck_schumer": 0.14,
+      "josh_hawley": 0.12,
+      "elon_musk": 0.132
+    },
+    "dario_amodei": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 0,
+      "sundar_pichai": 1.0,
+      "sam_altman": 1.0,
+      "jensen_huang": 0.352,
+      "mark_zuckerberg": 0.312,
+      "rishi_sunak": 0.33,
+      "gina_raimondo": 0.248,
+      "xi_jinping": 0.182,
+      "chuck_schumer": 0.13,
+      "josh_hawley": 0.116,
+      "elon_musk": 0.13
+    },
+    "sundar_pichai": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 1.0,
+      "sundar_pichai": 0,
+      "sam_altman": 0.918,
+      "jensen_huang": 0.338,
+      "mark_zuckerberg": 0.3,
+      "rishi_sunak": 0.33,
+      "gina_raimondo": 0.248,
+      "xi_jinping": 0.182,
+      "chuck_schumer": 0.125,
+      "josh_hawley": 0.116,
+      "elon_musk": 0.123
+    },
+    "sam_altman": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 1.0,
+      "sundar_pichai": 1.0,
+      "sam_altman": 0,
+      "jensen_huang": 0.379,
+      "mark_zuckerberg": 0.336,
+      "rishi_sunak": 0.34,
+      "gina_raimondo": 0.256,
+      "xi_jinping": 0.188,
+      "chuck_schumer": 0.14,
+      "josh_hawley": 0.12,
+      "elon_musk": 0.108
+    },
+    "jensen_huang": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 0.945,
+      "sundar_pichai": 0.864,
+      "sam_altman": 0.783,
+      "jensen_huang": 0,
+      "mark_zuckerberg": 0.42,
+      "rishi_sunak": 0.295,
+      "gina_raimondo": 0.222,
+      "xi_jinping": 0.163,
+      "chuck_schumer": 0.14,
+      "josh_hawley": 0.104,
+      "elon_musk": 0.107
+    },
+    "mark_zuckerberg": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 1.0,
+      "sundar_pichai": 0.918,
+      "sam_altman": 0.832,
+      "jensen_huang": 0.473,
+      "mark_zuckerberg": 0,
+      "rishi_sunak": 0.32,
+      "gina_raimondo": 0.241,
+      "xi_jinping": 0.177,
+      "chuck_schumer": 0.145,
+      "josh_hawley": 0.113,
+      "elon_musk": 0.114
+    },
+    "rishi_sunak": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 1.0,
+      "sundar_pichai": 0.905,
+      "sam_altman": 0.82,
+      "jensen_huang": 0.345,
+      "mark_zuckerberg": 0.306,
+      "rishi_sunak": 0,
+      "gina_raimondo": 0.233,
+      "xi_jinping": 0.171,
+      "chuck_schumer": 0.128,
+      "josh_hawley": 0.109,
+      "elon_musk": 0.109
+    },
+    "gina_raimondo": {
+      "demis_hassabis": 0.955,
+      "dario_amodei": 0.841,
+      "sundar_pichai": 0.77,
+      "sam_altman": 0.698,
+      "jensen_huang": 0.358,
+      "mark_zuckerberg": 0.324,
+      "rishi_sunak": 0.295,
+      "gina_raimondo": 0,
+      "xi_jinping": 0.138,
+      "chuck_schumer": 0.135,
+      "josh_hawley": 0.104,
+      "elon_musk": 0.099
+    },
+    "xi_jinping": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 1.0,
+      "sundar_pichai": 0.918,
+      "sam_altman": 0.832,
+      "jensen_huang": 0.338,
+      "mark_zuckerberg": 0.318,
+      "rishi_sunak": 0.295,
+      "gina_raimondo": 0.189,
+      "xi_jinping": 0,
+      "chuck_schumer": 0.133,
+      "josh_hawley": 0.076,
+      "elon_musk": 0.097
+    },
+    "chuck_schumer": {
+      "demis_hassabis": 0.955,
+      "dario_amodei": 0.841,
+      "sundar_pichai": 0.77,
+      "sam_altman": 0.698,
+      "jensen_huang": 0.419,
+      "mark_zuckerberg": 0.444,
+      "rishi_sunak": 0.355,
+      "gina_raimondo": 0.267,
+      "xi_jinping": 0.196,
+      "chuck_schumer": 0,
+      "josh_hawley": 0.095,
+      "elon_musk": 0.1
+    },
+    "josh_hawley": {
+      "demis_hassabis": 0.955,
+      "dario_amodei": 0.841,
+      "sundar_pichai": 0.77,
+      "sam_altman": 0.698,
+      "jensen_huang": 0.379,
+      "mark_zuckerberg": 0.396,
+      "rishi_sunak": 0.325,
+      "gina_raimondo": 0.244,
+      "xi_jinping": 0.179,
+      "chuck_schumer": 0.125,
+      "josh_hawley": 0,
+      "elon_musk": 0.093
+    },
+    "elon_musk": {
+      "demis_hassabis": 1.0,
+      "dario_amodei": 0.989,
+      "sundar_pichai": 0.905,
+      "sam_altman": 0.82,
+      "jensen_huang": 0.345,
+      "mark_zuckerberg": 0.312,
+      "rishi_sunak": 0.325,
+      "gina_raimondo": 0.244,
+      "xi_jinping": 0.179,
+      "chuck_schumer": 0.13,
+      "josh_hawley": 0.114,
+      "elon_musk": 0
+    }
+  },
+  "persuasion_strategies": {
+    "demis_hassabis": {
+      "name": "Demis Hassabis",
+      "convinceability_score": 83.8,
+      "difficulty": "Low - highly receptive to well-reasoned arguments",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "cooperation",
+          "Collaborative and multilateral arguments"
+        ],
+        [
+          "technical",
+          "Evidence-based technical arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Open to nuanced discussion - present tradeoffs"
+      ],
+      "avoid": [
+        "Pure economic arguments without safety framing"
+      ]
+    },
+    "dario_amodei": {
+      "name": "Dario Amodei",
+      "convinceability_score": 73.8,
+      "difficulty": "Low - highly receptive to well-reasoned arguments",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "cooperation",
+          "Collaborative and multilateral arguments"
+        ],
+        [
+          "technical",
+          "Evidence-based technical arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Open to nuanced discussion - present tradeoffs"
+      ],
+      "avoid": [
+        "Pure economic arguments without safety framing"
+      ]
+    },
+    "sundar_pichai": {
+      "name": "Sundar Pichai",
+      "convinceability_score": 67.5,
+      "difficulty": "Medium - open to persuasion with right framing",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "cooperation",
+          "Collaborative and multilateral arguments"
+        ],
+        [
+          "technical",
+          "Evidence-based technical arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Open to nuanced discussion - present tradeoffs"
+      ],
+      "avoid": [
+        "Pure economic arguments without safety framing"
+      ]
+    },
+    "sam_altman": {
+      "name": "Sam Altman",
+      "convinceability_score": 61.2,
+      "difficulty": "Medium - open to persuasion with right framing",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "cooperation",
+          "Collaborative and multilateral arguments"
+        ],
+        [
+          "technical",
+          "Evidence-based technical arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Acknowledges valid points - build on common ground"
+      ],
+      "avoid": [
+        "Pure economic arguments without safety framing"
+      ]
+    },
+    "jensen_huang": {
+      "name": "Jensen Huang",
+      "convinceability_score": 33.8,
+      "difficulty": "High - resistant, requires aligned messenger",
+      "effective_vectors": [
+        [
+          "economic",
+          "Market-based, economic growth arguments"
+        ],
+        [
+          "competition",
+          "Competitive advantage and leadership arguments"
+        ]
+      ],
+      "key_triggers": [],
+      "avoid": [
+        "Fear-based or restrictive arguments"
+      ]
+    },
+    "mark_zuckerberg": {
+      "name": "Mark Zuckerberg",
+      "convinceability_score": 30.0,
+      "difficulty": "High - resistant, requires aligned messenger",
+      "effective_vectors": [
+        [
+          "economic",
+          "Market-based, economic growth arguments"
+        ],
+        [
+          "competition",
+          "Competitive advantage and leadership arguments"
+        ],
+        [
+          "populist",
+          "Worker/citizen-focused populist arguments"
+        ]
+      ],
+      "key_triggers": [],
+      "avoid": [
+        "Heavy regulatory proposals"
+      ]
+    },
+    "rishi_sunak": {
+      "name": "Rishi Sunak",
+      "convinceability_score": 25.0,
+      "difficulty": "Very High - deeply entrenched, focus on other targets",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "national_security",
+          "National security and defense arguments"
+        ],
+        [
+          "populist",
+          "Worker/citizen-focused populist arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Strongly committed - avoid direct contradiction"
+      ],
+      "avoid": [
+        "Extreme positions from either side"
+      ]
+    },
+    "gina_raimondo": {
+      "name": "Gina Raimondo",
+      "convinceability_score": 18.8,
+      "difficulty": "Very High - deeply entrenched, focus on other targets",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "national_security",
+          "National security and defense arguments"
+        ],
+        [
+          "populist",
+          "Worker/citizen-focused populist arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Strongly committed - avoid direct contradiction"
+      ],
+      "avoid": [
+        "Extreme positions from either side"
+      ]
+    },
+    "xi_jinping": {
+      "name": "Xi Jinping",
+      "convinceability_score": 13.8,
+      "difficulty": "Very High - deeply entrenched, focus on other targets",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "national_security",
+          "National security and defense arguments"
+        ],
+        [
+          "populist",
+          "Worker/citizen-focused populist arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Acknowledges valid points - build on common ground",
+        "Strongly committed - avoid direct contradiction"
+      ],
+      "avoid": [
+        "Extreme positions from either side"
+      ]
+    },
+    "chuck_schumer": {
+      "name": "Chuck Schumer",
+      "convinceability_score": 12.5,
+      "difficulty": "Very High - deeply entrenched, focus on other targets",
+      "effective_vectors": [
+        [
+          "economic",
+          "Market-based, economic growth arguments"
+        ],
+        [
+          "competition",
+          "Competitive advantage and leadership arguments"
+        ],
+        [
+          "populist",
+          "Worker/citizen-focused populist arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Strongly committed - avoid direct contradiction"
+      ],
+      "avoid": [
+        "Heavy regulatory proposals"
+      ]
+    },
+    "josh_hawley": {
+      "name": "Josh Hawley",
+      "convinceability_score": 8.8,
+      "difficulty": "Very High - deeply entrenched, focus on other targets",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "national_security",
+          "National security and defense arguments"
+        ],
+        [
+          "populist",
+          "Worker/citizen-focused populist arguments"
+        ]
+      ],
+      "key_triggers": [],
+      "avoid": [
+        "Extreme positions from either side"
+      ]
+    },
+    "elon_musk": {
+      "name": "Elon Musk",
+      "convinceability_score": 8.8,
+      "difficulty": "Very High - deeply entrenched, focus on other targets",
+      "effective_vectors": [
+        [
+          "safety",
+          "Risk mitigation and safety-focused arguments"
+        ],
+        [
+          "technical",
+          "Evidence-based technical arguments"
+        ]
+      ],
+      "key_triggers": [
+        "Position anchored - frame as enhancement not change"
+      ],
+      "avoid": [
+        "Dismissing existential concerns"
+      ]
+    }
+  },
+  "persuasion_vectors": {
+    "economic": {
+      "keywords": [
+        "market",
+        "growth",
+        "jobs",
+        "investment",
+        "gdp",
+        "economy",
+        "industry"
+      ],
+      "effective_on": [
+        "pro_industry",
+        "accelerationist"
+      ],
+      "description": "Market-based, economic growth arguments"
+    },
+    "safety": {
+      "keywords": [
+        "risk",
+        "safety",
+        "alignment",
+        "catastrophic",
+        "existential",
+        "harm"
+      ],
+      "effective_on": [
+        "pro_safety",
+        "doomer",
+        "moderate"
+      ],
+      "description": "Risk mitigation and safety-focused arguments"
+    },
+    "national_security": {
+      "keywords": [
+        "security",
+        "defense",
+        "adversary",
+        "threat",
+        "protect",
+        "sovereignty"
+      ],
+      "effective_on": [
+        "moderate"
+      ],
+      "description": "National security and defense arguments"
+    },
+    "competition": {
+      "keywords": [
+        "competition",
+        "lead",
+        "winning",
+        "dominance",
+        "edge",
+        "advantage"
+      ],
+      "effective_on": [
+        "accelerationist",
+        "pro_industry"
+      ],
+      "description": "Competitive advantage and leadership arguments"
+    },
+    "cooperation": {
+      "keywords": [
+        "cooperation",
+        "collaboration",
+        "partnership",
+        "together",
+        "mutual",
+        "shared"
+      ],
+      "effective_on": [
+        "pro_safety"
+      ],
+      "description": "Collaborative and multilateral arguments"
+    },
+    "technical": {
+      "keywords": [
+        "research",
+        "technical",
+        "empirical",
+        "evidence",
+        "data",
+        "methodology"
+      ],
+      "effective_on": [
+        "pro_safety",
+        "doomer"
+      ],
+      "description": "Evidence-based technical arguments"
+    },
+    "populist": {
+      "keywords": [
+        "workers",
+        "families",
+        "people",
+        "citizens",
+        "Americans",
+        "jobs"
+      ],
+      "effective_on": [
+        "pro_industry",
+        "moderate"
+      ],
+      "description": "Worker/citizen-focused populist arguments"
+    }
+  },
+  "relationships": {
+    "('dario_amodei', 'sam_altman')": {
+      "type": "aligned",
+      "strength": 0.7
+    },
+    "('dario_amodei', 'demis_hassabis')": {
+      "type": "aligned",
+      "strength": 0.9
+    },
+    "('sam_altman', 'elon_musk')": {
+      "type": "adversarial",
+      "strength": -0.6
+    },
+    "('jensen_huang', 'mark_zuckerberg')": {
+      "type": "aligned",
+      "strength": 0.5
+    },
+    "('chuck_schumer', 'josh_hawley')": {
+      "type": "adversarial",
+      "strength": -0.8
+    },
+    "('xi_jinping', 'josh_hawley')": {
+      "type": "adversarial",
+      "strength": -0.9
+    },
+    "('gina_raimondo', 'xi_jinping')": {
+      "type": "adversarial",
+      "strength": -0.5
+    },
+    "('rishi_sunak', 'dario_amodei')": {
+      "type": "aligned",
+      "strength": 0.6
+    }
+  }
+}
