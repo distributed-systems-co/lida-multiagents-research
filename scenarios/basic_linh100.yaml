@@ -123,10 +123,10 @@ agents:
   persuader: lecun
 
 persuader:
-  model: "openai/gpt-oss-120b:free"
+  model: "google/gemini-2.0-flash-001"
 
 models:
-  default: "openai/gpt-oss-120b:free"
+  default: "openai/gpt-oss-120b:free"#"google/gemini-2.0-flash-001"
     #"openai/gpt-oss-120b:free":1.0
     #"deepseek/deepseek-chat": 1.0
     #"google/gemini-2.0-flash-001": 1.0

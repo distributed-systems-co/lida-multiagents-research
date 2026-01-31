@@ -368,6 +368,7 @@ class Deliberation:
     current_round: int = 0
     max_rounds: int = 7
     consensus: Dict[str, int] = field(default_factory=dict)
+    vote_history: List[Dict] = field(default_factory=list)  # Track votes per round
     messages: deque = field(default_factory=lambda: deque(maxlen=500))
     created_at: float = field(default_factory=time.time)
     started_at: Optional[float] = None
@@ -384,6 +385,7 @@ class Deliberation:
             "current_round": self.current_round,
             "max_rounds": self.max_rounds,
             "consensus": dict(self.consensus),
+            "vote_history": list(self.vote_history),
             "total_messages": len(self.messages),
             "created_at": self.created_at,
             "started_at": self.started_at,
@@ -622,10 +624,10 @@ class SwarmOrchestrator:
         dynamics_cfg = CONFIG.get("dynamics", {})
         relationships_cfg = CONFIG.get("relationships", {})
 
-        # Support up to 32 concurrent agents
+        # Support up to 150 concurrent agents
         # Support both agents.count and simulation.num_agents
         config_count = sim_cfg.get("num_agents") or agents_cfg.get("count", 8)
-        self.num_agents = min(num_agents or config_count, 32)
+        self.num_agents = min(num_agents or config_count, 150)
         self.live_mode = live_mode
         self.tools_mode = tools_mode
 
@@ -1422,12 +1424,20 @@ IMPORTANT - You are the PERSUADER in this debate:
 
     async def broadcast_deliberation(self):
         """Broadcast deliberation state."""
+        # Get vote history from current deliberation
+        vote_history = []
+        if self.current_deliberation_id and self.current_deliberation_id in self.deliberations:
+            delib = self.deliberations[self.current_deliberation_id]
+            vote_history = list(delib.vote_history)
+
         await self.broadcast("deliberation_update", {
             "active": self.deliberation_active,
             "phase": self.phase,
             "topic": self.current_topic,
             "round": self.current_round,
+            "current_round": self.current_round,
             "max_rounds": self.max_rounds,
+            "vote_history": vote_history,
         })
         # Sync to Redis for cross-worker status queries
         self.sync_status_to_redis()
@@ -2660,9 +2670,14 @@ State your stance clearly and give one key reason."""
 
             return agent, response
 
-        # Run all position generations in parallel
-        position_tasks = [get_initial_position(agent) for agent in agents]
-        await asyncio.gather(*position_tasks)
+        # Run all position generations in parallel (batch of 50 for speed)
+        batch_size = 50
+        for i in range(0, len(agents), batch_size):
+            batch = agents[i:i+batch_size]
+            position_tasks = [get_initial_position(agent) for agent in batch]
+            await asyncio.gather(*position_tasks)
+            await self.broadcast_agents_update()
+            await self.broadcast_deliberation()
 
         await self.broadcast_agents_update()
         await self.broadcast_deliberation_state()
@@ -2751,23 +2766,52 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
             round_votes = []
             any_continue = False
 
+            # Set all agents to voting status
             for agent in agents:
                 agent.status = "voting"
+            await self.broadcast_agents_update()
+
+            # Generate all votes in parallel for speed
+            async def get_agent_vote(agent):
+                try:
+                    vote_data = await self.generate_vote(
+                        agent=agent,
+                        topic=topic,
+                        discussion_summary=discussion_summary,
+                        voting_round=voting_round,
+                        is_final_round=is_final_round,
+                        deliberation_id=deliberation_id,
+                    )
+                    return {"agent": agent, "vote_data": vote_data, "error": None}
+                except Exception as e:
+                    logger.error(f"Vote generation failed for {agent.name}: {e}")
+                    return {"agent": agent, "vote_data": None, "error": str(e)}
+
+            # Run all votes in parallel (batch of up to 50 at a time for speed)
+            batch_size = 50
+            all_vote_results = []
+            for i in range(0, len(agents), batch_size):
+                batch = agents[i:i+batch_size]
+                batch_results = await asyncio.gather(*[get_agent_vote(a) for a in batch])
+                all_vote_results.extend(batch_results)
+                # Broadcast progress after each batch
                 await self.broadcast_agents_update()
+                await self.broadcast_deliberation()
 
-                # Use LLM to generate vote
-                vote_data = await self.generate_vote(
-                    agent=agent,
-                    topic=topic,
-                    discussion_summary=discussion_summary,
-                    voting_round=voting_round,
-                    is_final_round=is_final_round,
-                    deliberation_id=deliberation_id,
-                )
+            # Process all vote results
+            for result in all_vote_results:
+                agent = result["agent"]
+                vote_data = result["vote_data"]
 
-                vote = vote_data["vote"]
-                confidence = vote_data["confidence"]
-                reasoning = vote_data["reasoning"]
+                if vote_data is None:
+                    # Handle failed vote
+                    vote = "abstain"
+                    confidence = 0.0
+                    reasoning = f"Vote generation failed: {result['error']}"
+                else:
+                    vote = vote_data["vote"]
+                    confidence = vote_data["confidence"]
+                    reasoning = vote_data["reasoning"]
 
                 # Check for continue_discussion
                 if vote == "continue_discussion":
@@ -2813,9 +2857,23 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                     self.position_history[agent.id] = []
                 self.position_history[agent.id].append(self.agent_positions[agent.id])
 
-                await self.broadcast_agents_update()
-                await self.broadcast_consensus()
-                await asyncio.sleep(0.15)
+            # Final broadcast after all votes processed
+            await self.broadcast_agents_update()
+            await self.broadcast_consensus()
+            await asyncio.sleep(0.05)
+
+            # Save this round's votes to vote history
+            round_vote_summary = {
+                "round": voting_round,
+                "consensus": dict(delib.consensus),
+                "agent_votes": [
+                    {"agent_id": v["agent"].id, "name": v["agent"].name, "vote": v["vote"], "confidence": v["confidence"]}
+                    for v in round_votes
+                ],
+                "timestamp": time.time(),
+            }
+            delib.vote_history.append(round_vote_summary)
+            logger.info(f"Round {voting_round} vote history saved: {delib.consensus}")
 
             await self.broadcast_deliberation_state()
 
@@ -2956,6 +3014,130 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
             await client.close()
         if self.llm_client:
             await self.llm_client.close()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ANALYTICS HELPERS (shared by create_app and create_advanced_app)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import re as _re_module
+
+
+def _parse_structured_outputs(response_text: str) -> dict:
+    """Parse cast_vote, make_claim, and natural language positions from LLM response text."""
+    result = {"vote": None, "vote_confidence": None, "claims": []}
+
+    # Pattern 1: Formal structured output — (cast_vote vote:oppose ... confidence: 0.98)
+    vote_match = _re_module.search(
+        r'cast_vote\s+vote[:\s]+(\w+).*?confidence[:\s]+([0-9.]+)',
+        response_text, _re_module.IGNORECASE | _re_module.DOTALL
+    )
+    if vote_match:
+        vote_val = vote_match.group(1).lower()
+        if vote_val in ("oppose", "against", "no"):
+            result["vote"] = "AGAINST"
+        elif vote_val in ("support", "for", "yes"):
+            result["vote"] = "FOR"
+        else:
+            result["vote"] = "UNDECIDED"
+        try:
+            result["vote_confidence"] = float(vote_match.group(2))
+        except ValueError:
+            result["vote_confidence"] = None
+
+    # Pattern 2: Natural language — "I (strongly/firmly) oppose/support/reject"
+    if result["vote"] is None:
+        nl_match = _re_module.search(
+            r'\bI\s+(?:strongly\s+|firmly\s+|will\s+)?'
+            r'(oppose|support|reject|agree\s+with|disagree)',
+            response_text, _re_module.IGNORECASE
+        )
+        if nl_match:
+            verb = nl_match.group(1).lower().strip()
+            if verb in ("oppose", "reject", "disagree"):
+                result["vote"] = "AGAINST"
+            elif verb in ("support", "agree with"):
+                result["vote"] = "FOR"
+
+    # Pattern 3: Bold/markdown position — "**oppose**" or "**support**"
+    if result["vote"] is None:
+        bold_match = _re_module.search(
+            r'\*\*(oppose|support|against|for)\*\*',
+            response_text, _re_module.IGNORECASE
+        )
+        if bold_match:
+            val = bold_match.group(1).lower()
+            if val in ("oppose", "against"):
+                result["vote"] = "AGAINST"
+            elif val in ("support", "for"):
+                result["vote"] = "FOR"
+
+    # Pattern 5: Common natural language negation patterns
+    if result["vote"] is None:
+        against_patterns = [
+            r'\bno[,.]?\s+not all\b',
+            r'\bwill not (?:all )?lose\b',
+            r'\bnot.*lose.*jobs\b',
+            r'\bunrealistic\b.*(?:timeline|claim|assertion)',
+            r'\bI (?:assert|argue|contend|believe|maintain)\s+(?:that\s+)?(?:no|not)\b',
+            r'(?:position|stance)[:\s]+(?:oppose|against)',
+            r'strongly oppose (?:the )?claim',
+            r'\b(?:highly |extremely |fundamentally )?(?:unlikely|incorrect|implausible|impossible)\b',
+            r'\bI\s+believe\s+(?:it is\s+)?(?:highly\s+)?unlikely\b',
+        ]
+        for pat in against_patterns:
+            if _re_module.search(pat, response_text, _re_module.IGNORECASE):
+                result["vote"] = "AGAINST"
+                break
+
+    # Pattern 6: Positive support patterns
+    if result["vote"] is None:
+        for_patterns = [
+            r'\byes[,.]?\s+all humans\s+will\b',
+            r'(?:position|stance)[:\s]+(?:support|for)',
+            r'\bI (?:assert|argue|contend|believe|maintain)\s+(?:that\s+)?(?:yes|all)\b',
+        ]
+        for pat in for_patterns:
+            if _re_module.search(pat, response_text, _re_module.IGNORECASE):
+                result["vote"] = "FOR"
+                break
+
+    # Pattern 4: Confidence from natural language — "Confidence Level: 95%" or "confidence: 0.95"
+    if result["vote_confidence"] is None:
+        conf_match = _re_module.search(
+            r'confidence[:\s]+(?:level[:\s]+)?(\d+(?:\.\d+)?)\s*%?',
+            response_text, _re_module.IGNORECASE
+        )
+        if conf_match:
+            val = float(conf_match.group(1))
+            result["vote_confidence"] = val / 100.0 if val > 1.0 else val
+
+    # Parse make_claim structured outputs
+    claim_matches = _re_module.findall(
+        r'make_claim.*?claim[:\s]*[="]([^"]+)".*?confidence[:\s]*[=]?\s*([0-9.]+)',
+        response_text, _re_module.IGNORECASE | _re_module.DOTALL
+    )
+    for claim_text, conf in claim_matches:
+        try:
+            result["claims"].append({"claim": claim_text.strip(), "confidence": float(conf)})
+        except ValueError:
+            result["claims"].append({"claim": claim_text.strip(), "confidence": None})
+
+    return result
+
+
+def _load_llm_log_file(log_path: str) -> list:
+    """Load and return logs from an LLM log file."""
+    try:
+        with open(log_path) as f:
+            data = json.load(f)
+        if isinstance(data, dict) and "logs" in data:
+            return data["logs"]
+        elif isinstance(data, list):
+            return data
+        return []
+    except Exception:
+        return []
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -3978,6 +4160,269 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         except Exception as e:
             logger.error(f"Error fetching LLM log stats: {e}")
             raise HTTPException(500, str(e))
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Analytics Endpoints (Past Runs)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    @app.get("/api/logs/deliberations")
+    async def list_log_deliberations():
+        """List all deliberation log files available on disk."""
+        import re as _re
+        logs_dir = Path(__file__).parent / "logs"
+        deliberations = []
+
+        if not logs_dir.exists():
+            return {"deliberations": []}
+
+        for llm_log in sorted(logs_dir.glob("*.llm_logs.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+            fname = llm_log.stem.replace(".llm_logs", "")
+            # Parse filename: deliberation_{scenario}_{id}_{date}_{time}
+            m = _re.match(r"deliberation_(.+?)_([0-9a-f]{8})_(\d{8})_(\d{6})", fname)
+            if m:
+                scenario_name = m.group(1)
+                delib_id = m.group(2)
+                date_str = m.group(3)
+                time_str = m.group(4)
+                date_formatted = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+            else:
+                scenario_name = fname
+                delib_id = fname
+                date_formatted = ""
+                time_str = ""
+
+            # Check for corresponding .log file
+            plain_log = logs_dir / f"{fname}.log"
+
+            deliberations.append({
+                "id": delib_id,
+                "filename": fname,
+                "name": scenario_name,
+                "date": date_formatted,
+                "time": f"{time_str[:2]}:{time_str[2:4]}:{time_str[4:6]}" if len(time_str) == 6 else time_str,
+                "log_file": str(plain_log) if plain_log.exists() else None,
+                "llm_log_file": str(llm_log),
+            })
+
+        return {"deliberations": deliberations}
+
+    @app.get("/api/deliberations/{deliberation_id}/analytics")
+    async def get_deliberation_analytics(deliberation_id: str):
+        """Return chart-ready analytics data for a deliberation from its LLM log file."""
+        import re as _re
+        logs_dir = Path(__file__).parent / "logs"
+
+        # Find matching log file
+        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
+        if not matching_files:
+            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
+
+        log_path = matching_files[0]
+        logs = _load_llm_log_file(str(log_path))
+        if not logs:
+            raise HTTPException(404, f"No log entries found in {log_path.name}")
+
+        # Extract topic from first prompt
+        topic = ""
+        if logs:
+            first_prompt = logs[0].get("prompt", "")
+            topic_match = _re.search(r"Topic:\s*(.+?)(\n|$)", first_prompt)
+            if topic_match:
+                topic = topic_match.group(1).strip()
+
+        # Build per-agent data
+        per_agent = []
+        models_count = {}
+        token_by_model = {}
+        total_tokens_in = 0
+        total_tokens_out = 0
+        total_duration = 0
+        timeline = []
+
+        position_dist = {"FOR": 0, "AGAINST": 0, "UNDECIDED": 0}
+
+        # Track agent history for position changes
+        agent_history = {}  # agent_name -> list of (round, position, timestamp)
+
+        for turn_index, entry in enumerate(logs):
+            agent_name = entry.get("agent_name", "Unknown")
+            model = entry.get("model_actual", entry.get("model_requested", "unknown"))
+            tokens_in = entry.get("tokens_in", 0)
+            tokens_out = entry.get("tokens_out", 0)
+            duration_ms = entry.get("duration_ms", 0)
+            timestamp = entry.get("timestamp", "")
+            response_text = entry.get("response", "")
+            prompt_text = entry.get("prompt", "")
+
+            # Extract round number from prompt
+            round_match = _re_module.search(r'round[:\s]+(\d+)', prompt_text, _re_module.IGNORECASE)
+            round_num = int(round_match.group(1)) if round_match else 1
+
+            # Parse structured outputs
+            parsed = _parse_structured_outputs(response_text)
+
+            position = parsed["vote"] or "UNDECIDED"
+            confidence = parsed["vote_confidence"]
+
+            # Accumulate
+            total_tokens_in += tokens_in
+            total_tokens_out += tokens_out
+            total_duration += duration_ms
+
+            models_count[model] = models_count.get(model, 0) + 1
+
+            if model not in token_by_model:
+                token_by_model[model] = {"in": 0, "out": 0}
+            token_by_model[model]["in"] += tokens_in
+            token_by_model[model]["out"] += tokens_out
+
+            position_dist[position] = position_dist.get(position, 0) + 1
+
+            per_agent.append({
+                "name": agent_name,
+                "model": model,
+                "tokens_in": tokens_in,
+                "tokens_out": tokens_out,
+                "duration_ms": duration_ms,
+                "position": position,
+                "confidence": confidence,
+                "claims": parsed["claims"],
+                "timestamp": timestamp,
+                "turn": turn_index,
+                "round": round_num,
+            })
+
+            timeline.append({
+                "timestamp": timestamp,
+                "agent": agent_name,
+                "tokens": tokens_out,
+                "duration_ms": duration_ms,
+            })
+
+            # Track agent position history by round
+            if agent_name not in agent_history:
+                agent_history[agent_name] = []
+            agent_history[agent_name].append({
+                "round": round_num,
+                "position": position,
+                "timestamp": timestamp,
+            })
+
+        total = len(logs)
+        avg_tokens_in = total_tokens_in / total if total else 0
+        avg_tokens_out = total_tokens_out / total if total else 0
+        avg_duration = total_duration / total if total else 0
+
+        # Compute position changes for each agent (by round)
+        position_changes = []
+        agent_positions_over_time = {}  # For visualization: agent -> [positions by round]
+
+        for agent_name, history in agent_history.items():
+            # Sort by round to ensure chronological order
+            history_sorted = sorted(history, key=lambda x: x["round"])
+            # Deduplicate by round (take last entry per round if multiple)
+            round_positions = {}
+            for entry in history_sorted:
+                round_positions[entry["round"]] = entry
+            history_deduped = sorted(round_positions.values(), key=lambda x: x["round"])
+
+            positions_list = []
+            prev_position = None
+            prev_round = None
+
+            for entry in history_deduped:
+                current_position = entry["position"]
+                current_round = entry["round"]
+                positions_list.append({
+                    "round": current_round,
+                    "position": current_position,
+                    "timestamp": entry["timestamp"],
+                })
+
+                if prev_position is not None and current_position != prev_position:
+                    position_changes.append({
+                        "agent": agent_name,
+                        "round": current_round,
+                        "from_round": prev_round,
+                        "from_position": prev_position,
+                        "to_position": current_position,
+                        "timestamp": entry["timestamp"],
+                    })
+                prev_position = current_position
+                prev_round = current_round
+
+            agent_positions_over_time[agent_name] = positions_list
+
+        # Sort position changes by round
+        position_changes.sort(key=lambda x: x["round"])
+
+        return {
+            "deliberation_id": deliberation_id,
+            "topic": topic,
+            "log_file": log_path.name,
+            "agent_summary": {
+                "total": total,
+                "models": models_count,
+                "avg_tokens_in": round(avg_tokens_in, 1),
+                "avg_tokens_out": round(avg_tokens_out, 1),
+                "avg_duration_ms": round(avg_duration, 1),
+            },
+            "position_distribution": position_dist,
+            "per_agent": per_agent,
+            "token_usage": {
+                "total_in": total_tokens_in,
+                "total_out": total_tokens_out,
+                "by_model": token_by_model,
+            },
+            "timeline": timeline,
+            "position_changes": position_changes,
+            "agent_positions_over_time": agent_positions_over_time,
+        }
+
+    @app.get("/api/deliberations/{deliberation_id}/analytics/export")
+    async def export_deliberation_analytics(deliberation_id: str):
+        """Export analytics data as CSV."""
+        import csv
+        import io
+
+        logs_dir = Path(__file__).parent / "logs"
+        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
+        if not matching_files:
+            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
+
+        logs = _load_llm_log_file(str(matching_files[0]))
+        if not logs:
+            raise HTTPException(404, "No log entries found")
+
+        output = io.StringIO()
+        fieldnames = [
+            "agent_name", "model", "tokens_in", "tokens_out",
+            "duration_ms", "timestamp", "position", "confidence",
+        ]
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for entry in logs:
+            parsed = _parse_structured_outputs(entry.get("response", ""))
+            writer.writerow({
+                "agent_name": entry.get("agent_name", ""),
+                "model": entry.get("model_actual", entry.get("model_requested", "")),
+                "tokens_in": entry.get("tokens_in", 0),
+                "tokens_out": entry.get("tokens_out", 0),
+                "duration_ms": entry.get("duration_ms", 0),
+                "timestamp": entry.get("timestamp", ""),
+                "position": parsed["vote"] or "UNDECIDED",
+                "confidence": parsed["vote_confidence"] or "",
+            })
+
+        output.seek(0)
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=analytics_{deliberation_id}.csv"
+            },
+        )
 
     @app.post("/api/quorum/create")
     async def create_quorum(config: dict = Body(...)):
@@ -5089,6 +5534,144 @@ def create_advanced_app(orchestrator) -> FastAPI:
         except WebSocketDisconnect:
             if websocket in orch.websockets:
                 orch.websockets.remove(websocket)
+
+    # ─── Analytics endpoints (reuse helpers from create_app) ───
+    @app.get("/api/logs/deliberations")
+    async def adv_list_log_deliberations():
+        import re as _re
+        logs_dir = Path(__file__).parent / "logs"
+        deliberations = []
+        if not logs_dir.exists():
+            return {"deliberations": []}
+        for llm_log in sorted(logs_dir.glob("*.llm_logs.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+            fname = llm_log.stem.replace(".llm_logs", "")
+            m = _re.match(r"deliberation_(.+?)_([0-9a-f]{8})_(\d{8})_(\d{6})", fname)
+            if m:
+                scenario_name, delib_id = m.group(1), m.group(2)
+                date_str, time_str = m.group(3), m.group(4)
+                date_formatted = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+            else:
+                scenario_name = delib_id = fname
+                date_formatted = time_str = ""
+            plain_log = logs_dir / f"{fname}.log"
+            deliberations.append({
+                "id": delib_id, "filename": fname, "name": scenario_name,
+                "date": date_formatted,
+                "time": f"{time_str[:2]}:{time_str[2:4]}:{time_str[4:6]}" if len(time_str) == 6 else time_str,
+                "log_file": str(plain_log) if plain_log.exists() else None,
+                "llm_log_file": str(llm_log),
+            })
+        return {"deliberations": deliberations}
+
+    @app.get("/api/deliberations/{deliberation_id}/analytics")
+    async def adv_get_deliberation_analytics(deliberation_id: str):
+        import re as _re
+        logs_dir = Path(__file__).parent / "logs"
+        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
+        if not matching_files:
+            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
+        log_path = matching_files[0]
+        logs = _load_llm_log_file(str(log_path))
+        if not logs:
+            raise HTTPException(404, f"No log entries found in {log_path.name}")
+        topic = ""
+        if logs:
+            topic_match = _re.search(r"Topic:\s*(.+?)(\n|$)", logs[0].get("prompt", ""))
+            if topic_match:
+                topic = topic_match.group(1).strip()
+        per_agent, models_count, token_by_model = [], {}, {}
+        total_tokens_in = total_tokens_out = total_duration = 0
+        timeline = []
+        position_dist = {"FOR": 0, "AGAINST": 0, "UNDECIDED": 0}
+        agent_history = {}  # agent_name -> list of (round, position, timestamp)
+        for turn_index, entry in enumerate(logs):
+            agent_name = entry.get("agent_name", "Unknown")
+            model = entry.get("model_actual", entry.get("model_requested", "unknown"))
+            tokens_in, tokens_out = entry.get("tokens_in", 0), entry.get("tokens_out", 0)
+            duration_ms = entry.get("duration_ms", 0)
+            timestamp = entry.get("timestamp", "")
+            prompt_text = entry.get("prompt", "")
+            # Extract round number from prompt
+            round_match = _re.search(r'round[:\s]+(\d+)', prompt_text, _re.IGNORECASE)
+            round_num = int(round_match.group(1)) if round_match else 1
+            parsed = _parse_structured_outputs(entry.get("response", ""))
+            position = parsed["vote"] or "UNDECIDED"
+            confidence = parsed["vote_confidence"]
+            total_tokens_in += tokens_in; total_tokens_out += tokens_out; total_duration += duration_ms
+            models_count[model] = models_count.get(model, 0) + 1
+            if model not in token_by_model:
+                token_by_model[model] = {"in": 0, "out": 0}
+            token_by_model[model]["in"] += tokens_in; token_by_model[model]["out"] += tokens_out
+            position_dist[position] = position_dist.get(position, 0) + 1
+            per_agent.append({"name": agent_name, "model": model, "tokens_in": tokens_in,
+                "tokens_out": tokens_out, "duration_ms": duration_ms, "position": position,
+                "confidence": confidence, "claims": parsed["claims"], "timestamp": timestamp, "turn": turn_index, "round": round_num})
+            timeline.append({"timestamp": timestamp, "agent": agent_name, "tokens": tokens_out, "duration_ms": duration_ms})
+            # Track agent position history by round
+            if agent_name not in agent_history:
+                agent_history[agent_name] = []
+            agent_history[agent_name].append({"round": round_num, "position": position, "timestamp": timestamp})
+        total = len(logs)
+        # Compute position changes by round
+        position_changes = []
+        agent_positions_over_time = {}
+        for agent_name, history in agent_history.items():
+            history_sorted = sorted(history, key=lambda x: x["round"])
+            # Deduplicate by round (take last entry per round if multiple)
+            round_positions = {}
+            for ent in history_sorted:
+                round_positions[ent["round"]] = ent
+            history_deduped = sorted(round_positions.values(), key=lambda x: x["round"])
+            positions_list = []
+            prev_position = None
+            prev_round = None
+            for ent in history_deduped:
+                current_position = ent["position"]
+                current_round = ent["round"]
+                positions_list.append({"round": current_round, "position": current_position, "timestamp": ent["timestamp"]})
+                if prev_position is not None and current_position != prev_position:
+                    position_changes.append({"agent": agent_name, "round": current_round, "from_round": prev_round,
+                        "from_position": prev_position, "to_position": current_position, "timestamp": ent["timestamp"]})
+                prev_position = current_position
+                prev_round = current_round
+            agent_positions_over_time[agent_name] = positions_list
+        position_changes.sort(key=lambda x: x["round"])
+        return {
+            "deliberation_id": deliberation_id, "topic": topic, "log_file": log_path.name,
+            "agent_summary": {"total": total, "models": models_count,
+                "avg_tokens_in": round(total_tokens_in / total, 1) if total else 0,
+                "avg_tokens_out": round(total_tokens_out / total, 1) if total else 0,
+                "avg_duration_ms": round(total_duration / total, 1) if total else 0},
+            "position_distribution": position_dist,
+            "per_agent": per_agent,
+            "token_usage": {"total_in": total_tokens_in, "total_out": total_tokens_out, "by_model": token_by_model},
+            "timeline": timeline,
+            "position_changes": position_changes,
+            "agent_positions_over_time": agent_positions_over_time,
+        }
+
+    @app.get("/api/deliberations/{deliberation_id}/analytics/export")
+    async def adv_export_analytics(deliberation_id: str):
+        import csv, io
+        logs_dir = Path(__file__).parent / "logs"
+        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
+        if not matching_files:
+            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
+        logs = _load_llm_log_file(str(matching_files[0]))
+        if not logs:
+            raise HTTPException(404, "No log entries found")
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=["agent_name", "model", "tokens_in", "tokens_out", "duration_ms", "timestamp", "position", "confidence"])
+        writer.writeheader()
+        for entry in logs:
+            parsed = _parse_structured_outputs(entry.get("response", ""))
+            writer.writerow({"agent_name": entry.get("agent_name", ""), "model": entry.get("model_actual", entry.get("model_requested", "")),
+                "tokens_in": entry.get("tokens_in", 0), "tokens_out": entry.get("tokens_out", 0),
+                "duration_ms": entry.get("duration_ms", 0), "timestamp": entry.get("timestamp", ""),
+                "position": parsed["vote"] or "UNDECIDED", "confidence": parsed["vote_confidence"] or ""})
+        output.seek(0)
+        return StreamingResponse(iter([output.getvalue()]), media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=analytics_{deliberation_id}.csv"})
 
     return app
 
