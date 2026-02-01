@@ -4585,7 +4585,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
 
     @app.get("/api/llm/logs")
     async def get_llm_logs(
-        limit: int = Query(100, description="Max records to return", ge=1, le=1000),
+        limit: int = Query(10000, description="Max records to return", ge=1, le=10000),
         offset: int = Query(0, description="Records to skip", ge=0),
         agent_id: Optional[str] = Query(None, description="Filter by agent ID"),
         model: Optional[str] = Query(None, description="Filter by model name (partial match)"),
@@ -4597,7 +4597,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         """Get LLM response logs with optional filters.
 
         Query params:
-        - limit: Max records (default 100, max 1000)
+        - limit: Max records (default 10000, max 10000)
         - offset: Records to skip for pagination
         - agent_id: Filter by agent ID
         - model: Filter by model name (partial match, e.g., 'claude' or 'gpt')
