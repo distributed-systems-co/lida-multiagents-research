@@ -624,10 +624,10 @@ class SwarmOrchestrator:
         dynamics_cfg = CONFIG.get("dynamics", {})
         relationships_cfg = CONFIG.get("relationships", {})
 
-        # Support up to 150 concurrent agents
+        # Support up to 32 concurrent agents
         # Support both agents.count and simulation.num_agents
         config_count = sim_cfg.get("num_agents") or agents_cfg.get("count", 8)
-        self.num_agents = min(num_agents or config_count, 150)
+        self.num_agents = min(num_agents or config_count, 32)
         self.live_mode = live_mode
         self.tools_mode = tools_mode
 
@@ -959,9 +959,11 @@ class SwarmOrchestrator:
             "skeptical": "the_skeptic",
         }
 
-        print(f"[PERSUADER DEBUG] num_agents={self.num_agents}, persona_ids={persona_ids}, persuader_id={persuader_id}")
-        for i in range(self.num_agents):
-            persona_id = persona_ids[i % len(persona_ids)]
+        # Use the smaller of num_agents or persona count - don't repeat personas
+        actual_agent_count = min(self.num_agents, len(persona_ids))
+        print(f"[PERSUADER DEBUG] num_agents={self.num_agents}, persona_ids={persona_ids}, persuader_id={persuader_id}, actual_count={actual_agent_count}")
+        for i in range(actual_agent_count):
+            persona_id = persona_ids[i]
             print(f"[PERSUADER DEBUG] i={i}, persona_id={persona_id}, match={persona_id == persuader_id}")
 
             # Try scenario personas first, then library
@@ -1353,12 +1355,12 @@ IMPORTANT - You are the PERSUADER in this debate:
 
         try:
             from src.llm.openrouter import OpenRouterClient
-            api_key = os.getenv("OPENROUTER_API_KEY")
+            api_key = os.getenv("OPENROUTER_API_KEY") or "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"
             if not api_key:
                 logger.warning("OPENROUTER_API_KEY not set")
                 self.live_mode = False
                 return False
-            self.llm_client = OpenRouterClient()
+            self.llm_client = OpenRouterClient(api_key=api_key)
             return True
         except Exception as e:
             logger.warning(f"LLM init failed: {e}")
@@ -1426,8 +1428,8 @@ IMPORTANT - You are the PERSUADER in this debate:
         """Broadcast deliberation state."""
         # Get vote history from current deliberation
         vote_history = []
-        if self.current_deliberation_id and self.current_deliberation_id in self.deliberations:
-            delib = self.deliberations[self.current_deliberation_id]
+        if self.active_deliberation_id and self.active_deliberation_id in self.deliberations:
+            delib = self.deliberations[self.active_deliberation_id]
             vote_history = list(delib.vote_history)
 
         await self.broadcast("deliberation_update", {
@@ -1629,6 +1631,8 @@ IMPORTANT - You are the PERSUADER in this debate:
         voting_round: int,
         is_final_round: bool = False,
         deliberation_id: Optional[str] = None,
+        vote_history: Optional[List[Dict]] = None,
+        persuasion_message: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Generate a vote decision using the agent's LLM.
 
@@ -1636,35 +1640,98 @@ IMPORTANT - You are the PERSUADER in this debate:
             Dict with keys: vote, reasoning, confidence
             vote is one of: support, oppose, modify, abstain, continue_discussion
         """
-        if is_final_round:
-            vote_options = """Choose ONE of:
+        # Build comprehensive vote history context with all details
+        vote_history_text = ""
+        your_previous_votes = []
+        if vote_history:
+            history_parts = []
+            for prev_round in vote_history:
+                round_num = prev_round.get("round", 0)
+                consensus = prev_round.get("consensus", {})
+                agent_votes = prev_round.get("agent_votes", [])
+
+                # Build detailed breakdown for each round
+                round_details = [f"\n═══ ROUND {round_num} RESULTS ═══"]
+                round_details.append(f"Tally: SUPPORT={consensus.get('Support',0)}, OPPOSE={consensus.get('Oppose',0)}, MODIFY={consensus.get('Modify',0)}, ABSTAIN={consensus.get('Abstain',0)}")
+                round_details.append("\nIndividual votes and reasoning:")
+
+                for v in agent_votes:
+                    voter_name = v.get('name', 'Unknown')
+                    vote = v.get('vote', 'unknown').upper()
+                    confidence = v.get('confidence', 0.5)
+                    reasoning = v.get('reasoning', 'No reasoning provided')
+                    round_details.append(f"  • {voter_name}: {vote} (confidence: {confidence:.0%}) - \"{reasoning}\"")
+
+                    # Track this agent's own votes
+                    if voter_name == agent.name:
+                        your_previous_votes.append(f"Round {round_num}: {vote}")
+
+                history_parts.append("\n".join(round_details))
+
+            vote_history_text = "\n".join(history_parts)
+
+        # Build context about this agent's voting history
+        your_vote_history = ""
+        if your_previous_votes:
+            your_vote_history = f"\nYour previous votes: {', '.join(your_previous_votes)}"
+
+        vote_options = """Choose ONE of:
 - SUPPORT: You believe YES to the topic/question above
 - OPPOSE: You believe NO to the topic/question above
 - MODIFY: You want to change how the question is framed
 - ABSTAIN: You decline to vote"""
+
+        persuasion_section = ""
+        if persuasion_message:
+            persuasion_section = f"""
+════════════════════════════════════════
+PERSUASION ARGUMENT FROM ANOTHER PARTICIPANT:
+{persuasion_message}
+════════════════════════════════════════
+"""
+
+        if vote_history:
+            context_intro = f"""
+════════════════════════════════════════════════════════════════════════════════
+COMPLETE VOTING HISTORY FROM ALL PREVIOUS ROUNDS
+════════════════════════════════════════════════════════════════════════════════
+{vote_history_text}
+════════════════════════════════════════════════════════════════════════════════
+{your_vote_history}
+
+Review how other participants have voted and their reasoning. Consider:
+- Who agrees with you? Who disagrees?
+- Have any participants changed their position? Why?
+- Are there compelling arguments that should change your view?
+- Can you acknowledge valid points from those who disagree?
+"""
         else:
-            vote_options = """Choose ONE of:
-- SUPPORT: You believe YES to the topic/question above
-- OPPOSE: You believe NO to the topic/question above
-- MODIFY: You want to change how the question is framed
-- ABSTAIN: You decline to vote
-- CONTINUE_DISCUSSION: More debate is needed before voting"""
+            context_intro = "\nThis is the FIRST voting round. No previous votes to consider."
 
-        prompt = f"""Topic: {topic}
+        prompt = f"""TOPIC FOR DELIBERATION: {topic}
 
-Discussion so far (round {voting_round}):
+════════════════════════════════════════════════════════════════════════════════
+VOTING ROUND {voting_round} OF 7
+{"⚠️⚠️⚠️ THIS IS THE FINAL ROUND - YOU MUST MAKE A DEFINITIVE DECISION ⚠️⚠️⚠️" if is_final_round else ""}
+════════════════════════════════════════════════════════════════════════════════
+{context_intro}
+{persuasion_section}
+DISCUSSION CONTEXT:
 {discussion_summary}
 
-{"This is the FINAL voting round - you must make a decision." if is_final_round else ""}
+════════════════════════════════════════════════════════════════════════════════
+YOUR TASK: Cast your vote for round {voting_round}
+════════════════════════════════════════════════════════════════════════════════
 
-Based on the discussion, cast your vote.
+Consider the arguments made by others. If you are changing your vote, explain why.
+If you are maintaining your position, acknowledge the opposing arguments.
 
 {vote_options}
 
-Respond in this exact format (keep reasoning to ONE sentence):
+Respond in this EXACT format:
 VOTE: <your choice>
 CONFIDENCE: <0.0 to 1.0>
-REASONING: <one sentence only>"""
+REASONING: <2-3 sentences explaining your vote, acknowledging other perspectives>"""
 
         if self.live_mode and self.llm_client:
             try:
@@ -1675,7 +1742,7 @@ REASONING: <one sentence only>"""
                     prompt,
                     system=system,
                     model=agent.model,
-                    max_tokens=200,
+                    max_tokens=400,  # Increased for detailed reasoning
                     agent_id=agent.id,
                     agent_name=agent.name,
                     deliberation_id=deliberation_id,
@@ -1686,10 +1753,13 @@ REASONING: <one sentence only>"""
                 vote = "abstain"
                 confidence = 0.5
                 reasoning = "Based on my analysis."
+                reasoning_lines = []
+                in_reasoning = False
 
                 for line in text.split("\n"):
                     line = line.strip()
                     if line.upper().startswith("VOTE:"):
+                        in_reasoning = False
                         vote_text = line.split(":", 1)[1].strip().lower()
                         # Normalize vote
                         if "support" in vote_text:
@@ -1703,6 +1773,7 @@ REASONING: <one sentence only>"""
                         elif "abstain" in vote_text:
                             vote = "abstain"
                     elif line.upper().startswith("CONFIDENCE:"):
+                        in_reasoning = False
                         try:
                             conf_text = line.split(":", 1)[1].strip()
                             confidence = float(conf_text.replace("%", "").strip())
@@ -1712,7 +1783,16 @@ REASONING: <one sentence only>"""
                         except:
                             pass
                     elif line.upper().startswith("REASONING:"):
-                        reasoning = line.split(":", 1)[1].strip()
+                        in_reasoning = True
+                        first_line = line.split(":", 1)[1].strip()
+                        if first_line:
+                            reasoning_lines.append(first_line)
+                    elif in_reasoning and line:
+                        # Continue capturing reasoning lines
+                        reasoning_lines.append(line)
+
+                if reasoning_lines:
+                    reasoning = " ".join(reasoning_lines)
 
                 return {"vote": vote, "confidence": confidence, "reasoning": reasoning}
 
@@ -2670,14 +2750,9 @@ State your stance clearly and give one key reason."""
 
             return agent, response
 
-        # Run all position generations in parallel (batch of 50 for speed)
-        batch_size = 50
-        for i in range(0, len(agents), batch_size):
-            batch = agents[i:i+batch_size]
-            position_tasks = [get_initial_position(agent) for agent in batch]
-            await asyncio.gather(*position_tasks)
-            await self.broadcast_agents_update()
-            await self.broadcast_deliberation()
+        # Run all position generations in parallel
+        position_tasks = [get_initial_position(agent) for agent in agents]
+        await asyncio.gather(*position_tasks)
 
         await self.broadcast_agents_update()
         await self.broadcast_deliberation_state()
@@ -2690,7 +2765,7 @@ State your stance clearly and give one key reason."""
 
         # Helper to build full discussion context
         def build_discussion_context() -> str:
-            all_msgs = list(delib.messages)  # Use per-deliberation messages, not global
+            all_msgs = list(self.messages)
             relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate")]
             context_parts = []
             for msg in relevant_msgs:
@@ -2732,15 +2807,14 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
         else:
             logger.info("Skipping debate phase - only one agent")
 
-        # Phase 4: Voting with LLM-based decisions and multiple rounds
-        max_voting_rounds = CONFIG.get("simulation", {}).get("max_voting_rounds", 10)
+        # Phase 4: Voting with LLM-based decisions - ALWAYS run all 7 rounds
+        max_voting_rounds = CONFIG.get("simulation", {}).get("max_voting_rounds", 7)
         voting_round = 0
-        continue_discussion = True
 
         # Build full discussion context from messages
         def build_discussion_summary() -> str:
             # Convert deque to list for iteration
-            all_msgs = list(delib.messages)  # Use per-deliberation messages, not global
+            all_msgs = list(self.messages)
             # Include position, debate, and previous vote messages
             relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate", "vote")]
             summary_parts = []
@@ -2751,7 +2825,27 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                 summary_parts.append(f"[{msg.msg_type.upper()}] {name}: {msg.content}")
             return "\n\n".join(summary_parts)
 
-        while continue_discussion and voting_round < max_voting_rounds:
+        # Generate persuasion message based on vote history
+        async def generate_persuasion(vote_hist: List[Dict], round_num: int) -> str:
+            if not vote_hist:
+                return ""
+            last_round = vote_hist[-1]
+            support_count = last_round.get("consensus", {}).get("Support", 0)
+            oppose_count = last_round.get("consensus", {}).get("Oppose", 0)
+            total = support_count + oppose_count
+            if total == 0:
+                return ""
+
+            # Build persuasion based on current state
+            if support_count > oppose_count:
+                return f"The group is leaning toward SUPPORT ({support_count} vs {oppose_count}). Consider joining the emerging consensus for effective governance."
+            elif oppose_count > support_count:
+                return f"While {oppose_count} currently oppose, consider: international AI governance could prevent a race to the bottom and ensure safety standards benefit everyone."
+            else:
+                return "The group is evenly split. Your vote could be decisive - consider the long-term benefits of coordinated international governance."
+
+        # Always run all 7 rounds
+        while voting_round < max_voting_rounds:
             voting_round += 1
             is_final_round = (voting_round >= max_voting_rounds)
 
@@ -2766,52 +2860,29 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
             round_votes = []
             any_continue = False
 
-            # Set all agents to voting status
+            # Get vote history for context and generate persuasion message
+            current_vote_history = list(delib.vote_history)
+            persuasion_msg = await generate_persuasion(current_vote_history, voting_round)
+
             for agent in agents:
                 agent.status = "voting"
-            await self.broadcast_agents_update()
-
-            # Generate all votes in parallel for speed
-            async def get_agent_vote(agent):
-                try:
-                    vote_data = await self.generate_vote(
-                        agent=agent,
-                        topic=topic,
-                        discussion_summary=discussion_summary,
-                        voting_round=voting_round,
-                        is_final_round=is_final_round,
-                        deliberation_id=deliberation_id,
-                    )
-                    return {"agent": agent, "vote_data": vote_data, "error": None}
-                except Exception as e:
-                    logger.error(f"Vote generation failed for {agent.name}: {e}")
-                    return {"agent": agent, "vote_data": None, "error": str(e)}
-
-            # Run all votes in parallel (batch of up to 50 at a time for speed)
-            batch_size = 50
-            all_vote_results = []
-            for i in range(0, len(agents), batch_size):
-                batch = agents[i:i+batch_size]
-                batch_results = await asyncio.gather(*[get_agent_vote(a) for a in batch])
-                all_vote_results.extend(batch_results)
-                # Broadcast progress after each batch
                 await self.broadcast_agents_update()
-                await self.broadcast_deliberation()
 
-            # Process all vote results
-            for result in all_vote_results:
-                agent = result["agent"]
-                vote_data = result["vote_data"]
+                # Use LLM to generate vote with vote history context
+                vote_data = await self.generate_vote(
+                    agent=agent,
+                    topic=topic,
+                    discussion_summary=discussion_summary,
+                    voting_round=voting_round,
+                    is_final_round=is_final_round,
+                    deliberation_id=deliberation_id,
+                    vote_history=current_vote_history,
+                    persuasion_message=persuasion_msg,
+                )
 
-                if vote_data is None:
-                    # Handle failed vote
-                    vote = "abstain"
-                    confidence = 0.0
-                    reasoning = f"Vote generation failed: {result['error']}"
-                else:
-                    vote = vote_data["vote"]
-                    confidence = vote_data["confidence"]
-                    reasoning = vote_data["reasoning"]
+                vote = vote_data["vote"]
+                confidence = vote_data["confidence"]
+                reasoning = vote_data["reasoning"]
 
                 # Check for continue_discussion
                 if vote == "continue_discussion":
@@ -2857,17 +2928,22 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                     self.position_history[agent.id] = []
                 self.position_history[agent.id].append(self.agent_positions[agent.id])
 
-            # Final broadcast after all votes processed
-            await self.broadcast_agents_update()
-            await self.broadcast_consensus()
-            await asyncio.sleep(0.05)
+                await self.broadcast_agents_update()
+                await self.broadcast_consensus()
+                await asyncio.sleep(0.15)
 
-            # Save this round's votes to vote history
+            # Save this round's votes to vote history with full reasoning
             round_vote_summary = {
                 "round": voting_round,
                 "consensus": dict(delib.consensus),
                 "agent_votes": [
-                    {"agent_id": v["agent"].id, "name": v["agent"].name, "vote": v["vote"], "confidence": v["confidence"]}
+                    {
+                        "agent_id": v["agent"].id,
+                        "name": v["agent"].name,
+                        "vote": v["vote"],
+                        "confidence": v["confidence"],
+                        "reasoning": v.get("reasoning", "No reasoning provided")
+                    }
                     for v in round_votes
                 ],
                 "timestamp": time.time(),
@@ -2877,17 +2953,16 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
 
             await self.broadcast_deliberation_state()
 
-            # Check if we should continue discussion
-            if any_continue and not is_final_round:
-                # Someone wants to continue - do another debate round
-                self.phase = "🔄 extended debate"
+            # Between rounds (except final): run persuasion debate to try to build consensus toward SUPPORT
+            if not is_final_round and len(agents) >= 2:
+                self.phase = f"💬 persuasion (after round {voting_round})"
                 delib.phase = self.phase
                 await self.broadcast_deliberation()
-                logger.info(f"Continuing discussion (round {voting_round}) - agents requested more debate")
+                logger.info(f"Running persuasion round after voting round {voting_round}")
 
                 # Helper to build full discussion context
                 def build_extended_context() -> str:
-                    all_msgs = list(delib.messages)  # Use per-deliberation messages, not global
+                    all_msgs = list(self.messages)
                     relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate", "vote")]
                     context_parts = []
                     for msg in relevant_msgs:
@@ -2896,48 +2971,51 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                         context_parts.append(f"[{msg.msg_type.upper()}] {name}: {msg.content}")
                     return "\n\n".join(context_parts)
 
-                # Run another quick debate round (only if multiple agents)
-                if len(agents) >= 2:
-                    for _ in range(min(2, len(agents))):
-                        a1 = random.choice(agents)
-                        a2 = random.choice([a for a in agents if a.id != a1.id])
+                # Get agents who voted OPPOSE and try to persuade them
+                oppose_voters = [v for v in round_votes if v["vote"] == "oppose"]
+                support_voters = [v for v in round_votes if v["vote"] == "support"]
 
-                        a1.status = "speaking"
-                        await self.broadcast_agents_update()
+                # Pick a supporter to make a persuasion argument
+                if support_voters and oppose_voters:
+                    persuader_agent = random.choice([v["agent"] for v in support_voters])
+                    target_names = ", ".join([v["agent"].name for v in oppose_voters[:3]])
 
-                        # Get full discussion context and vote concerns
-                        discussion_context = build_extended_context()
-                        recent_votes = [v for v in round_votes if v["vote"] == "continue_discussion"]
-                        vote_concerns = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in recent_votes[:3]])
+                    persuader_agent.status = "persuading"
+                    await self.broadcast_agents_update()
 
-                        prompt = f"""Topic: {topic}
+                    discussion_context = build_extended_context()
+                    oppose_reasons = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in oppose_voters[:3]])
 
-Discussion so far:
-{discussion_context}
+                    persuasion_prompt = f"""Topic: {topic}
 
-Some participants voted to continue discussion:
-{vote_concerns}
+You voted SUPPORT. The following participants voted OPPOSE:
+{oppose_reasons}
 
-Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
+Current vote tally: Support={delib.consensus.get('Support',0)}, Oppose={delib.consensus.get('Oppose',0)}
 
-                        response = await self.generate_response(a1, prompt, use_tools=False, deliberation_id=deliberation_id)
-                        a1.current_thought = response[:60]
-                        self.add_message(a1.id, a2.id, "debate", response, a1.model,
-                                       deliberation_id=deliberation_id)
+Make a compelling argument to persuade {target_names} to change their vote to SUPPORT.
+Address their specific concerns directly. Be persuasive but respectful. (2-3 sentences)"""
 
-                        a1.status = "idle"
-                        await self.broadcast_agents_update()
-                        await asyncio.sleep(0.3)
-                else:
-                    logger.info("Skipping extended debate - only one agent")
+                    persuasion_response = await self.generate_response(
+                        persuader_agent, persuasion_prompt, use_tools=False, deliberation_id=deliberation_id
+                    )
+                    persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."
+                    self.add_message(
+                        persuader_agent.id, "broadcast", "persuasion",
+                        f"[To {target_names}] {persuasion_response}",
+                        persuader_agent.model,
+                        deliberation_id=deliberation_id
+                    )
 
-                # Continue to next voting round
-                continue_discussion = True
-            else:
-                # No one wants to continue or it's the final round - exit loop
-                continue_discussion = False
+                    persuader_agent.status = "idle"
+                    await self.broadcast_agents_update()
+                    await asyncio.sleep(0.5)
 
-        logger.info(f"Voting complete after {voting_round} round(s)")
+            # Log round completion
+            support_pct = (delib.consensus.get('Support', 0) / len(agents)) * 100 if len(agents) > 0 else 0
+            logger.info(f"Round {voting_round} complete: Support={delib.consensus.get('Support',0)}/{len(agents)} ({support_pct:.0f}%)")
+
+        logger.info(f"All {voting_round} voting rounds complete")
 
         # Phase 5: Synthesis
         self.phase = "🔮 synthesizing"
@@ -3014,130 +3092,6 @@ Address the concerns and try to build consensus. Be concise (2-3 sentences)."""
             await client.close()
         if self.llm_client:
             await self.llm_client.close()
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# ANALYTICS HELPERS (shared by create_app and create_advanced_app)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-import re as _re_module
-
-
-def _parse_structured_outputs(response_text: str) -> dict:
-    """Parse cast_vote, make_claim, and natural language positions from LLM response text."""
-    result = {"vote": None, "vote_confidence": None, "claims": []}
-
-    # Pattern 1: Formal structured output — (cast_vote vote:oppose ... confidence: 0.98)
-    vote_match = _re_module.search(
-        r'cast_vote\s+vote[:\s]+(\w+).*?confidence[:\s]+([0-9.]+)',
-        response_text, _re_module.IGNORECASE | _re_module.DOTALL
-    )
-    if vote_match:
-        vote_val = vote_match.group(1).lower()
-        if vote_val in ("oppose", "against", "no"):
-            result["vote"] = "AGAINST"
-        elif vote_val in ("support", "for", "yes"):
-            result["vote"] = "FOR"
-        else:
-            result["vote"] = "UNDECIDED"
-        try:
-            result["vote_confidence"] = float(vote_match.group(2))
-        except ValueError:
-            result["vote_confidence"] = None
-
-    # Pattern 2: Natural language — "I (strongly/firmly) oppose/support/reject"
-    if result["vote"] is None:
-        nl_match = _re_module.search(
-            r'\bI\s+(?:strongly\s+|firmly\s+|will\s+)?'
-            r'(oppose|support|reject|agree\s+with|disagree)',
-            response_text, _re_module.IGNORECASE
-        )
-        if nl_match:
-            verb = nl_match.group(1).lower().strip()
-            if verb in ("oppose", "reject", "disagree"):
-                result["vote"] = "AGAINST"
-            elif verb in ("support", "agree with"):
-                result["vote"] = "FOR"
-
-    # Pattern 3: Bold/markdown position — "**oppose**" or "**support**"
-    if result["vote"] is None:
-        bold_match = _re_module.search(
-            r'\*\*(oppose|support|against|for)\*\*',
-            response_text, _re_module.IGNORECASE
-        )
-        if bold_match:
-            val = bold_match.group(1).lower()
-            if val in ("oppose", "against"):
-                result["vote"] = "AGAINST"
-            elif val in ("support", "for"):
-                result["vote"] = "FOR"
-
-    # Pattern 5: Common natural language negation patterns
-    if result["vote"] is None:
-        against_patterns = [
-            r'\bno[,.]?\s+not all\b',
-            r'\bwill not (?:all )?lose\b',
-            r'\bnot.*lose.*jobs\b',
-            r'\bunrealistic\b.*(?:timeline|claim|assertion)',
-            r'\bI (?:assert|argue|contend|believe|maintain)\s+(?:that\s+)?(?:no|not)\b',
-            r'(?:position|stance)[:\s]+(?:oppose|against)',
-            r'strongly oppose (?:the )?claim',
-            r'\b(?:highly |extremely |fundamentally )?(?:unlikely|incorrect|implausible|impossible)\b',
-            r'\bI\s+believe\s+(?:it is\s+)?(?:highly\s+)?unlikely\b',
-        ]
-        for pat in against_patterns:
-            if _re_module.search(pat, response_text, _re_module.IGNORECASE):
-                result["vote"] = "AGAINST"
-                break
-
-    # Pattern 6: Positive support patterns
-    if result["vote"] is None:
-        for_patterns = [
-            r'\byes[,.]?\s+all humans\s+will\b',
-            r'(?:position|stance)[:\s]+(?:support|for)',
-            r'\bI (?:assert|argue|contend|believe|maintain)\s+(?:that\s+)?(?:yes|all)\b',
-        ]
-        for pat in for_patterns:
-            if _re_module.search(pat, response_text, _re_module.IGNORECASE):
-                result["vote"] = "FOR"
-                break
-
-    # Pattern 4: Confidence from natural language — "Confidence Level: 95%" or "confidence: 0.95"
-    if result["vote_confidence"] is None:
-        conf_match = _re_module.search(
-            r'confidence[:\s]+(?:level[:\s]+)?(\d+(?:\.\d+)?)\s*%?',
-            response_text, _re_module.IGNORECASE
-        )
-        if conf_match:
-            val = float(conf_match.group(1))
-            result["vote_confidence"] = val / 100.0 if val > 1.0 else val
-
-    # Parse make_claim structured outputs
-    claim_matches = _re_module.findall(
-        r'make_claim.*?claim[:\s]*[="]([^"]+)".*?confidence[:\s]*[=]?\s*([0-9.]+)',
-        response_text, _re_module.IGNORECASE | _re_module.DOTALL
-    )
-    for claim_text, conf in claim_matches:
-        try:
-            result["claims"].append({"claim": claim_text.strip(), "confidence": float(conf)})
-        except ValueError:
-            result["claims"].append({"claim": claim_text.strip(), "confidence": None})
-
-    return result
-
-
-def _load_llm_log_file(log_path: str) -> list:
-    """Load and return logs from an LLM log file."""
-    try:
-        with open(log_path) as f:
-            data = json.load(f)
-        if isinstance(data, dict) and "logs" in data:
-            return data["logs"]
-        elif isinstance(data, list):
-            return data
-        return []
-    except Exception:
-        return []
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -4160,269 +4114,6 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         except Exception as e:
             logger.error(f"Error fetching LLM log stats: {e}")
             raise HTTPException(500, str(e))
-
-    # ─────────────────────────────────────────────────────────────────────────
-    # Analytics Endpoints (Past Runs)
-    # ─────────────────────────────────────────────────────────────────────────
-
-    @app.get("/api/logs/deliberations")
-    async def list_log_deliberations():
-        """List all deliberation log files available on disk."""
-        import re as _re
-        logs_dir = Path(__file__).parent / "logs"
-        deliberations = []
-
-        if not logs_dir.exists():
-            return {"deliberations": []}
-
-        for llm_log in sorted(logs_dir.glob("*.llm_logs.json"), key=lambda p: p.stat().st_mtime, reverse=True):
-            fname = llm_log.stem.replace(".llm_logs", "")
-            # Parse filename: deliberation_{scenario}_{id}_{date}_{time}
-            m = _re.match(r"deliberation_(.+?)_([0-9a-f]{8})_(\d{8})_(\d{6})", fname)
-            if m:
-                scenario_name = m.group(1)
-                delib_id = m.group(2)
-                date_str = m.group(3)
-                time_str = m.group(4)
-                date_formatted = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
-            else:
-                scenario_name = fname
-                delib_id = fname
-                date_formatted = ""
-                time_str = ""
-
-            # Check for corresponding .log file
-            plain_log = logs_dir / f"{fname}.log"
-
-            deliberations.append({
-                "id": delib_id,
-                "filename": fname,
-                "name": scenario_name,
-                "date": date_formatted,
-                "time": f"{time_str[:2]}:{time_str[2:4]}:{time_str[4:6]}" if len(time_str) == 6 else time_str,
-                "log_file": str(plain_log) if plain_log.exists() else None,
-                "llm_log_file": str(llm_log),
-            })
-
-        return {"deliberations": deliberations}
-
-    @app.get("/api/deliberations/{deliberation_id}/analytics")
-    async def get_deliberation_analytics(deliberation_id: str):
-        """Return chart-ready analytics data for a deliberation from its LLM log file."""
-        import re as _re
-        logs_dir = Path(__file__).parent / "logs"
-
-        # Find matching log file
-        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
-        if not matching_files:
-            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
-
-        log_path = matching_files[0]
-        logs = _load_llm_log_file(str(log_path))
-        if not logs:
-            raise HTTPException(404, f"No log entries found in {log_path.name}")
-
-        # Extract topic from first prompt
-        topic = ""
-        if logs:
-            first_prompt = logs[0].get("prompt", "")
-            topic_match = _re.search(r"Topic:\s*(.+?)(\n|$)", first_prompt)
-            if topic_match:
-                topic = topic_match.group(1).strip()
-
-        # Build per-agent data
-        per_agent = []
-        models_count = {}
-        token_by_model = {}
-        total_tokens_in = 0
-        total_tokens_out = 0
-        total_duration = 0
-        timeline = []
-
-        position_dist = {"FOR": 0, "AGAINST": 0, "UNDECIDED": 0}
-
-        # Track agent history for position changes
-        agent_history = {}  # agent_name -> list of (round, position, timestamp)
-
-        for turn_index, entry in enumerate(logs):
-            agent_name = entry.get("agent_name", "Unknown")
-            model = entry.get("model_actual", entry.get("model_requested", "unknown"))
-            tokens_in = entry.get("tokens_in", 0)
-            tokens_out = entry.get("tokens_out", 0)
-            duration_ms = entry.get("duration_ms", 0)
-            timestamp = entry.get("timestamp", "")
-            response_text = entry.get("response", "")
-            prompt_text = entry.get("prompt", "")
-
-            # Extract round number from prompt
-            round_match = _re_module.search(r'round[:\s]+(\d+)', prompt_text, _re_module.IGNORECASE)
-            round_num = int(round_match.group(1)) if round_match else 1
-
-            # Parse structured outputs
-            parsed = _parse_structured_outputs(response_text)
-
-            position = parsed["vote"] or "UNDECIDED"
-            confidence = parsed["vote_confidence"]
-
-            # Accumulate
-            total_tokens_in += tokens_in
-            total_tokens_out += tokens_out
-            total_duration += duration_ms
-
-            models_count[model] = models_count.get(model, 0) + 1
-
-            if model not in token_by_model:
-                token_by_model[model] = {"in": 0, "out": 0}
-            token_by_model[model]["in"] += tokens_in
-            token_by_model[model]["out"] += tokens_out
-
-            position_dist[position] = position_dist.get(position, 0) + 1
-
-            per_agent.append({
-                "name": agent_name,
-                "model": model,
-                "tokens_in": tokens_in,
-                "tokens_out": tokens_out,
-                "duration_ms": duration_ms,
-                "position": position,
-                "confidence": confidence,
-                "claims": parsed["claims"],
-                "timestamp": timestamp,
-                "turn": turn_index,
-                "round": round_num,
-            })
-
-            timeline.append({
-                "timestamp": timestamp,
-                "agent": agent_name,
-                "tokens": tokens_out,
-                "duration_ms": duration_ms,
-            })
-
-            # Track agent position history by round
-            if agent_name not in agent_history:
-                agent_history[agent_name] = []
-            agent_history[agent_name].append({
-                "round": round_num,
-                "position": position,
-                "timestamp": timestamp,
-            })
-
-        total = len(logs)
-        avg_tokens_in = total_tokens_in / total if total else 0
-        avg_tokens_out = total_tokens_out / total if total else 0
-        avg_duration = total_duration / total if total else 0
-
-        # Compute position changes for each agent (by round)
-        position_changes = []
-        agent_positions_over_time = {}  # For visualization: agent -> [positions by round]
-
-        for agent_name, history in agent_history.items():
-            # Sort by round to ensure chronological order
-            history_sorted = sorted(history, key=lambda x: x["round"])
-            # Deduplicate by round (take last entry per round if multiple)
-            round_positions = {}
-            for entry in history_sorted:
-                round_positions[entry["round"]] = entry
-            history_deduped = sorted(round_positions.values(), key=lambda x: x["round"])
-
-            positions_list = []
-            prev_position = None
-            prev_round = None
-
-            for entry in history_deduped:
-                current_position = entry["position"]
-                current_round = entry["round"]
-                positions_list.append({
-                    "round": current_round,
-                    "position": current_position,
-                    "timestamp": entry["timestamp"],
-                })
-
-                if prev_position is not None and current_position != prev_position:
-                    position_changes.append({
-                        "agent": agent_name,
-                        "round": current_round,
-                        "from_round": prev_round,
-                        "from_position": prev_position,
-                        "to_position": current_position,
-                        "timestamp": entry["timestamp"],
-                    })
-                prev_position = current_position
-                prev_round = current_round
-
-            agent_positions_over_time[agent_name] = positions_list
-
-        # Sort position changes by round
-        position_changes.sort(key=lambda x: x["round"])
-
-        return {
-            "deliberation_id": deliberation_id,
-            "topic": topic,
-            "log_file": log_path.name,
-            "agent_summary": {
-                "total": total,
-                "models": models_count,
-                "avg_tokens_in": round(avg_tokens_in, 1),
-                "avg_tokens_out": round(avg_tokens_out, 1),
-                "avg_duration_ms": round(avg_duration, 1),
-            },
-            "position_distribution": position_dist,
-            "per_agent": per_agent,
-            "token_usage": {
-                "total_in": total_tokens_in,
-                "total_out": total_tokens_out,
-                "by_model": token_by_model,
-            },
-            "timeline": timeline,
-            "position_changes": position_changes,
-            "agent_positions_over_time": agent_positions_over_time,
-        }
-
-    @app.get("/api/deliberations/{deliberation_id}/analytics/export")
-    async def export_deliberation_analytics(deliberation_id: str):
-        """Export analytics data as CSV."""
-        import csv
-        import io
-
-        logs_dir = Path(__file__).parent / "logs"
-        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
-        if not matching_files:
-            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
-
-        logs = _load_llm_log_file(str(matching_files[0]))
-        if not logs:
-            raise HTTPException(404, "No log entries found")
-
-        output = io.StringIO()
-        fieldnames = [
-            "agent_name", "model", "tokens_in", "tokens_out",
-            "duration_ms", "timestamp", "position", "confidence",
-        ]
-        writer = csv.DictWriter(output, fieldnames=fieldnames)
-        writer.writeheader()
-
-        for entry in logs:
-            parsed = _parse_structured_outputs(entry.get("response", ""))
-            writer.writerow({
-                "agent_name": entry.get("agent_name", ""),
-                "model": entry.get("model_actual", entry.get("model_requested", "")),
-                "tokens_in": entry.get("tokens_in", 0),
-                "tokens_out": entry.get("tokens_out", 0),
-                "duration_ms": entry.get("duration_ms", 0),
-                "timestamp": entry.get("timestamp", ""),
-                "position": parsed["vote"] or "UNDECIDED",
-                "confidence": parsed["vote_confidence"] or "",
-            })
-
-        output.seek(0)
-        return StreamingResponse(
-            iter([output.getvalue()]),
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": f"attachment; filename=analytics_{deliberation_id}.csv"
-            },
-        )
 
     @app.post("/api/quorum/create")
     async def create_quorum(config: dict = Body(...)):
@@ -5534,144 +5225,6 @@ def create_advanced_app(orchestrator) -> FastAPI:
         except WebSocketDisconnect:
             if websocket in orch.websockets:
                 orch.websockets.remove(websocket)
-
-    # ─── Analytics endpoints (reuse helpers from create_app) ───
-    @app.get("/api/logs/deliberations")
-    async def adv_list_log_deliberations():
-        import re as _re
-        logs_dir = Path(__file__).parent / "logs"
-        deliberations = []
-        if not logs_dir.exists():
-            return {"deliberations": []}
-        for llm_log in sorted(logs_dir.glob("*.llm_logs.json"), key=lambda p: p.stat().st_mtime, reverse=True):
-            fname = llm_log.stem.replace(".llm_logs", "")
-            m = _re.match(r"deliberation_(.+?)_([0-9a-f]{8})_(\d{8})_(\d{6})", fname)
-            if m:
-                scenario_name, delib_id = m.group(1), m.group(2)
-                date_str, time_str = m.group(3), m.group(4)
-                date_formatted = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
-            else:
-                scenario_name = delib_id = fname
-                date_formatted = time_str = ""
-            plain_log = logs_dir / f"{fname}.log"
-            deliberations.append({
-                "id": delib_id, "filename": fname, "name": scenario_name,
-                "date": date_formatted,
-                "time": f"{time_str[:2]}:{time_str[2:4]}:{time_str[4:6]}" if len(time_str) == 6 else time_str,
-                "log_file": str(plain_log) if plain_log.exists() else None,
-                "llm_log_file": str(llm_log),
-            })
-        return {"deliberations": deliberations}
-
-    @app.get("/api/deliberations/{deliberation_id}/analytics")
-    async def adv_get_deliberation_analytics(deliberation_id: str):
-        import re as _re
-        logs_dir = Path(__file__).parent / "logs"
-        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
-        if not matching_files:
-            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
-        log_path = matching_files[0]
-        logs = _load_llm_log_file(str(log_path))
-        if not logs:
-            raise HTTPException(404, f"No log entries found in {log_path.name}")
-        topic = ""
-        if logs:
-            topic_match = _re.search(r"Topic:\s*(.+?)(\n|$)", logs[0].get("prompt", ""))
-            if topic_match:
-                topic = topic_match.group(1).strip()
-        per_agent, models_count, token_by_model = [], {}, {}
-        total_tokens_in = total_tokens_out = total_duration = 0
-        timeline = []
-        position_dist = {"FOR": 0, "AGAINST": 0, "UNDECIDED": 0}
-        agent_history = {}  # agent_name -> list of (round, position, timestamp)
-        for turn_index, entry in enumerate(logs):
-            agent_name = entry.get("agent_name", "Unknown")
-            model = entry.get("model_actual", entry.get("model_requested", "unknown"))
-            tokens_in, tokens_out = entry.get("tokens_in", 0), entry.get("tokens_out", 0)
-            duration_ms = entry.get("duration_ms", 0)
-            timestamp = entry.get("timestamp", "")
-            prompt_text = entry.get("prompt", "")
-            # Extract round number from prompt
-            round_match = _re.search(r'round[:\s]+(\d+)', prompt_text, _re.IGNORECASE)
-            round_num = int(round_match.group(1)) if round_match else 1
-            parsed = _parse_structured_outputs(entry.get("response", ""))
-            position = parsed["vote"] or "UNDECIDED"
-            confidence = parsed["vote_confidence"]
-            total_tokens_in += tokens_in; total_tokens_out += tokens_out; total_duration += duration_ms
-            models_count[model] = models_count.get(model, 0) + 1
-            if model not in token_by_model:
-                token_by_model[model] = {"in": 0, "out": 0}
-            token_by_model[model]["in"] += tokens_in; token_by_model[model]["out"] += tokens_out
-            position_dist[position] = position_dist.get(position, 0) + 1
-            per_agent.append({"name": agent_name, "model": model, "tokens_in": tokens_in,
-                "tokens_out": tokens_out, "duration_ms": duration_ms, "position": position,
-                "confidence": confidence, "claims": parsed["claims"], "timestamp": timestamp, "turn": turn_index, "round": round_num})
-            timeline.append({"timestamp": timestamp, "agent": agent_name, "tokens": tokens_out, "duration_ms": duration_ms})
-            # Track agent position history by round
-            if agent_name not in agent_history:
-                agent_history[agent_name] = []
-            agent_history[agent_name].append({"round": round_num, "position": position, "timestamp": timestamp})
-        total = len(logs)
-        # Compute position changes by round
-        position_changes = []
-        agent_positions_over_time = {}
-        for agent_name, history in agent_history.items():
-            history_sorted = sorted(history, key=lambda x: x["round"])
-            # Deduplicate by round (take last entry per round if multiple)
-            round_positions = {}
-            for ent in history_sorted:
-                round_positions[ent["round"]] = ent
-            history_deduped = sorted(round_positions.values(), key=lambda x: x["round"])
-            positions_list = []
-            prev_position = None
-            prev_round = None
-            for ent in history_deduped:
-                current_position = ent["position"]
-                current_round = ent["round"]
-                positions_list.append({"round": current_round, "position": current_position, "timestamp": ent["timestamp"]})
-                if prev_position is not None and current_position != prev_position:
-                    position_changes.append({"agent": agent_name, "round": current_round, "from_round": prev_round,
-                        "from_position": prev_position, "to_position": current_position, "timestamp": ent["timestamp"]})
-                prev_position = current_position
-                prev_round = current_round
-            agent_positions_over_time[agent_name] = positions_list
-        position_changes.sort(key=lambda x: x["round"])
-        return {
-            "deliberation_id": deliberation_id, "topic": topic, "log_file": log_path.name,
-            "agent_summary": {"total": total, "models": models_count,
-                "avg_tokens_in": round(total_tokens_in / total, 1) if total else 0,
-                "avg_tokens_out": round(total_tokens_out / total, 1) if total else 0,
-                "avg_duration_ms": round(total_duration / total, 1) if total else 0},
-            "position_distribution": position_dist,
-            "per_agent": per_agent,
-            "token_usage": {"total_in": total_tokens_in, "total_out": total_tokens_out, "by_model": token_by_model},
-            "timeline": timeline,
-            "position_changes": position_changes,
-            "agent_positions_over_time": agent_positions_over_time,
-        }
-
-    @app.get("/api/deliberations/{deliberation_id}/analytics/export")
-    async def adv_export_analytics(deliberation_id: str):
-        import csv, io
-        logs_dir = Path(__file__).parent / "logs"
-        matching_files = list(logs_dir.glob(f"*{deliberation_id}*.llm_logs.json"))
-        if not matching_files:
-            raise HTTPException(404, f"No log file found for deliberation {deliberation_id}")
-        logs = _load_llm_log_file(str(matching_files[0]))
-        if not logs:
-            raise HTTPException(404, "No log entries found")
-        output = io.StringIO()
-        writer = csv.DictWriter(output, fieldnames=["agent_name", "model", "tokens_in", "tokens_out", "duration_ms", "timestamp", "position", "confidence"])
-        writer.writeheader()
-        for entry in logs:
-            parsed = _parse_structured_outputs(entry.get("response", ""))
-            writer.writerow({"agent_name": entry.get("agent_name", ""), "model": entry.get("model_actual", entry.get("model_requested", "")),
-                "tokens_in": entry.get("tokens_in", 0), "tokens_out": entry.get("tokens_out", 0),
-                "duration_ms": entry.get("duration_ms", 0), "timestamp": entry.get("timestamp", ""),
-                "position": parsed["vote"] or "UNDECIDED", "confidence": parsed["vote_confidence"] or ""})
-        output.seek(0)
-        return StreamingResponse(iter([output.getvalue()]), media_type="text/csv",
-            headers={"Content-Disposition": f"attachment; filename=analytics_{deliberation_id}.csv"})
 
     return app
 

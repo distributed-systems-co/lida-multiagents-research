@@ -69,12 +69,12 @@ deliberation:
     coalition_threshold: 0.33  # Min for coalition recognition
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# AGENT CONFIGURATION - 24 DIVERSE AGENTS
+# AGENT CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
 agents:
-  # Number of agents to spawn (18-24 supported)
-  count: 24
+  # Number of agents to spawn (overridden by scenario personas count)
+  count: 10
 
   # Use real-world personas (from src/manipulation/personas/)
   use_real_personas: true
