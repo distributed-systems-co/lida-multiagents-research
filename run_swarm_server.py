@@ -3497,7 +3497,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
     @app.get("/api/deliberations/{deliberation_id}/logs")
     async def get_deliberation_logs(
         deliberation_id: str,
-        limit: int = Query(100, ge=1, le=1000),
+        limit: int = Query(10000, ge=1, le=10000),
         offset: int = Query(0, ge=0),
     ):
         """Get logs for a specific deliberation."""
@@ -3532,7 +3532,7 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         try:
             from src.api.datasets import DatasetStore
             store = DatasetStore()
-            logs = store.get_llm_logs(limit=1000, deliberation_id=deliberation_id)
+            logs = store.get_llm_logs(limit=10000, deliberation_id=deliberation_id)
         except Exception:
             logs = []
 
