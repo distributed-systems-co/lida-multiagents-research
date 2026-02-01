@@ -386,6 +386,42 @@ class Deliberation:
     scenario_name: Optional[str] = None
     config: Optional[Dict] = None
 
+    # Per-deliberation position tracking (isolated from other deliberations)
+    agent_positions: Dict[str, str] = field(default_factory=dict)  # agent_id -> FOR/AGAINST/UNDECIDED
+    position_history: Dict[str, List[str]] = field(default_factory=dict)  # agent_id -> [positions]
+    position_confidence: Dict[str, float] = field(default_factory=dict)  # agent_id -> confidence
+
+    # Per-deliberation social dynamics (isolated from other deliberations)
+    active_coalitions: List[Dict] = field(default_factory=list)
+    coalition_history: List[Dict] = field(default_factory=list)
+    agent_influence: Dict[str, float] = field(default_factory=dict)
+    belief_states: Dict[str, Any] = field(default_factory=dict)
+
+    # Per-deliberation agent state snapshots (isolated from other deliberations)
+    agent_states: Dict[str, Dict] = field(default_factory=dict)  # {agent_id: {status, vote, thought}}
+
+    def get_agent_state(self, agent_id: str) -> Dict:
+        """Get agent's state for this deliberation."""
+        if agent_id not in self.agent_states:
+            self.agent_states[agent_id] = {
+                "status": "idle",
+                "current_vote": None,
+                "current_thought": "",
+            }
+        return self.agent_states[agent_id]
+
+    def set_agent_status(self, agent_id: str, status: str):
+        """Set agent's status for this deliberation."""
+        self.get_agent_state(agent_id)["status"] = status
+
+    def set_agent_vote(self, agent_id: str, vote: str):
+        """Set agent's vote for this deliberation."""
+        self.get_agent_state(agent_id)["current_vote"] = vote
+
+    def set_agent_thought(self, agent_id: str, thought: str):
+        """Set agent's current thought for this deliberation."""
+        self.get_agent_state(agent_id)["current_thought"] = thought
+
     def to_dict(self, include_messages: bool = False) -> dict:
         result = {
             "id": self.id,
@@ -401,6 +437,10 @@ class Deliberation:
             "started_at": self.started_at,
             "completed_at": self.completed_at,
             "scenario_name": self.scenario_name,
+            # Per-deliberation state
+            "agent_positions": dict(self.agent_positions),
+            "agent_states": dict(self.agent_states),
+            "active_coalitions": list(self.active_coalitions),
         }
         if include_messages:
             # Include recent messages (last 100) for UI
@@ -1220,20 +1260,42 @@ IMPORTANT - You are the PERSUADER in this debate:
 
         logger.info(f"Initialized influence scores for {len(self.agents)} agents")
 
-    def sync_status_to_redis(self):
-        """Sync deliberation status to Redis for cross-worker consistency."""
+    def sync_status_to_redis(self, delib: Optional[Deliberation] = None):
+        """Sync deliberation status to Redis for cross-worker consistency.
+
+        Args:
+            delib: Optional specific deliberation. If not provided, falls back to
+                   legacy self.* state for backward compatibility.
+        """
         if not self.redis_client:
             return
         try:
-            status = {
-                "active": self.deliberation_active,
-                "phase": self.phase,
-                "topic": self.current_topic,
-                "paused": self.paused,
-                "consensus": self.consensus,
-                "agent_count": len(self.agents),
-                "total_messages": self.total_messages,
-            }
+            if delib:
+                status = {
+                    "deliberation_id": delib.id,
+                    "active": delib.status == "active",
+                    "phase": delib.phase,
+                    "topic": delib.topic,
+                    "paused": self.paused,
+                    "consensus": dict(delib.consensus),
+                    "agent_count": len(self.agents),
+                    "total_messages": len(delib.messages),
+                    "current_round": delib.current_round,
+                    "max_rounds": delib.max_rounds,
+                }
+                # Store per-deliberation status with deliberation ID as key
+                self.redis_client.set(f"delib:status:{delib.id}", json.dumps(status), ex=300)
+            else:
+                # Legacy fallback
+                status = {
+                    "active": self.deliberation_active,
+                    "phase": self.phase,
+                    "topic": self.current_topic,
+                    "paused": self.paused,
+                    "consensus": self.consensus,
+                    "agent_count": len(self.agents),
+                    "total_messages": self.total_messages,
+                }
             self.redis_client.set("delib:status", json.dumps(status), ex=300)  # 5 min TTL
         except Exception as e:
             logger.warning(f"Failed to sync status to Redis: {e}")
@@ -1250,16 +1312,26 @@ IMPORTANT - You are the PERSUADER in this debate:
             logger.warning(f"Failed to get status from Redis: {e}")
         return None
 
-    def detect_coalitions(self) -> List[Dict]:
-        """Detect emergent coalitions based on position alignment and relationships."""
+    def detect_coalitions(self, delib: Optional[Deliberation] = None) -> List[Dict]:
+        """Detect emergent coalitions based on position alignment and relationships.
+
+        Args:
+            delib: Optional specific deliberation to use for position tracking.
+                   If not provided, falls back to legacy self.agent_positions.
+        """
         if not self.coalitions_enabled:
             return []
 
         coalitions = []
         positions = {"FOR": [], "AGAINST": [], "UNDECIDED": []}
 
+        # Use per-deliberation positions if available, otherwise fall back to legacy
+        agent_positions = delib.agent_positions if delib else self.agent_positions
+        agent_influence = delib.agent_influence if delib else self.agent_influence
+        current_round = delib.current_round if delib else self.current_round
+
         # Group agents by position
-        for agent_id, position in self.agent_positions.items():
+        for agent_id, position in agent_positions.items():
             positions[position].append(agent_id)
 
         # Check each position group for coalition formation
@@ -1283,12 +1355,16 @@ IMPORTANT - You are the PERSUADER in this debate:
                         "members": agents,
                         "size": len(agents),
                         "cohesion": avg_affinity,
-                        "influence": sum(self.agent_influence.get(a, 1.0) for a in agents),
-                        "formed_at": self.current_round,
+                        "influence": sum(agent_influence.get(a, 1.0) for a in agents),
+                        "formed_at": current_round,
                     }
                     coalitions.append(coalition)
 
-        self.active_coalitions = coalitions
+        # Store coalitions in the appropriate location
+        if delib:
+            delib.active_coalitions = coalitions
+        else:
+            self.active_coalitions = coalitions
         return coalitions
 
     def calculate_belief_shift(self, agent_id: str, influencer_id: str, argument_strength: float) -> float:
@@ -1326,35 +1402,58 @@ IMPORTANT - You are the PERSUADER in this debate:
 
         return max(0.0, min(1.0, susceptibility))
 
-    def update_influence_scores(self):
-        """Update influence scores based on round outcomes."""
+    def update_influence_scores(self, delib: Optional[Deliberation] = None):
+        """Update influence scores based on round outcomes.
+
+        Args:
+            delib: Optional specific deliberation to use for consensus/positions.
+                   If not provided, falls back to legacy self.consensus/self.agent_positions.
+        """
         if not self.influence_enabled:
             return
 
+        # Use per-deliberation state if available, otherwise fall back to legacy
+        consensus = delib.consensus if delib else self.consensus
+        agent_positions = delib.agent_positions if delib else self.agent_positions
+        agent_influence = delib.agent_influence if delib else self.agent_influence
+
         # Decay all influence slightly
-        for agent_id in self.agent_influence:
-            self.agent_influence[agent_id] *= (1.0 - self.influence_decay_rate)
+        for agent_id in agent_influence:
+            agent_influence[agent_id] *= (1.0 - self.influence_decay_rate)
 
         # Boost influence for agents whose position gained support
-        if self.consensus:
-            winning_position = max(self.consensus.items(), key=lambda x: x[1])[0] if self.consensus else None
-            for agent_id, position in self.agent_positions.items():
+        if consensus:
+            winning_position = max(consensus.items(), key=lambda x: x[1])[0] if consensus else None
+            for agent_id, position in agent_positions.items():
                 if position == winning_position:
-                    self.agent_influence[agent_id] += self.influence_validation_boost
-                    self.agent_influence[agent_id] = min(2.0, self.agent_influence[agent_id])
+                    agent_influence[agent_id] = agent_influence.get(agent_id, 1.0) + self.influence_validation_boost
+                    agent_influence[agent_id] = min(2.0, agent_influence[agent_id])
 
-    async def broadcast_dynamics_update(self):
-        """Broadcast social dynamics state to all clients."""
+    async def broadcast_dynamics_update(self, delib: Optional[Deliberation] = None):
+        """Broadcast social dynamics state to all clients.
+
+        Args:
+            delib: Optional specific deliberation to use for state.
+                   If not provided, falls back to legacy self.* state.
+        """
+        # Use per-deliberation state if available, otherwise fall back to legacy
+        active_coalitions = delib.active_coalitions if delib else self.active_coalitions
+        agent_influence = delib.agent_influence if delib else self.agent_influence
+        agent_positions = delib.agent_positions if delib else self.agent_positions
+        position_confidence = delib.position_confidence if delib else self.position_confidence
+
         dynamics_data = {
-            "coalitions": self.active_coalitions,
+            "deliberation_id": delib.id if delib else self.active_deliberation_id,
+            "coalitions": active_coalitions,
             "influence_scores": {
                 agent_id: {
                     "name": self.agents[agent_id].name,
                     "influence": score,
-                    "position": self.agent_positions.get(agent_id, "UNDECIDED"),
-                    "confidence": self.position_confidence.get(agent_id, 0.7),
+                    "position": agent_positions.get(agent_id, "UNDECIDED"),
+                    "confidence": position_confidence.get(agent_id, 0.7),
                 }
-                for agent_id, score in self.agent_influence.items()
+                for agent_id, score in agent_influence.items()
+                if agent_id in self.agents
             },
             "relationships_active": len([
                 1 for a1 in self.relationship_matrix
@@ -1416,10 +1515,27 @@ IMPORTANT - You are the PERSUADER in this debate:
         for ws in disconnected:
             self.websockets.remove(ws)
 
-    async def broadcast_agents_update(self):
-        """Send agents update."""
+    async def broadcast_agents_update(self, delib: Optional[Deliberation] = None):
+        """Send agents update.
+
+        Args:
+            delib: Optional deliberation to use for per-deliberation agent states.
+                   If provided, merges per-deliberation state into agent data.
+        """
+        agents_data = []
+        for agent in self.agents.values():
+            agent_dict = agent.to_dict()
+            # If we have per-deliberation state, include it
+            if delib and agent.id in delib.agent_states:
+                delib_state = delib.agent_states[agent.id]
+                agent_dict["delib_status"] = delib_state.get("status", agent.status)
+                agent_dict["delib_vote"] = delib_state.get("current_vote")
+                agent_dict["delib_thought"] = delib_state.get("current_thought", "")
+            agents_data.append(agent_dict)
+
         await self.broadcast("agents_update", {
-            "agents": [a.to_dict() for a in self.agents.values()]
+            "agents": agents_data,
+            "deliberation_id": delib.id if delib else self.active_deliberation_id,
         })
 
     async def broadcast_stats_update(self):
@@ -1440,38 +1556,64 @@ IMPORTANT - You are the PERSUADER in this debate:
         """Broadcast a tool call event."""
         await self.broadcast("tool_call", {"tool_call": call.to_dict()})
 
-    async def broadcast_deliberation(self):
-        """Broadcast deliberation state."""
-        # Get values from current deliberation if available, fall back to orchestrator's
-        vote_history = []
-        current_round = self.current_round
-        max_rounds = self.max_rounds
-        if self.active_deliberation_id and self.active_deliberation_id in self.deliberations:
+    async def broadcast_deliberation(self, delib: Optional[Deliberation] = None):
+        """Broadcast deliberation state.
+
+        Args:
+            delib: Optional specific deliberation to broadcast. If not provided,
+                   falls back to active_deliberation_id for backward compatibility.
+        """
+        # Use provided deliberation or fall back to active one
+        if delib is None and self.active_deliberation_id and self.active_deliberation_id in self.deliberations:
             delib = self.deliberations[self.active_deliberation_id]
-            vote_history = list(delib.vote_history)
-            current_round = delib.current_round
-            max_rounds = delib.max_rounds
 
-        await self.broadcast("deliberation_update", {
-            "active": self.deliberation_active,
-            "phase": self.phase,
-            "topic": self.current_topic,
-            "round": current_round,
-            "current_round": current_round,
-            "max_rounds": max_rounds,
-            "vote_history": vote_history,
-        })
+        if delib:
+            await self.broadcast("deliberation_update", {
+                "deliberation_id": delib.id,
+                "active": delib.status == "active",
+                "phase": delib.phase,
+                "topic": delib.topic,
+                "round": delib.current_round,
+                "current_round": delib.current_round,
+                "max_rounds": delib.max_rounds,
+                "consensus": dict(delib.consensus),
+                "vote_history": list(delib.vote_history),
+                "agent_positions": dict(delib.agent_positions),
+            })
+        else:
+            # Legacy fallback for backward compatibility
+            await self.broadcast("deliberation_update", {
+                "active": self.deliberation_active,
+                "phase": self.phase,
+                "topic": self.current_topic,
+                "round": self.current_round,
+                "current_round": self.current_round,
+                "max_rounds": self.max_rounds,
+                "vote_history": [],
+            })
         # Sync to Redis for cross-worker status queries
-        self.sync_status_to_redis()
+        self.sync_status_to_redis(delib)
 
-    async def broadcast_consensus(self):
-        """Broadcast consensus state."""
-        await self.broadcast("consensus_update", {
-            "consensus": self.consensus,
-            "deliberation_id": self.active_deliberation_id,
-        })
+    async def broadcast_consensus(self, delib: Optional[Deliberation] = None):
+        """Broadcast consensus state.
+
+        Args:
+            delib: Optional specific deliberation. If not provided, falls back to
+                   legacy self.consensus for backward compatibility.
+        """
+        if delib:
+            await self.broadcast("consensus_update", {
+                "consensus": dict(delib.consensus),
+                "deliberation_id": delib.id,
+            })
+        else:
+            # Legacy fallback
+            await self.broadcast("consensus_update", {
+                "consensus": self.consensus,
+                "deliberation_id": self.active_deliberation_id,
+            })
         # Sync to Redis for cross-worker status queries
-        self.sync_status_to_redis()
+        self.sync_status_to_redis(delib)
 
     async def broadcast_stream_token(self, agent_id: str, token: str, done: bool = False):
         """Broadcast a streaming token from an agent."""
@@ -1506,14 +1648,30 @@ IMPORTANT - You are the PERSUADER in this debate:
             "belief_state": belief_state,
         })
 
-    async def broadcast_deliberation_state(self):
-        """Broadcast full deliberation state including claims and votes."""
+    async def broadcast_deliberation_state(self, delib: Optional[Deliberation] = None):
+        """Broadcast full deliberation state including claims and votes.
+
+        Args:
+            delib: Optional specific deliberation. If not provided, falls back to
+                   legacy self.current_topic/self.phase for backward compatibility.
+        """
         state = self.tool_handler.get_state_summary()
-        await self.broadcast("deliberation_state", {
-            "state": state,
-            "topic": self.current_topic,
-            "phase": self.phase,
-        })
+        if delib:
+            await self.broadcast("deliberation_state", {
+                "state": state,
+                "deliberation_id": delib.id,
+                "topic": delib.topic,
+                "phase": delib.phase,
+                "consensus": dict(delib.consensus),
+                "agent_positions": dict(delib.agent_positions),
+            })
+        else:
+            # Legacy fallback
+            await self.broadcast("deliberation_state", {
+                "state": state,
+                "topic": self.current_topic,
+                "phase": self.phase,
+            })
 
     def add_message(
         self,
@@ -2584,43 +2742,48 @@ Your confidence should change based on argument quality:
         except ImportError:
             pass
 
-        # Reset per-deliberation state (delib.messages is already fresh from Deliberation creation)
-        # Note: We don't clear self.messages as it may contain messages from parallel deliberations
-        # The prompt builders now use delib.messages instead to isolate deliberations
-        self.agent_positions = {}
+        # Per-deliberation state is already fresh from Deliberation creation
+        # delib.agent_positions, delib.consensus, etc. are all empty dicts
+        # We do NOT reset self.* state to avoid interfering with parallel deliberations
 
-        # Update legacy state for backward compatibility
+        # Update legacy state for backward compatibility (single-deliberation mode)
+        # These are used by legacy code paths but should be phased out
         self.current_topic = topic
         self.deliberation_active = True
-        delib.consensus = {}  # Use per-deliberation consensus
-        self.consensus = delib.consensus  # Point legacy reference to it
         self.current_round = 0
         agents = list(self.agents.values())
 
-        # Reset agent state for new deliberation
+        # Initialize per-deliberation agent states
         for agent in agents:
+            delib.get_agent_state(agent.id)  # Initialize state for this agent
+            # Also reset shared agent state for backward compatibility
             agent.current_vote = None
 
-        await self.broadcast_deliberation()
+        await self.broadcast_deliberation(delib)
 
         # Phase 1: Analysis
-        self.phase = "🔍 analyzing"
-        delib.phase = self.phase
-        await self.broadcast_deliberation()
+        delib.phase = "🔍 analyzing"
+        self.phase = delib.phase  # Legacy compatibility
+        await self.broadcast_deliberation(delib)
 
         for agent in agents:
+            delib.set_agent_status(agent.id, "analyzing")
+            delib.set_agent_thought(agent.id, f"Processing: {topic[:30]}...")
+            delib.set_agent_vote(agent.id, None)
+            # Also update shared agent for backward compatibility with UI
             agent.status = "analyzing"
             agent.current_thought = f"Processing: {topic[:30]}..."
             agent.current_vote = None
 
-        await self.broadcast_agents_update()
+        await self.broadcast_agents_update(delib)
 
         # Tool research for some agents
         if self.tools_mode:
             research_agents = [a for a in agents if a.mcp_connected][:3]
             for agent in research_agents:
-                agent.status = "researching"
-                await self.broadcast_agents_update()
+                delib.set_agent_status(agent.id, "researching")
+                agent.status = "researching"  # Legacy compatibility
+                await self.broadcast_agents_update(delib)
 
                 if agent.available_tools:
                     tool = random.choice(agent.available_tools)
@@ -2634,14 +2797,15 @@ Your confidence should change based on argument quality:
         await asyncio.sleep(1)
 
         # Phase 2: Initial positions with structured claims (parallel)
-        self.phase = "📢 opening statements"
-        delib.phase = self.phase
-        await self.broadcast_deliberation()
+        delib.phase = "📢 opening statements"
+        self.phase = delib.phase  # Legacy compatibility
+        await self.broadcast_deliberation(delib)
 
         # Set all agents to speaking status
         for agent in agents:
-            agent.status = "speaking"
-        await self.broadcast_agents_update()
+            delib.set_agent_status(agent.id, "speaking")
+            agent.status = "speaking"  # Legacy compatibility
+        await self.broadcast_agents_update(delib)
 
         # Generate all initial positions in parallel, adding messages as they complete
         async def get_initial_position(agent):
@@ -2669,7 +2833,8 @@ State your stance clearly and give one key reason."""
             )
             await self.broadcast_structured_output(agent.id, "claim", claim_result)
 
-            agent.current_thought = response[:60]
+            delib.set_agent_thought(agent.id, response[:60])
+            agent.current_thought = response[:60]  # Legacy compatibility
             self.add_message(agent.id, "broadcast", "position", response, agent.model,
                            deliberation_id=deliberation_id)
 
@@ -2679,8 +2844,8 @@ State your stance clearly and give one key reason."""
         position_tasks = [get_initial_position(agent) for agent in agents]
         await asyncio.gather(*position_tasks)
 
-        await self.broadcast_agents_update()
-        await self.broadcast_deliberation_state()
+        await self.broadcast_agents_update(delib)
+        await self.broadcast_deliberation_state(delib)
         await asyncio.sleep(0.5)
 
         # Helper to build full discussion context for debate
@@ -2740,9 +2905,9 @@ State your stance clearly and give one key reason."""
 
             # Debate phase within round - each agent speaks once
             if len(agents) >= 2:
-                self.phase = f"🔄 debating (round {voting_round}/{max_voting_rounds})"
-                delib.phase = self.phase
-                await self.broadcast_deliberation()
+                delib.phase = f"🔄 debating (round {voting_round}/{max_voting_rounds})"
+                self.phase = delib.phase  # Legacy compatibility
+                await self.broadcast_deliberation(delib)
 
                 # Shuffle agents so speaking order varies each round
                 debate_order = list(agents)
@@ -2752,8 +2917,9 @@ State your stance clearly and give one key reason."""
                     # Pick a random other agent to address
                     a2 = random.choice([a for a in agents if a.id != a1.id])
 
-                    a1.status = "speaking"
-                    await self.broadcast_agents_update()
+                    delib.set_agent_status(a1.id, "speaking")
+                    a1.status = "speaking"  # Legacy compatibility
+                    await self.broadcast_agents_update(delib)
 
                     discussion_context = build_discussion_context()
                     prompt = f"""Topic: {topic}
@@ -2765,20 +2931,22 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
 
                     use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
                     response = await self.generate_response(a1, prompt, use_tools=use_tools, deliberation_id=deliberation_id)
-                    a1.current_thought = response[:60]
+                    delib.set_agent_thought(a1.id, response[:60])
+                    a1.current_thought = response[:60]  # Legacy compatibility
                     self.add_message(a1.id, a2.id, "debate", response, a1.model,
                                    deliberation_id=deliberation_id)
 
-                    a1.status = "idle"
-                    await self.broadcast_agents_update()
+                    delib.set_agent_status(a1.id, "idle")
+                    a1.status = "idle"  # Legacy compatibility
+                    await self.broadcast_agents_update(delib)
                     await asyncio.sleep(0.3)
 
             # Voting phase within round
-            self.phase = f"🗳️ voting (round {voting_round}/{max_voting_rounds})"
-            delib.phase = self.phase
-            await self.broadcast_deliberation()
+            delib.phase = f"🗳️ voting (round {voting_round}/{max_voting_rounds})"
+            self.phase = delib.phase  # Legacy compatibility
+            await self.broadcast_deliberation(delib)
             delib.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
-            self.consensus = delib.consensus  # Point legacy reference to per-deliberation consensus
+            # Note: We no longer alias self.consensus = delib.consensus to avoid cross-contamination
 
             discussion_summary = build_discussion_summary()
             round_votes = []
@@ -2790,8 +2958,9 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
 
             # Set all agents to voting status
             for agent in agents:
-                agent.status = "voting"
-            await self.broadcast_agents_update()
+                delib.set_agent_status(agent.id, "voting")
+                agent.status = "voting"  # Legacy compatibility
+            await self.broadcast_agents_update(delib)
 
             # Generate a single agent's vote
             async def get_agent_vote(agent):
@@ -2851,19 +3020,22 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                 )
                 await self.broadcast_structured_output(agent.id, "vote", vote_result)
 
-                agent.current_vote = display_vote
-                agent.current_thought = f"Voted: {display_vote} ({confidence*100:.0f}%)"
+                delib.set_agent_vote(agent.id, display_vote)
+                delib.set_agent_thought(agent.id, f"Voted: {display_vote} ({confidence*100:.0f}%)")
+                agent.current_vote = display_vote  # Legacy compatibility
+                agent.current_thought = f"Voted: {display_vote} ({confidence*100:.0f}%)"  # Legacy compatibility
                 self.add_message(agent.id, "broadcast", "vote", f"Casts vote: {display_vote} - {reasoning[:60]}...", agent.model,
                                deliberation_id=deliberation_id)
 
-                # Map votes to positions for persuader game
-                self.agent_positions[agent.id] = vote_to_position.get(vote, "UNDECIDED")
-                if agent.id not in self.position_history:
-                    self.position_history[agent.id] = []
-                self.position_history[agent.id].append(self.agent_positions[agent.id])
+                # Map votes to positions for this deliberation (isolated)
+                position = vote_to_position.get(vote, "UNDECIDED")
+                delib.agent_positions[agent.id] = position
+                if agent.id not in delib.position_history:
+                    delib.position_history[agent.id] = []
+                delib.position_history[agent.id].append(position)
 
-            await self.broadcast_agents_update()
-            await self.broadcast_consensus()
+            await self.broadcast_agents_update(delib)
+            await self.broadcast_consensus(delib)
 
             # Save this round's votes to vote history with full reasoning
             round_vote_summary = {
@@ -2882,16 +3054,16 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                 "timestamp": time.time(),
             }
             delib.vote_history.append(round_vote_summary)
-            logger.info(f"Round {voting_round} vote history saved: {delib.consensus}")
+            logger.info(f"[{deliberation_id[:8]}] Round {voting_round} vote history saved: {delib.consensus}")
 
-            await self.broadcast_deliberation_state()
+            await self.broadcast_deliberation_state(delib)
 
             # Between rounds (except final): run persuasion debate to try to build consensus toward SUPPORT
             if not is_final_round and len(agents) >= 2:
-                self.phase = f"💬 persuasion (after round {voting_round})"
-                delib.phase = self.phase
-                await self.broadcast_deliberation()
-                logger.info(f"Running persuasion round after voting round {voting_round}")
+                delib.phase = f"💬 persuasion (after round {voting_round})"
+                self.phase = delib.phase  # Legacy compatibility
+                await self.broadcast_deliberation(delib)
+                logger.info(f"[{deliberation_id[:8]}] Running persuasion round after voting round {voting_round}")
 
                 # Helper to build full discussion context
                 def build_extended_context() -> str:
@@ -2915,8 +3087,9 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                     persuader_agent = random.choice([v["agent"] for v in support_voters])
                     target_names = ", ".join([v["agent"].name for v in oppose_voters[:3]])
 
-                    persuader_agent.status = "persuading"
-                    await self.broadcast_agents_update()
+                    delib.set_agent_status(persuader_agent.id, "persuading")
+                    persuader_agent.status = "persuading"  # Legacy compatibility
+                    await self.broadcast_agents_update(delib)
 
                     oppose_reasons = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in oppose_voters[:3]])
 
@@ -2933,7 +3106,8 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
                     persuasion_response = await self.generate_response(
                         persuader_agent, persuasion_prompt, use_tools=False, deliberation_id=deliberation_id
                     )
-                    persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."
+                    delib.set_agent_thought(persuader_agent.id, f"Persuading: {persuasion_response[:50]}...")
+                    persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."  # Legacy compatibility
                     self.add_message(
                         persuader_agent.id, "broadcast", "persuasion",
                         f"[FOR → {target_names}] {persuasion_response}",
@@ -2941,8 +3115,9 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
                         deliberation_id=deliberation_id
                     )
 
-                    persuader_agent.status = "idle"
-                    await self.broadcast_agents_update()
+                    delib.set_agent_status(persuader_agent.id, "idle")
+                    persuader_agent.status = "idle"  # Legacy compatibility
+                    await self.broadcast_agents_update(delib)
                     await asyncio.sleep(0.5)
 
                 # OPPOSE persuader tries to convince SUPPORT voters
@@ -2950,8 +3125,9 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
                     persuader_agent = random.choice([v["agent"] for v in oppose_voters])
                     target_names = ", ".join([v["agent"].name for v in support_voters[:3]])
 
-                    persuader_agent.status = "persuading"
-                    await self.broadcast_agents_update()
+                    delib.set_agent_status(persuader_agent.id, "persuading")
+                    persuader_agent.status = "persuading"  # Legacy compatibility
+                    await self.broadcast_agents_update(delib)
 
                     support_reasons = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in support_voters[:3]])
 
@@ -2968,7 +3144,8 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
                     persuasion_response = await self.generate_response(
                         persuader_agent, persuasion_prompt, use_tools=False, deliberation_id=deliberation_id
                     )
-                    persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."
+                    delib.set_agent_thought(persuader_agent.id, f"Persuading: {persuasion_response[:50]}...")
+                    persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."  # Legacy compatibility
                     self.add_message(
                         persuader_agent.id, "broadcast", "persuasion",
                         f"[AGAINST → {target_names}] {persuasion_response}",
@@ -2976,26 +3153,29 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
                         deliberation_id=deliberation_id
                     )
 
-                    persuader_agent.status = "idle"
-                    await self.broadcast_agents_update()
+                    delib.set_agent_status(persuader_agent.id, "idle")
+                    persuader_agent.status = "idle"  # Legacy compatibility
+                    await self.broadcast_agents_update(delib)
                     await asyncio.sleep(0.5)
 
             # Log round completion
             support_pct = (delib.consensus.get('Support', 0) / len(agents)) * 100 if len(agents) > 0 else 0
-            logger.info(f"Round {voting_round} complete: Support={delib.consensus.get('Support',0)}/{len(agents)} ({support_pct:.0f}%)")
+            logger.info(f"[{deliberation_id[:8]}] Round {voting_round} complete: Support={delib.consensus.get('Support',0)}/{len(agents)} ({support_pct:.0f}%)")
 
-        logger.info(f"All {voting_round} voting rounds complete")
+        logger.info(f"[{deliberation_id[:8]}] All {voting_round} voting rounds complete")
 
         # Phase 5: Synthesis
-        self.phase = "🔮 synthesizing"
-        delib.phase = self.phase
-        await self.broadcast_deliberation()
+        delib.phase = "🔮 synthesizing"
+        self.phase = delib.phase  # Legacy compatibility
+        await self.broadcast_deliberation(delib)
 
         synthesizers = [a for a in agents if a.personality_type == "the_synthesizer"]
         synthesizer = random.choice(synthesizers) if synthesizers else random.choice(agents)
-        synthesizer.status = "synthesizing"
-        synthesizer.current_thought = "Integrating all perspectives..."
-        await self.broadcast_agents_update()
+        delib.set_agent_status(synthesizer.id, "synthesizing")
+        delib.set_agent_thought(synthesizer.id, "Integrating all perspectives...")
+        synthesizer.status = "synthesizing"  # Legacy compatibility
+        synthesizer.current_thought = "Integrating all perspectives..."  # Legacy compatibility
+        await self.broadcast_agents_update(delib)
 
         await asyncio.sleep(1)
 
@@ -3008,15 +3188,16 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
         )
 
         # Complete
-        self.phase = "✅ complete"
-        delib.phase = self.phase
-        await self.broadcast_deliberation()
+        delib.phase = "✅ complete"
+        self.phase = delib.phase  # Legacy compatibility
+        await self.broadcast_deliberation(delib)
 
         for agent in agents:
-            agent.status = "idle"
+            delib.set_agent_status(agent.id, "idle")
+            agent.status = "idle"  # Legacy compatibility
             agent.energy = max(0.2, agent.energy - 0.1)
 
-        await self.broadcast_agents_update()
+        await self.broadcast_agents_update(delib)
         await asyncio.sleep(2)
 
         self.deliberation_active = False
@@ -3025,8 +3206,7 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
         delib.status = "completed"
         delib.phase = "complete"
         delib.completed_at = time.time()
-        # Also update legacy self.consensus for backward compatibility
-        self.consensus = dict(delib.consensus)
+        # Note: We no longer copy to self.consensus to avoid contaminating parallel deliberations
 
         # Persist final state to database
         try:
@@ -3045,7 +3225,7 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
         except Exception as e:
             logger.warning(f"Failed to update deliberation in database: {e}")
 
-        await self.broadcast_deliberation()
+        await self.broadcast_deliberation(delib)
         return deliberation_id
 
     async def decay_energy(self):
