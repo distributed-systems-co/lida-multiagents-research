@@ -1426,19 +1426,23 @@ IMPORTANT - You are the PERSUADER in this debate:
 
     async def broadcast_deliberation(self):
         """Broadcast deliberation state."""
-        # Get vote history from current deliberation
+        # Get values from current deliberation if available, fall back to orchestrator's
         vote_history = []
+        current_round = self.current_round
+        max_rounds = self.max_rounds
         if self.active_deliberation_id and self.active_deliberation_id in self.deliberations:
             delib = self.deliberations[self.active_deliberation_id]
             vote_history = list(delib.vote_history)
+            current_round = delib.current_round
+            max_rounds = delib.max_rounds
 
         await self.broadcast("deliberation_update", {
             "active": self.deliberation_active,
             "phase": self.phase,
             "topic": self.current_topic,
-            "round": self.current_round,
-            "current_round": self.current_round,
-            "max_rounds": self.max_rounds,
+            "round": current_round,
+            "current_round": current_round,
+            "max_rounds": max_rounds,
             "vote_history": vote_history,
         })
         # Sync to Redis for cross-worker status queries
@@ -1710,7 +1714,6 @@ Review how other participants have voted and their reasoning. Consider:
 
         prompt = f"""TOPIC FOR DELIBERATION: {topic}
 
-════════════════════════════════════════════════════════════════════════════════
 VOTING ROUND {voting_round} OF 7
 {"⚠️⚠️⚠️ THIS IS THE FINAL ROUND - YOU MUST MAKE A DEFINITIVE DECISION ⚠️⚠️⚠️" if is_final_round else ""}
 ════════════════════════════════════════════════════════════════════════════════
@@ -2758,12 +2761,7 @@ State your stance clearly and give one key reason."""
         await self.broadcast_deliberation_state()
         await asyncio.sleep(0.5)
 
-        # Phase 3: Debate
-        self.phase = "🔄 debating"
-        delib.phase = self.phase
-        await self.broadcast_deliberation()
-
-        # Helper to build full discussion context
+        # Helper to build full discussion context for debate
         def build_discussion_context() -> str:
             all_msgs = list(self.messages)
             relevant_msgs = [m for m in all_msgs if m.msg_type in ("position", "debate")]
@@ -2774,40 +2772,7 @@ State your stance clearly and give one key reason."""
                 context_parts.append(f"{name}: {msg.content}")
             return "\n\n".join(context_parts)
 
-        # Skip debate if only one agent
-        if len(agents) >= 2:
-            for round_num in range(self.max_rounds):
-                self.current_round = round_num + 1
-                await self.broadcast_deliberation()
-
-                a1 = random.choice(agents)
-                a2 = random.choice([a for a in agents if a.id != a1.id])
-
-                a1.status = "speaking"
-                await self.broadcast_agents_update()
-
-                # Include full discussion context
-                discussion_context = build_discussion_context()
-                prompt = f"""Topic: {topic}
-
-Discussion so far:
-{discussion_context}
-
-Respond to the discussion, particularly addressing {a2.name}'s points. Be concise (2-3 sentences). State whether you agree or disagree and why."""
-
-                use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
-                response = await self.generate_response(a1, prompt, use_tools=use_tools, deliberation_id=deliberation_id)
-                a1.current_thought = response[:60]
-                self.add_message(a1.id, a2.id, "debate", response, a1.model,
-                               deliberation_id=deliberation_id)
-
-                a1.status = "idle"
-                await self.broadcast_agents_update()
-                await asyncio.sleep(0.3)
-        else:
-            logger.info("Skipping debate phase - only one agent")
-
-        # Phase 4: Voting with LLM-based decisions - ALWAYS run all 7 rounds
+        # Phase 3+4: Combined Debate and Voting rounds - ALWAYS run all 7 rounds
         max_voting_rounds = CONFIG.get("simulation", {}).get("max_voting_rounds", 7)
         voting_round = 0
 
@@ -2848,10 +2813,41 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
         while voting_round < max_voting_rounds:
             voting_round += 1
             is_final_round = (voting_round >= max_voting_rounds)
+            delib.current_round = voting_round
 
+            # Debate phase within round
+            if len(agents) >= 2:
+                self.phase = f"🔄 debating (round {voting_round}/{max_voting_rounds})"
+                delib.phase = self.phase
+                await self.broadcast_deliberation()
+
+                a1 = random.choice(agents)
+                a2 = random.choice([a for a in agents if a.id != a1.id])
+
+                a1.status = "speaking"
+                await self.broadcast_agents_update()
+
+                discussion_context = build_discussion_context()
+                prompt = f"""Topic: {topic}
+
+Discussion so far:
+{discussion_context}
+
+Respond to the discussion, particularly addressing {a2.name}'s points. Be concise (2-3 sentences). State whether you agree or disagree and why."""
+
+                use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
+                response = await self.generate_response(a1, prompt, use_tools=use_tools, deliberation_id=deliberation_id)
+                a1.current_thought = response[:60]
+                self.add_message(a1.id, a2.id, "debate", response, a1.model,
+                               deliberation_id=deliberation_id)
+
+                a1.status = "idle"
+                await self.broadcast_agents_update()
+                await asyncio.sleep(0.3)
+
+            # Voting phase within round
             self.phase = f"🗳️ voting (round {voting_round}/{max_voting_rounds})"
             delib.phase = self.phase
-            delib.current_round = voting_round
             await self.broadcast_deliberation()
             delib.consensus = {"Support": 0, "Oppose": 0, "Modify": 0, "Abstain": 0, "Continue": 0}
             self.consensus = delib.consensus  # Point legacy reference to per-deliberation consensus

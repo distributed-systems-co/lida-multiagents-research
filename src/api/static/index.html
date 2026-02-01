@@ -2265,17 +2265,17 @@
     </div>
 
     <!-- Vote History by Round -->
-    <div v-if="deliberation.vote_history && deliberation.vote_history.length > 0" class="mt-4 bg-gray-900/50 rounded-lg border border-gray-800 overflow-hidden">
+    <div v-if="deliberation.vote_history && deliberation.vote_history.length > 0" class="mt-4 bg-gray-900/50 rounded-lg border border-gray-800">
         <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 border-b border-gray-700">
             <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-3">
                 <span>📊 Vote History ({{ deliberation.vote_history.length }} rounds)</span>
             </h3>
         </div>
-        <div class="p-4">
+        <div class="p-4 overflow-x-auto">
             <!-- Round summary cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div class="flex gap-3" style="min-width: max-content;">
                 <div v-for="round in deliberation.vote_history" :key="round.round"
-                     class="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                     class="bg-gray-800/50 rounded-lg p-3 border border-gray-700 flex-shrink-0" style="width: 200px;">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs font-bold text-purple-400">Round {{ round.round }}</span>
                         <span class="text-[10px] text-gray-500">{{ round.agent_votes?.length || 0 }} votes</span>
