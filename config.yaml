@@ -46,7 +46,7 @@ redis:
 
 deliberation:
   # Number of debate rounds per deliberation
-  max_rounds: 7
+  max_rounds: 5
 
   # Phase durations (seconds) - 0 for no delay
   phase_delays:

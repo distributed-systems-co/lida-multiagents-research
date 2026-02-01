@@ -2172,8 +2172,11 @@
 
     <!-- Agent Status Table -->
     <div v-if="agents.length > 0" class="mt-4 bg-gray-900/50 rounded-lg border border-gray-800 overflow-hidden">
-        <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 border-b border-gray-700">
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 cursor-pointer"
+             :class="agentStatusMinimized ? '' : 'border-b border-gray-700'"
+             @click="agentStatusMinimized = !agentStatusMinimized">
             <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-3">
+                <span class="text-gray-500 transition-transform" :class="agentStatusMinimized ? '' : 'rotate-90'">&#9654;</span>
                 <span>Agent Status ({{ agents.length }} agents)</span>
                 <span v-if="deliberation.current_round > 0 || deliberation.round > 0"
                       class="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
@@ -2181,7 +2184,7 @@
                 </span>
                 <span v-if="deliberation.phase" class="text-xs text-gray-400">{{ deliberation.phase }}</span>
             </h3>
-            <div class="flex items-center gap-4 text-xs">
+            <div v-show="!agentStatusMinimized" class="flex items-center gap-4 text-xs">
                 <span class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-green-500"></span>
                     Debating: {{ agents.filter(a => a.status === 'speaking' || a.status === 'debating').length }}
@@ -2200,7 +2203,7 @@
                 </span>
             </div>
         </div>
-        <div class="max-h-64 overflow-y-auto scroll-thin">
+        <div v-show="!agentStatusMinimized" class="max-h-64 overflow-y-auto scroll-thin">
             <table class="w-full text-xs">
                 <thead class="bg-gray-800/80 sticky top-0">
                     <tr>
@@ -2266,12 +2269,15 @@
 
     <!-- Vote History by Round -->
     <div v-if="deliberation.vote_history && deliberation.vote_history.length > 0" class="mt-4 bg-gray-900/50 rounded-lg border border-gray-800">
-        <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 border-b border-gray-700">
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 cursor-pointer"
+             :class="voteHistoryMinimized ? '' : 'border-b border-gray-700'"
+             @click="voteHistoryMinimized = !voteHistoryMinimized">
             <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-3">
-                <span>📊 Vote History ({{ deliberation.vote_history.length }} rounds)</span>
+                <span class="text-gray-500 transition-transform" :class="voteHistoryMinimized ? '' : 'rotate-90'">&#9654;</span>
+                <span>Vote History ({{ deliberation.vote_history.length }} rounds)</span>
             </h3>
         </div>
-        <div class="p-4 overflow-x-auto">
+        <div v-show="!voteHistoryMinimized" class="p-4 overflow-x-auto">
             <!-- Round summary cards -->
             <div class="flex gap-3" style="min-width: max-content;">
                 <div v-for="round in deliberation.vote_history" :key="round.round"
@@ -2401,6 +2407,10 @@ createApp({
         const structuredVotes = ref([]);  // Array of structured votes with reasoning
         const beliefStates = ref({});     // agent_id -> belief state
         const activeTab = ref('consensus');
+
+        // Panel minimization state
+        const agentStatusMinimized = ref(false);
+        const voteHistoryMinimized = ref(false);
 
         // Persuader state
         const persuader = ref({
@@ -4415,6 +4425,10 @@ createApp({
             structuredVotes,
             beliefStates,
             activeTab,
+
+            // Panel minimization state
+            agentStatusMinimized,
+            voteHistoryMinimized,
 
             // Persuader state
             persuader,

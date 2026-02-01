@@ -56,7 +56,11 @@ def load_scenario_config() -> Dict[str, Any]:
     # Try to load from our scenario system
     try:
         from src.config.loader import load_scenario
-        return load_scenario(scenario_name)
+        # Clear cache to ensure fresh load
+        load_scenario.cache_clear()
+        config = load_scenario(scenario_name)
+        print(f"[SCENARIO DEBUG] Loaded scenario '{scenario_name}': agents.models={config.get('agents', {}).get('models', 'NOT SET')}")
+        return config
     except ImportError:
         # Fall back to direct file loading
         scenarios_dir = Path(__file__).parent / "scenarios"
@@ -88,8 +92,12 @@ if SCENARIO_CONFIG:
     CONFIG = deep_merge(CONFIG, SCENARIO_CONFIG)
 
 # Debug: log what config was loaded
-print(f"[CONFIG DEBUG] SCENARIO={os.getenv('SCENARIO')}")
-print(f"[CONFIG DEBUG] agents={CONFIG.get('agents', {})}")
+_scenario = os.getenv('SCENARIO')
+_models = CONFIG.get('agents', {}).get('models', [])
+print(f"\n{'='*60}")
+print(f"SCENARIO: {_scenario or 'NOT SET (using config.yaml only)'}")
+print(f"MODELS: {_models}")
+print(f"{'='*60}\n")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
@@ -837,9 +845,11 @@ class SwarmOrchestrator:
         elif agents_cfg.get("models"):
             model_list = agents_cfg.get("models")
             logger.info(f"Using agents.models: {model_list}")
+            print(f"[MODEL DEBUG] Using agents.models: {model_list}")
         else:
             model_list = list(MODELS.values())
             logger.info(f"Using fallback MODELS: {model_list[:3]}...")
+            print(f"[MODEL DEBUG] Using FALLBACK MODELS: {model_list}")
 
         # Check if we should use real-world personas
         use_real_personas = agents_cfg.get("use_real_personas", False)
@@ -1011,7 +1021,7 @@ IMPORTANT - You are the PERSUADER in this debate:
             palette = AGENT_PALETTES[i % len(AGENT_PALETTES)]
             # Scenario models take priority over persona-specific models
             model = model_list[i % len(model_list)] if model_list else (model_override or "anthropic/claude-sonnet-4")
-            # logger.info(f"Agent {i} ({name}): model_list={model_list}, model_override={model_override}, final={model}")
+            print(f"[AGENT MODEL] Agent {i} ({name}): assigned model={model}")
 
             archetype = archetype_map.get(personality_type, archetype_map.get(category, "the_scholar"))
             pm = get_personality_manager()
@@ -1633,6 +1643,7 @@ IMPORTANT - You are the PERSUADER in this debate:
         topic: str,
         discussion_summary: str,
         voting_round: int,
+        max_rounds: int = 7,
         is_final_round: bool = False,
         deliberation_id: Optional[str] = None,
         vote_history: Optional[List[Dict]] = None,
@@ -1714,7 +1725,7 @@ Review how other participants have voted and their reasoning. Consider:
 
         prompt = f"""TOPIC FOR DELIBERATION: {topic}
 
-VOTING ROUND {voting_round} OF 7
+VOTING ROUND {voting_round} OF {max_rounds}
 {"⚠️⚠️⚠️ THIS IS THE FINAL ROUND - YOU MUST MAKE A DEFINITIVE DECISION ⚠️⚠️⚠️" if is_final_round else ""}
 ════════════════════════════════════════════════════════════════════════════════
 {context_intro}
@@ -2772,8 +2783,8 @@ State your stance clearly and give one key reason."""
                 context_parts.append(f"{name}: {msg.content}")
             return "\n\n".join(context_parts)
 
-        # Phase 3+4: Combined Debate and Voting rounds - ALWAYS run all 7 rounds
-        max_voting_rounds = CONFIG.get("simulation", {}).get("max_voting_rounds", 7)
+        # Phase 3+4: Combined Debate and Voting rounds
+        max_voting_rounds = delib.max_rounds
         voting_round = 0
 
         # Build full discussion context from messages
@@ -2809,41 +2820,46 @@ State your stance clearly and give one key reason."""
             else:
                 return "The group is evenly split. Your vote could be decisive - consider the long-term benefits of coordinated international governance."
 
-        # Always run all 7 rounds
+        # Run all configured rounds
         while voting_round < max_voting_rounds:
             voting_round += 1
             is_final_round = (voting_round >= max_voting_rounds)
             delib.current_round = voting_round
 
-            # Debate phase within round
+            # Debate phase within round - each agent speaks once
             if len(agents) >= 2:
                 self.phase = f"🔄 debating (round {voting_round}/{max_voting_rounds})"
                 delib.phase = self.phase
                 await self.broadcast_deliberation()
 
-                a1 = random.choice(agents)
-                a2 = random.choice([a for a in agents if a.id != a1.id])
+                # Shuffle agents so speaking order varies each round
+                debate_order = list(agents)
+                random.shuffle(debate_order)
 
-                a1.status = "speaking"
-                await self.broadcast_agents_update()
+                for a1 in debate_order:
+                    # Pick a random other agent to address
+                    a2 = random.choice([a for a in agents if a.id != a1.id])
 
-                discussion_context = build_discussion_context()
-                prompt = f"""Topic: {topic}
+                    a1.status = "speaking"
+                    await self.broadcast_agents_update()
+
+                    discussion_context = build_discussion_context()
+                    prompt = f"""Topic: {topic}
 
 Discussion so far:
 {discussion_context}
 
 Respond to the discussion, particularly addressing {a2.name}'s points. Be concise (2-3 sentences). State whether you agree or disagree and why."""
 
-                use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
-                response = await self.generate_response(a1, prompt, use_tools=use_tools, deliberation_id=deliberation_id)
-                a1.current_thought = response[:60]
-                self.add_message(a1.id, a2.id, "debate", response, a1.model,
-                               deliberation_id=deliberation_id)
+                    use_tools = a1.personality_type == "the_skeptic" and random.random() < 0.4
+                    response = await self.generate_response(a1, prompt, use_tools=use_tools, deliberation_id=deliberation_id)
+                    a1.current_thought = response[:60]
+                    self.add_message(a1.id, a2.id, "debate", response, a1.model,
+                                   deliberation_id=deliberation_id)
 
-                a1.status = "idle"
-                await self.broadcast_agents_update()
-                await asyncio.sleep(0.3)
+                    a1.status = "idle"
+                    await self.broadcast_agents_update()
+                    await asyncio.sleep(0.3)
 
             # Voting phase within round
             self.phase = f"🗳️ voting (round {voting_round}/{max_voting_rounds})"
@@ -2860,22 +2876,39 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
             current_vote_history = list(delib.vote_history)
             persuasion_msg = await generate_persuasion(current_vote_history, voting_round)
 
+            # Set all agents to voting status
             for agent in agents:
                 agent.status = "voting"
-                await self.broadcast_agents_update()
+            await self.broadcast_agents_update()
 
-                # Use LLM to generate vote with vote history context
+            # Generate a single agent's vote
+            async def get_agent_vote(agent):
                 vote_data = await self.generate_vote(
                     agent=agent,
                     topic=topic,
                     discussion_summary=discussion_summary,
                     voting_round=voting_round,
+                    max_rounds=max_voting_rounds,
                     is_final_round=is_final_round,
                     deliberation_id=deliberation_id,
                     vote_history=current_vote_history,
                     persuasion_message=persuasion_msg,
                 )
+                return agent, vote_data
 
+            # Run all votes in parallel
+            vote_results = await asyncio.gather(*[get_agent_vote(agent) for agent in agents])
+
+            # Process all vote results
+            vote_to_position = {
+                "support": "FOR",
+                "oppose": "AGAINST",
+                "modify": "UNDECIDED",
+                "abstain": "UNDECIDED",
+                "continue_discussion": "UNDECIDED",
+            }
+
+            for agent, vote_data in vote_results:
                 vote = vote_data["vote"]
                 confidence = vote_data["confidence"]
                 reasoning = vote_data["reasoning"]
@@ -2912,21 +2945,13 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                                deliberation_id=deliberation_id)
 
                 # Map votes to positions for persuader game
-                vote_to_position = {
-                    "support": "FOR",
-                    "oppose": "AGAINST",
-                    "modify": "UNDECIDED",
-                    "abstain": "UNDECIDED",
-                    "continue_discussion": "UNDECIDED",
-                }
                 self.agent_positions[agent.id] = vote_to_position.get(vote, "UNDECIDED")
                 if agent.id not in self.position_history:
                     self.position_history[agent.id] = []
                 self.position_history[agent.id].append(self.agent_positions[agent.id])
 
-                await self.broadcast_agents_update()
-                await self.broadcast_consensus()
-                await asyncio.sleep(0.15)
+            await self.broadcast_agents_update()
+            await self.broadcast_consensus()
 
             # Save this round's votes to vote history with full reasoning
             round_vote_summary = {
@@ -2967,11 +2992,12 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                         context_parts.append(f"[{msg.msg_type.upper()}] {name}: {msg.content}")
                     return "\n\n".join(context_parts)
 
-                # Get agents who voted OPPOSE and try to persuade them
+                # Get agents who voted OPPOSE and SUPPORT
                 oppose_voters = [v for v in round_votes if v["vote"] == "oppose"]
                 support_voters = [v for v in round_votes if v["vote"] == "support"]
+                discussion_context = build_extended_context()
 
-                # Pick a supporter to make a persuasion argument
+                # SUPPORT persuader tries to convince OPPOSE voters
                 if support_voters and oppose_voters:
                     persuader_agent = random.choice([v["agent"] for v in support_voters])
                     target_names = ", ".join([v["agent"].name for v in oppose_voters[:3]])
@@ -2979,7 +3005,6 @@ Respond to the discussion, particularly addressing {a2.name}'s points. Be concis
                     persuader_agent.status = "persuading"
                     await self.broadcast_agents_update()
 
-                    discussion_context = build_extended_context()
                     oppose_reasons = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in oppose_voters[:3]])
 
                     persuasion_prompt = f"""Topic: {topic}
@@ -2998,7 +3023,42 @@ Address their specific concerns directly. Be persuasive but respectful. (2-3 sen
                     persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."
                     self.add_message(
                         persuader_agent.id, "broadcast", "persuasion",
-                        f"[To {target_names}] {persuasion_response}",
+                        f"[FOR → {target_names}] {persuasion_response}",
+                        persuader_agent.model,
+                        deliberation_id=deliberation_id
+                    )
+
+                    persuader_agent.status = "idle"
+                    await self.broadcast_agents_update()
+                    await asyncio.sleep(0.5)
+
+                # OPPOSE persuader tries to convince SUPPORT voters
+                if oppose_voters and support_voters:
+                    persuader_agent = random.choice([v["agent"] for v in oppose_voters])
+                    target_names = ", ".join([v["agent"].name for v in support_voters[:3]])
+
+                    persuader_agent.status = "persuading"
+                    await self.broadcast_agents_update()
+
+                    support_reasons = "\n".join([f"- {v['agent'].name}: {v['reasoning']}" for v in support_voters[:3]])
+
+                    persuasion_prompt = f"""Topic: {topic}
+
+You voted OPPOSE. The following participants voted SUPPORT:
+{support_reasons}
+
+Current vote tally: Support={delib.consensus.get('Support',0)}, Oppose={delib.consensus.get('Oppose',0)}
+
+Make a compelling argument to persuade {target_names} to change their vote to OPPOSE.
+Address their specific concerns directly. Be persuasive but respectful. (2-3 sentences)"""
+
+                    persuasion_response = await self.generate_response(
+                        persuader_agent, persuasion_prompt, use_tools=False, deliberation_id=deliberation_id
+                    )
+                    persuader_agent.current_thought = f"Persuading: {persuasion_response[:50]}..."
+                    self.add_message(
+                        persuader_agent.id, "broadcast", "persuasion",
+                        f"[AGAINST → {target_names}] {persuasion_response}",
                         persuader_agent.model,
                         deliberation_id=deliberation_id
                     )
@@ -4015,16 +4075,17 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         orch = app.state.orchestrator
         if orch.llm_client and hasattr(orch.llm_client, 'available_models'):
             return {"models": orch.llm_client.available_models}
-        # Fallback to default models
+        # Use models from config
+        config_models = CONFIG.get("agents", {}).get("models", [])
+        if config_models:
+            return {"models": [
+                {"id": m, "name": m.split("/")[-1].replace("-", " ").title()}
+                for m in config_models
+            ]}
+        # Fallback to MODELS constant
         return {"models": [
-            {"id": "anthropic/claude-sonnet-4", "name": "Claude Sonnet 4"},
-            {"id": "anthropic/claude-opus-4", "name": "Claude Opus 4"},
-            {"id": "openai/gpt-4o", "name": "GPT-4o"},
-            {"id": "google/gemini-2.0-flash-001", "name": "Gemini 2.0 Flash"},
-            {"id": "x-ai/grok-3", "name": "Grok 3"},
-            {"id": "deepseek/deepseek-r1", "name": "DeepSeek R1"},
-            {"id": "meta-llama/llama-3.3-70b-instruct", "name": "Llama 3.3 70B"},
-            {"id": "mistralai/mistral-large-2411", "name": "Mistral Large"},
+            {"id": model_id, "name": model_id.split("/")[-1].replace("-", " ").title()}
+            for model_id in MODELS.values()
         ]}
 
     @app.get("/api/llm/logs")
@@ -4464,17 +4525,36 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         Activate specific personas for the current session.
         This rebuilds the agent roster with selected personas.
 
-        Body: {"personas": ["sam_altman", "yann_lecun", "chuck_schumer"], "persona_version": "v2"}
+        Body: {
+            "personas": ["sam_altman", "yann_lecun", "chuck_schumer"],
+            "persona_version": "v2",
+            "scenario": "basic_linh10"  // Optional: load models from scenario file
+        }
         """
         orch = app.state.orchestrator
         persona_ids = request.get("personas", [])
         persona_version = request.get("persona_version", "v1")
+        scenario_name = request.get("scenario")
 
         if not persona_ids:
             raise HTTPException(400, "At least one persona required")
 
+        # Load models from scenario file if provided
+        model_list = None
+        if scenario_name:
+            scenario_file = Path("scenarios") / f"{scenario_name}.yaml"
+            if scenario_file.exists():
+                try:
+                    with open(scenario_file) as f:
+                        scenario_cfg = yaml.safe_load(f) or {}
+                    model_list = scenario_cfg.get("agents", {}).get("models")
+                    if model_list:
+                        logger.info(f"Loaded models from scenario '{scenario_name}': {model_list}")
+                except Exception as e:
+                    logger.warning(f"Could not load scenario file: {e}")
+
         # Update config and rebuild agents
-        agents_cfg = CONFIG.get("agents", {})
+        agents_cfg = CONFIG.get("agents", {}).copy()
         agents_cfg["personas"] = persona_ids
         agents_cfg["count"] = len(persona_ids)
         agents_cfg["persona_version"] = persona_version
@@ -4483,7 +4563,9 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         orch.agents.clear()
         orch.num_agents = len(persona_ids)
 
-        model_list = agents_cfg.get("models", list(MODELS.values()))
+        # Use scenario models, then config models, then fallback
+        if not model_list:
+            model_list = agents_cfg.get("models", list(MODELS.values()))
         orch._create_real_persona_agents(agents_cfg, model_list)
         orch._init_relationships()
         orch._init_influence_scores()
@@ -4492,7 +4574,9 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             "status": "activated",
             "count": len(orch.agents),
             "persona_version": persona_version,
-            "personas": [{"id": a.id, "name": a.name} for a in orch.agents.values()],
+            "scenario": scenario_name,
+            "models": model_list,
+            "personas": [{"id": a.id, "name": a.name, "model": a.model} for a in orch.agents.values()],
         }
 
     # ═══════════════════════════════════════════════════════════════════════════════
