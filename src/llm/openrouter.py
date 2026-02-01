@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import os
+import random
 import time
 from dataclasses import dataclass, field
 from typing import AsyncIterator, Optional, Any, Callable
@@ -13,6 +14,33 @@ from typing import AsyncIterator, Optional, Any, Callable
 import httpx
 
 logger = logging.getLogger(__name__)
+
+# Retry configuration
+MAX_RETRIES = 3
+INITIAL_BACKOFF = 1.0  # seconds
+MAX_BACKOFF = 30.0  # seconds
+RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+
+
+def _should_retry(error: Exception) -> bool:
+    """Determine if an error is retryable."""
+    if isinstance(error, httpx.HTTPStatusError):
+        return error.response.status_code in RETRYABLE_STATUS_CODES
+    if isinstance(error, (httpx.ConnectError, httpx.TimeoutException, httpx.ReadTimeout)):
+        return True
+    return False
+
+
+def _get_retry_after(error: Exception) -> Optional[float]:
+    """Extract Retry-After header if present."""
+    if isinstance(error, httpx.HTTPStatusError):
+        retry_after = error.response.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return float(retry_after)
+            except ValueError:
+                pass
+    return None
 
 # LLM response logging
 _llm_logger = None
@@ -255,19 +283,41 @@ class OpenRouterClient:
             return await self._complete(payload, effective_agent_id, agent_name, effective_delib_id)
 
     async def _complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None, deliberation_id: Optional[str] = None) -> StreamingResponse:
-        """Non-streaming completion."""
+        """Non-streaming completion with retry logic."""
         client = await self._get_client()
 
         logger.info(f"OpenRouter API call - Requesting model: {payload['model']}")
         logger.debug(f"OpenRouter payload: {json.dumps({k: v for k, v in payload.items() if k != 'messages'}, indent=2)}")
 
-        start_time = time.time()
-        response = await client.post(
-            f"{self.base_url}/chat/completions",
-            json=payload,
-        )
-        response.raise_for_status()
-        duration_ms = int((time.time() - start_time) * 1000)
+        last_error = None
+        for attempt in range(MAX_RETRIES + 1):
+            try:
+                start_time = time.time()
+                response = await client.post(
+                    f"{self.base_url}/chat/completions",
+                    json=payload,
+                )
+                response.raise_for_status()
+                duration_ms = int((time.time() - start_time) * 1000)
+                break  # Success, exit retry loop
+            except Exception as e:
+                last_error = e
+                if attempt < MAX_RETRIES and _should_retry(e):
+                    # Calculate backoff with jitter
+                    retry_after = _get_retry_after(e)
+                    if retry_after:
+                        backoff = min(retry_after, MAX_BACKOFF)
+                    else:
+                        backoff = min(INITIAL_BACKOFF * (2 ** attempt) + random.uniform(0, 1), MAX_BACKOFF)
+
+                    logger.warning(f"OpenRouter API error (attempt {attempt + 1}/{MAX_RETRIES + 1}): {e}. Retrying in {backoff:.1f}s...")
+                    await asyncio.sleep(backoff)
+                else:
+                    logger.error(f"OpenRouter API error (attempt {attempt + 1}/{MAX_RETRIES + 1}): {e}. No more retries.")
+                    raise
+        else:
+            # All retries exhausted
+            raise last_error
 
         data = response.json()
         actual_model = data.get("model", payload["model"])
@@ -308,36 +358,59 @@ class OpenRouterClient:
         )
 
     async def _stream_complete(self, payload: dict, agent_id: Optional[str] = None, agent_name: Optional[str] = None, deliberation_id: Optional[str] = None) -> AsyncIterator[str]:
-        """Streaming completion yielding content chunks."""
+        """Streaming completion yielding content chunks with retry logic."""
         client = await self._get_client()
 
         logger.info(f"OpenRouter API call (streaming) - Requesting model: {payload['model']}")
 
-        async with client.stream(
-            "POST",
-            f"{self.base_url}/chat/completions",
-            json=payload,
-        ) as response:
-            response.raise_for_status()
+        last_error = None
+        for attempt in range(MAX_RETRIES + 1):
+            try:
+                async with client.stream(
+                    "POST",
+                    f"{self.base_url}/chat/completions",
+                    json=payload,
+                ) as response:
+                    response.raise_for_status()
 
-            async for line in response.aiter_lines():
-                if not line or not line.startswith("data: "):
-                    continue
+                    async for line in response.aiter_lines():
+                        if not line or not line.startswith("data: "):
+                            continue
 
-                data_str = line[6:]  # Remove "data: " prefix
+                        data_str = line[6:]  # Remove "data: " prefix
 
-                if data_str == "[DONE]":
-                    break
+                        if data_str == "[DONE]":
+                            break
 
-                try:
-                    chunk = json.loads(data_str)
-                    if "choices" in chunk and chunk["choices"]:
-                        delta = chunk["choices"][0].get("delta", {})
-                        content = delta.get("content", "")
-                        if content:
-                            yield content
-                except json.JSONDecodeError:
-                    continue
+                        try:
+                            chunk = json.loads(data_str)
+                            if "choices" in chunk and chunk["choices"]:
+                                delta = chunk["choices"][0].get("delta", {})
+                                content = delta.get("content", "")
+                                if content:
+                                    yield content
+                        except json.JSONDecodeError:
+                            continue
+                    return  # Success, exit retry loop
+            except Exception as e:
+                last_error = e
+                if attempt < MAX_RETRIES and _should_retry(e):
+                    # Calculate backoff with jitter
+                    retry_after = _get_retry_after(e)
+                    if retry_after:
+                        backoff = min(retry_after, MAX_BACKOFF)
+                    else:
+                        backoff = min(INITIAL_BACKOFF * (2 ** attempt) + random.uniform(0, 1), MAX_BACKOFF)
+
+                    logger.warning(f"OpenRouter streaming API error (attempt {attempt + 1}/{MAX_RETRIES + 1}): {e}. Retrying in {backoff:.1f}s...")
+                    await asyncio.sleep(backoff)
+                else:
+                    logger.error(f"OpenRouter streaming API error (attempt {attempt + 1}/{MAX_RETRIES + 1}): {e}. No more retries.")
+                    raise
+
+        # All retries exhausted
+        if last_error:
+            raise last_error
 
     async def stream_to_response(
         self,

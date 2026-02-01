@@ -3894,22 +3894,68 @@ createApp({
             prChartInstances = {};
         };
 
-        const MODEL_COLORS = {
-            'deepseek/deepseek-r1': '#22c55e',
-            'openai/gpt-4o': '#3b82f6',
-            'anthropic/claude-sonnet-4': '#a78bfa',
-            'anthropic/claude-opus-4': '#f59e0b',
-            'x-ai/grok-3': '#ef4444',
-            'meta-llama/llama-3.3-70b-instruct': '#ec4899',
-            'google/gemini-2.0-flash-001': '#06b6d4',
+        // Distinct colors - maximally different from each other
+        const DISTINCT_COLORS = [
+            '#e6194b', // red
+            '#3cb44b', // green
+            '#4363d8', // blue
+            '#f58231', // orange
+            '#911eb4', // purple
+            '#42d4f4', // cyan
+            '#f032e6', // magenta
+            '#bfef45', // lime
+            '#fabed4', // pink
+            '#469990', // teal
+            '#dcbeff', // lavender
+            '#9a6324', // brown
+            '#fffac8', // beige
+            '#800000', // maroon
+            '#aaffc3', // mint
+            '#808000', // olive
+            '#ffd8b1', // apricot
+            '#000075', // navy
+        ];
+
+        // Map providers to base colors
+        const PROVIDER_COLORS = {
+            'openai': '#4363d8',      // blue
+            'anthropic': '#911eb4',   // purple
+            'deepseek': '#3cb44b',    // green
+            'x-ai': '#e6194b',        // red
+            'meta-llama': '#f032e6',  // magenta
+            'google': '#42d4f4',      // cyan
+            'mistralai': '#f58231',   // orange
+            'qwen': '#bfef45',        // lime
+            'cohere': '#469990',      // teal
+            'perplexity': '#dcbeff',  // lavender
         };
-        const getModelColor = (model) => MODEL_COLORS[model] || '#6b7280';
+
+        const getModelColor = (model) => {
+            if (!model) return '#6b7280';
+            // Get provider from model name
+            const provider = model.split('/')[0];
+            if (PROVIDER_COLORS[provider]) return PROVIDER_COLORS[provider];
+            // Generate consistent distinct color from hash
+            let hash = 0;
+            for (let i = 0; i < model.length; i++) {
+                hash = model.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return DISTINCT_COLORS[Math.abs(hash) % DISTINCT_COLORS.length];
+        };
 
         const renderPastRunCharts = () => {
             destroyPrCharts();
             const d = pastRunsData.value;
             if (!d) { console.warn('[Analytics] No data to render'); return; }
 
+            console.log('[Analytics] Data received:', {
+                topic: d.topic,
+                status: d.status,
+                consensus: d.consensus,
+                vote_history_length: d.vote_history?.length,
+                agents_count: d.agent_summary?.agents?.length,
+                models: d.agent_summary?.models
+            });
             console.log('[Analytics] Rendering charts. Refs:', {
                 vote: !!prVoteChart.value, model: !!prModelChart.value,
                 token: !!prTokenChart.value, duration: !!prDurationChart.value,
@@ -3927,134 +3973,189 @@ createApp({
             // --- Chart 1: Vote Distribution Doughnut ---
             if (prVoteChart.value) {
                 const ctx = prVoteChart.value.getContext('2d');
-                const dist = d.position_distribution;
-                prChartInstances.vote = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['FOR', 'AGAINST', 'UNDECIDED'],
-                        datasets: [{
-                            data: [dist.FOR || 0, dist.AGAINST || 0, dist.UNDECIDED || 0],
-                            backgroundColor: ['#22c55e', '#ef4444', '#f59e0b'],
-                            borderWidth: 0,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11, family: 'JetBrains Mono' } } }
+                // Use consensus data (Support, Oppose, Modify, Abstain) from analytics
+                const cons = d.consensus || {};
+                const voteData = [cons.Support || 0, cons.Oppose || 0, cons.Modify || 0, cons.Abstain || 0];
+                const totalVotes = voteData.reduce((a, b) => a + b, 0);
+
+                if (totalVotes === 0) {
+                    // Show "No votes" message instead of empty chart
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No vote data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.vote = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Support', 'Oppose', 'Modify', 'Abstain'],
+                            datasets: [{
+                                data: voteData,
+                                backgroundColor: ['#22c55e', '#ef4444', '#f59e0b', '#6b7280'],
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11, family: 'JetBrains Mono' } } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
 
             // --- Chart 4: Model Distribution Pie ---
             if (prModelChart.value) {
                 const ctx = prModelChart.value.getContext('2d');
-                const models = d.agent_summary.models;
+                const models = d.agent_summary?.models || {};
                 const modelNames = Object.keys(models);
                 const modelCounts = Object.values(models);
                 const modelColors = modelNames.map(m => getModelColor(m));
-                prChartInstances.model = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: modelNames.map(m => m.split('/').pop()),
-                        datasets: [{
-                            data: modelCounts,
-                            backgroundColor: modelColors,
-                            borderWidth: 0,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11, family: 'JetBrains Mono' } } }
+
+                if (modelNames.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No model data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.model = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: modelNames.map(m => m.split('/').pop()),
+                            datasets: [{
+                                data: modelCounts,
+                                backgroundColor: modelColors,
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11, family: 'JetBrains Mono' } } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
 
             // --- Chart 2: Token Usage by Agent (Horizontal Bar) ---
             if (prTokenChart.value) {
                 const ctx = prTokenChart.value.getContext('2d');
-                const agents = d.per_agent.slice(0, 30);
-                prChartInstances.token = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: agents.map(a => a.name.length > 15 ? a.name.slice(0, 14) + '...' : a.name),
-                        datasets: [{
-                            label: 'Tokens Out',
-                            data: agents.map(a => a.tokens_out),
-                            backgroundColor: agents.map(a => getModelColor(a.model)),
-                            borderWidth: 0,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        scales: {
-                            x: { grid: { color: '#1e1e2e' }, ticks: { color: '#6b7280', font: { size: 10 } } },
-                            y: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, family: 'JetBrains Mono' } } }
+                const agents = (d.agent_summary?.agents || []).slice(0, 30);
+
+                if (agents.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No agent data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.token = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: agents.map(a => a.name.length > 15 ? a.name.slice(0, 14) + '...' : a.name),
+                            datasets: [{
+                                label: 'Tokens Out',
+                                data: agents.map(a => a.tokens_out),
+                                backgroundColor: agents.map(a => getModelColor(a.model)),
+                                borderWidth: 0,
+                            }]
                         },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    afterLabel: (ctx) => `Model: ${agents[ctx.dataIndex]?.model?.split('/').pop() || '?'}`
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: { grid: { color: '#1e1e2e' }, ticks: { color: '#6b7280', font: { size: 10 } } },
+                                y: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, family: 'JetBrains Mono' } } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        afterLabel: (ctx) => `Model: ${agents[ctx.dataIndex]?.model?.split('/').pop() || '?'}`
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
 
             // --- Chart 3: Response Time by Agent (Bar) ---
             if (prDurationChart.value) {
                 const ctx = prDurationChart.value.getContext('2d');
-                const agents = d.per_agent.slice(0, 30);
-                prChartInstances.duration = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: agents.map(a => a.name.length > 15 ? a.name.slice(0, 14) + '...' : a.name),
-                        datasets: [{
-                            label: 'Duration (ms)',
-                            data: agents.map(a => a.duration_ms),
-                            backgroundColor: agents.map(a => getModelColor(a.model)),
-                            borderWidth: 0,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        scales: {
-                            x: { grid: { color: '#1e1e2e' }, ticks: { color: '#6b7280', font: { size: 10 },
-                                callback: v => v >= 1000 ? (v/1000).toFixed(1) + 's' : v + 'ms' } },
-                            y: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, family: 'JetBrains Mono' } } }
+                const agents = (d.agent_summary?.agents || []).slice(0, 30);
+
+                if (agents.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No agent data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.duration = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: agents.map(a => a.name.length > 15 ? a.name.slice(0, 14) + '...' : a.name),
+                            datasets: [{
+                                label: 'Duration (ms)',
+                                data: agents.map(a => a.duration_ms),
+                                backgroundColor: agents.map(a => getModelColor(a.model)),
+                                borderWidth: 0,
+                            }]
                         },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: (ctx) => `${(ctx.raw / 1000).toFixed(2)}s`,
-                                    afterLabel: (ctx) => `Model: ${agents[ctx.dataIndex]?.model?.split('/').pop() || '?'}`
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: { grid: { color: '#1e1e2e' }, ticks: { color: '#6b7280', font: { size: 10 },
+                                    callback: v => v >= 1000 ? (v/1000).toFixed(1) + 's' : v + 'ms' } },
+                                y: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, family: 'JetBrains Mono' } } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => `${(ctx.raw / 1000).toFixed(2)}s`,
+                                        afterLabel: (ctx) => `Model: ${agents[ctx.dataIndex]?.model?.split('/').pop() || '?'}`
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
 
             // --- Chart 6: Agent Position Heatmap (D3) ---
             if (prHeatmapContainer.value) {
                 const container = prHeatmapContainer.value;
                 container.innerHTML = '';
-                const agents = d.per_agent;
-                if (agents.length === 0) return;
 
-                const posColor = { 'FOR': '#22c55e', 'AGAINST': '#ef4444', 'UNDECIDED': '#f59e0b' };
+                // Build agent list with their latest positions from agent_positions_over_time
+                const positionsData = d.agent_positions_over_time || {};
+                const agents = Object.entries(positionsData).map(([agentId, data]) => {
+                    const positions = data.positions || [];
+                    // Get the latest position (highest round number)
+                    const latestPos = positions.length > 0
+                        ? positions.reduce((latest, p) => p.round > latest.round ? p : latest, positions[0])
+                        : null;
+                    return {
+                        id: agentId,
+                        name: data.name || agentId,
+                        position: latestPos?.position || 'UNKNOWN',
+                        confidence: latestPos?.confidence || null,
+                    };
+                });
+
+                if (agents.length === 0) {
+                    container.innerHTML = '<div style="color:#6b7280;text-align:center;padding:20px;">No position data available</div>';
+                    return;
+                }
+
+                const posColor = { 'SUPPORT': '#22c55e', 'OPPOSE': '#ef4444', 'MODIFY': '#f59e0b', 'ABSTAIN': '#6b7280', 'UNKNOWN': '#333' };
                 const cellSize = 28;
                 const labelW = 120;
                 const cols = Math.min(agents.length, 20);
@@ -4066,11 +4167,11 @@ createApp({
 
                 // Legend
                 const legend = svg.append('g').attr('transform', 'translate(0, 4)');
-                ['FOR', 'AGAINST', 'UNDECIDED'].forEach((pos, i) => {
-                    legend.append('rect').attr('x', i * 90).attr('y', 0).attr('width', 12).attr('height', 12)
+                ['SUPPORT', 'OPPOSE', 'MODIFY', 'ABSTAIN'].forEach((pos, i) => {
+                    legend.append('rect').attr('x', i * 75).attr('y', 0).attr('width', 12).attr('height', 12)
                         .attr('rx', 2).attr('fill', posColor[pos]);
-                    legend.append('text').attr('x', i * 90 + 16).attr('y', 10)
-                        .attr('fill', '#9ca3af').attr('font-size', '10px').text(pos);
+                    legend.append('text').attr('x', i * 75 + 16).attr('y', 10)
+                        .attr('fill', '#9ca3af').attr('font-size', '10px').text(pos.charAt(0) + pos.slice(1).toLowerCase());
                 });
 
                 const grid = svg.append('g').attr('transform', 'translate(0, 26)');
@@ -4081,8 +4182,8 @@ createApp({
                     g.append('rect')
                         .attr('width', cellSize).attr('height', cellSize)
                         .attr('rx', 4).attr('fill', posColor[agent.position] || '#333')
-                        .attr('opacity', agent.confidence ? Math.max(0.4, agent.confidence) : 0.7);
-                    g.append('title').text(`${agent.name}: ${agent.position}${agent.confidence ? ' (' + (agent.confidence * 100).toFixed(0) + '%)' : ''}`);
+                        .attr('opacity', agent.confidence ? Math.max(0.4, agent.confidence / 100) : 0.7);
+                    g.append('title').text(`${agent.name}: ${agent.position}${agent.confidence ? ' (' + agent.confidence + '%)' : ''}`);
                     g.append('text')
                         .attr('x', cellSize / 2).attr('y', cellSize / 2 + 3)
                         .attr('text-anchor', 'middle').attr('fill', '#fff').attr('font-size', '8px')
@@ -4094,7 +4195,7 @@ createApp({
             if (prTimelineContainer.value) {
                 const container = prTimelineContainer.value;
                 container.innerHTML = '';
-                const timeline = d.timeline;
+                const timeline = d.timeline || [];
                 if (timeline.length === 0) return;
 
                 const margin = { top: 20, right: 20, bottom: 30, left: 50 };
@@ -4220,7 +4321,7 @@ createApp({
             container.innerHTML = '';
 
             const changes = d.position_changes;
-            const posColor = { 'FOR': '#22c55e', 'AGAINST': '#ef4444', 'UNDECIDED': '#f59e0b' };
+            const posColor = { 'SUPPORT': '#22c55e', 'OPPOSE': '#ef4444', 'MODIFY': '#f59e0b', 'ABSTAIN': '#6b7280' };
 
             const margin = { top: 30, right: 20, bottom: 40, left: 150 };
             const width = Math.max(container.clientWidth - margin.left - margin.right, 400);
@@ -4320,11 +4421,11 @@ createApp({
                 .attr('fill', '#6b7280');
 
             // Legend
-            const legendG = svg.append('g').attr('transform', `translate(${width - 200}, -20)`);
-            ['FOR', 'AGAINST', 'UNDECIDED'].forEach((pos, i) => {
-                legendG.append('circle').attr('cx', i * 75).attr('cy', 0).attr('r', 6).attr('fill', posColor[pos]);
-                legendG.append('text').attr('x', i * 75 + 10).attr('y', 4)
-                    .attr('fill', '#9ca3af').attr('font-size', '9px').text(pos);
+            const legendG = svg.append('g').attr('transform', `translate(${width - 280}, -20)`);
+            ['SUPPORT', 'OPPOSE', 'MODIFY', 'ABSTAIN'].forEach((pos, i) => {
+                legendG.append('circle').attr('cx', i * 70).attr('cy', 0).attr('r', 6).attr('fill', posColor[pos]);
+                legendG.append('text').attr('x', i * 70 + 10).attr('y', 4)
+                    .attr('fill', '#9ca3af').attr('font-size', '9px').text(pos.charAt(0) + pos.slice(1).toLowerCase());
             });
         };
 
@@ -4334,19 +4435,20 @@ createApp({
             const container = prAllPositionsContainer.value;
             container.innerHTML = '';
 
-            const agentData = d.agent_positions_over_time;
+            const agentData = d.agent_positions_over_time || {};
             const agents = Object.keys(agentData).sort();
             if (agents.length === 0) return;
 
             // Find all unique rounds across all agents
             const allRounds = new Set();
             agents.forEach(agent => {
-                agentData[agent].forEach(entry => allRounds.add(entry.round));
+                const positions = agentData[agent]?.positions || [];
+                positions.forEach(entry => allRounds.add(entry.round));
             });
             const rounds = Array.from(allRounds).sort((a, b) => a - b);
 
-            const posColor = { 'FOR': '#22c55e', 'AGAINST': '#ef4444', 'UNDECIDED': '#f59e0b' };
-            const posBg = { 'FOR': 'rgba(34, 197, 94, 0.2)', 'AGAINST': 'rgba(239, 68, 68, 0.2)', 'UNDECIDED': 'rgba(245, 158, 11, 0.2)' };
+            const posColor = { 'SUPPORT': '#22c55e', 'OPPOSE': '#ef4444', 'MODIFY': '#f59e0b', 'ABSTAIN': '#6b7280' };
+            const posBg = { 'SUPPORT': 'rgba(34, 197, 94, 0.2)', 'OPPOSE': 'rgba(239, 68, 68, 0.2)', 'MODIFY': 'rgba(245, 158, 11, 0.2)', 'ABSTAIN': 'rgba(107, 114, 128, 0.2)' };
 
             // Build HTML table
             let html = `<table style="width:100%;border-collapse:collapse;font-size:11px;">`;
@@ -4357,14 +4459,16 @@ createApp({
             });
             html += `</tr></thead><tbody>`;
 
-            agents.forEach((agent, idx) => {
+            agents.forEach((agentId, idx) => {
+                const agentName = agentData[agentId]?.name || agentId;
                 const bgColor = idx % 2 === 0 ? '#0d0d15' : '#12121f';
                 html += `<tr style="background:${bgColor};">`;
-                html += `<td style="padding:4px 8px;border-bottom:1px solid #1e1e2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="${agent}">${agent}</td>`;
+                html += `<td style="padding:4px 8px;border-bottom:1px solid #1e1e2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="${agentName}">${agentName}</td>`;
 
                 // Build a map of round -> position for this agent
                 const roundPositions = {};
-                agentData[agent].forEach(entry => {
+                const positions = agentData[agentId]?.positions || [];
+                positions.forEach(entry => {
                     roundPositions[entry.round] = entry.position;
                 });
 
@@ -4373,8 +4477,8 @@ createApp({
                     if (pos) {
                         const color = posColor[pos] || '#666';
                         const bg = posBg[pos] || 'transparent';
-                        const label = pos === 'FOR' ? '✓' : pos === 'AGAINST' ? '✗' : '?';
-                        html += `<td style="padding:4px;text-align:center;border-bottom:1px solid #1e1e2e;background:${bg};" title="${agent}: ${pos} at Round ${round}">`;
+                        const label = pos === 'SUPPORT' ? '✓' : pos === 'OPPOSE' ? '✗' : pos === 'MODIFY' ? '~' : '-';
+                        html += `<td style="padding:4px;text-align:center;border-bottom:1px solid #1e1e2e;background:${bg};" title="${agentName}: ${pos} at Round ${round}">`;
                         html += `<span style="color:${color};font-weight:bold;">${label}</span></td>`;
                     } else {
                         html += `<td style="padding:4px;text-align:center;border-bottom:1px solid #1e1e2e;color:#444;">-</td>`;
@@ -4387,9 +4491,10 @@ createApp({
 
             // Add legend
             html += `<div style="margin-top:8px;display:flex;gap:16px;font-size:10px;color:#9ca3af;">`;
-            html += `<span><span style="color:#22c55e;font-weight:bold;">✓</span> FOR</span>`;
-            html += `<span><span style="color:#ef4444;font-weight:bold;">✗</span> AGAINST</span>`;
-            html += `<span><span style="color:#f59e0b;font-weight:bold;">?</span> UNDECIDED</span>`;
+            html += `<span><span style="color:#22c55e;font-weight:bold;">✓</span> Support</span>`;
+            html += `<span><span style="color:#ef4444;font-weight:bold;">✗</span> Oppose</span>`;
+            html += `<span><span style="color:#f59e0b;font-weight:bold;">~</span> Modify</span>`;
+            html += `<span><span style="color:#6b7280;font-weight:bold;">-</span> Abstain</span>`;
             html += `<span style="color:#444;">- No data</span>`;
             html += `</div>`;
 
