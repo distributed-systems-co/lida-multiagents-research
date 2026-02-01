@@ -324,6 +324,7 @@ class Message:
     thread_id: Optional[str] = None  # Root thread ID
     is_private: bool = False  # Private persuader messages
     position: Optional[str] = None  # FOR/AGAINST/UNDECIDED
+    deliberation_id: Optional[str] = None  # Which deliberation this message belongs to
 
     def __post_init__(self):
         if not self.msg_id:
@@ -345,6 +346,7 @@ class Message:
             "thread_id": self.thread_id,
             "is_private": self.is_private,
             "position": self.position,
+            "deliberation_id": self.deliberation_id,
         }
 
 
@@ -384,8 +386,8 @@ class Deliberation:
     scenario_name: Optional[str] = None
     config: Optional[Dict] = None
 
-    def to_dict(self) -> dict:
-        return {
+    def to_dict(self, include_messages: bool = False) -> dict:
+        result = {
             "id": self.id,
             "topic": self.topic,
             "status": self.status,
@@ -400,6 +402,10 @@ class Deliberation:
             "completed_at": self.completed_at,
             "scenario_name": self.scenario_name,
         }
+        if include_messages:
+            # Include recent messages (last 100) for UI
+            result["messages"] = [m.to_dict() for m in list(self.messages)[-100:]]
+        return result
 
 
 @dataclass
@@ -1460,7 +1466,10 @@ IMPORTANT - You are the PERSUADER in this debate:
 
     async def broadcast_consensus(self):
         """Broadcast consensus state."""
-        await self.broadcast("consensus_update", {"consensus": self.consensus})
+        await self.broadcast("consensus_update", {
+            "consensus": self.consensus,
+            "deliberation_id": self.active_deliberation_id,
+        })
         # Sync to Redis for cross-worker status queries
         self.sync_status_to_redis()
 
@@ -1475,6 +1484,7 @@ IMPORTANT - You are the PERSUADER in this debate:
             "token": token,
             "buffer": self.streaming_buffers[agent_id],
             "done": done,
+            "deliberation_id": self.active_deliberation_id,
         })
 
         if done:
@@ -1516,6 +1526,9 @@ IMPORTANT - You are the PERSUADER in this debate:
         deliberation_id: Optional[str] = None,
     ):
         """Add a message and broadcast it."""
+        # Use provided deliberation_id or fall back to active
+        target_delib_id = deliberation_id or self.active_deliberation_id
+
         msg = Message(
             timestamp=self.elapsed(),
             sender_id=sender_id,
@@ -1524,12 +1537,12 @@ IMPORTANT - You are the PERSUADER in this debate:
             content=content[:150],
             model_used=model,
             tool_used=tool,
+            deliberation_id=target_delib_id,
         )
         self.messages.append(msg)
         self.total_messages += 1
 
-        # Add to specific deliberation's messages (use provided ID or fall back to active)
-        target_delib_id = deliberation_id or self.active_deliberation_id
+        # Add to specific deliberation's messages
         if target_delib_id and target_delib_id in self.deliberations:
             self.deliberations[target_delib_id].messages.append(msg)
 
@@ -3367,14 +3380,17 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
         return delib.to_dict()
 
     @app.get("/api/deliberations/{deliberation_id}")
-    async def get_deliberation(deliberation_id: str):
+    async def get_deliberation(
+        deliberation_id: str,
+        include_messages: bool = Query(False, description="Include recent messages"),
+    ):
         """Get a specific deliberation."""
         orch = app.state.orchestrator
 
         if deliberation_id not in orch.deliberations:
             raise HTTPException(404, f"Deliberation {deliberation_id} not found")
 
-        return orch.deliberations[deliberation_id].to_dict()
+        return orch.deliberations[deliberation_id].to_dict(include_messages=include_messages)
 
     @app.post("/api/deliberations/{deliberation_id}/start")
     async def start_deliberation_by_id(deliberation_id: str):
@@ -3501,6 +3517,93 @@ def create_app(orchestrator: SwarmOrchestrator) -> FastAPI:
             return {"logs": logs, "deliberation_id": deliberation_id}
         except Exception as e:
             raise HTTPException(500, f"Failed to fetch logs: {e}")
+
+    @app.get("/api/deliberations/{deliberation_id}/analytics")
+    async def get_deliberation_analytics(deliberation_id: str):
+        """Get analytics for a specific deliberation."""
+        orch = app.state.orchestrator
+
+        if deliberation_id not in orch.deliberations:
+            raise HTTPException(404, f"Deliberation {deliberation_id} not found")
+
+        delib = orch.deliberations[deliberation_id]
+
+        # Get LLM logs for this deliberation
+        try:
+            from src.api.datasets import DatasetStore
+            store = DatasetStore()
+            logs = store.get_llm_logs(limit=1000, deliberation_id=deliberation_id)
+        except Exception:
+            logs = []
+
+        # Compute agent summary from logs
+        agent_stats = {}
+        for log in logs:
+            agent_id = log.get("agent_id", "unknown")
+            if agent_id not in agent_stats:
+                agent_stats[agent_id] = {
+                    "name": log.get("agent_name", agent_id),
+                    "model": log.get("model", "unknown"),
+                    "tokens_in": 0,
+                    "tokens_out": 0,
+                    "duration_ms": 0,
+                    "count": 0,
+                }
+            agent_stats[agent_id]["tokens_in"] += log.get("tokens_in", 0)
+            agent_stats[agent_id]["tokens_out"] += log.get("tokens_out", 0)
+            agent_stats[agent_id]["duration_ms"] += log.get("duration_ms", 0)
+            agent_stats[agent_id]["count"] += 1
+
+        # Model distribution
+        models = {}
+        for stats in agent_stats.values():
+            model = stats["model"]
+            models[model] = models.get(model, 0) + 1
+
+        # Compute totals
+        total_tokens_in = sum(s["tokens_in"] for s in agent_stats.values())
+        total_tokens_out = sum(s["tokens_out"] for s in agent_stats.values())
+        total_duration = sum(s["duration_ms"] for s in agent_stats.values())
+        num_agents = len(agent_stats) or 1
+
+        # Build position changes from vote history
+        position_changes = []
+        agent_positions_over_time = {}
+        for round_data in delib.vote_history:
+            round_num = round_data.get("round", 0)
+            for vote in round_data.get("agent_votes", []):
+                agent_id = vote.get("agent_id", "")
+                agent_name = vote.get("name", agent_id)
+                vote_val = vote.get("vote", "").upper()
+
+                if agent_id not in agent_positions_over_time:
+                    agent_positions_over_time[agent_id] = {"name": agent_name, "positions": []}
+                agent_positions_over_time[agent_id]["positions"].append({
+                    "round": round_num,
+                    "position": vote_val,
+                })
+
+        return {
+            "topic": delib.topic,
+            "status": delib.status,
+            "current_round": delib.current_round,
+            "max_rounds": delib.max_rounds,
+            "agent_summary": {
+                "total": num_agents,
+                "models": models,
+                "avg_tokens_out": total_tokens_out / num_agents if num_agents else 0,
+                "avg_duration_ms": total_duration / num_agents if num_agents else 0,
+                "agents": list(agent_stats.values()),
+            },
+            "token_usage": {
+                "total_in": total_tokens_in,
+                "total_out": total_tokens_out,
+            },
+            "vote_history": delib.vote_history,
+            "consensus": dict(delib.consensus),
+            "position_changes": position_changes,
+            "agent_positions_over_time": agent_positions_over_time,
+        }
 
     @app.get("/api/deliberations/{deliberation_id}/status")
     async def get_deliberation_status(deliberation_id: str):

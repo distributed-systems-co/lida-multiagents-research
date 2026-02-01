@@ -2706,12 +2706,18 @@ createApp({
                     break;
 
                 case 'message':
-                    messages.value.push({
-                        id: Date.now() + Math.random(),
-                        ...data.message
-                    });
-                    if (messages.value.length > 100) messages.value.shift();
-                    scrollMessages();
+                    // Only add messages for the selected deliberation (or if none selected yet)
+                    const msgDelibId = data.message?.deliberation_id;
+                    const isForSelectedDelib = !activeDeliberationId.value ||
+                                               msgDelibId === activeDeliberationId.value;
+                    if (isForSelectedDelib) {
+                        messages.value.push({
+                            id: Date.now() + Math.random(),
+                            ...data.message
+                        });
+                        if (messages.value.length > 100) messages.value.shift();
+                        scrollMessages();
+                    }
                     break;
 
                 case 'tool_call':
@@ -2725,21 +2731,7 @@ createApp({
                     break;
 
                 case 'deliberation_update':
-                    deliberation.value = {
-                        active: data.active,
-                        phase: data.phase,
-                        topic: data.topic,
-                        round: data.round || 0,
-                        current_round: data.current_round || data.round || 0,
-                        max_rounds: data.max_rounds || 10,
-                        deliberation_id: data.deliberation_id || activeDeliberationId.value,
-                        vote_history: data.vote_history || []
-                    };
-                    // Update active deliberation ID if provided
-                    if (data.deliberation_id) {
-                        activeDeliberationId.value = data.deliberation_id;
-                    }
-                    // Update deliberation in list
+                    // Always update the deliberation in the sidebar list
                     if (data.deliberation_id) {
                         const idx = deliberations.value.findIndex(d => d.id === data.deliberation_id);
                         if (idx >= 0) {
@@ -2749,6 +2741,27 @@ createApp({
                                 phase: data.phase,
                                 current_round: data.round
                             };
+                        }
+                    }
+                    // Only update main view if:
+                    // 1. No deliberation is selected yet (auto-select first one)
+                    // 2. This message is for the currently selected deliberation
+                    const isForSelected = !activeDeliberationId.value ||
+                                         data.deliberation_id === activeDeliberationId.value;
+                    if (isForSelected) {
+                        deliberation.value = {
+                            active: data.active,
+                            phase: data.phase,
+                            topic: data.topic,
+                            round: data.round || 0,
+                            current_round: data.current_round || data.round || 0,
+                            max_rounds: data.max_rounds || 10,
+                            deliberation_id: data.deliberation_id || activeDeliberationId.value,
+                            vote_history: data.vote_history || []
+                        };
+                        // Auto-select if none selected
+                        if (!activeDeliberationId.value && data.deliberation_id) {
+                            activeDeliberationId.value = data.deliberation_id;
                         }
                     }
                     break;
@@ -2783,7 +2796,13 @@ createApp({
                     break;
 
                 case 'consensus_update':
-                    consensus.value = data.consensus || {};
+                    // Only update consensus for the selected deliberation
+                    const consensusDelibId = data.deliberation_id;
+                    const isConsensusForSelected = !activeDeliberationId.value ||
+                                                   consensusDelibId === activeDeliberationId.value;
+                    if (isConsensusForSelected) {
+                        consensus.value = data.consensus || {};
+                    }
                     break;
 
                 case 'chat_response':
@@ -2797,31 +2816,37 @@ createApp({
                     break;
 
                 case 'stream_token':
-                    // Handle streaming tokens
-                    if (data.done) {
-                        // Stream complete - add to conversation history
-                        const completedBuffer = streamingAgents.value[data.agent_id];
-                        if (completedBuffer) {
-                            recentConversation.value.push({
-                                id: Date.now() + Math.random(),
-                                sender_id: data.agent_id,
-                                content: completedBuffer,
-                                timestamp: stats.value.elapsed,
-                                position: positions.value[data.agent_id],
-                                reactions: []
-                            });
-                            // Limit history
-                            if (recentConversation.value.length > maxConversationHistory) {
-                                recentConversation.value.shift();
+                    // Only handle stream tokens for the selected deliberation
+                    const streamDelibId = data.deliberation_id;
+                    const isStreamForSelected = !activeDeliberationId.value ||
+                                                streamDelibId === activeDeliberationId.value;
+                    if (isStreamForSelected) {
+                        // Handle streaming tokens
+                        if (data.done) {
+                            // Stream complete - add to conversation history
+                            const completedBuffer = streamingAgents.value[data.agent_id];
+                            if (completedBuffer) {
+                                recentConversation.value.push({
+                                    id: Date.now() + Math.random(),
+                                    sender_id: data.agent_id,
+                                    content: completedBuffer,
+                                    timestamp: stats.value.elapsed,
+                                    position: positions.value[data.agent_id],
+                                    reactions: []
+                                });
+                                // Limit history
+                                if (recentConversation.value.length > maxConversationHistory) {
+                                    recentConversation.value.shift();
+                                }
                             }
+                            // Remove from active streams
+                            delete streamingAgents.value[data.agent_id];
+                            streamingAgents.value = {...streamingAgents.value};
+                        } else {
+                            // Update streaming buffer
+                            streamingAgents.value[data.agent_id] = data.buffer || '';
+                            streamingAgents.value = {...streamingAgents.value};
                         }
-                        // Remove from active streams
-                        delete streamingAgents.value[data.agent_id];
-                        streamingAgents.value = {...streamingAgents.value};
-                    } else {
-                        // Update streaming buffer
-                        streamingAgents.value[data.agent_id] = data.buffer || '';
-                        streamingAgents.value = {...streamingAgents.value};
                     }
                     break;
 
@@ -3089,16 +3114,36 @@ createApp({
         };
 
         // Select a deliberation
-        const selectDeliberation = (delib) => {
+        const selectDeliberation = async (delib) => {
             activeDeliberationId.value = delib.id;
             deliberation.value = {
                 active: delib.status === 'active',
                 phase: delib.phase || '',
                 topic: delib.topic,
                 round: delib.current_round || 0,
+                current_round: delib.current_round || 0,
                 max_rounds: delib.max_rounds || 7,
-                deliberation_id: delib.id
+                deliberation_id: delib.id,
+                vote_history: delib.vote_history || []
             };
+            consensus.value = delib.consensus || {};
+
+            // Load the deliberation's messages
+            try {
+                const response = await fetch(`/api/deliberations/${delib.id}?include_messages=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // Clear old messages and load this deliberation's messages
+                    messages.value = (data.messages || []).map(m => ({
+                        id: Date.now() + Math.random(),
+                        ...m
+                    }));
+                    consensus.value = data.consensus || {};
+                    deliberation.value.vote_history = data.vote_history || [];
+                }
+            } catch (err) {
+                console.error('Failed to load deliberation messages:', err);
+            }
         };
 
         // Get status badge class
@@ -3800,9 +3845,16 @@ createApp({
         const openPastRunsPanel = async () => {
             showPastRunsPanel.value = true;
             try {
-                const res = await fetch('/api/logs/deliberations');
+                const res = await fetch('/api/deliberations');
                 const data = await res.json();
-                pastRunsList.value = data.deliberations || [];
+                // Transform deliberations to expected format
+                pastRunsList.value = (data.deliberations || []).map(d => ({
+                    id: d.id,
+                    name: d.topic ? d.topic.substring(0, 50) : 'Untitled',
+                    date: d.created_at ? new Date(d.created_at).toLocaleDateString() : '',
+                    time: d.created_at ? new Date(d.created_at).toLocaleTimeString() : '',
+                    status: d.status
+                }));
             } catch (e) {
                 console.error('Failed to load deliberation list:', e);
                 pastRunsList.value = [];
