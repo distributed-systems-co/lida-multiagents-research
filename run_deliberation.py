@@ -170,21 +170,28 @@ def name_to_persona_id(name: str) -> str:
     return name_lower.replace(" ", "_").replace("-", "_")
 
 
-def activate_personas(api_port: int, personas: list, persona_version: str = "v1") -> bool:
+def activate_personas(api_port: int, personas: list, persona_version: str = "v1", scenario: str = None) -> bool:
     """Activate personas on the server via API call."""
     if not personas:
         return True  # Nothing to activate
 
     url = f"http://localhost:{api_port}/api/session/activate"
     print(f">>> Activating {len(personas)} personas (version {persona_version}) on server...", flush=True)
+    if scenario:
+        print(f">>> Using models from scenario: {scenario}", flush=True)
     try:
-        resp = requests.post(url, json={
+        payload = {
             "personas": personas,
             "persona_version": persona_version,
-        }, timeout=30)
+        }
+        if scenario:
+            payload["scenario"] = scenario
+        resp = requests.post(url, json=payload, timeout=30)
         if resp.status_code == 200:
             result = resp.json()
             print(f">>> Activated {result.get('count', 0)} agents", flush=True)
+            if result.get("models"):
+                print(f">>> Models: {result.get('models')}", flush=True)
             return True
         else:
             print(f">>> Failed to activate personas: {resp.status_code} {resp.text}", flush=True)
@@ -385,9 +392,9 @@ def main():
         if personas:
             print(f"Found {len(personas)} personas (version {persona_version}) in scenario: {args.scenario}")
 
-    # Activate personas
+    # Activate personas (pass scenario to load correct models)
     if personas:
-        if not activate_personas(args.port, personas, persona_version or "v1"):
+        if not activate_personas(args.port, personas, persona_version or "v1", scenario=args.scenario):
             print("WARNING: Failed to activate personas, continuing anyway...")
         print()
 

@@ -146,6 +146,7 @@ class DatasetStore:
                     scenario_name TEXT,
                     config_json TEXT,
                     consensus_json TEXT,
+                    vote_history_json TEXT,
                     created_at TEXT NOT NULL,
                     started_at TEXT,
                     completed_at TEXT
@@ -154,6 +155,14 @@ class DatasetStore:
                 CREATE INDEX IF NOT EXISTS idx_deliberation_status ON deliberations(status);
                 CREATE INDEX IF NOT EXISTS idx_deliberation_created ON deliberations(created_at);
             """)
+
+            # Migration: Add vote_history_json column if it doesn't exist (for existing databases)
+            try:
+                conn.execute("ALTER TABLE deliberations ADD COLUMN vote_history_json TEXT")
+                logger.info("Added vote_history_json column to deliberations table")
+            except sqlite3.OperationalError:
+                pass  # Column already exists
+
         logger.info(f"Database initialized at {self.db_path}")
 
     # Dataset operations
@@ -600,6 +609,12 @@ class DatasetStore:
         if not row:
             return None
 
+        # Handle vote_history_json column which may not exist in older databases
+        try:
+            vote_history = json.loads(row["vote_history_json"]) if row["vote_history_json"] else []
+        except (KeyError, TypeError):
+            vote_history = []
+
         return {
             "id": row["id"],
             "topic": row["topic"],
@@ -610,6 +625,7 @@ class DatasetStore:
             "scenario_name": row["scenario_name"],
             "config": json.loads(row["config_json"]) if row["config_json"] else None,
             "consensus": json.loads(row["consensus_json"]) if row["consensus_json"] else None,
+            "vote_history": vote_history,
             "created_at": row["created_at"],
             "started_at": row["started_at"],
             "completed_at": row["completed_at"],
@@ -644,8 +660,15 @@ class DatasetStore:
         with self._transaction() as conn:
             rows = conn.execute(query, params).fetchall()
 
-        return [
-            {
+        results = []
+        for row in rows:
+            # Handle vote_history_json column which may not exist in older databases
+            try:
+                vote_history = json.loads(row["vote_history_json"]) if row["vote_history_json"] else []
+            except (KeyError, TypeError):
+                vote_history = []
+
+            results.append({
                 "id": row["id"],
                 "topic": row["topic"],
                 "status": row["status"],
@@ -655,12 +678,12 @@ class DatasetStore:
                 "scenario_name": row["scenario_name"],
                 "config": json.loads(row["config_json"]) if row["config_json"] else None,
                 "consensus": json.loads(row["consensus_json"]) if row["consensus_json"] else None,
+                "vote_history": vote_history,
                 "created_at": row["created_at"],
                 "started_at": row["started_at"],
                 "completed_at": row["completed_at"],
-            }
-            for row in rows
-        ]
+            })
+        return results
 
     def update_deliberation(
         self,
@@ -669,6 +692,7 @@ class DatasetStore:
         phase: Optional[str] = None,
         current_round: Optional[int] = None,
         consensus: Optional[dict] = None,
+        vote_history: Optional[list] = None,
         started_at: Optional[str] = None,
         completed_at: Optional[str] = None,
     ) -> bool:
@@ -680,6 +704,7 @@ class DatasetStore:
             phase: Current phase
             current_round: Current round number
             consensus: Consensus dict
+            vote_history: List of vote history dicts per round
             started_at: When deliberation started (ISO format)
             completed_at: When deliberation completed (ISO format)
 
@@ -701,6 +726,9 @@ class DatasetStore:
         if consensus is not None:
             updates.append("consensus_json = ?")
             params.append(json.dumps(consensus))
+        if vote_history is not None:
+            updates.append("vote_history_json = ?")
+            params.append(json.dumps(vote_history))
         if started_at is not None:
             updates.append("started_at = ?")
             params.append(started_at)

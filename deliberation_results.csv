@@ -1,0 +1,23 @@
+Question,Deliberation ID,Topic (first 10 words),Support,Oppose,Modify,Abstain,Total Agents,Vote Changers
+Q1,59fb24cd,Do you support requiring all new AI accelerators to include,0,10,0,0,10,Yoshua Bengio: MODIFY -> MODIFY -> MODIFY -> MODIFY -> OPPOSE
+Q2,aad76967,Do you support requiring 80% of existing datacenter AI chips,3,7,0,0,10,None
+Q3,6c62f5a7,Do you support mandating hardware-rooted attestation to verify training run,7,3,0,0,10,Sam Altman: OPPOSE -> ABSTAIN -> OPPOSE -> OPPOSE -> OPPOSE
+Q4,35362103,Do you support requiring AI chips to use offline licensing,7,3,0,0,10,None
+Q5,9d8b3755,Do you support embedding location verification mechanisms in AI chips,3,7,0,0,10,Ursula von der Leyen: MODIFY -> MODIFY -> MODIFY -> MODIFY -> OPPOSE
+Q6,6ebc1cef,Do you support requiring chip manufacturers to implement hardware-enabled mechanisms,8,2,0,0,10,None
+Q7,2ca7f0e6,Do you support chips automatically entering reduced-capability mode if compliance,5,5,0,0,10,None
+Q8,7dafe3db,Do you support requiring compute usage reporting through privacy-preserving mechanisms,9,1,0,0,10,None
+Q9,a269fcf6,Do you support automatic escalation from anonymized reporting to detailed,0,4,6,0,10,Sundar Pichai: SUPPORT -> MODIFY -> MODIFY -> MODIFY -> MODIFY; Sam Altman: SUPPORT -> SUPPORT -> SUPPORT -> SUPPORT -> MODIFY; Yoshua Bengio: SUPPORT -> SUPPORT -> SUPPORT -> MODIFY -> MODIFY; Chuck Schumer: SUPPORT -> SUPPORT -> SUPPORT -> MODIFY -> MODIFY; Elon Musk: SUPPORT -> SUPPORT -> MODIFY -> MODIFY -> MODIFY; Dario Amodei: SUPPORT -> SUPPORT -> MODIFY -> MODIFY -> MODIFY
+Q10,d6dfdb4f,Do you support requiring AI training infrastructure to use only,10,0,0,0,10,Sundar Pichai: MODIFY -> MODIFY -> MODIFY -> MODIFY -> SUPPORT
+Q11,7f32a9b0,Do you support requiring additional government approval for AI hardware,10,0,0,0,10,None
+Q12,65c52a7f,Do you support mandating tamper-evident mechanisms in AI chips that,5,5,0,0,10,None
+Q13,bd07ae83,Do you support establishing an international technical body to maintain,5,5,0,0,10,Elon Musk: MODIFY -> MODIFY -> MODIFY -> MODIFY -> OPPOSE
+Q14,f7400f95,Do you support requiring participation in this international body as,4,6,0,0,10,None
+Q15,69f0cb37,Do you support hardware-level enforcement of non-compliance (license suspension limiting,8,2,0,0,10,Ursula von der Leyen: ABSTAIN -> SUPPORT -> SUPPORT -> SUPPORT -> SUPPORT
+Q16,6ef6dd88,Do you support requiring 72-hour incident notification for frontier AI,9,1,0,0,10,None
+Q17,756ee209,Do you support linking dangerous capability evaluations to hardware-enforced security,10,0,0,0,10,None
+Q18,e520c222,Do you support requiring 90-day advance notification for training runs,7,3,0,0,10,None
+Q19,c1202d68,Do you support automatic flagging for government review when actual,8,2,0,0,10,None
+Q20,a8b15c73,Do you support using hardware-enabled mechanisms as the primary enforcement,0,10,0,0,10,None
+Q21,57587154,Do you support trade restrictions on AI-related exports as an,8,2,0,0,10,None
+Q22,290dd24e,Do you support a multilateral technical secretariat publishing anonymized aggregate,8,2,0,0,10,None

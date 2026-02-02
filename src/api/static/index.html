@@ -768,6 +768,84 @@
         .source-badge.opinion { border-left: 3px solid #f59e0b; }
         .source-badge.custom { border-left: 3px solid #8b5cf6; }
 
+        /* Past Runs Analytics Panel */
+        .analytics-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .analytics-panel {
+            background: #0d0d15;
+            border: 1px solid #2e2e4e;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 92vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+        }
+        .analytics-panel .ap-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #2e2e4e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .analytics-panel .ap-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+        .chart-card {
+            background: #12121a;
+            border: 1px solid #1e1e2e;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .chart-card h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 12px;
+        }
+        .chart-canvas-wrap {
+            position: relative;
+            width: 100%;
+        }
+        .chart-canvas-wrap canvas {
+            width: 100% !important;
+        }
+        .stat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #1e1e2e;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        .stat-pill .sp-label { color: #6b7280; }
+        .stat-pill .sp-value { color: #e2e8f0; font-weight: 600; }
+        .ap-select {
+            background: #1e1e2e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #e2e8f0;
+            min-width: 300px;
+        }
+        .ap-select:focus { outline: none; border-color: var(--accent); }
+        .timeline-svg { width: 100%; height: 200px; }
+
         /* Paused overlay */
         .paused-overlay {
             position: fixed;
@@ -800,6 +878,12 @@
                         title="View Deliberations">
                     📋
                 </button>
+                <button @click="openPastRunsPanel"
+                        :class="['p-2 rounded transition-colors',
+                                showPastRunsPanel ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700']"
+                        title="Past Runs Analytics">
+                    📊
+                </button>
                 <div class="text-2xl">{{ spinnerChar }}</div>
                 <h1 class="text-xl font-bold bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">LIDA</h1>
                 <span class="text-sm text-gray-500">Swarm Intelligence</span>
@@ -815,8 +899,8 @@
                 <span v-else-if="deliberation.active" class="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">
                     Active
                 </span>
-                <span v-if="deliberation.round > 0" class="px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
-                    Round {{ deliberation.round }}/{{ deliberation.max_rounds }}
+                <span v-if="deliberation.current_round > 0 || deliberation.round > 0" class="px-2 py-1 rounded text-xs font-bold bg-purple-500/30 text-purple-300 border border-purple-500/50">
+                    Round {{ deliberation.current_round || deliberation.round }}/{{ deliberation.max_rounds || 10 }}
                 </span>
             </div>
         </div>
@@ -1947,12 +2031,320 @@
         </div>
     </div>
 
+    <!-- Past Runs Analytics Panel -->
+    <div v-if="showPastRunsPanel" class="analytics-panel-overlay" @click.self="showPastRunsPanel = false">
+        <div class="analytics-panel">
+            <div class="ap-header">
+                <div class="flex items-center gap-4">
+                    <span class="text-xl">📊</span>
+                    <h3 class="text-lg font-semibold text-white">Past Runs Analytics</h3>
+                    <select v-model="pastRunsSelected" @change="loadPastRunAnalytics" class="ap-select">
+                        <option value="">-- Select a deliberation --</option>
+                        <option v-for="d in pastRunsList" :key="d.id" :value="d.id">
+                            {{ d.name }} ({{ d.date }} {{ d.time }}) [{{ d.id }}]
+                        </option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button v-if="pastRunsData" @click="exportPastRunCsv"
+                            class="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 transition-colors">
+                        CSV Export
+                    </button>
+                    <button @click="showPastRunsPanel = false"
+                            class="text-gray-400 hover:text-white text-xl">&times;</button>
+                </div>
+            </div>
+            <div class="ap-body scroll-thin">
+                <!-- Loading / Empty State -->
+                <div v-if="pastRunsLoading" class="text-center py-12 text-gray-500">
+                    <div class="spinner mx-auto mb-3" style="width:24px;height:24px;"></div>
+                    Loading analytics...
+                </div>
+                <div v-else-if="!pastRunsData && !pastRunsSelected" class="text-center py-12 text-gray-500">
+                    <div class="text-4xl mb-3">📊</div>
+                    <div class="text-sm">Select a past deliberation to view analytics</div>
+                </div>
+
+                <!-- Analytics Content -->
+                <div v-else-if="pastRunsData">
+                    <!-- Summary Stats Row -->
+                    <div class="flex flex-wrap gap-3 mb-5">
+                        <div class="stat-pill">
+                            <span class="sp-label">Topic:</span>
+                            <span class="sp-value">{{ pastRunsData.topic || 'N/A' }}</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="sp-label">Agents:</span>
+                            <span class="sp-value">{{ pastRunsData.agent_summary.total }}</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="sp-label">Avg Tokens Out:</span>
+                            <span class="sp-value">{{ Math.round(pastRunsData.agent_summary.avg_tokens_out) }}</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="sp-label">Avg Duration:</span>
+                            <span class="sp-value">{{ (pastRunsData.agent_summary.avg_duration_ms / 1000).toFixed(1) }}s</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="sp-label">Total Tokens:</span>
+                            <span class="sp-value">{{ (pastRunsData.token_usage.total_in + pastRunsData.token_usage.total_out).toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <!-- Chart 1: Vote Distribution (Doughnut) -->
+                        <div class="chart-card">
+                            <h4>Vote Distribution</h4>
+                            <div class="chart-canvas-wrap" style="height:220px;">
+                                <canvas ref="prVoteChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 4: Model Distribution (Pie) -->
+                        <div class="chart-card">
+                            <h4>Model Distribution</h4>
+                            <div class="chart-canvas-wrap" style="height:220px;">
+                                <canvas ref="prModelChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 6: Agent Position Heatmap (D3) -->
+                        <div class="chart-card">
+                            <h4>Agent Positions</h4>
+                            <div ref="prHeatmapContainer" style="height:220px;overflow-y:auto;" class="scroll-thin"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Chart 2: Token Usage by Agent (Horizontal Bar) -->
+                        <div class="chart-card">
+                            <h4>Token Usage by Agent</h4>
+                            <div class="chart-canvas-wrap" style="height:300px;">
+                                <canvas ref="prTokenChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 3: Response Time by Agent (Bar) -->
+                        <div class="chart-card">
+                            <h4>Response Time by Agent</h4>
+                            <div class="chart-canvas-wrap" style="height:300px;">
+                                <canvas ref="prDurationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart 5: Response Timeline (D3) -->
+                    <div class="chart-card">
+                        <h4>Response Timeline (Cumulative)</h4>
+                        <div ref="prTimelineContainer" style="height:220px;"></div>
+                    </div>
+
+                    <!-- Chart 7: Position Changes Over Time -->
+                    <div class="chart-card" v-if="pastRunsData.position_changes && pastRunsData.position_changes.length > 0">
+                        <h4>Position Changes by Agent ({{ pastRunsData.position_changes.length }} changes)</h4>
+                        <div ref="prPositionChangesContainer" style="height:300px;overflow-y:auto;" class="scroll-thin"></div>
+                    </div>
+                    <div class="chart-card" v-else-if="pastRunsData.position_changes">
+                        <h4>Position Changes</h4>
+                        <div class="flex items-center justify-center h-32 text-gray-500">
+                            No position changes detected - all agents maintained their initial positions
+                        </div>
+                    </div>
+
+                    <!-- Chart 8: All Agent Positions Over Time Grid -->
+                    <div class="chart-card" v-if="pastRunsData.agent_positions_over_time && Object.keys(pastRunsData.agent_positions_over_time).length > 0">
+                        <h4>Agent Positions by Round ({{ Object.keys(pastRunsData.agent_positions_over_time).length }} agents)</h4>
+                        <div ref="prAllPositionsContainer" style="max-height:400px;overflow:auto;" class="scroll-thin"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Paused Indicator -->
     <div v-if="isPaused" class="paused-overlay">
         ⏸ PAUSED - Discussion halted
         <button @click="togglePause" class="ml-2 px-2 py-0.5 rounded bg-black/30 hover:bg-black/50 text-xs">
             Resume
         </button>
+    </div>
+
+    <!-- Agent Status Table -->
+    <div v-if="agents.length > 0" class="mt-4 bg-gray-900/50 rounded-lg border border-gray-800 overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 cursor-pointer"
+             :class="agentStatusMinimized ? '' : 'border-b border-gray-700'"
+             @click="agentStatusMinimized = !agentStatusMinimized">
+            <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-3">
+                <span class="text-gray-500 transition-transform" :class="agentStatusMinimized ? '' : 'rotate-90'">&#9654;</span>
+                <span>Agent Status ({{ agents.length }} agents)</span>
+                <span v-if="deliberation.current_round > 0 || deliberation.round > 0"
+                      class="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
+                    ROUND {{ deliberation.current_round || deliberation.round }} / {{ deliberation.max_rounds || 10 }}
+                </span>
+                <span v-if="deliberation.phase" class="text-xs text-gray-400">{{ deliberation.phase }}</span>
+            </h3>
+            <div v-show="!agentStatusMinimized" class="flex items-center gap-4 text-xs">
+                <span class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    Debating: {{ agents.filter(a => a.status === 'speaking' || a.status === 'debating').length }}
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    Voting: {{ agents.filter(a => a.status === 'voting').length }}
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Waiting: {{ agents.filter(a => a.status === 'idle' || a.status === 'analyzing').length }}
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    Voted: {{ agents.filter(a => a.current_vote).length }}
+                </span>
+            </div>
+        </div>
+        <div v-show="!agentStatusMinimized" class="max-h-64 overflow-y-auto scroll-thin">
+            <table class="w-full text-xs">
+                <thead class="bg-gray-800/80 sticky top-0">
+                    <tr>
+                        <th class="px-3 py-2 text-left text-gray-400 font-medium">Agent</th>
+                        <th class="px-3 py-2 text-left text-gray-400 font-medium">Status</th>
+                        <th class="px-3 py-2 text-left text-gray-400 font-medium">Vote</th>
+                        <th class="px-3 py-2 text-left text-gray-400 font-medium">Model</th>
+                        <th class="px-3 py-2 text-left text-gray-400 font-medium">Current Thought</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="agent in sortedAgentsByStatus" :key="agent.id"
+                        :class="[
+                            'border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors',
+                            agent.status === 'speaking' || agent.status === 'debating' ? 'bg-green-900/20' : '',
+                            agent.status === 'voting' ? 'bg-yellow-900/20' : ''
+                        ]">
+                        <td class="px-3 py-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">{{ agent.avatar || '🤖' }}</span>
+                                <div>
+                                    <div class="font-medium text-gray-200">{{ agent.name }}</div>
+                                    <div class="text-gray-500 text-[10px]">{{ agent.role || agent.category }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-3 py-2">
+                            <span :class="[
+                                'px-2 py-0.5 rounded-full text-[10px] font-medium',
+                                agent.status === 'speaking' || agent.status === 'debating' ? 'bg-green-500/20 text-green-400' : '',
+                                agent.status === 'voting' ? 'bg-yellow-500/20 text-yellow-400' : '',
+                                agent.status === 'idle' ? 'bg-gray-500/20 text-gray-400' : '',
+                                agent.status === 'analyzing' ? 'bg-blue-500/20 text-blue-400' : '',
+                                agent.status === 'researching' ? 'bg-cyan-500/20 text-cyan-400' : ''
+                            ]">
+                                {{ agent.status || 'idle' }}
+                            </span>
+                        </td>
+                        <td class="px-3 py-2">
+                            <span v-if="agent.current_vote" :class="[
+                                'px-2 py-0.5 rounded text-[10px] font-bold',
+                                agent.current_vote === 'Support' ? 'bg-green-500/30 text-green-400' : '',
+                                agent.current_vote === 'Oppose' ? 'bg-red-500/30 text-red-400' : '',
+                                agent.current_vote === 'Modify' ? 'bg-orange-500/30 text-orange-400' : '',
+                                agent.current_vote === 'Abstain' ? 'bg-gray-500/30 text-gray-400' : '',
+                                agent.current_vote === 'Continue' ? 'bg-blue-500/30 text-blue-400' : ''
+                            ]">
+                                {{ agent.current_vote }}
+                            </span>
+                            <span v-else class="text-gray-600">-</span>
+                        </td>
+                        <td class="px-3 py-2 text-gray-500 text-[10px] max-w-[120px] truncate" :title="agent.model">
+                            {{ agent.model ? agent.model.split('/').pop() : '-' }}
+                        </td>
+                        <td class="px-3 py-2 text-gray-400 text-[10px] max-w-[200px] truncate" :title="agent.current_thought">
+                            {{ agent.current_thought || '-' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Vote History by Round -->
+    <div v-if="deliberation.vote_history && deliberation.vote_history.length > 0" class="mt-4 bg-gray-900/50 rounded-lg border border-gray-800">
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 cursor-pointer"
+             :class="voteHistoryMinimized ? '' : 'border-b border-gray-700'"
+             @click="voteHistoryMinimized = !voteHistoryMinimized">
+            <h3 class="text-sm font-semibold text-gray-300 flex items-center gap-3">
+                <span class="text-gray-500 transition-transform" :class="voteHistoryMinimized ? '' : 'rotate-90'">&#9654;</span>
+                <span>Vote History ({{ deliberation.vote_history.length }} rounds)</span>
+            </h3>
+        </div>
+        <div v-show="!voteHistoryMinimized" class="p-4 overflow-x-auto">
+            <!-- Round summary cards -->
+            <div class="flex gap-3" style="min-width: max-content;">
+                <div v-for="round in deliberation.vote_history" :key="round.round"
+                     class="bg-gray-800/50 rounded-lg p-3 border border-gray-700 flex-shrink-0" style="width: 200px;">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-purple-400">Round {{ round.round }}</span>
+                        <span class="text-[10px] text-gray-500">{{ round.agent_votes?.length || 0 }} votes</span>
+                    </div>
+                    <!-- Vote bars -->
+                    <div class="space-y-1">
+                        <div v-if="round.consensus?.Support > 0" class="flex items-center gap-2">
+                            <span class="text-[10px] text-green-400 w-12">Support</span>
+                            <div class="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 rounded-full transition-all duration-500"
+                                     :style="{width: ((round.consensus.Support / getTotalVotes(round.consensus)) * 100) + '%'}"></div>
+                            </div>
+                            <span class="text-[10px] text-gray-400 w-6 text-right">{{ round.consensus.Support }}</span>
+                        </div>
+                        <div v-if="round.consensus?.Oppose > 0" class="flex items-center gap-2">
+                            <span class="text-[10px] text-red-400 w-12">Oppose</span>
+                            <div class="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-red-500 rounded-full transition-all duration-500"
+                                     :style="{width: ((round.consensus.Oppose / getTotalVotes(round.consensus)) * 100) + '%'}"></div>
+                            </div>
+                            <span class="text-[10px] text-gray-400 w-6 text-right">{{ round.consensus.Oppose }}</span>
+                        </div>
+                        <div v-if="round.consensus?.Modify > 0" class="flex items-center gap-2">
+                            <span class="text-[10px] text-orange-400 w-12">Modify</span>
+                            <div class="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-orange-500 rounded-full transition-all duration-500"
+                                     :style="{width: ((round.consensus.Modify / getTotalVotes(round.consensus)) * 100) + '%'}"></div>
+                            </div>
+                            <span class="text-[10px] text-gray-400 w-6 text-right">{{ round.consensus.Modify }}</span>
+                        </div>
+                        <div v-if="round.consensus?.Abstain > 0" class="flex items-center gap-2">
+                            <span class="text-[10px] text-gray-400 w-12">Abstain</span>
+                            <div class="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-gray-500 rounded-full transition-all duration-500"
+                                     :style="{width: ((round.consensus.Abstain / getTotalVotes(round.consensus)) * 100) + '%'}"></div>
+                            </div>
+                            <span class="text-[10px] text-gray-400 w-6 text-right">{{ round.consensus.Abstain }}</span>
+                        </div>
+                        <div v-if="round.consensus?.Continue > 0" class="flex items-center gap-2">
+                            <span class="text-[10px] text-blue-400 w-12">Continue</span>
+                            <div class="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full transition-all duration-500"
+                                     :style="{width: ((round.consensus.Continue / getTotalVotes(round.consensus)) * 100) + '%'}"></div>
+                            </div>
+                            <span class="text-[10px] text-gray-400 w-6 text-right">{{ round.consensus.Continue }}</span>
+                        </div>
+                    </div>
+                    <!-- Winner badge -->
+                    <div class="mt-2 pt-2 border-t border-gray-700">
+                        <span :class="[
+                            'px-2 py-0.5 rounded text-[10px] font-bold',
+                            getWinningVote(round.consensus) === 'Support' ? 'bg-green-500/30 text-green-400' : '',
+                            getWinningVote(round.consensus) === 'Oppose' ? 'bg-red-500/30 text-red-400' : '',
+                            getWinningVote(round.consensus) === 'Modify' ? 'bg-orange-500/30 text-orange-400' : '',
+                            getWinningVote(round.consensus) === 'Abstain' ? 'bg-gray-500/30 text-gray-400' : '',
+                            getWinningVote(round.consensus) === 'Continue' ? 'bg-blue-500/30 text-blue-400' : ''
+                        ]">
+                            {{ getWinningVote(round.consensus) }}: {{ getWinningCount(round.consensus) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -2015,6 +2407,10 @@ createApp({
         const structuredVotes = ref([]);  // Array of structured votes with reasoning
         const beliefStates = ref({});     // agent_id -> belief state
         const activeTab = ref('consensus');
+
+        // Panel minimization state
+        const agentStatusMinimized = ref(false);
+        const voteHistoryMinimized = ref(false);
 
         // Persuader state
         const persuader = ref({
@@ -2119,6 +2515,26 @@ createApp({
             'Autonomous Vehicles'
         ]);
 
+        // Past Runs Analytics State
+        const showPastRunsPanel = ref(false);
+        const pastRunsList = ref([]);
+        const pastRunsSelected = ref('');
+        const pastRunsData = ref(null);
+        const pastRunsLoading = ref(false);
+
+        // Chart refs
+        const prVoteChart = ref(null);
+        const prModelChart = ref(null);
+        const prTokenChart = ref(null);
+        const prDurationChart = ref(null);
+        const prHeatmapContainer = ref(null);
+        const prTimelineContainer = ref(null);
+        const prPositionChangesContainer = ref(null);
+        const prAllPositionsContainer = ref(null);
+
+        // Chart instances for cleanup
+        let prChartInstances = {};
+
         // Computed: Best performing tactic
         const bestTactic = computed(() => {
             const entries = Object.entries(tacticEffectiveness.value);
@@ -2140,6 +2556,28 @@ createApp({
                 }
             }
             return count > 0 ? totalChange / count : 0;
+        });
+
+        // Computed: Agents sorted by status (active first, then voting, then idle)
+        const sortedAgentsByStatus = computed(() => {
+            const statusPriority = {
+                'speaking': 1,
+                'debating': 1,
+                'voting': 2,
+                'researching': 3,
+                'analyzing': 4,
+                'idle': 5,
+            };
+            return [...agents.value].sort((a, b) => {
+                const priorityA = statusPriority[a.status] || 6;
+                const priorityB = statusPriority[b.status] || 6;
+                if (priorityA !== priorityB) return priorityA - priorityB;
+                // Secondary sort: agents with votes first
+                if (a.current_vote && !b.current_vote) return -1;
+                if (!a.current_vote && b.current_vote) return 1;
+                // Tertiary sort: by name
+                return (a.name || '').localeCompare(b.name || '');
+            });
         });
 
         // Computed: Average resistance
@@ -2268,12 +2706,18 @@ createApp({
                     break;
 
                 case 'message':
-                    messages.value.push({
-                        id: Date.now() + Math.random(),
-                        ...data.message
-                    });
-                    if (messages.value.length > 100) messages.value.shift();
-                    scrollMessages();
+                    // Only add messages for the selected deliberation (or if none selected yet)
+                    const msgDelibId = data.message?.deliberation_id;
+                    const isForSelectedDelib = !activeDeliberationId.value ||
+                                               msgDelibId === activeDeliberationId.value;
+                    if (isForSelectedDelib) {
+                        messages.value.push({
+                            id: Date.now() + Math.random(),
+                            ...data.message
+                        });
+                        if (messages.value.length > 100) messages.value.shift();
+                        scrollMessages();
+                    }
                     break;
 
                 case 'tool_call':
@@ -2287,19 +2731,7 @@ createApp({
                     break;
 
                 case 'deliberation_update':
-                    deliberation.value = {
-                        active: data.active,
-                        phase: data.phase,
-                        topic: data.topic,
-                        round: data.round || 0,
-                        max_rounds: data.max_rounds || 5,
-                        deliberation_id: data.deliberation_id || activeDeliberationId.value
-                    };
-                    // Update active deliberation ID if provided
-                    if (data.deliberation_id) {
-                        activeDeliberationId.value = data.deliberation_id;
-                    }
-                    // Update deliberation in list
+                    // Always update the deliberation in the sidebar list
                     if (data.deliberation_id) {
                         const idx = deliberations.value.findIndex(d => d.id === data.deliberation_id);
                         if (idx >= 0) {
@@ -2309,6 +2741,27 @@ createApp({
                                 phase: data.phase,
                                 current_round: data.round
                             };
+                        }
+                    }
+                    // Only update main view if:
+                    // 1. No deliberation is selected yet (auto-select first one)
+                    // 2. This message is for the currently selected deliberation
+                    const isForSelected = !activeDeliberationId.value ||
+                                         data.deliberation_id === activeDeliberationId.value;
+                    if (isForSelected) {
+                        deliberation.value = {
+                            active: data.active,
+                            phase: data.phase,
+                            topic: data.topic,
+                            round: data.round || 0,
+                            current_round: data.current_round || data.round || 0,
+                            max_rounds: data.max_rounds || 10,
+                            deliberation_id: data.deliberation_id || activeDeliberationId.value,
+                            vote_history: data.vote_history || []
+                        };
+                        // Auto-select if none selected
+                        if (!activeDeliberationId.value && data.deliberation_id) {
+                            activeDeliberationId.value = data.deliberation_id;
                         }
                     }
                     break;
@@ -2343,7 +2796,13 @@ createApp({
                     break;
 
                 case 'consensus_update':
-                    consensus.value = data.consensus || {};
+                    // Only update consensus for the selected deliberation
+                    const consensusDelibId = data.deliberation_id;
+                    const isConsensusForSelected = !activeDeliberationId.value ||
+                                                   consensusDelibId === activeDeliberationId.value;
+                    if (isConsensusForSelected) {
+                        consensus.value = data.consensus || {};
+                    }
                     break;
 
                 case 'chat_response':
@@ -2357,31 +2816,37 @@ createApp({
                     break;
 
                 case 'stream_token':
-                    // Handle streaming tokens
-                    if (data.done) {
-                        // Stream complete - add to conversation history
-                        const completedBuffer = streamingAgents.value[data.agent_id];
-                        if (completedBuffer) {
-                            recentConversation.value.push({
-                                id: Date.now() + Math.random(),
-                                sender_id: data.agent_id,
-                                content: completedBuffer,
-                                timestamp: stats.value.elapsed,
-                                position: positions.value[data.agent_id],
-                                reactions: []
-                            });
-                            // Limit history
-                            if (recentConversation.value.length > maxConversationHistory) {
-                                recentConversation.value.shift();
+                    // Only handle stream tokens for the selected deliberation
+                    const streamDelibId = data.deliberation_id;
+                    const isStreamForSelected = !activeDeliberationId.value ||
+                                                streamDelibId === activeDeliberationId.value;
+                    if (isStreamForSelected) {
+                        // Handle streaming tokens
+                        if (data.done) {
+                            // Stream complete - add to conversation history
+                            const completedBuffer = streamingAgents.value[data.agent_id];
+                            if (completedBuffer) {
+                                recentConversation.value.push({
+                                    id: Date.now() + Math.random(),
+                                    sender_id: data.agent_id,
+                                    content: completedBuffer,
+                                    timestamp: stats.value.elapsed,
+                                    position: positions.value[data.agent_id],
+                                    reactions: []
+                                });
+                                // Limit history
+                                if (recentConversation.value.length > maxConversationHistory) {
+                                    recentConversation.value.shift();
+                                }
                             }
+                            // Remove from active streams
+                            delete streamingAgents.value[data.agent_id];
+                            streamingAgents.value = {...streamingAgents.value};
+                        } else {
+                            // Update streaming buffer
+                            streamingAgents.value[data.agent_id] = data.buffer || '';
+                            streamingAgents.value = {...streamingAgents.value};
                         }
-                        // Remove from active streams
-                        delete streamingAgents.value[data.agent_id];
-                        streamingAgents.value = {...streamingAgents.value};
-                    } else {
-                        // Update streaming buffer
-                        streamingAgents.value[data.agent_id] = data.buffer || '';
-                        streamingAgents.value = {...streamingAgents.value};
                     }
                     break;
 
@@ -2649,16 +3114,36 @@ createApp({
         };
 
         // Select a deliberation
-        const selectDeliberation = (delib) => {
+        const selectDeliberation = async (delib) => {
             activeDeliberationId.value = delib.id;
             deliberation.value = {
                 active: delib.status === 'active',
                 phase: delib.phase || '',
                 topic: delib.topic,
                 round: delib.current_round || 0,
+                current_round: delib.current_round || 0,
                 max_rounds: delib.max_rounds || 7,
-                deliberation_id: delib.id
+                deliberation_id: delib.id,
+                vote_history: delib.vote_history || []
             };
+            consensus.value = delib.consensus || {};
+
+            // Load the deliberation's messages
+            try {
+                const response = await fetch(`/api/deliberations/${delib.id}?include_messages=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // Clear old messages and load this deliberation's messages
+                    messages.value = (data.messages || []).map(m => ({
+                        id: Date.now() + Math.random(),
+                        ...m
+                    }));
+                    consensus.value = data.consensus || {};
+                    deliberation.value.vote_history = data.vote_history || [];
+                }
+            } catch (err) {
+                console.error('Failed to load deliberation messages:', err);
+            }
         };
 
         // Get status badge class
@@ -3355,6 +3840,667 @@ createApp({
             return 'msg-direct';
         };
 
+        // ─── Past Runs Analytics Functions ─────────────────────────────
+
+        const openPastRunsPanel = async () => {
+            showPastRunsPanel.value = true;
+            try {
+                const res = await fetch('/api/deliberations');
+                const data = await res.json();
+                // Transform deliberations to expected format
+                pastRunsList.value = (data.deliberations || []).map(d => ({
+                    id: d.id,
+                    name: d.topic ? d.topic.substring(0, 50) : 'Untitled',
+                    date: d.created_at ? new Date(d.created_at).toLocaleDateString() : '',
+                    time: d.created_at ? new Date(d.created_at).toLocaleTimeString() : '',
+                    status: d.status
+                }));
+            } catch (e) {
+                console.error('Failed to load deliberation list:', e);
+                pastRunsList.value = [];
+            }
+        };
+
+        const loadPastRunAnalytics = async () => {
+            const id = pastRunsSelected.value;
+            if (!id) { pastRunsData.value = null; return; }
+            pastRunsLoading.value = true;
+            pastRunsData.value = null;
+            try {
+                const res = await fetch(`/api/deliberations/${id}/analytics`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                pastRunsLoading.value = false;
+                pastRunsData.value = data;
+                await nextTick();
+                // Double nextTick to ensure canvas refs are mounted
+                await nextTick();
+                renderPastRunCharts();
+            } catch (e) {
+                console.error('Failed to load analytics:', e);
+                pastRunsData.value = null;
+                pastRunsLoading.value = false;
+            }
+        };
+
+        const exportPastRunCsv = () => {
+            const id = pastRunsSelected.value;
+            if (!id) return;
+            window.open(`/api/deliberations/${id}/analytics/export`, '_blank');
+        };
+
+        const destroyPrCharts = () => {
+            Object.values(prChartInstances).forEach(c => { try { c.destroy(); } catch(e) {} });
+            prChartInstances = {};
+        };
+
+        // Distinct colors - maximally different from each other
+        const DISTINCT_COLORS = [
+            '#e6194b', // red
+            '#3cb44b', // green
+            '#4363d8', // blue
+            '#f58231', // orange
+            '#911eb4', // purple
+            '#42d4f4', // cyan
+            '#f032e6', // magenta
+            '#bfef45', // lime
+            '#fabed4', // pink
+            '#469990', // teal
+            '#dcbeff', // lavender
+            '#9a6324', // brown
+            '#fffac8', // beige
+            '#800000', // maroon
+            '#aaffc3', // mint
+            '#808000', // olive
+            '#ffd8b1', // apricot
+            '#000075', // navy
+        ];
+
+        // Map providers to base colors
+        const PROVIDER_COLORS = {
+            'openai': '#4363d8',      // blue
+            'anthropic': '#911eb4',   // purple
+            'deepseek': '#3cb44b',    // green
+            'x-ai': '#e6194b',        // red
+            'meta-llama': '#f032e6',  // magenta
+            'google': '#42d4f4',      // cyan
+            'mistralai': '#f58231',   // orange
+            'qwen': '#bfef45',        // lime
+            'cohere': '#469990',      // teal
+            'perplexity': '#dcbeff',  // lavender
+        };
+
+        const getModelColor = (model) => {
+            if (!model) return '#6b7280';
+            // Get provider from model name
+            const provider = model.split('/')[0];
+            if (PROVIDER_COLORS[provider]) return PROVIDER_COLORS[provider];
+            // Generate consistent distinct color from hash
+            let hash = 0;
+            for (let i = 0; i < model.length; i++) {
+                hash = model.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return DISTINCT_COLORS[Math.abs(hash) % DISTINCT_COLORS.length];
+        };
+
+        const renderPastRunCharts = () => {
+            destroyPrCharts();
+            const d = pastRunsData.value;
+            if (!d) { console.warn('[Analytics] No data to render'); return; }
+
+            console.log('[Analytics] Data received:', {
+                topic: d.topic,
+                status: d.status,
+                consensus: d.consensus,
+                vote_history_length: d.vote_history?.length,
+                agents_count: d.agent_summary?.agents?.length,
+                models: d.agent_summary?.models
+            });
+            console.log('[Analytics] Rendering charts. Refs:', {
+                vote: !!prVoteChart.value, model: !!prModelChart.value,
+                token: !!prTokenChart.value, duration: !!prDurationChart.value,
+                heatmap: !!prHeatmapContainer.value, timeline: !!prTimelineContainer.value,
+                posChanges: !!prPositionChangesContainer.value, allPositions: !!prAllPositionsContainer.value
+            });
+
+            // If refs aren't ready, retry after a short delay
+            if (!prVoteChart.value) {
+                console.log('[Analytics] Canvas refs not ready, retrying in 100ms...');
+                setTimeout(renderPastRunCharts, 100);
+                return;
+            }
+
+            // --- Chart 1: Vote Distribution Doughnut ---
+            if (prVoteChart.value) {
+                const ctx = prVoteChart.value.getContext('2d');
+                // Use consensus data (Support, Oppose, Modify, Abstain) from analytics
+                const cons = d.consensus || {};
+                const voteData = [cons.Support || 0, cons.Oppose || 0, cons.Modify || 0, cons.Abstain || 0];
+                const totalVotes = voteData.reduce((a, b) => a + b, 0);
+
+                if (totalVotes === 0) {
+                    // Show "No votes" message instead of empty chart
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No vote data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.vote = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Support', 'Oppose', 'Modify', 'Abstain'],
+                            datasets: [{
+                                data: voteData,
+                                backgroundColor: ['#22c55e', '#ef4444', '#f59e0b', '#6b7280'],
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11, family: 'JetBrains Mono' } } }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // --- Chart 4: Model Distribution Pie ---
+            if (prModelChart.value) {
+                const ctx = prModelChart.value.getContext('2d');
+                const models = d.agent_summary?.models || {};
+                const modelNames = Object.keys(models);
+                const modelCounts = Object.values(models);
+                const modelColors = modelNames.map(m => getModelColor(m));
+
+                if (modelNames.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No model data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.model = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: modelNames.map(m => m.split('/').pop()),
+                            datasets: [{
+                                data: modelCounts,
+                                backgroundColor: modelColors,
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11, family: 'JetBrains Mono' } } }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // --- Chart 2: Token Usage by Agent (Horizontal Bar) ---
+            if (prTokenChart.value) {
+                const ctx = prTokenChart.value.getContext('2d');
+                const agents = (d.agent_summary?.agents || []).slice(0, 30);
+
+                if (agents.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No agent data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.token = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: agents.map(a => a.name.length > 15 ? a.name.slice(0, 14) + '...' : a.name),
+                            datasets: [{
+                                label: 'Tokens Out',
+                                data: agents.map(a => a.tokens_out),
+                                backgroundColor: agents.map(a => getModelColor(a.model)),
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: { grid: { color: '#1e1e2e' }, ticks: { color: '#6b7280', font: { size: 10 } } },
+                                y: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, family: 'JetBrains Mono' } } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        afterLabel: (ctx) => `Model: ${agents[ctx.dataIndex]?.model?.split('/').pop() || '?'}`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // --- Chart 3: Response Time by Agent (Bar) ---
+            if (prDurationChart.value) {
+                const ctx = prDurationChart.value.getContext('2d');
+                const agents = (d.agent_summary?.agents || []).slice(0, 30);
+
+                if (agents.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '12px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No agent data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                } else {
+                    prChartInstances.duration = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: agents.map(a => a.name.length > 15 ? a.name.slice(0, 14) + '...' : a.name),
+                            datasets: [{
+                                label: 'Duration (ms)',
+                                data: agents.map(a => a.duration_ms),
+                                backgroundColor: agents.map(a => getModelColor(a.model)),
+                                borderWidth: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: { grid: { color: '#1e1e2e' }, ticks: { color: '#6b7280', font: { size: 10 },
+                                    callback: v => v >= 1000 ? (v/1000).toFixed(1) + 's' : v + 'ms' } },
+                                y: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, family: 'JetBrains Mono' } } }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => `${(ctx.raw / 1000).toFixed(2)}s`,
+                                        afterLabel: (ctx) => `Model: ${agents[ctx.dataIndex]?.model?.split('/').pop() || '?'}`
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // --- Chart 6: Agent Position Heatmap (D3) ---
+            if (prHeatmapContainer.value) {
+                const container = prHeatmapContainer.value;
+                container.innerHTML = '';
+
+                // Build agent list with their latest positions from agent_positions_over_time
+                const positionsData = d.agent_positions_over_time || {};
+                const agents = Object.entries(positionsData).map(([agentId, data]) => {
+                    const positions = data.positions || [];
+                    // Get the latest position (highest round number)
+                    const latestPos = positions.length > 0
+                        ? positions.reduce((latest, p) => p.round > latest.round ? p : latest, positions[0])
+                        : null;
+                    return {
+                        id: agentId,
+                        name: data.name || agentId,
+                        position: latestPos?.position || 'UNKNOWN',
+                        confidence: latestPos?.confidence || null,
+                    };
+                });
+
+                if (agents.length === 0) {
+                    container.innerHTML = '<div style="color:#6b7280;text-align:center;padding:20px;">No position data available</div>';
+                    return;
+                }
+
+                const posColor = { 'SUPPORT': '#22c55e', 'OPPOSE': '#ef4444', 'MODIFY': '#f59e0b', 'ABSTAIN': '#6b7280', 'UNKNOWN': '#333' };
+                const cellSize = 28;
+                const labelW = 120;
+                const cols = Math.min(agents.length, 20);
+                const rows = Math.ceil(agents.length / cols);
+
+                const svg = d3.select(container).append('svg')
+                    .attr('width', labelW + cols * (cellSize + 2))
+                    .attr('height', rows * (cellSize + 2) + 30);
+
+                // Legend
+                const legend = svg.append('g').attr('transform', 'translate(0, 4)');
+                ['SUPPORT', 'OPPOSE', 'MODIFY', 'ABSTAIN'].forEach((pos, i) => {
+                    legend.append('rect').attr('x', i * 75).attr('y', 0).attr('width', 12).attr('height', 12)
+                        .attr('rx', 2).attr('fill', posColor[pos]);
+                    legend.append('text').attr('x', i * 75 + 16).attr('y', 10)
+                        .attr('fill', '#9ca3af').attr('font-size', '10px').text(pos.charAt(0) + pos.slice(1).toLowerCase());
+                });
+
+                const grid = svg.append('g').attr('transform', 'translate(0, 26)');
+                agents.forEach((agent, idx) => {
+                    const row = Math.floor(idx / cols);
+                    const col = idx % cols;
+                    const g = grid.append('g').attr('transform', `translate(${col * (cellSize + 2)}, ${row * (cellSize + 2)})`);
+                    g.append('rect')
+                        .attr('width', cellSize).attr('height', cellSize)
+                        .attr('rx', 4).attr('fill', posColor[agent.position] || '#333')
+                        .attr('opacity', agent.confidence ? Math.max(0.4, agent.confidence / 100) : 0.7);
+                    g.append('title').text(`${agent.name}: ${agent.position}${agent.confidence ? ' (' + agent.confidence + '%)' : ''}`);
+                    g.append('text')
+                        .attr('x', cellSize / 2).attr('y', cellSize / 2 + 3)
+                        .attr('text-anchor', 'middle').attr('fill', '#fff').attr('font-size', '8px')
+                        .text(agent.name.split(' ').map(w => w[0]).join('').slice(0, 3));
+                });
+            }
+
+            // --- Chart 5: Response Timeline (D3) ---
+            if (prTimelineContainer.value) {
+                const container = prTimelineContainer.value;
+                container.innerHTML = '';
+                const timeline = d.timeline || [];
+                if (timeline.length === 0) return;
+
+                const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                const width = container.clientWidth - margin.left - margin.right;
+                const height = 180 - margin.top - margin.bottom;
+
+                const svg = d3.select(container).append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+                // Parse timestamps and build cumulative data
+                const parseTime = (ts) => new Date(ts);
+                const sorted = timeline.filter(t => t.timestamp).map((t, i) => ({
+                    time: parseTime(t.timestamp),
+                    cumulative: i + 1,
+                    agent: t.agent,
+                    tokens: t.tokens,
+                })).sort((a, b) => a.time - b.time);
+
+                if (sorted.length === 0) return;
+
+                // Reassign cumulative after sort
+                sorted.forEach((d, i) => d.cumulative = i + 1);
+
+                const x = d3.scaleTime()
+                    .domain(d3.extent(sorted, s => s.time))
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain([0, sorted.length])
+                    .range([height, 0]);
+
+                // Axes
+                svg.append('g').attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat('%H:%M:%S')))
+                    .selectAll('text').attr('fill', '#6b7280').attr('font-size', '9px');
+                svg.append('g')
+                    .call(d3.axisLeft(y).ticks(5))
+                    .selectAll('text').attr('fill', '#6b7280').attr('font-size', '9px');
+                svg.selectAll('.domain, .tick line').attr('stroke', '#1e1e2e');
+
+                // Line
+                const line = d3.line()
+                    .x(s => x(s.time))
+                    .y(s => y(s.cumulative))
+                    .curve(d3.curveStepAfter);
+
+                svg.append('path')
+                    .datum(sorted)
+                    .attr('fill', 'none')
+                    .attr('stroke', '#7c3aed')
+                    .attr('stroke-width', 2)
+                    .attr('d', line);
+
+                // Area
+                const area = d3.area()
+                    .x(s => x(s.time))
+                    .y0(height)
+                    .y1(s => y(s.cumulative))
+                    .curve(d3.curveStepAfter);
+
+                svg.append('path')
+                    .datum(sorted)
+                    .attr('fill', '#7c3aed')
+                    .attr('opacity', 0.15)
+                    .attr('d', area);
+
+                // Dots
+                svg.selectAll('.dot')
+                    .data(sorted).enter()
+                    .append('circle')
+                    .attr('cx', s => x(s.time))
+                    .attr('cy', s => y(s.cumulative))
+                    .attr('r', 3)
+                    .attr('fill', '#7c3aed')
+                    .append('title')
+                    .text(s => `${s.agent}: ${s.tokens} tokens`);
+
+                // Y-axis label
+                svg.append('text')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', -40).attr('x', -height / 2)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#6b7280').attr('font-size', '10px')
+                    .text('Cumulative Responses');
+            }
+
+            // --- Chart 7: Position Changes Visualization ---
+            if (d.position_changes && d.position_changes.length > 0) {
+                // Container is conditionally rendered, may need retry
+                if (!prPositionChangesContainer.value) {
+                    console.log('[Analytics] Position changes container not ready, retrying in 150ms...');
+                    setTimeout(() => {
+                        if (prPositionChangesContainer.value && pastRunsData.value) {
+                            renderPositionChangesChart(pastRunsData.value);
+                        }
+                    }, 150);
+                } else {
+                    renderPositionChangesChart(d);
+                }
+            }
+
+            // --- Chart 8: All Agent Positions Over Time ---
+            if (d.agent_positions_over_time && Object.keys(d.agent_positions_over_time).length > 0) {
+                if (!prAllPositionsContainer.value) {
+                    console.log('[Analytics] All positions container not ready, retrying in 150ms...');
+                    setTimeout(() => {
+                        if (prAllPositionsContainer.value && pastRunsData.value) {
+                            renderAllPositionsChart(pastRunsData.value);
+                        }
+                    }, 150);
+                } else {
+                    renderAllPositionsChart(d);
+                }
+            }
+        };
+
+        // Separate function for rendering position changes chart (can be called after retry)
+        const renderPositionChangesChart = (d) => {
+            if (!prPositionChangesContainer.value || !d.position_changes || d.position_changes.length === 0) return;
+            const container = prPositionChangesContainer.value;
+            container.innerHTML = '';
+
+            const changes = d.position_changes;
+            const posColor = { 'SUPPORT': '#22c55e', 'OPPOSE': '#ef4444', 'MODIFY': '#f59e0b', 'ABSTAIN': '#6b7280' };
+
+            const margin = { top: 30, right: 20, bottom: 40, left: 150 };
+            const width = Math.max(container.clientWidth - margin.left - margin.right, 400);
+            const rowHeight = 28;
+            const height = Math.max(changes.length * rowHeight, 100);
+
+            const svg = d3.select(container).append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Title
+            svg.append('text')
+                .attr('x', width / 2).attr('y', -10)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#9ca3af').attr('font-size', '12px')
+                .text('Agent Position Changes by Round');
+
+            // Find round range
+            const rounds = changes.map(c => c.round);
+            const minRound = Math.min(...rounds);
+            const maxRound = Math.max(...rounds);
+
+            const x = d3.scaleLinear()
+                .domain([Math.max(0, minRound - 1), maxRound + 1])
+                .range([0, width]);
+
+            // X axis
+            svg.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x).ticks(Math.min(10, maxRound - minRound + 2)).tickFormat(d => `Round ${d}`))
+                .selectAll('text').attr('fill', '#6b7280').attr('font-size', '9px');
+            svg.selectAll('.domain, .tick line').attr('stroke', '#1e1e2e');
+
+            // Draw each change as a row with arrow
+            changes.forEach((change, idx) => {
+                const y = idx * rowHeight + rowHeight / 2;
+
+                // Agent name
+                svg.append('text')
+                    .attr('x', -10).attr('y', y + 4)
+                    .attr('text-anchor', 'end')
+                    .attr('fill', '#d1d5db').attr('font-size', '11px')
+                    .text(change.agent.length > 18 ? change.agent.slice(0, 16) + '...' : change.agent);
+
+                // Position at round
+                const xPos = x(change.round);
+
+                // From position circle
+                svg.append('circle')
+                    .attr('cx', xPos - 30).attr('cy', y)
+                    .attr('r', 8)
+                    .attr('fill', posColor[change.from_position] || '#666');
+
+                // Arrow
+                svg.append('line')
+                    .attr('x1', xPos - 20).attr('y1', y)
+                    .attr('x2', xPos + 10).attr('y2', y)
+                    .attr('stroke', '#6b7280').attr('stroke-width', 2)
+                    .attr('marker-end', 'url(#arrowhead)');
+
+                // To position circle
+                svg.append('circle')
+                    .attr('cx', xPos + 20).attr('cy', y)
+                    .attr('r', 8)
+                    .attr('fill', posColor[change.to_position] || '#666');
+
+                // Round label
+                svg.append('text')
+                    .attr('x', xPos).attr('y', y + 20)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#6b7280').attr('font-size', '9px')
+                    .text(`R${change.round}`);
+
+                // Tooltip
+                const tooltip = svg.append('g').attr('class', 'tooltip-group').style('opacity', 0);
+                tooltip.append('rect')
+                    .attr('x', xPos - 60).attr('y', y - 35)
+                    .attr('width', 120).attr('height', 25)
+                    .attr('fill', '#1e1e2e').attr('rx', 4);
+                tooltip.append('text')
+                    .attr('x', xPos).attr('y', y - 18)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#fff').attr('font-size', '10px')
+                    .text(`${change.from_position} → ${change.to_position}`);
+            });
+
+            // Arrow marker definition
+            svg.append('defs').append('marker')
+                .attr('id', 'arrowhead')
+                .attr('viewBox', '0 -5 10 10')
+                .attr('refX', 5).attr('refY', 0)
+                .attr('markerWidth', 4).attr('markerHeight', 4)
+                .attr('orient', 'auto')
+                .append('path')
+                .attr('d', 'M0,-5L10,0L0,5')
+                .attr('fill', '#6b7280');
+
+            // Legend
+            const legendG = svg.append('g').attr('transform', `translate(${width - 280}, -20)`);
+            ['SUPPORT', 'OPPOSE', 'MODIFY', 'ABSTAIN'].forEach((pos, i) => {
+                legendG.append('circle').attr('cx', i * 70).attr('cy', 0).attr('r', 6).attr('fill', posColor[pos]);
+                legendG.append('text').attr('x', i * 70 + 10).attr('y', 4)
+                    .attr('fill', '#9ca3af').attr('font-size', '9px').text(pos.charAt(0) + pos.slice(1).toLowerCase());
+            });
+        };
+
+        // Render all agent positions over time as a table/grid
+        const renderAllPositionsChart = (d) => {
+            if (!prAllPositionsContainer.value || !d.agent_positions_over_time) return;
+            const container = prAllPositionsContainer.value;
+            container.innerHTML = '';
+
+            const agentData = d.agent_positions_over_time || {};
+            const agents = Object.keys(agentData).sort();
+            if (agents.length === 0) return;
+
+            // Find all unique rounds across all agents
+            const allRounds = new Set();
+            agents.forEach(agent => {
+                const positions = agentData[agent]?.positions || [];
+                positions.forEach(entry => allRounds.add(entry.round));
+            });
+            const rounds = Array.from(allRounds).sort((a, b) => a - b);
+
+            const posColor = { 'SUPPORT': '#22c55e', 'OPPOSE': '#ef4444', 'MODIFY': '#f59e0b', 'ABSTAIN': '#6b7280' };
+            const posBg = { 'SUPPORT': 'rgba(34, 197, 94, 0.2)', 'OPPOSE': 'rgba(239, 68, 68, 0.2)', 'MODIFY': 'rgba(245, 158, 11, 0.2)', 'ABSTAIN': 'rgba(107, 114, 128, 0.2)' };
+
+            // Build HTML table
+            let html = `<table style="width:100%;border-collapse:collapse;font-size:11px;">`;
+            html += `<thead><tr style="background:#1a1a2e;position:sticky;top:0;z-index:1;">`;
+            html += `<th style="padding:6px 8px;text-align:left;border-bottom:1px solid #2e2e4e;min-width:120px;">Agent</th>`;
+            rounds.forEach(round => {
+                html += `<th style="padding:6px 4px;text-align:center;border-bottom:1px solid #2e2e4e;min-width:50px;">R${round}</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            agents.forEach((agentId, idx) => {
+                const agentName = agentData[agentId]?.name || agentId;
+                const bgColor = idx % 2 === 0 ? '#0d0d15' : '#12121f';
+                html += `<tr style="background:${bgColor};">`;
+                html += `<td style="padding:4px 8px;border-bottom:1px solid #1e1e2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="${agentName}">${agentName}</td>`;
+
+                // Build a map of round -> position for this agent
+                const roundPositions = {};
+                const positions = agentData[agentId]?.positions || [];
+                positions.forEach(entry => {
+                    roundPositions[entry.round] = entry.position;
+                });
+
+                rounds.forEach(round => {
+                    const pos = roundPositions[round];
+                    if (pos) {
+                        const color = posColor[pos] || '#666';
+                        const bg = posBg[pos] || 'transparent';
+                        const label = pos === 'SUPPORT' ? '✓' : pos === 'OPPOSE' ? '✗' : pos === 'MODIFY' ? '~' : '-';
+                        html += `<td style="padding:4px;text-align:center;border-bottom:1px solid #1e1e2e;background:${bg};" title="${agentName}: ${pos} at Round ${round}">`;
+                        html += `<span style="color:${color};font-weight:bold;">${label}</span></td>`;
+                    } else {
+                        html += `<td style="padding:4px;text-align:center;border-bottom:1px solid #1e1e2e;color:#444;">-</td>`;
+                    }
+                });
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table>`;
+
+            // Add legend
+            html += `<div style="margin-top:8px;display:flex;gap:16px;font-size:10px;color:#9ca3af;">`;
+            html += `<span><span style="color:#22c55e;font-weight:bold;">✓</span> Support</span>`;
+            html += `<span><span style="color:#ef4444;font-weight:bold;">✗</span> Oppose</span>`;
+            html += `<span><span style="color:#f59e0b;font-weight:bold;">~</span> Modify</span>`;
+            html += `<span><span style="color:#6b7280;font-weight:bold;">-</span> Abstain</span>`;
+            html += `<span style="color:#444;">- No data</span>`;
+            html += `</div>`;
+
+            container.innerHTML = html;
+        };
+
         // Keyboard shortcuts
         const handleKeydown = (e) => {
             if (e.ctrlKey && e.key === 'd') {
@@ -3389,6 +4535,30 @@ createApp({
             document.removeEventListener('keydown', handleKeydown);
         });
 
+        // Vote history helper functions
+        function getTotalVotes(consensus) {
+            if (!consensus) return 0;
+            return Object.values(consensus).reduce((sum, val) => sum + (val || 0), 0);
+        }
+
+        function getWinningVote(consensus) {
+            if (!consensus) return 'None';
+            let maxVote = 'None';
+            let maxCount = 0;
+            for (const [vote, count] of Object.entries(consensus)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    maxVote = vote;
+                }
+            }
+            return maxVote;
+        }
+
+        function getWinningCount(consensus) {
+            if (!consensus) return 0;
+            return Math.max(...Object.values(consensus), 0);
+        }
+
         return {
             connected,
             agents,
@@ -3412,6 +4582,10 @@ createApp({
             structuredVotes,
             beliefStates,
             activeTab,
+
+            // Panel minimization state
+            agentStatusMinimized,
+            voteHistoryMinimized,
 
             // Persuader state
             persuader,
@@ -3479,6 +4653,7 @@ createApp({
             influenceEdges,
             bestTactic,
             avgConfidenceChange,
+            sortedAgentsByStatus,
             avgResistance,
             heatmapData,
             getHeatmapColor,
@@ -3528,7 +4703,30 @@ createApp({
             getConsensusPercent,
             getVoteClass,
             getMessageClass,
-            getFlipRate
+            getFlipRate,
+
+            // Vote history helpers
+            getTotalVotes,
+            getWinningVote,
+            getWinningCount,
+
+            // Past Runs Analytics
+            showPastRunsPanel,
+            pastRunsList,
+            pastRunsSelected,
+            pastRunsData,
+            pastRunsLoading,
+            prVoteChart,
+            prModelChart,
+            prTokenChart,
+            prDurationChart,
+            prHeatmapContainer,
+            prTimelineContainer,
+            prPositionChangesContainer,
+            prAllPositionsContainer,
+            openPastRunsPanel,
+            loadPastRunAnalytics,
+            exportPastRunCsv,
         };
     }
 }).mount('#app');

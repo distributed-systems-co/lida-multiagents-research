@@ -9,7 +9,7 @@ _imports:
   - personas/v2/ai_researchers.yaml    # altman, lecun, yudkowsky, amodei, bengio, russell, andreessen, gebru, etc.
 
 simulation:
-  num_agents: 100
+  num_agents: 10
   max_rounds_per_agent: 20
   max_voting_rounds: 20  # Maximum rounds before forcing a final vote
   auto_start_topic: "Should we establish a ban on open-source models above some capability threshold, to be determined such that models can still be released for the next 6 months?"  # Optional: auto-start deliberation with this topic
@@ -123,10 +123,10 @@ agents:
   persuader: lecun
 
 persuader:
-  model: "openai/gpt-oss-120b:free"
+  model: "google/gemini-2.0-flash-001"
 
 models:
-  default: "openai/gpt-oss-120b:free"
+  default: "openai/gpt-oss-120b:free"#"google/gemini-2.0-flash-001"
     #"openai/gpt-oss-120b:free":1.0
     #"deepseek/deepseek-chat": 1.0
     #"google/gemini-2.0-flash-001": 1.0
