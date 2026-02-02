@@ -1,0 +1,138 @@
+============================================================
+PERSONA PIPELINE V2 - Date-stamped, Non-destructive
+============================================================
+People:      12
+Searches:    up to 80/person
+Min size:    12,000 bytes (skip if larger exists)
+Models:      anthropic/claude-opus-4.5 + fallbacks
+Output:      /Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas
+============================================================
+
+[REGEN] Donald Trump - existing is small (10,975 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+
+[REGEN] Emmanuel Macron - existing is small (11,493 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 47 sources        8/35 queries -> 39 sources        16/35 queries -> 108 sources        16/35 queries -> 84 sources        24/35 queries -> 132 sources        24/35 queries -> 159 sources        32/35 queries -> 181 sources        32/35 queries -> 213 sources        35/35 queries -> 195 sources
+        195 unique sources
+  [3/3] Synthesizing...
+        35/35 queries -> 230 sources
+        230 unique sources
+  [3/3] Synthesizing...
+  [DONE] donald_trump_2026-01-24.json (24,743 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Fumio Kishida - existing is small (8,685 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 33 sources        16/35 queries -> 71 sources  [DONE] emmanuel_macron_2026-01-24.json (28,360 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Jake Sullivan - existing is small (6,300 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 36 sources        24/35 queries -> 112 sources        16/35 queries -> 72 sources        32/35 queries -> 147 sources        24/35 queries -> 107 sources        35/35 queries -> 161 sources
+        161 unique sources
+  [3/3] Synthesizing...
+        32/35 queries -> 132 sources        35/35 queries -> 142 sources
+        142 unique sources
+  [3/3] Synthesizing...
+  [DONE] fumio_kishida_2026-01-24.json (22,284 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Jason Smith - existing is small (11,908 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 46 sources        16/35 queries -> 99 sources        24/35 queries -> 150 sources        32/35 queries -> 190 sources        35/35 queries -> 207 sources
+        207 unique sources
+  [3/3] Synthesizing...
+  [DONE] jake_sullivan_2026-01-24.json (24,075 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Joe Biden - existing is small (3,986 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 47 sources        16/35 queries -> 99 sources        24/35 queries -> 151 sources        32/35 queries -> 200 sources        35/35 queries -> 215 sources
+        215 unique sources
+  [3/3] Synthesizing...
+  [DONE] jason_smith_2026-01-24.json (16,911 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Lee Hsien Loong - existing is small (4,362 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 38 sources        16/35 queries -> 74 sources        24/35 queries -> 124 sources        32/35 queries -> 163 sources        35/35 queries -> 178 sources
+        178 unique sources
+  [3/3] Synthesizing...
+  [DONE] joe_biden_2026-01-24.json (29,420 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Li Qiang - existing is small (4,471 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 40 sources        16/35 queries -> 85 sources        24/35 queries -> 121 sources        32/35 queries -> 155 sources        35/35 queries -> 168 sources
+        168 unique sources
+  [3/3] Synthesizing...
+  [DONE] lee_hsien_loong_2026-01-24.json (5,393 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Marco Rubio - existing is small (5,754 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 38 sources        16/35 queries -> 78 sources        24/35 queries -> 123 sources        32/35 queries -> 162 sources        35/35 queries -> 168 sources
+        168 unique sources
+  [3/3] Synthesizing...
+  [DONE] li_qiang_2026-01-24.json (5,410 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Olaf Scholz - existing is small (8,849 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 35 sources        16/35 queries -> 82 sources        24/35 queries -> 120 sources        32/35 queries -> 156 sources        35/35 queries -> 173 sources
+        173 unique sources
+  [3/3] Synthesizing...
+  [DONE] marco_rubio_2026-01-24.json (25,825 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Ursula von der Leyen - existing is small (11,175 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 36 sources        16/35 queries -> 71 sources        24/35 queries -> 110 sources        32/35 queries -> 146 sources        35/35 queries -> 159 sources
+        159 unique sources
+  [3/3] Synthesizing...
+  [DONE] olaf_scholz_2026-01-24.json (21,336 bytes, anthropic/claude-opus-4.5)
+
+[REGEN] Xi Jinping - existing is small (10,799 bytes), regenerating
+============================================================
+  [1/3] Generating search terms...
+        35 terms
+  [2/3] Searching...
+        8/35 queries -> 46 sources        16/35 queries -> 92 sources        24/35 queries -> 137 sources        32/35 queries -> 183 sources        35/35 queries -> 199 sources
+        199 unique sources
+  [3/3] Synthesizing...
+  [DONE] ursula_von_der_leyen_2026-01-24.json (24,671 bytes, anthropic/claude-opus-4.5)
+  [DONE] xi_jinping_2026-01-24.json (32,270 bytes, anthropic/claude-opus-4.5)
+
+============================================================
+COMPLETE
+============================================================
+Generated: 12
+Skipped:   0 (good version exists)
+Failed:    0
+
+Model stats: {'calls': 12, 'failures': 0, 'fallbacks': 0}

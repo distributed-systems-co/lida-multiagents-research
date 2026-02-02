@@ -1,0 +1,199 @@
+{
+  "study_type": "breaking_point_analysis",
+  "timestamp": "2026-01-25T23:31:28.925112",
+  "topic": "Should the US and China establish a joint AI safety research institution?",
+  "tactics_available": [
+    "coalition_isolation",
+    "social_proof_cascade",
+    "commitment_escalation",
+    "identity_reframe",
+    "temporal_pressure",
+    "enemy_endorsement"
+  ],
+  "targets": [
+    {
+      "target": "jensen_huang",
+      "initial_position": -1.0,
+      "final_position": 0.1,
+      "total_movement": 1.1,
+      "broke_through": false,
+      "tactics_attempted": 3,
+      "most_effective_tactic": "identity_reframe",
+      "results": [
+        {
+          "tactic": "commitment_escalation",
+          "position_before": -1.0,
+          "position_after": -1.0,
+          "movement": 0.0
+        },
+        {
+          "tactic": "identity_reframe",
+          "position_before": -1.0,
+          "position_after": 0.3,
+          "movement": 1.3
+        },
+        {
+          "tactic": "temporal_pressure",
+          "position_before": 0.3,
+          "position_after": 0.1,
+          "movement": -0.19999999999999998
+        }
+      ]
+    },
+    {
+      "target": "josh_hawley",
+      "initial_position": -0.5,
+      "final_position": 0.3,
+      "total_movement": 0.8,
+      "broke_through": false,
+      "tactics_attempted": 3,
+      "most_effective_tactic": "identity_reframe",
+      "results": [
+        {
+          "tactic": "commitment_escalation",
+          "position_before": -0.5,
+          "position_after": -0.5,
+          "movement": 0.0
+        },
+        {
+          "tactic": "identity_reframe",
+          "position_before": -0.5,
+          "position_after": 0.2,
+          "movement": 0.7
+        },
+        {
+          "tactic": "temporal_pressure",
+          "position_before": 0.2,
+          "position_after": 0.3,
+          "movement": 0.09999999999999998
+        }
+      ]
+    },
+    {
+      "target": "elon_musk",
+      "initial_position": 0.0,
+      "final_position": 0.2,
+      "total_movement": 0.2,
+      "broke_through": false,
+      "tactics_attempted": 3,
+      "most_effective_tactic": "identity_reframe",
+      "results": [
+        {
+          "tactic": "commitment_escalation",
+          "position_before": 0.0,
+          "position_after": 0.0,
+          "movement": 0.0
+        },
+        {
+          "tactic": "identity_reframe",
+          "position_before": 0.0,
+          "position_after": 0.4,
+          "movement": 0.4
+        },
+        {
+          "tactic": "temporal_pressure",
+          "position_before": 0.4,
+          "position_after": 0.2,
+          "movement": -0.2
+        }
+      ]
+    },
+    {
+      "target": "chuck_schumer",
+      "initial_position": -0.3,
+      "final_position": 0.6,
+      "total_movement": 0.8999999999999999,
+      "broke_through": true,
+      "tactics_attempted": 3,
+      "most_effective_tactic": "identity_reframe",
+      "results": [
+        {
+          "tactic": "commitment_escalation",
+          "position_before": -0.3,
+          "position_after": -0.3,
+          "movement": 0.0
+        },
+        {
+          "tactic": "identity_reframe",
+          "position_before": -0.3,
+          "position_after": 0.3,
+          "movement": 0.6
+        },
+        {
+          "tactic": "temporal_pressure",
+          "position_before": 0.3,
+          "position_after": 0.6,
+          "movement": 0.3
+        }
+      ]
+    }
+  ],
+  "profiles": {
+    "jensen_huang": {
+      "isolation_threshold": 0.6,
+      "social_proof_threshold": 0.5,
+      "escalation_vulnerability": 0.7,
+      "identity_flexibility": 0.8,
+      "sacred_values": [
+        "progress",
+        "innovation",
+        "NVIDIA dominance"
+      ]
+    },
+    "josh_hawley": {
+      "isolation_threshold": 0.8,
+      "social_proof_threshold": 0.7,
+      "escalation_vulnerability": 0.4,
+      "identity_flexibility": 0.3,
+      "sacred_values": [
+        "American workers",
+        "anti-China",
+        "anti-Big Tech"
+      ]
+    },
+    "elon_musk": {
+      "isolation_threshold": 0.4,
+      "social_proof_threshold": 0.3,
+      "escalation_vulnerability": 0.6,
+      "identity_flexibility": 0.7,
+      "sacred_values": [
+        "first principles",
+        "saving humanity",
+        "being the smartest"
+      ]
+    },
+    "chuck_schumer": {
+      "isolation_threshold": 0.5,
+      "social_proof_threshold": 0.4,
+      "escalation_vulnerability": 0.6,
+      "identity_flexibility": 0.5,
+      "sacred_values": [
+        "working families",
+        "Democratic majority",
+        "New York"
+      ]
+    },
+    "dario_amodei": {
+      "isolation_threshold": 0.3,
+      "social_proof_threshold": 0.2,
+      "escalation_vulnerability": 0.7,
+      "identity_flexibility": 0.8,
+      "sacred_values": [
+        "AI safety",
+        "scientific rigor",
+        "measured approach"
+      ]
+    },
+    "xi_jinping": {
+      "isolation_threshold": 0.9,
+      "social_proof_threshold": 0.8,
+      "escalation_vulnerability": 0.3,
+      "identity_flexibility": 0.2,
+      "sacred_values": [
+        "sovereignty",
+        "party control",
+        "national dignity"
+      ]
+    }
+  }
+}

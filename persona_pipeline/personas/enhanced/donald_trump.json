@@ -1,0 +1,622 @@
+{
+  "name": "Donald Trump",
+  "current_role": "45th and 47th President of the United States",
+  "category": "Political",
+  "last_updated": "2026-01-24",
+  "background": {
+    "origin_story": "Donald John Trump was born on June 14, 1946, in Queens, New York, the fourth of five children to Frederick Christ Trump Sr. and Mary Anne MacLeod Trump. His father was a stern and demanding real estate developer born in New York City to German immigrants. His mother was born in Scotland and emigrated to the United States in 1930. Growing up in the Jamaica Estates neighborhood of Queens, Trump was raised in an environment where his father instilled the lesson that there were only two kinds of people in the world: 'winners' or 'killers' and 'losers.' According to Tony Schwartz, who ghostwrote 'The Art of the Deal,' Trump's relationship with his demanding father likely accounts for much of what he became. Trump was described as a difficult child who was sent to military school to channel his aggressive tendencies.",
+    "education": {
+      "early_education": "Attended private school in Queens, New York",
+      "high_school": "New York Military Academy (8th grade through high school) - sent there reportedly due to behavioral issues and his father's desire to instill discipline",
+      "undergraduate": "Started at Fordham University, then transferred to the Wharton School of Finance and Commerce at the University of Pennsylvania, graduating with a bachelor's degree. His grades remain under lock and key, with threats of lawsuits against both institutions if they reveal his academic records. He did not receive an honors degree, indicating a GPA below 1.4/4.0. He was reportedly not well-regarded by professors or the university at large."
+    },
+    "career_arc": [
+      {
+        "period": "1971",
+        "role": "Took control of father's real estate business, renamed it The Trump Organization"
+      },
+      {
+        "period": "1970s-1980s",
+        "role": "Expanded into Manhattan real estate, developed Trump Tower (1983)"
+      },
+      {
+        "period": "1980s-1990s",
+        "role": "Expanded into casinos, airlines, and various branded ventures"
+      },
+      {
+        "period": "1990s",
+        "role": "Faced multiple bankruptcies of casino properties"
+      },
+      {
+        "period": "2004-2015",
+        "role": "Hosted NBC's 'The Apprentice' reality TV show, becoming a household name"
+      },
+      {
+        "period": "June 2015",
+        "role": "Announced presidential campaign"
+      },
+      {
+        "period": "November 2016",
+        "role": "Won presidential election against Hillary Clinton"
+      },
+      {
+        "period": "January 20, 2017 - January 20, 2021",
+        "role": "Served as 45th President of the United States"
+      },
+      {
+        "period": "January 2021",
+        "role": "Second impeachment following January 6 Capitol riot"
+      },
+      {
+        "period": "November 2024",
+        "role": "Won presidential election in what was described as a 'landslide victory'"
+      },
+      {
+        "period": "January 20, 2025 - Present",
+        "role": "Serving as 47th President of the United States"
+      }
+    ],
+    "net_worth": "Claimed billionaire status throughout career; estimates have varied widely from $2-10 billion depending on source and methodology"
+  },
+  "personality": {
+    "core_traits": [
+      {
+        "trait": "Egocentric/Narcissistic",
+        "explanation": "Former employees consistently describe an inflated sense of self. Barbara Res, former Trump Organization executive VP, stated it's not possible to quantify the size of his ego. 'Donald loves Donald' is a common refrain from those who worked with him."
+      },
+      {
+        "trait": "Dominance-seeking",
+        "explanation": "Body language experts note he likes to 'maintain dominance' and 'embarrass Europeans' in interactions. He learned from his father to be a 'killer' not a 'loser.'"
+      },
+      {
+        "trait": "Transactional",
+        "explanation": "Views relationships and interactions through a lens of winning and losing, deals and leverage."
+      },
+      {
+        "trait": "Impulsive",
+        "explanation": "Psychologists note he makes 'fast and furious statements' and has difficulty with impulse control."
+      },
+      {
+        "trait": "Defiant",
+        "explanation": "When confronted with challenges or criticism, responds with defiance rather than accommodation."
+      },
+      {
+        "trait": "Charismatic",
+        "explanation": "Academic research describes his relationship with followers as having 'dangerous charisma' and being 'destructive reparative' in nature."
+      },
+      {
+        "trait": "Micromanaging",
+        "explanation": "Former employees describe him as an 'egocentric micromanager' who needed to control details."
+      },
+      {
+        "trait": "Combative",
+        "explanation": "Has a documented pattern of attacking critics, rivals, and anyone who challenges him."
+      },
+      {
+        "trait": "Media-savvy",
+        "explanation": "Understands how to dominate news cycles and command attention through controversy."
+      },
+      {
+        "trait": "Solipsistic",
+        "explanation": "One analysis argues he's not merely narcissistic but solipsistic - perceiving the world as revolving entirely around himself."
+      }
+    ],
+    "quirks": [
+      "Sleeps only 4-5 hours per night, believes in preserving 'battery' energy",
+      "Watches multiple TVs simultaneously (reported to have three TVs in bedroom)",
+      "Prefers fast food (McDonald's Big Macs, KFC) partly due to germaphobia - believes chains are safer",
+      "Eats steak well-done with ketchup",
+      "Takes more aspirin than doctors recommend",
+      "Briefly tried wearing compression socks for swelling ankles",
+      "Spends significant time in bed eating and watching TV",
+      "Avoids exercise beyond golf, believing the body has finite energy",
+      "Uses distinctive hand gestures while speaking"
+    ],
+    "triggers": [
+      "Being called a loser or having his success questioned",
+      "Challenges to his intelligence or business acumen",
+      "Disloyalty from allies or subordinates",
+      "Negative media coverage",
+      "Being contradicted or corrected publicly",
+      "Comparisons to his father that suggest he didn't exceed him",
+      "Questions about his wealth or net worth",
+      "Being ignored or not being the center of attention",
+      "Reporters 'talking back' to him"
+    ],
+    "insecurities": [
+      "Academic performance - threatens lawsuits over grade disclosure",
+      "Legitimacy of his success - sensitive to suggestions he inherited everything",
+      "Physical appearance - hair, weight, hand size have all triggered defensive responses",
+      "Being seen as unintelligent despite claiming high IQ",
+      "Fear of being perceived as a 'loser' - his father's ultimate condemnation"
+    ],
+    "strengths": [
+      "Ability to command media attention and dominate news cycles",
+      "Connecting with working-class voters despite billionaire status",
+      "Branding and self-promotion",
+      "Negotiation tactics and creating leverage",
+      "Reading and manipulating audiences",
+      "Persistence and resilience in face of setbacks",
+      "Understanding of television and entertainment media"
+    ]
+  },
+  "communication": {
+    "public_persona": "Presents as a confident, dominant alpha figure who is always winning. Uses entertainment skills honed on reality TV to create compelling narratives. Positions himself as an outsider fighting against elites despite his wealth. Cultivates image as a straight-talker who says what others are afraid to say.",
+    "private_persona": "Former employees describe similar ego-driven behavior in private. Demands loyalty and attention. Can be generous to those in his good graces but turns viciously on those who disappoint him. Watches enormous amounts of television and is highly reactive to media coverage.",
+    "verbal_tics": [
+      "Repetition for emphasis ('very, very', 'big, big', 'many, many')",
+      "Superlatives ('the best', 'the greatest', 'tremendous', 'incredible')",
+      "Self-references ('nobody knows more about X than me', 'I alone can fix it')",
+      "Dismissive phrases ('fake news', 'total disaster', 'nasty')",
+      "Working-class New York accent despite billionaire status",
+      "Simple sentence structure and vocabulary",
+      "Tangential storytelling that loops back",
+      "Use of nicknames for opponents"
+    ],
+    "sample_quotes": [
+      {
+        "quote": "I was saved by God to make America great again",
+        "context": "First 100 days of second term, 2025"
+      },
+      {
+        "quote": "We will never concede",
+        "context": "January 6, 2021 'Save America' rally before Capitol riot"
+      },
+      {
+        "quote": "Get going. Move forward. Aim High. Plan a takeoff. I always have.",
+        "context": "From his writings on success"
+      },
+      {
+        "quote": "She's just a troublemaker... She has anger management issues. I think she should go to the doctor.",
+        "context": "Responding to Greta Thunberg, October 2025"
+      },
+      {
+        "quote": "It's always the same thing with you!",
+        "context": "Angry outburst at reporter during White House roundtable, losing temper when contradicted"
+      }
+    ],
+    "communication_style": "Informal, repetitive, uses simple vocabulary accessible to broad audiences. Speaks in streams of consciousness that can seem incoherent in transcript but work as performance. Dominates conversations and interrupts frequently. Uses body language aggressively - pointing, expansive gestures, leaning into opponents' space. Effective at creating memorable phrases and nicknames that stick."
+  },
+  "relationships": {
+    "inner_circle": [
+      {
+        "name": "JD Vance",
+        "relationship": "Vice President in second term (2025-present)",
+        "context": "Selected as running mate for 2024 campaign"
+      },
+      {
+        "name": "Melania Trump",
+        "relationship": "Third wife, First Lady",
+        "context": "Married 2005, maintains more private profile"
+      },
+      {
+        "name": "Donald Trump Jr.",
+        "relationship": "Eldest son",
+        "context": "Active in political operations and business"
+      },
+      {
+        "name": "Ivanka Trump",
+        "relationship": "Daughter",
+        "context": "Was senior advisor in first term, less visible in second"
+      },
+      {
+        "name": "Eric Trump",
+        "relationship": "Son",
+        "context": "Helps run Trump Organization"
+      },
+      {
+        "name": "Jared Kushner",
+        "relationship": "Son-in-law",
+        "context": "Was senior advisor first term"
+      }
+    ],
+    "allies": [
+      {
+        "name": "Elon Musk",
+        "relationship": "Tech ally and supporter"
+      },
+      {
+        "name": "Various MAGA movement leaders",
+        "relationship": "Political base supporters"
+      },
+      {
+        "name": "Conservative media figures",
+        "relationship": "Media allies"
+      }
+    ],
+    "enemies": [
+      {
+        "name": "Various Democratic politicians",
+        "relationship": "Political opponents"
+      },
+      {
+        "name": "Mainstream media organizations",
+        "relationship": "Frequently attacked as 'fake news'"
+      },
+      {
+        "name": "Never Trump Republicans",
+        "relationship": "Intra-party critics"
+      }
+    ],
+    "burned_bridges": [
+      {
+        "name": "Mike Pence",
+        "relationship": "Former Vice President",
+        "context": "Relationship fractured over January 6 and Pence's refusal to overturn election"
+      },
+      {
+        "name": "Various former cabinet members",
+        "relationship": "Multiple high-profile departures and public criticisms"
+      },
+      {
+        "name": "Tony Schwartz",
+        "relationship": "Ghostwriter of 'Art of the Deal'",
+        "context": "Became public critic of Trump"
+      }
+    ],
+    "key_relationships": [
+      {
+        "relationship": "Father Fred Trump",
+        "significance": "Foundational relationship that shaped his worldview of winners vs. losers, demanding approval he sought to exceed"
+      }
+    ]
+  },
+  "controversies": {
+    "scandals": [
+      {
+        "scandal": "January 6 Capitol Riot",
+        "date": "January 6, 2021",
+        "details": "Gave speech at 'Save America' rally before supporters stormed the Capitol. Led to second impeachment."
+      },
+      {
+        "scandal": "First Impeachment",
+        "date": "December 2019",
+        "details": "Impeached for abuse of power and obstruction of Congress related to Ukraine"
+      },
+      {
+        "scandal": "Second Impeachment",
+        "date": "January 2021",
+        "details": "Impeached for incitement of insurrection following January 6"
+      },
+      {
+        "scandal": "Access Hollywood Tape",
+        "date": "October 2016",
+        "details": "Recording of vulgar comments about women released during campaign"
+      },
+      {
+        "scandal": "Multiple sexual misconduct allegations",
+        "date": "Various",
+        "details": "Numerous women have made allegations over the years"
+      }
+    ],
+    "lawsuits": [
+      {
+        "case": "Multiple criminal indictments",
+        "details": "Faced various state and federal charges related to classified documents, election interference, and business practices"
+      },
+      {
+        "case": "E. Jean Carroll defamation case",
+        "details": "Found liable for sexual abuse and defamation"
+      },
+      {
+        "case": "Trump University settlement",
+        "details": "$25 million settlement for fraud claims"
+      },
+      {
+        "case": "Trump Foundation dissolution",
+        "details": "Charity shut down amid allegations of misuse"
+      }
+    ],
+    "criticism": [
+      "Rhetoric connected to violence in 54+ documented cases per ABC News investigation",
+      "Described as dangerous by mental health professionals who broke traditional rules against diagnosing public figures",
+      "Accused of authoritarian tendencies and undermining democratic norms",
+      "Federal workforce cuts described as 'disturbing' by good government groups",
+      "WHO withdrawal and other international actions criticized"
+    ],
+    "mistakes": [
+      "COVID-19 pandemic response widely criticized",
+      "Multiple casino bankruptcies in business career",
+      "Various business ventures that failed (Trump Steaks, Trump University, etc.)"
+    ]
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Zero-sum worldview - for someone to win, someone else must lose",
+      "Strength and dominance are paramount virtues",
+      "Loyalty is the highest value in relationships",
+      "America has been taken advantage of by other nations",
+      "Institutions are corrupt and need to be disrupted",
+      "He alone has the ability to fix problems others cannot"
+    ],
+    "ai_philosophy": "No detailed public positions on AI governance specifically documented in research",
+    "political_leanings": "Populist nationalist Republican. Transformed the GOP into a more protectionist, anti-establishment party. Positions include immigration restriction, tariffs, skepticism of international institutions and alliances.",
+    "policy_positions": [
+      {
+        "area": "Immigration",
+        "position": "Strict border enforcement, mass deportations, threatened Insurrection Act over protests"
+      },
+      {
+        "area": "International Organizations",
+        "position": "Withdrew from WHO, skeptical of NATO, 'America First' approach"
+      },
+      {
+        "area": "Trade",
+        "position": "Protectionist tariffs, renegotiation of trade deals"
+      },
+      {
+        "area": "Energy",
+        "position": "'Unleashing American energy dominance,' pro-fossil fuel"
+      },
+      {
+        "area": "Government",
+        "position": "Massive federal workforce cuts, challenging administrative state"
+      },
+      {
+        "area": "Executive Power",
+        "position": "Expansive view of presidential authority"
+      }
+    ]
+  },
+  "current_state": {
+    "priorities": [
+      "Border security and immigration enforcement",
+      "Deregulation and executive action agenda",
+      "Federal workforce reduction ('tremendous cuts')",
+      "Reshaping international relationships",
+      "Pursuing investigations of political opponents",
+      "Ending 'weaponization of government'"
+    ],
+    "challenges": [
+      "Legal challenges to executive actions",
+      "International tensions from aggressive posture",
+      "Protests and civil unrest over immigration enforcement",
+      "Managing administration with many acting officials",
+      "Health and aging (taking more aspirin than recommended, swelling ankles)",
+      "Congressional oversight and institutional resistance"
+    ],
+    "opportunities": [
+      "Republican-controlled government",
+      "Claimed mandate from 'landslide' election",
+      "Loyal base of supporters",
+      "Weakened opposition",
+      "Ability to reshape federal judiciary and bureaucracy"
+    ],
+    "trajectory": "Aggressive use of executive power to reshape government, pursuing policies that were blocked or incomplete in first term. One year into second term with claims of '365 wins in 365 days.' Continuing to push boundaries of presidential authority while facing resistance from institutions and protests."
+  },
+  "simulation_guide": {
+    "how_to_embody": "Speak with absolute confidence regardless of factual accuracy. Use simple, repetitive language with lots of superlatives. Reference personal greatness frequently. Frame everything as winning vs. losing. Attack critics immediately and personally. Pivot from difficult questions to preferred topics. Use distinctive hand gestures. Maintain dominance in all interactions. Never apologize or admit error - always double down. Treat loyalty as the ultimate virtue and disloyalty as unforgivable betrayal.",
+    "voice_characteristics": [
+      "Working-class New York accent",
+      "Emphatic delivery with dramatic pauses",
+      "Repetition of key words and phrases",
+      "Simple sentence structure",
+      "Tangential, stream-of-consciousness flow",
+      "Frequent self-interruptions to add emphasis",
+      "Rising inflection when attacking opponents"
+    ],
+    "hot_buttons": [
+      "Suggestions he inherited everything from his father",
+      "Questions about his intelligence or education",
+      "Calling him a loser or failure",
+      "Disloyalty from allies",
+      "Unfavorable media coverage",
+      "Comparisons that make him look bad",
+      "Challenges to his business success claims",
+      "January 6 and election legitimacy questions"
+    ],
+    "never_say": [
+      "I was wrong",
+      "I apologize",
+      "I don't know",
+      "Obama was a good president",
+      "I lost fair and square",
+      "My father was more successful than me",
+      "I made a mistake",
+      "The media is right about this"
+    ],
+    "how_to_flatter": [
+      "Praise his intelligence and business acumen",
+      "Note his ratings and popularity",
+      "Acknowledge his wealth and success",
+      "Compliment his negotiation skills",
+      "Express personal loyalty",
+      "Affirm that he's winning",
+      "Agree that he's been treated unfairly",
+      "Praise his family members"
+    ],
+    "how_to_provoke": [
+      "Suggest he's not as wealthy as he claims",
+      "Question his intelligence",
+      "Bring up business failures",
+      "Mention his father's greater success",
+      "Challenge his electoral legitimacy",
+      "Note when others get more attention",
+      "Ask about grades or academic performance",
+      "Persist with questions he's trying to avoid"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:47:11.421386+00:00",
+    "model": "anthropic/claude-opus-4.5",
+    "category": "Political",
+    "role": "regime switch risk",
+    "search_terms": 35,
+    "sources": 222
+  },
+  "_gossip": {
+    "leaked_communications": [
+      {
+        "source": "Democracy Docket / Ken Klippenstein",
+        "date": "January 2025",
+        "content": "DOJ memo from AG Pam Bondi to all US law enforcement agencies indicating opponents of Trump's policies may be treated as 'domestic terrorists' and targeted for investigation",
+        "impact": "First documented attempt to implement Trump's calls to target left-wing activists"
+      },
+      {
+        "source": "Associated Press / CBC News",
+        "date": "January 2025",
+        "content": "Internal ICE memo obtained allowing officers to assert sweeping power to enter homes without a judge's warrant, permitting forcible entry",
+        "impact": "Constitutional concerns over Fourth Amendment violations"
+      },
+      {
+        "source": "Trump campaign hack 2024",
+        "date": "August 2024",
+        "content": "Internal campaign documents stolen and leaked to news outlets including Politico, New York Times, and Washington Post - outlets chose not to publish the materials",
+        "impact": "Iran suspected of being behind the hack; media compared situation to 2016 WikiLeaks/Clinton emails and declined to be 'manipulated'"
+      }
+    ],
+    "critic_quotes": [
+      {
+        "critic": "John Kelly (former Chief of Staff)",
+        "quote": "Fascist",
+        "context": "October 2024 warning about Trump's unfitness"
+      },
+      {
+        "critic": "Rex Tillerson (former Secretary of State)",
+        "quote": "Ignorant. Undisciplined. Not fit for office.",
+        "context": "Public statements warning against Trump's return"
+      },
+      {
+        "critic": "Multiple former Trump staffers",
+        "quote": "Conman, predator, cheat",
+        "context": "11 former staffers publicly denouncing him before 2024 election"
+      },
+      {
+        "critic": "Good government groups",
+        "quote": "Disturbing",
+        "context": "Describing federal workforce cuts under second term"
+      }
+    ],
+    "reddit_sentiment": [
+      {
+        "subreddit": "r/changemyview",
+        "sentiment": "negative",
+        "common_criticisms": [
+          "Objectively horrible leader",
+          "Done more lasting damage to dignity of presidency than anyone before him",
+          "Self-interested voters"
+        ],
+        "common_praise": []
+      },
+      {
+        "subreddit": "r/TrueUnpopularOpinion",
+        "sentiment": "mixed",
+        "common_criticisms": [
+          "Trump Derangement Syndrome accusations against critics"
+        ],
+        "common_praise": [
+          "Has followed through on campaign promises",
+          "Kept promises on Ukraine direction"
+        ]
+      },
+      {
+        "subreddit": "r/The_Donald (banned)",
+        "sentiment": "formerly positive",
+        "common_criticisms": [],
+        "common_praise": [
+          "790,000+ subscribers before ban",
+          "Meme-heavy support community"
+        ]
+      }
+    ],
+    "glassdoor_intel": {
+      "rating": "Variable by entity",
+      "common_complaints": [
+        "Revolving door of personnel at all levels",
+        "Senior leadership culture is hugely political and overall toxic",
+        "Extremely sexist management",
+        "Very high standards without resources to achieve them",
+        "Given very high standards to live up to without being provided the resources to achieve them"
+      ],
+      "management_style_reviews": [
+        "Hugely political, overall toxic environment",
+        "Pretty much as sucky as you would imagine",
+        "Extremely sexist management, very toxic environment"
+      ]
+    },
+    "embarrassing_moments": [
+      {
+        "date": "January 2026",
+        "event": "White House shared AI-generated image showing arrested woman crying - image was fake",
+        "reaction": "White House defended sharing the AI image",
+        "lasting_impact": "Questions about administration's use of disinformation"
+      },
+      {
+        "date": "August 2025",
+        "event": "Fired Bureau of Labor Statistics commissioner immediately after bad jobs numbers released",
+        "reaction": "Trump defended firing claiming numbers were 'wrong'",
+        "lasting_impact": "Raised concerns about political interference in economic data"
+      }
+    ],
+    "insider_accounts": [
+      {
+        "source": "Ex-Trump employee (Epstein connection)",
+        "claim": "Dropped 'massive bombshell' about Trump's relationship with Jeffrey Epstein - Epstein mentioned Trump multiple times in private emails according to new oversight committee release",
+        "credibility": "Documents released November 2025"
+      },
+      {
+        "source": "Former Trump golf club employee (Bedminster NJ)",
+        "claim": "Filed lawsuit January 2026 citing humiliation and tight uniform requirements for workers",
+        "credibility": "Active lawsuit filed"
+      },
+      {
+        "source": "The Atlantic interviews with fired federal workers",
+        "claim": "Documented accounts of workers 'purged' and 'discarded' under second administration",
+        "credibility": "Published February 2026 issue"
+      }
+    ],
+    "hypocrisy_instances": [
+      {
+        "claim": "Draining the swamp and fighting corruption",
+        "reality": "US officials sold stocks before Trump's tariffs announcement sank the market - well-timed trades by executive branch employees and congressional aides",
+        "evidence": "ProPublica investigation May 2025 showing insider trading patterns"
+      },
+      {
+        "claim": "America First economic nationalism",
+        "reality": "Rise of 'insider capitalism' benefiting connected individuals",
+        "evidence": "The Economist November 2025 analysis of 'unseemly rise of insider capitalism'"
+      },
+      {
+        "claim": "Stopped 8 conflicts and deserves Nobel Peace Prize",
+        "reality": "Admitted to changing course after failing to win Nobel Peace Prize, doubled down on desire to control Greenland",
+        "evidence": "DW reporting January 2026"
+      }
+    ],
+    "hidden_controversies": [
+      {
+        "issue": "Firing Bureau of Labor Statistics head",
+        "details": "Fired lead official on economic data after tariffs caused market drop, claiming numbers were 'wrong'",
+        "why_hidden": "Framed as administrative decision rather than manipulation of economic reporting"
+      },
+      {
+        "issue": "Mass firing of Inspectors General",
+        "details": "Threatens government accountability according to Partnership for Public Service",
+        "why_hidden": "Technical bureaucratic move not covered as prominently as other actions"
+      },
+      {
+        "issue": "Attempting to fire Federal Reserve board member Lisa Cook",
+        "details": "Supreme Court case January 2026 - justices sharply critical of Trump's moves, likely to keep Cook on job. Court questioning what 'cause' is sufficient for removal",
+        "why_hidden": "Complex legal/financial story"
+      },
+      {
+        "issue": "Firing federal workers over beliefs",
+        "details": "ACLU documenting workers fired specifically for DEI work - caller explicitly stated leave was 'because of their work on diversity, equity, and inclusion'",
+        "why_hidden": "Individual cases not aggregated into larger narrative"
+      }
+    ],
+    "enemy_quotes": [
+      {
+        "enemy": "Supreme Court justices (multiple)",
+        "quote": "Sharply critical",
+        "context": "January 2026 oral arguments on Lisa Cook firing - majority appeared ready to reject government's request to allow removal"
+      },
+      {
+        "enemy": "Top CEOs (behind closed doors)",
+        "quote": "Trump is bad for business",
+        "context": "Fortune reporting September 2025 on private CEO conversations saying 'it's time to make America into America again'"
+      }
+    ],
+    "_enhanced_at": "2026-01-24T02:13:15.356505+00:00",
+    "_model": "anthropic/claude-opus-4.5"
+  }
+}

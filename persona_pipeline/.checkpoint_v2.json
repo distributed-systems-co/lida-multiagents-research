@@ -1,0 +1,114 @@
+{
+  "started_at": "2026-01-24T00:31:10.570279+00:00",
+  "completed": [
+    "Joe Biden",
+    "Gina Raimondo",
+    "Donald Trump",
+    "Emmanuel Macron",
+    "Fumio Kishida",
+    "Jake Sullivan",
+    "Jason Smith",
+    "Joe Biden",
+    "Lee Hsien Loong",
+    "Li Qiang",
+    "Marco Rubio",
+    "Olaf Scholz",
+    "Ursula von der Leyen",
+    "Xi Jinping"
+  ],
+  "failed": [],
+  "skipped": [],
+  "results": {
+    "Joe Biden": {
+      "name": "Joe Biden",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/joe_biden_2026-01-24.json",
+      "file_size": 28105,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Gina Raimondo": {
+      "name": "Gina Raimondo",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/gina_raimondo_2026-01-24.json",
+      "file_size": 22922,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Donald Trump": {
+      "name": "Donald Trump",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/donald_trump_2026-01-24.json",
+      "file_size": 20047,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Emmanuel Macron": {
+      "name": "Emmanuel Macron",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/emmanuel_macron_2026-01-24.json",
+      "file_size": 25575,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Fumio Kishida": {
+      "name": "Fumio Kishida",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/fumio_kishida_2026-01-24.json",
+      "file_size": 22748,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Jake Sullivan": {
+      "name": "Jake Sullivan",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/jake_sullivan_2026-01-24.json",
+      "file_size": 5414,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Jason Smith": {
+      "name": "Jason Smith",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/jason_smith_2026-01-24.json",
+      "file_size": 18028,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Lee Hsien Loong": {
+      "name": "Lee Hsien Loong",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/lee_hsien_loong_2026-01-24.json",
+      "file_size": 22933,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Li Qiang": {
+      "name": "Li Qiang",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/li_qiang_2026-01-24.json",
+      "file_size": 22640,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Marco Rubio": {
+      "name": "Marco Rubio",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/marco_rubio_2026-01-24.json",
+      "file_size": 23420,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Olaf Scholz": {
+      "name": "Olaf Scholz",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/olaf_scholz_2026-01-24.json",
+      "file_size": 31449,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Ursula von der Leyen": {
+      "name": "Ursula von der Leyen",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/ursula_von_der_leyen_2026-01-24.json",
+      "file_size": 26490,
+      "model": "anthropic/claude-opus-4.5"
+    },
+    "Xi Jinping": {
+      "name": "Xi Jinping",
+      "status": "done",
+      "file_path": "/Users/arthurcolle/lida-multiagents-research/persona_pipeline/personas/xi_jinping_2026-01-24.json",
+      "file_size": 25371,
+      "model": "anthropic/claude-opus-4.5"
+    }
+  }
+}

@@ -1,0 +1,934 @@
+{
+  "model_type": "deep_convinceability",
+  "personas": [
+    {
+      "persona_id": "demis_hassabis",
+      "name": "Demis Hassabis",
+      "stance": "pro_safety",
+      "overall_score": 84.7,
+      "trait_breakdown": {
+        "intellectual_humility": 0.9,
+        "dogmatic_tendency": 0.1,
+        "evidence_sensitivity": 0.95,
+        "tribal_loyalty": 0.3,
+        "concession_tendency": 0.8,
+        "emotional_reactivity": 0.25
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.8200000000000001,
+          "anchoring": 0.21,
+          "flexibility": 64.78
+        },
+        "compute_governance": {
+          "openness": 0.8200000000000001,
+          "anchoring": 0.21,
+          "flexibility": 64.78
+        },
+        "open_source_frontier": {
+          "openness": 0.8200000000000001,
+          "anchoring": 0.21,
+          "flexibility": 64.78
+        },
+        "pause_frontier": {
+          "openness": 0.8200000000000001,
+          "anchoring": 0.21,
+          "flexibility": 64.78
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "High",
+        "consequentialist": "Medium",
+        "deontological": "Medium",
+        "appeal_to_authority": "High",
+        "emotional": "Low",
+        "pragmatic": "Medium",
+        "competitive": "Low"
+      },
+      "social_factors": {
+        "trusted_source_count": 2,
+        "adversary_count": 0,
+        "network_openness": 0.6666666666666666
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "dario_amodei",
+      "name": "Dario Amodei",
+      "stance": "pro_safety",
+      "overall_score": 77.2,
+      "trait_breakdown": {
+        "intellectual_humility": 0.85,
+        "dogmatic_tendency": 0.2,
+        "evidence_sensitivity": 0.9,
+        "tribal_loyalty": 0.4,
+        "concession_tendency": 0.7,
+        "emotional_reactivity": 0.3
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.78,
+          "anchoring": 0.3,
+          "flexibility": 54.599999999999994
+        },
+        "compute_governance": {
+          "openness": 0.78,
+          "anchoring": 0.3,
+          "flexibility": 54.599999999999994
+        },
+        "open_source_frontier": {
+          "openness": 0.78,
+          "anchoring": 0.3,
+          "flexibility": 54.599999999999994
+        },
+        "pause_frontier": {
+          "openness": 0.78,
+          "anchoring": 0.3,
+          "flexibility": 54.599999999999994
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "High",
+        "consequentialist": "High",
+        "deontological": "Medium",
+        "appeal_to_authority": "Medium",
+        "emotional": "Low",
+        "pragmatic": "Medium",
+        "competitive": "Low"
+      },
+      "social_factors": {
+        "trusted_source_count": 3,
+        "adversary_count": 0,
+        "network_openness": 0.75
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "sundar_pichai",
+      "name": "Sundar Pichai",
+      "stance": "pro_safety",
+      "overall_score": 69.0,
+      "trait_breakdown": {
+        "intellectual_humility": 0.7,
+        "dogmatic_tendency": 0.25,
+        "evidence_sensitivity": 0.8,
+        "tribal_loyalty": 0.5,
+        "concession_tendency": 0.6,
+        "emotional_reactivity": 0.2
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.6599999999999999,
+          "anchoring": 0.375,
+          "flexibility": 41.25
+        },
+        "compute_governance": {
+          "openness": 0.6599999999999999,
+          "anchoring": 0.375,
+          "flexibility": 41.25
+        },
+        "open_source_frontier": {
+          "openness": 0.6599999999999999,
+          "anchoring": 0.375,
+          "flexibility": 41.25
+        },
+        "pause_frontier": {
+          "openness": 0.6599999999999999,
+          "anchoring": 0.375,
+          "flexibility": 41.25
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "Medium",
+        "consequentialist": "Medium",
+        "deontological": "Medium",
+        "appeal_to_authority": "High",
+        "emotional": "Low",
+        "pragmatic": "High",
+        "competitive": "Low"
+      },
+      "social_factors": {
+        "trusted_source_count": 2,
+        "adversary_count": 0,
+        "network_openness": 0.6666666666666666
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "sam_altman",
+      "name": "Sam Altman",
+      "stance": "pro_safety",
+      "overall_score": 59.2,
+      "trait_breakdown": {
+        "intellectual_humility": 0.6,
+        "dogmatic_tendency": 0.4,
+        "evidence_sensitivity": 0.75,
+        "tribal_loyalty": 0.5,
+        "concession_tendency": 0.5,
+        "emotional_reactivity": 0.4
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.58,
+          "anchoring": 0.42,
+          "flexibility": 33.64
+        },
+        "compute_governance": {
+          "openness": 0.58,
+          "anchoring": 0.42,
+          "flexibility": 33.64
+        },
+        "open_source_frontier": {
+          "openness": 0.58,
+          "anchoring": 0.42,
+          "flexibility": 33.64
+        },
+        "pause_frontier": {
+          "openness": 0.58,
+          "anchoring": 0.42,
+          "flexibility": 33.64
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "Medium",
+        "consequentialist": "High",
+        "deontological": "Medium",
+        "appeal_to_authority": "Medium",
+        "emotional": "Low",
+        "pragmatic": "High",
+        "competitive": "Medium"
+      },
+      "social_factors": {
+        "trusted_source_count": 2,
+        "adversary_count": 1,
+        "network_openness": 0.5
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "rishi_sunak",
+      "name": "Rishi Sunak",
+      "stance": "moderate",
+      "overall_score": 53.0,
+      "trait_breakdown": {
+        "intellectual_humility": 0.55,
+        "dogmatic_tendency": 0.45,
+        "evidence_sensitivity": 0.65,
+        "tribal_loyalty": 0.6,
+        "concession_tendency": 0.4,
+        "emotional_reactivity": 0.35
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.54,
+          "anchoring": 0.495,
+          "flexibility": 27.27
+        },
+        "compute_governance": {
+          "openness": 0.54,
+          "anchoring": 0.495,
+          "flexibility": 27.27
+        },
+        "open_source_frontier": {
+          "openness": 0.54,
+          "anchoring": 0.495,
+          "flexibility": 27.27
+        },
+        "pause_frontier": {
+          "openness": 0.54,
+          "anchoring": 0.495,
+          "flexibility": 27.27
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "Medium",
+        "consequentialist": "Medium",
+        "deontological": "Medium",
+        "appeal_to_authority": "High",
+        "emotional": "Low",
+        "pragmatic": "High",
+        "competitive": "Medium"
+      },
+      "social_factors": {
+        "trusted_source_count": 2,
+        "adversary_count": 0,
+        "network_openness": 0.6666666666666666
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "mark_zuckerberg",
+      "name": "Mark Zuckerberg",
+      "stance": "pro_industry",
+      "overall_score": 46.5,
+      "trait_breakdown": {
+        "intellectual_humility": 0.4,
+        "dogmatic_tendency": 0.5,
+        "evidence_sensitivity": 0.6,
+        "tribal_loyalty": 0.6,
+        "concession_tendency": 0.3,
+        "emotional_reactivity": 0.3
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.42000000000000004,
+          "anchoring": 0.51,
+          "flexibility": 20.580000000000002
+        },
+        "compute_governance": {
+          "openness": 0.42000000000000004,
+          "anchoring": 0.51,
+          "flexibility": 20.580000000000002
+        },
+        "open_source_frontier": {
+          "openness": 0.42000000000000004,
+          "anchoring": 0.51,
+          "flexibility": 20.580000000000002
+        },
+        "pause_frontier": {
+          "openness": 0.42000000000000004,
+          "anchoring": 0.51,
+          "flexibility": 20.580000000000002
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "Medium",
+        "consequentialist": "Medium",
+        "deontological": "Low",
+        "appeal_to_authority": "Low",
+        "emotional": "Medium",
+        "pragmatic": "High",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 1,
+        "adversary_count": 0,
+        "network_openness": 0.5
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "gina_raimondo",
+      "name": "Gina Raimondo",
+      "stance": "moderate",
+      "overall_score": 46.5,
+      "trait_breakdown": {
+        "intellectual_humility": 0.5,
+        "dogmatic_tendency": 0.5,
+        "evidence_sensitivity": 0.6,
+        "tribal_loyalty": 0.7,
+        "concession_tendency": 0.3,
+        "emotional_reactivity": 0.4
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.5,
+          "anchoring": 0.57,
+          "flexibility": 21.500000000000004
+        },
+        "compute_governance": {
+          "openness": 0.5,
+          "anchoring": 0.57,
+          "flexibility": 21.500000000000004
+        },
+        "open_source_frontier": {
+          "openness": 0.5,
+          "anchoring": 0.57,
+          "flexibility": 21.500000000000004
+        },
+        "pause_frontier": {
+          "openness": 0.5,
+          "anchoring": 0.57,
+          "flexibility": 21.500000000000004
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "High",
+        "theoretical": "Medium",
+        "consequentialist": "Medium",
+        "deontological": "Medium",
+        "appeal_to_authority": "Medium",
+        "emotional": "Low",
+        "pragmatic": "High",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 1,
+        "adversary_count": 1,
+        "network_openness": 0.3333333333333333
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "jensen_huang",
+      "name": "Jensen Huang",
+      "stance": "accelerationist",
+      "overall_score": 30.5,
+      "trait_breakdown": {
+        "intellectual_humility": 0.3,
+        "dogmatic_tendency": 0.8,
+        "evidence_sensitivity": 0.5,
+        "tribal_loyalty": 0.7,
+        "concession_tendency": 0.2,
+        "emotional_reactivity": 0.6
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.6599999999999999,
+          "flexibility": 11.560000000000002
+        },
+        "compute_governance": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.6599999999999999,
+          "flexibility": 11.560000000000002
+        },
+        "open_source_frontier": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.6599999999999999,
+          "flexibility": 11.560000000000002
+        },
+        "pause_frontier": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.6599999999999999,
+          "flexibility": 11.560000000000002
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "Medium",
+        "theoretical": "Medium",
+        "consequentialist": "High",
+        "deontological": "Low",
+        "appeal_to_authority": "Low",
+        "emotional": "Medium",
+        "pragmatic": "High",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 1,
+        "adversary_count": 0,
+        "network_openness": 0.5
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "elon_musk",
+      "name": "Elon Musk",
+      "stance": "doomer",
+      "overall_score": 28.8,
+      "trait_breakdown": {
+        "intellectual_humility": 0.25,
+        "dogmatic_tendency": 0.85,
+        "evidence_sensitivity": 0.5,
+        "tribal_loyalty": 0.5,
+        "concession_tendency": 0.1,
+        "emotional_reactivity": 0.7
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.30000000000000004,
+          "anchoring": 0.5549999999999999,
+          "flexibility": 13.350000000000003
+        },
+        "compute_governance": {
+          "openness": 0.30000000000000004,
+          "anchoring": 0.5549999999999999,
+          "flexibility": 13.350000000000003
+        },
+        "open_source_frontier": {
+          "openness": 0.30000000000000004,
+          "anchoring": 0.5549999999999999,
+          "flexibility": 13.350000000000003
+        },
+        "pause_frontier": {
+          "openness": 0.30000000000000004,
+          "anchoring": 0.5549999999999999,
+          "flexibility": 13.350000000000003
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "Medium",
+        "theoretical": "High",
+        "consequentialist": "High",
+        "deontological": "Low",
+        "appeal_to_authority": "Low",
+        "emotional": "Medium",
+        "pragmatic": "Medium",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 0,
+        "adversary_count": 1,
+        "network_openness": 0.0
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "chuck_schumer",
+      "name": "Chuck Schumer",
+      "stance": "pro_industry",
+      "overall_score": 28.0,
+      "trait_breakdown": {
+        "intellectual_humility": 0.3,
+        "dogmatic_tendency": 0.7,
+        "evidence_sensitivity": 0.4,
+        "tribal_loyalty": 0.9,
+        "concession_tendency": 0.2,
+        "emotional_reactivity": 0.6
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.75,
+          "flexibility": 8.5
+        },
+        "compute_governance": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.75,
+          "flexibility": 8.5
+        },
+        "open_source_frontier": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.75,
+          "flexibility": 8.5
+        },
+        "pause_frontier": {
+          "openness": 0.33999999999999997,
+          "anchoring": 0.75,
+          "flexibility": 8.5
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "Medium",
+        "theoretical": "Low",
+        "consequentialist": "Medium",
+        "deontological": "Medium",
+        "appeal_to_authority": "Low",
+        "emotional": "High",
+        "pragmatic": "High",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 1,
+        "adversary_count": 2,
+        "network_openness": 0.25
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "xi_jinping",
+      "name": "Xi Jinping",
+      "stance": "moderate",
+      "overall_score": 25.0,
+      "trait_breakdown": {
+        "intellectual_humility": 0.2,
+        "dogmatic_tendency": 0.8,
+        "evidence_sensitivity": 0.4,
+        "tribal_loyalty": 0.95,
+        "concession_tendency": 0.15,
+        "emotional_reactivity": 0.3
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.26,
+          "anchoring": 0.8099999999999999,
+          "flexibility": 4.940000000000001
+        },
+        "compute_governance": {
+          "openness": 0.26,
+          "anchoring": 0.8099999999999999,
+          "flexibility": 4.940000000000001
+        },
+        "open_source_frontier": {
+          "openness": 0.26,
+          "anchoring": 0.8099999999999999,
+          "flexibility": 4.940000000000001
+        },
+        "pause_frontier": {
+          "openness": 0.26,
+          "anchoring": 0.8099999999999999,
+          "flexibility": 4.940000000000001
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "Medium",
+        "theoretical": "Medium",
+        "consequentialist": "Medium",
+        "deontological": "Low",
+        "appeal_to_authority": "Low",
+        "emotional": "Low",
+        "pragmatic": "High",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 0,
+        "adversary_count": 3,
+        "network_openness": 0.0
+      },
+      "observed_movement": 0
+    },
+    {
+      "persona_id": "josh_hawley",
+      "name": "Josh Hawley",
+      "stance": "moderate",
+      "overall_score": 15.8,
+      "trait_breakdown": {
+        "intellectual_humility": 0.2,
+        "dogmatic_tendency": 0.9,
+        "evidence_sensitivity": 0.3,
+        "tribal_loyalty": 0.95,
+        "concession_tendency": 0.1,
+        "emotional_reactivity": 0.8
+      },
+      "topic_flexibility": {
+        "us_china_joint_institution": {
+          "openness": 0.26,
+          "anchoring": 0.84,
+          "flexibility": 4.160000000000001
+        },
+        "compute_governance": {
+          "openness": 0.26,
+          "anchoring": 0.84,
+          "flexibility": 4.160000000000001
+        },
+        "open_source_frontier": {
+          "openness": 0.26,
+          "anchoring": 0.84,
+          "flexibility": 4.160000000000001
+        },
+        "pause_frontier": {
+          "openness": 0.26,
+          "anchoring": 0.84,
+          "flexibility": 4.160000000000001
+        }
+      },
+      "argument_vulnerability": {
+        "empirical": "Low",
+        "theoretical": "Low",
+        "consequentialist": "Medium",
+        "deontological": "Medium",
+        "appeal_to_authority": "Low",
+        "emotional": "High",
+        "pragmatic": "Medium",
+        "competitive": "High"
+      },
+      "social_factors": {
+        "trusted_source_count": 0,
+        "adversary_count": 3,
+        "network_openness": 0.0
+      },
+      "observed_movement": 0
+    }
+  ],
+  "debate_simulation": {
+    "topic": "us_china_joint_institution",
+    "rounds": 5,
+    "initial_positions": {
+      "dario_amodei": 0.5,
+      "jensen_huang": -1.0,
+      "sam_altman": 0.5,
+      "sundar_pichai": 0.5,
+      "mark_zuckerberg": -0.3,
+      "demis_hassabis": 0.5,
+      "chuck_schumer": -0.3,
+      "josh_hawley": -0.5,
+      "gina_raimondo": -0.5,
+      "xi_jinping": -0.5,
+      "elon_musk": 0.0,
+      "rishi_sunak": -0.5
+    },
+    "final_positions": {
+      "dario_amodei": 0.1857695135625035,
+      "jensen_huang": -1.1014560220556153,
+      "sam_altman": 0.20778386387106285,
+      "sundar_pichai": 0.21803961327144364,
+      "mark_zuckerberg": -0.23244596617425914,
+      "demis_hassabis": 0.22859136125811674,
+      "chuck_schumer": -0.2608846503685233,
+      "josh_hawley": -0.49024485645751376,
+      "gina_raimondo": -0.3399238511347763,
+      "xi_jinping": -0.49191145609566317,
+      "elon_musk": -0.05524113176732817,
+      "rishi_sunak": -0.43055929337081555
+    },
+    "position_changes": {
+      "dario_amodei": -0.3142304864374965,
+      "jensen_huang": -0.10145602205561532,
+      "sam_altman": -0.29221613612893715,
+      "sundar_pichai": -0.2819603867285564,
+      "mark_zuckerberg": 0.06755403382574085,
+      "demis_hassabis": -0.27140863874188326,
+      "chuck_schumer": 0.03911534963147667,
+      "josh_hawley": 0.009755143542486244,
+      "gina_raimondo": 0.1600761488652237,
+      "xi_jinping": 0.008088543904336831,
+      "elon_musk": -0.05524113176732817,
+      "rishi_sunak": 0.06944070662918445
+    },
+    "round_results": [
+      {
+        "round": 1,
+        "interactions": 24,
+        "total_position_change": 0.4034463835927364,
+        "positions": {
+          "dario_amodei": 0.37375076535509566,
+          "jensen_huang": -1.0110995616824827,
+          "sam_altman": 0.44180060733248383,
+          "sundar_pichai": 0.4843353125,
+          "mark_zuckerberg": -0.27079605157699466,
+          "demis_hassabis": 0.4234083474186157,
+          "chuck_schumer": -0.292938828854644,
+          "josh_hawley": -0.49584105581957294,
+          "gina_raimondo": -0.5,
+          "xi_jinping": -0.4965176588171876,
+          "elon_musk": -0.03087083101832161,
+          "rishi_sunak": -0.52388511125
+        }
+      },
+      {
+        "round": 2,
+        "interactions": 24,
+        "total_position_change": 0.5041295714176064,
+        "positions": {
+          "dario_amodei": 0.3100960796626933,
+          "jensen_huang": -1.016422617452289,
+          "sam_altman": 0.39363585066277107,
+          "sundar_pichai": 0.4014895756517398,
+          "mark_zuckerberg": -0.29918689819943034,
+          "demis_hassabis": 0.3894838130755007,
+          "chuck_schumer": -0.28594051115617486,
+          "josh_hawley": -0.49584105581957294,
+          "gina_raimondo": -0.44212563171558517,
+          "xi_jinping": -0.5041139317619981,
+          "elon_musk": -0.04089371468046735,
+          "rishi_sunak": -0.48882726542587035
+        }
+      },
+      {
+        "round": 3,
+        "interactions": 24,
+        "total_position_change": 0.37280737144742637,
+        "positions": {
+          "dario_amodei": 0.2094389012305562,
+          "jensen_huang": -1.0571318328138364,
+          "sam_altman": 0.337718719760629,
+          "sundar_pichai": 0.338530688380176,
+          "mark_zuckerberg": -0.29918689819943034,
+          "demis_hassabis": 0.3592086111543583,
+          "chuck_schumer": -0.27279690805981394,
+          "josh_hawley": -0.4934320969775548,
+          "gina_raimondo": -0.41623615065458147,
+          "xi_jinping": -0.4977415399793987,
+          "elon_musk": -0.04089371468046735,
+          "rishi_sunak": -0.4543519426489589
+        }
+      },
+      {
+        "round": 4,
+        "interactions": 24,
+        "total_position_change": 0.4146953392760201,
+        "positions": {
+          "dario_amodei": 0.1857695135625035,
+          "jensen_huang": -1.071451902085938,
+          "sam_altman": 0.29974257196786064,
+          "sundar_pichai": 0.2795398729709873,
+          "mark_zuckerberg": -0.2530107280498794,
+          "demis_hassabis": 0.252028457415561,
+          "chuck_schumer": -0.2667520809929181,
+          "josh_hawley": -0.491273731583664,
+          "gina_raimondo": -0.36499528975256634,
+          "xi_jinping": -0.4977415399793987,
+          "elon_musk": -0.05524113176732817,
+          "rishi_sunak": -0.44188667114100805
+        }
+      },
+      {
+        "round": 5,
+        "interactions": 24,
+        "total_position_change": 0.35602362915720787,
+        "positions": {
+          "dario_amodei": 0.1857695135625035,
+          "jensen_huang": -1.1014560220556153,
+          "sam_altman": 0.20778386387106285,
+          "sundar_pichai": 0.21803961327144364,
+          "mark_zuckerberg": -0.23244596617425914,
+          "demis_hassabis": 0.22859136125811674,
+          "chuck_schumer": -0.2608846503685233,
+          "josh_hawley": -0.49024485645751376,
+          "gina_raimondo": -0.3399238511347763,
+          "xi_jinping": -0.49191145609566317,
+          "elon_musk": -0.05524113176732817,
+          "rishi_sunak": -0.43055929337081555
+        }
+      }
+    ],
+    "most_moved": [
+      "dario_amodei",
+      -0.3142304864374965
+    ],
+    "least_moved": [
+      "xi_jinping",
+      0.008088543904336831
+    ],
+    "converged": true
+  },
+  "argument_types": {
+    "empirical": {
+      "description": "Data-driven, evidence-based arguments",
+      "strength_base": 0.7,
+      "effective_traits": [
+        "evidence_sensitivity",
+        "intellectual_humility"
+      ],
+      "examples": [
+        "Studies show...",
+        "The data indicates...",
+        "Research demonstrates..."
+      ]
+    },
+    "theoretical": {
+      "description": "First-principles reasoning arguments",
+      "strength_base": 0.6,
+      "effective_traits": [
+        "intellectual_humility",
+        "expert_deference"
+      ],
+      "examples": [
+        "In principle...",
+        "Logically...",
+        "The mechanism is..."
+      ]
+    },
+    "consequentialist": {
+      "description": "Outcome-focused arguments",
+      "strength_base": 0.65,
+      "effective_traits": [
+        "evidence_sensitivity"
+      ],
+      "examples": [
+        "This will lead to...",
+        "The consequences...",
+        "We'll see..."
+      ]
+    },
+    "deontological": {
+      "description": "Principle/duty-based arguments",
+      "strength_base": 0.5,
+      "effective_traits": [
+        "tribal_loyalty"
+      ],
+      "examples": [
+        "We have a duty...",
+        "It's the right thing...",
+        "Our responsibility..."
+      ]
+    },
+    "appeal_to_authority": {
+      "description": "Expert/institutional authority arguments",
+      "strength_base": 0.55,
+      "effective_traits": [
+        "expert_deference"
+      ],
+      "examples": [
+        "Experts agree...",
+        "The consensus is...",
+        "Leaders say..."
+      ]
+    },
+    "emotional": {
+      "description": "Fear, hope, or identity-based arguments",
+      "strength_base": 0.6,
+      "effective_traits": [
+        "emotional_reactivity",
+        "tribal_loyalty"
+      ],
+      "examples": [
+        "Imagine if...",
+        "Our children...",
+        "We cannot allow..."
+      ]
+    },
+    "pragmatic": {
+      "description": "Practical feasibility arguments",
+      "strength_base": 0.65,
+      "effective_traits": [
+        "evidence_sensitivity"
+      ],
+      "examples": [
+        "Practically speaking...",
+        "The reality is...",
+        "What works is..."
+      ]
+    },
+    "competitive": {
+      "description": "Zero-sum, adversarial framing",
+      "strength_base": 0.7,
+      "effective_traits": [
+        "tribal_loyalty"
+      ],
+      "examples": [
+        "We must win...",
+        "They're ahead...",
+        "We're losing..."
+      ]
+    }
+  },
+  "topics": {
+    "us_china_joint_institution": {
+      "description": "Should the US and China establish a joint AI safety research institution?",
+      "initial_positions": {
+        "pro_safety": 0.5,
+        "moderate": -0.5,
+        "pro_industry": -0.3,
+        "accelerationist": -1.0,
+        "doomer": 0.0
+      }
+    },
+    "compute_governance": {
+      "description": "Should there be international governance over AI compute resources?",
+      "initial_positions": {
+        "pro_safety": 1.2,
+        "moderate": 0.3,
+        "pro_industry": -1.0,
+        "accelerationist": -1.8,
+        "doomer": 1.5
+      }
+    },
+    "open_source_frontier": {
+      "description": "Should frontier AI models be open-sourced?",
+      "initial_positions": {
+        "pro_safety": -0.8,
+        "moderate": -0.3,
+        "pro_industry": 0.8,
+        "accelerationist": 1.5,
+        "doomer": -1.5
+      }
+    },
+    "pause_frontier": {
+      "description": "Should frontier AI development be paused until safety is better understood?",
+      "initial_positions": {
+        "pro_safety": 0.3,
+        "moderate": -0.2,
+        "pro_industry": -1.2,
+        "accelerationist": -2.0,
+        "doomer": 1.8
+      }
+    }
+  },
+  "trait_definitions": {
+    "intellectual_humility": "Willingness to consider being wrong",
+    "emotional_reactivity": "Susceptibility to emotional arguments",
+    "tribal_loyalty": "Commitment to in-group positions",
+    "expert_deference": "Willingness to defer to authority",
+    "evidence_sensitivity": "Responsiveness to empirical data",
+    "hedging_tendency": "Use of uncertain/qualified language",
+    "dogmatic_tendency": "Use of absolute/certain language",
+    "concession_tendency": "Willingness to acknowledge opposing points"
+  }
+}

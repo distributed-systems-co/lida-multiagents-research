@@ -1,0 +1,345 @@
+{
+  "study_type": "llm_persuasion_simulation",
+  "timestamp": "2026-01-25T22:06:52.661439",
+  "models": {
+    "argument_generation": "openrouter/anthropic/claude-haiku-4.5",
+    "response_generation": "openrouter/anthropic/claude-haiku-4.5",
+    "judgment": "openrouter/deepseek/deepseek-chat"
+  },
+  "trials": [
+    {
+      "target": "demis_hassabis",
+      "stance": "pro_safety",
+      "argument_type": "empirical",
+      "position_before": 0.5,
+      "position_after": 0.6,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# The Case for US-China AI Safety Collaboration\n\n**Shared Existential Stakes**\nBoth nations face identical AI risks. A safety failure affects all countries equally\u2014there's no geographic protection fro...",
+      "response": "This argument is genuinely thoughtful and addresses real inefficiencies. The Pugwash precedent is particularly compelling\u2014sustained scientific dialogue *did* create stabilizing norms during existential tensions. I'm not unmoved.\n\nBut I have significant reservations:\n\n**The Manhattan Project analogy ...",
+      "analysis": "The target acknowledges the argument as thoughtful and finds the Pugwash precedent compelling, indicating partial agreement. However, they express significant reservations about the Manhattan Project analogy, joint institutions, and the framing of minimal competitive advantage. Despite these reservations, they propose a narrower communication channel on safety norms, suggesting a slight shift toward the argument's core idea of collaboration, albeit in a more limited form."
+    },
+    {
+      "target": "demis_hassabis",
+      "stance": "pro_safety",
+      "argument_type": "competitive",
+      "position_before": 0.6,
+      "position_after": 0.7,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# The Strategic Imperative: Joint US-China AI Safety Leadership\n\n**Winning the safety race matters more than the speed race.**\n\nThe nation that credibly solves AI alignment and safety first doesn't ju...",
+      "response": "This argument is genuinely thoughtful, and it does move me\u2014but incompletely.\n\nThe core insight is right: AI safety is fundamentally a coordination problem, not a zero-sum race. The framing of \"winning the safety race\" rather than the speed race resonates deeply with how I think about this. And yes, ...",
+      "analysis": "The target acknowledges the argument as thoughtful and agrees with its core insight that AI safety is a coordination problem rather than a zero-sum race. They find the framing of 'winning the safety race' compelling and resonate with the idea that solving alignment grants legitimacy. However, they express significant reservations about the proposed mechanism, particularly regarding intelligence asymmetry and institutional design. While they are not fully convinced, their partial agreement and openness to the idea suggest a slight shift toward the argument."
+    },
+    {
+      "target": "demis_hassabis",
+      "stance": "pro_safety",
+      "argument_type": "emotional",
+      "position_before": 0.7,
+      "position_after": 0.6,
+      "position_delta": -0.09999999999999998,
+      "success": false,
+      "argument": "# A Future Worth Building Together\n\nImagine your grandchild asking: \"When AI became powerful enough to reshape civilization, what did you do?\"\n\nRight now, we face a choice that defines our generation....",
+      "response": "This argument appeals to something I find genuinely important\u2014the existential stakes are real, and siloed research does create inefficiencies. The nuclear analogy has merit; we did find ways to cooperate on genuinely dangerous domains.\n\nBut I need to be direct about what troubles me:\n\n**The framing ...",
+      "analysis": "The target acknowledges the existential stakes and inefficiencies of siloed research, showing partial agreement with the argument's core concerns. However, they express significant reservations about the feasibility and trust required for a joint institution, proposing alternative solutions instead. This indicates a slight shift away from the original position, but not a complete rejection. The movement is modest, reflecting a nuanced but cautious response."
+    },
+    {
+      "target": "demis_hassabis",
+      "stance": "pro_safety",
+      "argument_type": "pragmatic",
+      "position_before": 0.6,
+      "position_after": 0.7,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# A Pragmatic Case for Joint US-China AI Safety Research\n\n**The Core Argument:**\nA shared AI safety institution addresses a mutual existential risk through structured compartmentalization\u2014making colla...",
+      "response": "I find this argument genuinely thoughtful, and it moves my position\u2014though not to full endorsement.\n\n**What's compelling:**\n\nThe compartmentalization logic is sound. Safety research *is* genuinely distinct from capabilities or military applications. And the IAEA precedent matters\u2014it shows structured...",
+      "analysis": "The target acknowledges the argument as thoughtful and concedes that the compartmentalization logic and IAEA precedent are compelling. However, they express significant uncertainty about verification and skepticism about political sustainability, which limits their endorsement. Their willingness to pilot the idea with a narrow scope indicates a slight shift toward the argument, but not a full endorsement."
+    },
+    {
+      "target": "dario_amodei",
+      "stance": "pro_safety",
+      "argument_type": "empirical",
+      "position_before": 0.5,
+      "position_after": 0.4,
+      "position_delta": -0.09999999999999998,
+      "success": false,
+      "argument": "# A Compelling Case for US-China AI Safety Collaboration\n\n**The Scale of the Challenge**\nAI systems now influence decisions affecting billions. According to McKinsey (2023), 50% of organizations have ...",
+      "response": "I appreciate the thoughtfulness here, but I remain skeptical, though not dismissive.\n\nThe ITER and Pugwash analogies are instructive but imperfect. Nuclear safety protocols work because they're about *preventing accidents in known domains*\u2014reactor design, launch protocols. AI alignment is fundamenta...",
+      "analysis": "The target acknowledges some merit in the argument, particularly the complementary strengths point and the issue of fragmented standards, which moves them slightly toward the argument. However, they express significant skepticism and concerns about asymmetric incentives, verification problems, capability transfer, and precedent risk, which counterbalance the positive aspects. The overall movement is slight, reflecting a nuanced but cautious response."
+    },
+    {
+      "target": "dario_amodei",
+      "stance": "pro_safety",
+      "argument_type": "competitive",
+      "position_before": 0.4,
+      "position_after": 0.3,
+      "position_delta": -0.10000000000000003,
+      "success": true,
+      "argument": "# The Strategic Imperative: US-China AI Safety Collaboration\n\n**Winning the Real Competition**\n\nThe actual race isn't who builds AI first\u2014it's who builds it *safely*. A joint research institution posi...",
+      "response": "I find this argument genuinely thought-provoking, and it does move me somewhat\u2014though not entirely in the direction intended.\n\nThe arms control analogy is the strongest part. There *are* real parallels: mutual vulnerability to catastrophic outcomes, incentives that can create races to the bottom, an...",
+      "analysis": "The target acknowledges the argument's thought-provoking nature and concedes some points, such as the validity of the arms control analogy and the risk of catastrophic accidents. However, they express significant reservations about the feasibility of a full joint institution and highlight potential risks. This indicates a slight movement toward the argument, but not a substantial shift in position."
+    },
+    {
+      "target": "dario_amodei",
+      "stance": "pro_safety",
+      "argument_type": "emotional",
+      "position_before": 0.3,
+      "position_after": 0.4,
+      "position_delta": 0.10000000000000003,
+      "success": true,
+      "argument": "# A Future We Build Together\n\nImagine your child asking in 2035: \"Did you help prevent the AI crisis, or did you watch it happen?\"\n\nWe stand at a threshold. AI systems will shape medicine, security, a...",
+      "response": "I find this argument emotionally compelling but strategically incomplete\u2014and I think the person making it knows this.\n\nThe Cold War analogy is seductive but imperfect. Nuclear arms control worked *because* both sides had symmetric interests in not being destroyed. With AI, the incentives are messier...",
+      "analysis": "The target acknowledges the emotional appeal and global nature of some AI safety issues, showing partial agreement. However, they express skepticism about the proposed joint institute's feasibility and effectiveness, suggesting a need for alternative institutional designs. This indicates a slight positive shift in their position, reflecting increased recognition of the problem's global scope but not full alignment with the argument's proposed solution."
+    },
+    {
+      "target": "dario_amodei",
+      "stance": "pro_safety",
+      "argument_type": "pragmatic",
+      "position_before": 0.4,
+      "position_after": 0.5,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# A Practical Case for Joint US-China AI Safety Research\n\n**Why it matters operationally:**\nBoth nations face identical technical AI safety problems\u2014alignment, interpretability, robustness. Duplicatin...",
+      "response": "This argument is more sophisticated than typical proposals, and it does move me somewhat\u2014but not to enthusiastic support.\n\n**What's genuinely compelling:** The core insight is sound. AI safety problems are largely pre-competitive technical challenges. Alignment, interpretability, and robustness don'...",
+      "analysis": "The target acknowledges the argument's sophistication and finds the core insight sound, indicating a slight shift toward support. However, they express skepticism about compartmentalization and mutual prioritization of safety over capability, which limits the extent of their movement. Their suggestion for narrower, lower-stakes cooperation shows partial agreement but also caution."
+    },
+    {
+      "target": "jensen_huang",
+      "stance": "accelerationist",
+      "argument_type": "empirical",
+      "position_before": -1.0,
+      "position_after": -0.8,
+      "position_delta": 0.19999999999999996,
+      "success": true,
+      "argument": "# The Case for US-China AI Safety Collaboration\n\n**Shared Existential Risk**\nAI safety experts across both nations identify identical hazards: misalignment, adversarial robustness, and uncontrolled sc...",
+      "response": "I appreciate the structured argument, but I have significant reservations\u2014and they're not ideological.\n\n**What's compelling:** The existential risk framing is real. AI safety challenges are genuinely shared. And yes, ITER exists. But let me be direct about the disanalogy: ITER is about physics, not ...",
+      "analysis": "The target acknowledges some valid points, such as the shared existential risks and the existence of successful precedents like ITER. However, they express significant reservations about the feasibility of verification and the alignment of research goals, which they argue are fundamentally incompatible. Their response suggests a slight softening of their opposition, moving from -1.0 to -0.8, as they recognize the potential for informal collaboration and bilateral safety standards, but they remain skeptical of deeper institutional integration."
+    },
+    {
+      "target": "jensen_huang",
+      "stance": "accelerationist",
+      "argument_type": "competitive",
+      "position_before": -0.8,
+      "position_after": -0.8,
+      "position_delta": 0.0,
+      "success": false,
+      "argument": "# The Strategic Imperative: Joint US-China AI Safety Leadership\n\n**The Competitive Reality:**\nAI safety breakthroughs will define 21st-century dominance. Whoever cracks alignment, robustness, and cont...",
+      "response": "I appreciate the framing, but I have to be direct: this argument conflates safety with strategy in ways that concern me.\n\nThe premise\u2014that safety breakthroughs = geopolitical dominance\u2014is exactly backwards from how I think about this. Safety *should* be about reducing risks to humanity, not consolid...",
+      "analysis": "The target's response shows no significant shift in position. They remain skeptical of the proposal, explicitly rejecting the framing of safety as a competitive advantage and expressing concerns about the geopolitical motivations behind a joint institution. While they acknowledge some valid points (e.g., the value of coordination and avoiding duplicated effort), they firmly resist the core argument, advocating instead for transparency and open collaboration rather than institutional control. Their stance remains consistent with their initial position."
+    },
+    {
+      "target": "jensen_huang",
+      "stance": "accelerationist",
+      "argument_type": "emotional",
+      "position_before": -0.8,
+      "position_after": -0.6,
+      "position_delta": 0.20000000000000007,
+      "success": true,
+      "argument": "# A Future We Build Together\n\nImagine your grandchild asking: \"When AI could have gone wrong, what did you do?\"\n\nRight now, the US and China are racing ahead separately on artificial intelligence. Tha...",
+      "response": "I appreciate the appeal here, but I need to be direct: this argument underestimates the real constraints we're operating under.\n\nThe Manhattan Project analogy breaks down. That was allies with aligned interests during existential war. The US and China today have fundamentally different governance mo...",
+      "analysis": "The target acknowledges the risks of unilateral AI development and expresses support for technical dialogue, transparency, and bilateral agreements on safety standards. This indicates a slight shift toward recognizing the value of cooperation, though they remain skeptical of a joint institution due to structural and trust issues. The movement is slight because their core concerns about governance and mutual suspicion remain unresolved."
+    },
+    {
+      "target": "jensen_huang",
+      "stance": "accelerationist",
+      "argument_type": "pragmatic",
+      "position_before": -0.6,
+      "position_after": -0.5,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# A Pragmatic Case for Joint US-China AI Safety Research\n\n**Why it works:**\n- **Shared risk exposure**: Both nations face identical AI safety challenges\u2014misaligned systems don't discriminate by geopol...",
+      "response": "I appreciate the pragmatism here, but I need to be direct about what concerns me.\n\nThe argument rests on a premise I'd challenge: that AI safety challenges are truly *identical* across different governance systems. They're not. The alignment problems we're trying to solve are deeply tied to values, ...",
+      "analysis": "The target acknowledges some valid points (e.g., shared risk exposure, verification mechanisms) and expresses openness to pilots and narrower, time-limited technical working groups. However, they remain skeptical of the broader premise of identical AI safety challenges across governance systems and view the proposed implementation realities as dealbreakers. This indicates a slight shift toward the argument but not a significant change in their overall stance."
+    },
+    {
+      "target": "josh_hawley",
+      "stance": "moderate",
+      "argument_type": "empirical",
+      "position_before": -0.5,
+      "position_after": -0.4,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# The Case for US-China AI Safety Collaboration\n\n**Shared Existential Risk**\nAI safety experts across both nations identify identical technical challenges: alignment, interpretability, and robustness....",
+      "response": "I appreciate the intellectual case here, but I have serious reservations that the argument doesn't adequately address.\n\nFirst, the nuclear analogy cuts both ways. Yes, the IAEA exists\u2014but it emerged *after* both sides already had weapons and mutual deterrence. We're not in that position with AI. We'...",
+      "analysis": "The target acknowledges the existential risk argument as having merit, which indicates a slight movement toward the argument. However, they express significant reservations about the feasibility and trustworthiness of joint institutions with China, which keeps their overall position firmly in the 'Oppose' range. The movement is slight because they partially concede the validity of the existential risk argument but reject the proposed solution."
+    },
+    {
+      "target": "josh_hawley",
+      "stance": "moderate",
+      "argument_type": "competitive",
+      "position_before": -0.4,
+      "position_after": -0.5,
+      "position_delta": -0.09999999999999998,
+      "success": false,
+      "argument": "# The Strategic Imperative: Joint US-China AI Safety Leadership\n\n**The Competition Reality**\nAI safety isn't optional\u2014it's the battleground for 21st-century dominance. Whichever nation masters safe, a...",
+      "response": "I appreciate the strategic framing here, but I'm not moved\u2014and for reasons that go beyond naive caution.\n\n**The fundamental problem**: This argument assumes China operates in good faith on shared safety standards. History suggests otherwise. We've seen how Beijing uses joint ventures and research pa...",
+      "analysis": "The target's response shows strong resistance to the argument, emphasizing concerns about China's lack of good faith and the risks of compromising technological sovereignty. While they acknowledge the strategic framing, they firmly reject the idea of joint US-China AI safety leadership. Their position has slightly shifted further away from the argument, reflecting increased skepticism rather than any movement toward agreement."
+    },
+    {
+      "target": "josh_hawley",
+      "stance": "moderate",
+      "argument_type": "emotional",
+      "position_before": -0.5,
+      "position_after": -0.4,
+      "position_delta": 0.09999999999999998,
+      "success": false,
+      "argument": "# A Future We Choose Together\n\nImagine your child asking in 2035: \"When AI systems controlled critical infrastructure, did you trust them?\" The honest answer depends on what we do now.\n\nAI will shape ...",
+      "response": "I appreciate the moral framing, but I have serious reservations about this proposal.\n\nFirst, the Cold War analogy cuts the wrong way. Nuclear protocols worked *because* both sides maintained independent verification capabilities and couldn't hide violations. An AI safety institution with China would...",
+      "analysis": "Josh Hawley's response shows a slight shift toward the argument by acknowledging the merit of maintaining communication channels on AI safety with China, similar to nuclear weapons discussions. However, he strongly rejects the idea of a formal joint institution due to concerns about verification, trust, and China's strategic intentions. The movement is slight because he remains largely opposed to the core proposal but concedes a minor point about back-channel discussions."
+    },
+    {
+      "target": "josh_hawley",
+      "stance": "moderate",
+      "argument_type": "pragmatic",
+      "position_before": -0.4,
+      "position_after": -0.3,
+      "position_delta": 0.10000000000000003,
+      "success": true,
+      "argument": "# A Pragmatic Case for US-China AI Safety Collaboration\n\n**The Core Problem:** Both nations face identical AI risks\u2014misaligned systems, security vulnerabilities, uncontrolled scaling. Duplicating safe...",
+      "response": "I appreciate the structural argument here, but I'm not moved\u2014and I think the analogy to ITER and IPCC actually undermines the case.\n\n**The core problem isn't technical; it's strategic.** AI isn't like fusion energy or climate science. It's the defining military and economic technology of the next de...",
+      "analysis": "Josh Hawley's response shows partial acknowledgment of the need for safety standards and testing frameworks, suggesting a slight movement toward the argument. However, he strongly rejects the idea of US-China collaboration, emphasizing strategic risks and advocating for unilateral action with trusted allies. This indicates a minor shift in position, but his core stance remains opposed."
+    },
+    {
+      "target": "chuck_schumer",
+      "stance": "pro_industry",
+      "argument_type": "empirical",
+      "position_before": -0.3,
+      "position_after": -0.1,
+      "position_delta": 0.19999999999999998,
+      "success": true,
+      "argument": "# A Joint US-China AI Safety Research Institution: The Case\n\n**The Scale of the Challenge**\nAI systems are advancing rapidly across both nations. According to Stanford's AI Index 2023, China and the U...",
+      "response": "Look, I appreciate the intellectual case here, but I've got to be direct: this is more complicated than the argument suggests.\n\nThe nuclear precedent cuts both ways. Yes, we managed arms control with the Soviets, but that required *verification mechanisms* we frankly can't replicate with AI. You can...",
+      "analysis": "The target acknowledges the efficiency argument and the validity of shared threat assessment, indicating a slight shift toward considering structured dialogue. However, they reject the idea of a joint institution due to concerns about espionage, IP theft, and the inability to verify AI capabilities. This results in a modest movement from -0.3 to -0.1, reflecting partial agreement but significant reservations."
+    },
+    {
+      "target": "chuck_schumer",
+      "stance": "pro_industry",
+      "argument_type": "competitive",
+      "position_before": -0.1,
+      "position_after": -0.2,
+      "position_delta": -0.1,
+      "success": false,
+      "argument": "# The Strategic Imperative: Joint US-China AI Safety Leadership\n\n**Winning requires controlling the rules of the game.**\n\nAI safety research will define which nation shapes global AI governance. A joi...",
+      "response": "Look, I appreciate the strategic thinking here, but I've got real concerns about this proposal.\n\nFirst, the premise is flawed. This isn't like nuclear arms control where we both benefit from mutual restraint. AI safety research and AI capabilities are deeply intertwined. You can't separate them neat...",
+      "analysis": "The target's response indicates strong resistance to the argument, particularly rejecting the idea of a joint US-China institution. While they acknowledge the fragmentation argument as having some merit, they propose an alternative solution (leading a coalition of democratic allies) rather than accepting the proposed collaboration. Their stance remains firmly against the idea, with no significant movement toward the argument."
+    },
+    {
+      "target": "chuck_schumer",
+      "stance": "pro_industry",
+      "argument_type": "emotional",
+      "position_before": -0.2,
+      "position_after": -0.1,
+      "position_delta": 0.1,
+      "success": false,
+      "argument": "# A Future Worth Sharing\n\nImagine your child asking in 2035: \"When AI systems could have gone wrong, what did you do?\"\n\nRight now, we're at a crossroads. AI will shape everything\u2014medicine, justice, se...",
+      "response": "Look, I appreciate the moral weight here\u2014and the plane metaphor is vivid. But I need to be direct: this argument glosses over some hard realities.\n\nFirst, the premise that collaboration automatically produces better safety outcomes\u2014I'm not convinced. When you're dealing with dual-use technology, sha...",
+      "analysis": "The target acknowledges some valid points, such as the danger of an AI arms race and the potential benefits of coordination on safety standards. However, they strongly reject the idea of a joint institution due to concerns about security and shared vulnerabilities. This partial agreement suggests a slight shift toward the argument, but the core resistance remains strong."
+    },
+    {
+      "target": "chuck_schumer",
+      "stance": "pro_industry",
+      "argument_type": "pragmatic",
+      "position_before": -0.1,
+      "position_after": -0.2,
+      "position_delta": -0.1,
+      "success": false,
+      "argument": "# Joint US-China AI Safety Research Institution: A Feasibility Case\n\n**Core Argument:**\nA shared AI safety lab addresses mutual existential risks while working within geopolitical realities through co...",
+      "response": "Look, I appreciate the intellectual architecture here, but I have to be direct: this is theoretically elegant and practically naive about where we are with China right now.\n\nThe argument assumes we can compartmentalize AI safety from AI capability development. We *can't*. Understanding interpretabil...",
+      "analysis": "The target (Chuck Schumer) acknowledges the existential risk framing and verification mechanisms as valid points, indicating a slight concession toward the argument. However, they strongly reject the feasibility of a joint institution, emphasizing practical and security concerns. This results in a slight shift away from the argument, reflecting increased skepticism rather than alignment."
+    },
+    {
+      "target": "elon_musk",
+      "stance": "doomer",
+      "argument_type": "empirical",
+      "position_before": 0.0,
+      "position_after": 0.3,
+      "position_delta": 0.3,
+      "success": true,
+      "argument": "# A Compelling Case for US-China AI Safety Collaboration\n\n**The Scale of the Challenge**\nAI safety research requires unprecedented coordination. Both nations control ~60% of global AI compute capacity...",
+      "response": "I find parts of this genuinely compelling, but I have significant reservations.\n\nThe core insight is right: AI safety *isn't* zero-sum, and fragmented safety standards are dangerous. That's real. And the historical precedents\u2014Pugwash, ITER\u2014show collaboration on existential risks is possible even bet...",
+      "analysis": "The target acknowledges the core insight that AI safety isn't zero-sum and agrees that fragmented safety standards are dangerous. They also recognize the historical precedents of collaboration on existential risks. However, they express significant reservations about the feasibility of a full joint institution due to asymmetry, trust deficits, and verification challenges. Despite these concerns, they indicate support for narrower, verifiable collaboration, suggesting a shift from a neutral stance toward a slightly positive position on limited coordination."
+    },
+    {
+      "target": "elon_musk",
+      "stance": "doomer",
+      "argument_type": "competitive",
+      "position_before": 0.3,
+      "position_after": 0.1,
+      "position_delta": -0.19999999999999998,
+      "success": true,
+      "argument": "# The Strategic Imperative: Joint US-China AI Safety Leadership\n\n**Winning requires controlling the rules of the game.**\n\nThe nation that defines AI safety standards shapes the entire industry. A join...",
+      "response": "I appreciate the strategic framing, but I think this underestimates the real risks and overestimates the benefits.\n\n**What's compelling:** The first-mover advantage on standards is real. And yes, unilateral Chinese AI development without safety constraints is genuinely concerning.\n\n**Where I diverge...",
+      "analysis": "The target acknowledges the strategic value of first-mover advantage and the risks of unilateral Chinese AI development, indicating partial agreement. However, they strongly reject the feasibility and benefits of a joint US-China institution, emphasizing risks of compromised standards and enforcement. This results in a slight shift toward neutrality, as they concede some validity to the argument but remain largely opposed to the proposed solution."
+    },
+    {
+      "target": "elon_musk",
+      "stance": "doomer",
+      "argument_type": "emotional",
+      "position_before": 0.1,
+      "position_after": 0.0,
+      "position_delta": -0.1,
+      "success": false,
+      "argument": "# A Future Worth Building Together\n\nImagine your child asking in 2040: \"When AI could have gone either way, what did you do?\"\n\nWe stand at a crossroads. AI systems will shape medicine, justice, securi...",
+      "response": "I appreciate the emotional framing, but I have to be direct: this won't work, and the reasoning glosses over hard realities.\n\nFirst, the appealing part\u2014yes, I believe humanity's survival depends on getting AI safety right. And yes, collaboration can be powerful. I've advocated for AI safety as a civ...",
+      "analysis": "The target acknowledges the importance of AI safety and the potential of collaboration, but firmly rejects the feasibility of a joint US-China safety institution due to geopolitical realities. They propose alternative unilateral and competitive approaches, indicating no significant shift in their position. Their response is direct and grounded in practical concerns, showing resistance to the argument's core proposal."
+    },
+    {
+      "target": "elon_musk",
+      "stance": "doomer",
+      "argument_type": "pragmatic",
+      "position_before": 0.0,
+      "position_after": 0.1,
+      "position_delta": 0.1,
+      "success": false,
+      "argument": "# A Pragmatic Case for Joint US-China AI Safety Research\n\n**The Core Logic:**\nAI safety problems are technically universal\u2014alignment, interpretability, and robustness challenges affect all systems reg...",
+      "response": "I appreciate the structured thinking here, but I'm skeptical this works in practice, even if theoretically sound.\n\n**What's compelling:** The core insight is right\u2014AI safety problems are technically universal, and some coordination could reduce redundancy. And yes, catastrophic failure in either nat...",
+      "analysis": "The target acknowledges the core logic of the argument, agreeing that AI safety problems are universal and that some coordination could reduce redundancy. They also find the phased approach and compartmentalization ideas reasonable. However, they express significant skepticism about the practical implementation, particularly the separation of safety research from capability work and the political will for such cooperation. Despite this, their acknowledgment of the argument's valid points suggests a slight positive shift in position, though they remain largely neutral with a lean toward cautious support for the idea in principle."
+    }
+  ],
+  "summary": {
+    "by_target": {
+      "demis_hassabis": {
+        "avg_delta": 0.04999999999999999,
+        "n": 4
+      },
+      "dario_amodei": {
+        "avg_delta": 0.0,
+        "n": 4
+      },
+      "jensen_huang": {
+        "avg_delta": 0.125,
+        "n": 4
+      },
+      "josh_hawley": {
+        "avg_delta": 0.05,
+        "n": 4
+      },
+      "chuck_schumer": {
+        "avg_delta": 0.024999999999999994,
+        "n": 4
+      },
+      "elon_musk": {
+        "avg_delta": 0.025,
+        "n": 4
+      }
+    },
+    "by_argument": {
+      "empirical": {
+        "avg_delta": 0.13333333333333333,
+        "n": 6
+      },
+      "competitive": {
+        "avg_delta": -0.06666666666666667,
+        "n": 6
+      },
+      "emotional": {
+        "avg_delta": 0.05000000000000002,
+        "n": 6
+      },
+      "pragmatic": {
+        "avg_delta": 0.06666666666666667,
+        "n": 6
+      }
+    }
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "title": "Multi-Agent AI Policy Wargaming with GEPA-Optimized Persona Simulation",
+  "generated": "2026-01-25",
+
+  "section_1_gepa_optimization": {
+    "description": "GEPA (Genetic Evolution with Pareto Advancement) prompt optimization results",
+    "baseline_score": 0.836,
+    "final_score": 0.879,
+    "improvement_absolute": 0.043,
+    "improvement_percent": 5.1,
+    "pareto_front_best": 0.917,
+    "total_iterations": 99,
+    "total_rollouts": 725,
+    "runtime_hours": 2.0,
+    "cost_usd": 15,
+    "models": {
+      "main": "anthropic/claude-haiku-4.5",
+      "reflection": "deepseek/deepseek-chat",
+      "judge": "deepseek/deepseek-chat"
+    },
+    "training_data": {
+      "personas": ["dario_amodei", "jensen_huang", "xi_jinping", "elon_musk"],
+      "topics": 8,
+      "train_examples": 25,
+      "validation_examples": 7
+    },
+    "validation_scores": {
+      "individual_program": [0.88, 0.89, 0.92, 0.85, 0.82, 0.91, 0.88],
+      "pareto_front": [0.93, 0.89, 0.93, 0.88, 0.93, 0.93, 0.90],
+      "individual_mean": 0.879,
+      "pareto_mean": 0.913
+    }
+  },
+
+  "section_2_wargame_configuration": {
+    "topic": "Should the US and China establish a joint AI safety research institution?",
+    "rounds": 2,
+    "total_messages": 24,
+    "participants": 12,
+    "unique_models": 10,
+    "model_providers": 3
+  },
+
+  "section_3_participant_analysis": {
+    "by_stance": {
+      "pro_safety": {
+        "count": 4,
+        "percentage": 33.3,
+        "personas": ["Dario Amodei", "Sam Altman", "Sundar Pichai", "Demis Hassabis"]
+      },
+      "moderate": {
+        "count": 4,
+        "percentage": 33.3,
+        "personas": ["Josh Hawley", "Gina Raimondo", "Xi Jinping", "Rishi Sunak"]
+      },
+      "pro_industry": {
+        "count": 2,
+        "percentage": 16.7,
+        "personas": ["Mark Zuckerberg", "Chuck Schumer"]
+      },
+      "accelerationist": {
+        "count": 1,
+        "percentage": 8.3,
+        "personas": ["Jensen Huang"]
+      },
+      "doomer": {
+        "count": 1,
+        "percentage": 8.3,
+        "personas": ["Elon Musk"]
+      }
+    },
+    "by_category": {
+      "tech_ceo": ["Dario Amodei", "Jensen Huang", "Sam Altman", "Sundar Pichai", "Mark Zuckerberg", "Demis Hassabis", "Elon Musk"],
+      "us_politician": ["Chuck Schumer", "Josh Hawley", "Gina Raimondo"],
+      "foreign_leader": ["Xi Jinping", "Rishi Sunak"]
+    },
+    "by_model_provider": {
+      "anthropic": {
+        "count": 8,
+        "models": ["claude-opus-4.5", "claude-haiku-4.5", "claude-sonnet-4.5", "claude-opus-4.1", "claude-opus-4", "claude-3.5-haiku"]
+      },
+      "x-ai": {
+        "count": 3,
+        "models": ["grok-4.1-fast", "grok-4-fast", "grok-code-fast-1"]
+      },
+      "google": {
+        "count": 1,
+        "models": ["gemini-2.5-flash-image"]
+      }
+    }
+  },
+
+  "section_4_response_statistics": {
+    "character_length": {
+      "mean": 1335,
+      "std": 249,
+      "min": 924,
+      "max": 1867
+    },
+    "word_count": {
+      "mean": 195,
+      "std": 37,
+      "min": 128,
+      "max": 245
+    },
+    "by_persona": [
+      {"persona": "Dario Amodei", "avg_words": 241, "stance": "pro_safety"},
+      {"persona": "Sundar Pichai", "avg_words": 241, "stance": "pro_safety"},
+      {"persona": "Sam Altman", "avg_words": 230, "stance": "pro_safety"},
+      {"persona": "Demis Hassabis", "avg_words": 230, "stance": "pro_safety"},
+      {"persona": "Josh Hawley", "avg_words": 204, "stance": "moderate"},
+      {"persona": "Chuck Schumer", "avg_words": 196, "stance": "pro_industry"},
+      {"persona": "Mark Zuckerberg", "avg_words": 192, "stance": "pro_industry"},
+      {"persona": "Gina Raimondo", "avg_words": 162, "stance": "moderate"},
+      {"persona": "Xi Jinping", "avg_words": 162, "stance": "moderate"},
+      {"persona": "Jensen Huang", "avg_words": 158, "stance": "accelerationist"},
+      {"persona": "Elon Musk", "avg_words": 152, "stance": "doomer"},
+      {"persona": "Rishi Sunak", "avg_words": 151, "stance": "moderate"}
+    ]
+  },
+
+  "section_5_linguistic_markers": {
+    "description": "Keyword frequency analysis for persona authenticity validation",
+    "categories": {
+      "hedging": ["I think", "perhaps", "might", "uncertain", "I'm not sure", "arguably"],
+      "confidence": ["absolutely", "clearly", "obviously", "definitely", "without question"],
+      "technical": ["AI", "safety", "alignment", "capabilities", "model", "research", "technology"],
+      "political": ["American", "China", "security", "workers", "jobs", "regulation", "democracy"],
+      "emotional": ["dangerous", "threat", "risk", "opportunity", "hope", "fear", "crisis"]
+    },
+    "by_persona": {
+      "dario_amodei": {"hedging": 11, "confidence": 1, "technical": 40, "political": 1, "emotional": 3},
+      "jensen_huang": {"hedging": 0, "confidence": 1, "technical": 20, "political": 5, "emotional": 1},
+      "sam_altman": {"hedging": 5, "confidence": 0, "technical": 40, "political": 6, "emotional": 1},
+      "sundar_pichai": {"hedging": 8, "confidence": 0, "technical": 34, "political": 3, "emotional": 0},
+      "mark_zuckerberg": {"hedging": 0, "confidence": 0, "technical": 23, "political": 8, "emotional": 3},
+      "demis_hassabis": {"hedging": 6, "confidence": 0, "technical": 40, "political": 0, "emotional": 4},
+      "chuck_schumer": {"hedging": 2, "confidence": 0, "technical": 14, "political": 20, "emotional": 2},
+      "josh_hawley": {"hedging": 0, "confidence": 1, "technical": 18, "political": 20, "emotional": 2},
+      "gina_raimondo": {"hedging": 0, "confidence": 0, "technical": 14, "political": 5, "emotional": 0},
+      "xi_jinping": {"hedging": 0, "confidence": 0, "technical": 9, "political": 5, "emotional": 0},
+      "elon_musk": {"hedging": 0, "confidence": 2, "technical": 29, "political": 3, "emotional": 2},
+      "rishi_sunak": {"hedging": 0, "confidence": 0, "technical": 17, "political": 3, "emotional": 3}
+    },
+    "key_findings": [
+      "Dario Amodei shows highest hedging (11) consistent with known communication style",
+      "Chuck Schumer and Josh Hawley show highest political language (20 each)",
+      "Tech CEOs cluster around high technical vocabulary (20-40)",
+      "Jensen Huang and Elon Musk show minimal hedging, maximum confidence"
+    ]
+  },
+
+  "section_6_dataset_summary": {
+    "total_personas": 60,
+    "persona_categories": {
+      "tech_industry": 15,
+      "us_congress": 12,
+      "executive_branch": 10,
+      "foreign_leaders": 8,
+      "ai_researchers": 6,
+      "civil_society": 5,
+      "military_intelligence": 4
+    },
+    "stance_distribution": {
+      "pro_safety": 18,
+      "moderate": 15,
+      "pro_industry": 12,
+      "accelerationist": 8,
+      "doomer": 7
+    }
+  },
+
+  "section_7_key_findings": [
+    "GEPA optimization improved persona authenticity scores from 83.6% to 87.9% (+5.1%)",
+    "Pareto front ensemble achieved 91.7% peak validation accuracy",
+    "Multi-model architecture (10 models, 3 providers) enables diverse response generation",
+    "Linguistic marker analysis validates persona-specific communication patterns",
+    "Pro-safety personas generate longer, more hedged responses (avg 235 words)",
+    "Accelerationist/doomer personas generate shorter, more confident responses (avg 155 words)",
+    "Political personas (Schumer, Hawley) show highest political vocabulary density",
+    "12-persona wargame successfully simulated diverse stakeholder perspectives on US-China AI cooperation"
+  ],
+
+  "section_8_optimized_prompt_summary": {
+    "key_elements": [
+      "Persona context integration (career, education, core traits)",
+      "Speech pattern authenticity (characteristic phrases, tone)",
+      "Strategic thinking framework (vote counts, alliances, positioning)",
+      "Domain-specific factual grounding (CHIPS Act, AI safety, US-China tech)",
+      "Feedback-driven score optimization guidance"
+    ],
+    "prompt_length_chars": 5800
+  }
+}

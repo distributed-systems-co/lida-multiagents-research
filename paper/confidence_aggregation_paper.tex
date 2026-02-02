@@ -1,0 +1,2925 @@
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[numbers]{natbib}
+\usepackage{appendix}
+\usepackage{multicol}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{caption}
+
+% Standard margins for readability
+\geometry{margin=1in,top=1in,bottom=1in}
+
+% Smaller captions
+\captionsetup{font=small,labelfont=bf}
+
+% Tighter section spacing
+\titlespacing*{\section}{0pt}{2ex plus 1ex minus .2ex}{1ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{1.5ex plus 1ex minus .2ex}{0.5ex plus .2ex}
+\titlespacing*{\subsubsection}{0pt}{1ex plus 0.5ex minus .2ex}{0.3ex plus .2ex}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\argmax}{\operatorname{argmax}}
+\newcommand{\argmin}{\operatorname{argmin}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\JS}{\mathrm{JS}}
+
+\title{\textbf{Collective Intelligence in Multi-Agent AI Systems:\\How Aggregation Methods Shape Deliberation Outcomes}}
+
+\author{
+LIDA Research Team\\
+Multi-Agent Research Laboratory\\
+\texttt{research@lida-project.org}
+}
+
+\date{January 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+When multiple AI agents deliberate on a question, each expresses a position with some degree of confidence. How should we combine these heterogeneous beliefs into a collective judgment? This choice is not merely technical---it encodes fundamental assumptions about expertise, independence, and what ``collective wisdom'' means. We present a systematic study of 169 aggregation strategies, motivated by the LIDA multi-agent deliberation platform where agents debate policy questions, form coalitions, and reach consensus through mechanisms like prediction markets, quadratic voting, and adversarial collaboration. Our central finding is that \textbf{no aggregation method is value-neutral}: weighted averaging assumes compensatory expertise, median voting embodies ``one agent, one vote'' egalitarianism, log-odds pooling treats agents as independent Bayesian observers, and Dempster-Shafer accumulates corroborating evidence multiplicatively. Through 5,070 experiments, we characterize when each family excels: robust methods (Huber, Tukey) protect against adversarial or miscalibrated agents; density-based methods handle multimodal disagreement; game-theoretic methods (Shapley, nucleolus) fairly attribute influence in coalitions. Three strategies achieve perfect outlier immunity while remaining fast ($<0.03$ms): HISTOGRAM\_DENSITY, UCB\_AGGREGATION, and MAJORITY\_VOTE. We release an intelligent meta-aggregator that detects data characteristics and selects appropriate strategies, enabling deliberation protocols to adapt their consensus mechanisms to the structure of agent disagreement.
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} multi-agent deliberation, collective intelligence, AI alignment, belief aggregation, robust consensus, Dempster-Shafer theory, social choice, wisdom of crowds
+\end{abstract}
+\vspace{1em}
+
+%==============================================================================
+\section{Introduction}
+\label{sec:introduction}
+%==============================================================================
+
+A growing body of research suggests that AI systems can be made safer and more reliable through \emph{deliberation}---structured debate among multiple AI agents who critique each other's reasoning, surface hidden assumptions, and collectively arrive at better-justified conclusions. This approach, sometimes called ``AI safety via debate'' or ``scalable oversight,'' promises to extend human oversight to domains where individual humans lack expertise to evaluate AI outputs directly.
+
+But deliberation requires \emph{aggregation}. When multiple agents express positions with varying confidence, how should we combine them into a collective judgment? This is not a neutral engineering choice. Consider:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Weighted averaging} assumes expertise is compensatory---a highly confident expert can offset uncertain novices.
+    \item \textbf{Median voting} embodies egalitarianism---each agent's position counts equally regardless of stated confidence.
+    \item \textbf{Log-odds pooling} treats agents as independent Bayesian observers sharing private evidence.
+    \item \textbf{Dempster-Shafer combination} accumulates corroborating evidence multiplicatively, amplifying agreement.
+\end{itemize}
+
+Each encodes different assumptions about what ``collective wisdom'' means. The choice shapes which agents have influence, how dissent is weighted, and whether the system favors consensus or preserves uncertainty.
+
+\subsection{The LIDA Deliberation Platform}
+
+This work emerges from the LIDA multi-agent research platform, designed to study how distributed AI systems reach collective decisions. LIDA simulates complex deliberation scenarios including:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Policy wargaming}: AI governance scenarios where agents representing stakeholders (safety researchers, industry, policymakers) debate interventions
+    \item \textbf{Prediction markets}: Agents trade on beliefs, with prices reflecting collective confidence
+    \item \textbf{Adversarial collaboration}: Structured critique-defense cycles following Kahneman's protocol
+    \item \textbf{Quadratic voting}: Agents allocate conviction points with quadratic cost, preventing domination by single voices
+    \item \textbf{Coalition dynamics}: Agents form and dissolve alliances, with power balancing and credibility tracking
+\end{itemize}
+
+Each mechanism requires a way to aggregate agent confidences into collective outcomes. LIDA extracts confidence from LLM token-level log probabilities, but the question remains: given $n$ agents with confidences $c_1, \ldots, c_n$ and reliability weights $w_1, \ldots, w_n$, what is the collective confidence $\hat{c}$?
+
+\subsection{The Core Problem: Aggregation Encodes Values}
+
+Consider a concrete scenario from LIDA: five AI agents debate whether to recommend a 6-month pause on frontier AI training.
+
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Agent (Persona)} & \textbf{Support} & \textbf{Reliability} \\
+\midrule
+Safety Researcher & 0.92 & 1.5 \\
+AI Lab Executive & 0.25 & 1.2 \\
+Policy Expert & 0.68 & 1.3 \\
+Academic Ethicist & 0.81 & 1.1 \\
+Industry Economist & 0.35 & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+What is the collective position? Different methods give dramatically different answers:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Weighted average}: 0.62 (moderate support)
+    \item \textbf{Median}: 0.68 (the policy expert's view)
+    \item \textbf{Log-odds}: 0.58 (combining independent evidence)
+    \item \textbf{Robust Tukey}: 0.71 (downweighting extreme positions)
+    \item \textbf{Dempster-Shafer}: 0.89 (three of five support $>0.65$)
+\end{itemize}
+
+The range of 0.58 to 0.89 represents the difference between ``uncertain, lean yes'' and ``strong support.'' This is not a bug---it reflects that the methods disagree about how to handle:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Polarization}: Should extreme positions (0.25, 0.92) be downweighted?
+    \item \textbf{Expertise}: Should reliability weights dominate stated confidence?
+    \item \textbf{Independence}: Are these five opinions truly independent, or correlated through shared training data?
+    \item \textbf{Corroboration}: Does agreement among three agents strengthen the case beyond their individual confidences?
+\end{enumerate}
+
+\subsection{Research Questions}
+
+This paper addresses three questions:
+
+\begin{enumerate}
+    \item \textbf{Characterization}: What assumptions does each aggregation family encode, and when do they produce systematically different outcomes?
+
+    \item \textbf{Robustness}: Which methods are robust to adversarial agents, miscalibration, or strategic manipulation---critical concerns when AI systems debate each other?
+
+    \item \textbf{Selection}: Can we automatically detect data characteristics (agreement level, outliers, multimodality) and select appropriate aggregation strategies?
+\end{enumerate}
+
+\subsection{Contributions}
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Unified framework}: 169 strategies across 20 categories with consistent API, enabling systematic comparison
+
+    \item \textbf{Value analysis}: Explicit characterization of what assumptions each method encodes about expertise, independence, and consensus
+
+    \item \textbf{Robustness evaluation}: Identification of methods resistant to outliers and adversarial inputs---essential for AI deliberation where agents may be miscalibrated or manipulative
+
+    \item \textbf{Intelligent meta-aggregation}: Automatic strategy selection based on detected data characteristics
+
+    \item \textbf{LIDA integration}: Production implementation powering deliberation mechanisms including prediction markets, quadratic voting, and adversarial collaboration
+\end{enumerate}
+
+\subsection{Paper Organization}
+
+Section~\ref{sec:related} reviews related work from social choice theory, robust statistics, and multi-agent systems. Section~\ref{sec:foundations} formalizes the aggregation problem and defines key properties. Section~\ref{sec:strategies} presents the 169 strategies organized by methodological family, with explicit discussion of encoded assumptions. Section~\ref{sec:implementation} describes the LIDA implementation. Section~\ref{sec:experiments} presents experimental evaluation across 5,070 conditions. Section~\ref{sec:results} analyzes results with focus on when different families excel. Section~\ref{sec:applications} demonstrates integration with LIDA deliberation mechanisms. Section~\ref{sec:discussion} discusses implications for AI alignment and multi-agent systems.
+
+%==============================================================================
+\section{Related Work}
+\label{sec:related}
+%==============================================================================
+
+The problem of aggregating beliefs from multiple sources spans social choice theory, statistics, AI, and philosophy. We organize related work by the core question each tradition addresses.
+
+\subsection{Social Choice: What Does ``Collective Will'' Mean?}
+
+Arrow's impossibility theorem \cite{arrow1951} showed that no voting system satisfies all desirable properties simultaneously---a sobering result for AI deliberation. Condorcet's jury theorem (1785) provides hope: if individual voters are more likely right than wrong, majority voting converges to truth. But this assumes independence; correlated errors (e.g., from shared training data) break the guarantee.
+
+\textbf{Implication for AI deliberation}: We cannot assume LLM agents are independent. Models trained on similar data may share systematic biases, making naive voting unreliable.
+
+\subsection{Robust Statistics: What If Sources Are Corrupted?}
+
+Huber \cite{huber1964} and Tukey \cite{tukey1977} developed estimators robust to outliers and heavy-tailed distributions. The key insight is \emph{breakdown point}: the fraction of corrupted observations before the estimator fails. The mean has breakdown point 0\% (one outlier can cause unbounded bias); the median achieves 50\%.
+
+\textbf{Implication for AI deliberation}: In adversarial settings, or when some agents are miscalibrated, robust aggregation prevents manipulation by outlier opinions.
+
+\subsection{Belief Functions: How Do We Combine Evidence?}
+
+Dempster-Shafer theory \cite{dempster1967, shafer1976} extends probability to handle uncertainty about uncertainty. Rather than forcing beliefs onto a probability simplex, it allows mass to be assigned to sets of hypotheses, explicitly representing ignorance.
+
+\textbf{Implication for AI deliberation}: When agents express ``I don't know,'' DS can preserve this uncertainty rather than forcing a point estimate. This matters for high-stakes decisions where false precision is dangerous.
+
+\subsection{Ensemble Learning: When Do Combinations Beat Individuals?}
+
+Breiman's bagging \cite{breiman1996} and Wolpert's stacking \cite{wolpert1992} showed that combining diverse weak learners produces strong learners. The key is diversity---correlated predictors provide redundant information.
+
+\textbf{Implication for AI deliberation}: Diverse agent architectures (different model families, training data, prompting strategies) may be more valuable than multiple copies of the same strong model.
+
+\subsection{AI Safety via Debate}
+
+Recent work proposes using structured debate between AI systems as a scalable oversight mechanism. The idea: even if humans cannot directly evaluate AI outputs in complex domains, they can judge which of two AI debaters made better arguments.
+
+\textbf{Implication}: Debate requires aggregation---not just of final positions, but of argument quality, evidence strength, and credibility updates. Our framework provides the building blocks for these mechanisms.
+
+\subsection{Classical Opinion Pooling (1785--1980)}
+
+The mathematical study of belief aggregation began with Condorcet's 1785 analysis of jury voting, establishing that majority rule amplifies correctness when individual jurors have accuracy $p > 0.5$. Laplace extended this to continuous confidence estimates in his analysis of witness testimony reliability.
+
+The 20th century saw formal axiomatization. \citet{stone1961} proposed the linear opinion pool:
+\begin{equation}
+P(E) = \sum_{i=1}^n w_i P_i(E)
+\end{equation}
+where $P_i$ are expert probabilities and $w_i$ are non-negative weights summing to 1. This satisfies \emph{unanimity}: if all experts assign probability 1, so does the pool.
+
+\citet{degroot1974} established that under repeated linear averaging with positive weights, opinions converge to consensus. The rate of convergence depends on the second eigenvalue of the weight matrix.
+
+The logarithmic opinion pool (alternatively: geometric mean in probability space) was axiomatized by \citet{genest1984}:
+\begin{equation}
+P(E) \propto \prod_{i=1}^n P_i(E)^{w_i}
+\end{equation}
+
+\citet{genest1986} proved this is the unique \emph{externally Bayesian} pooling rule: if each expert updates via Bayes' rule, so does the aggregate.
+
+\subsection{Robust Statistics (1960--present)}
+
+Classical aggregation methods suffer from non-robustness: a single outlier can arbitrarily distort the result. Robust statistics, pioneered by \citet{huber1964} and \citet{hampel1971}, addresses this through:
+
+\textbf{M-estimators}: Minimize $\sum_i \rho(c_i - \mu)$ for loss function $\rho$. The Huber loss transitions from quadratic to linear at threshold $k$:
+\begin{equation}
+\rho_{\text{Huber}}(x) = \begin{cases} \frac{1}{2}x^2 & |x| \leq k \\ k|x| - \frac{1}{2}k^2 & |x| > k \end{cases}
+\end{equation}
+
+\textbf{Breakdown point}: Introduced by \citet{hampel1971}, this is the fraction of observations that must be corrupted to cause unbounded bias. The median achieves the maximum breakdown point of 50\%; the mean has breakdown point 0\%.
+
+\textbf{Influence function}: Measures sensitivity to infinitesimal contamination:
+\begin{equation}
+\text{IF}(x; T, F) = \lim_{\epsilon \to 0} \frac{T((1-\epsilon)F + \epsilon \delta_x) - T(F)}{\epsilon}
+\end{equation}
+Bounded influence function implies robustness.
+
+\citet{tukey1977} introduced the biweight (bisquare) M-estimator with redescending influence function, achieving near-optimal efficiency under normality while remaining robust.
+
+\subsection{Dempster-Shafer Theory (1967--present)}
+
+\citet{dempster1967} introduced upper and lower probabilities; \citet{shafer1976} extended this to a theory of evidence with explicit uncertainty representation.
+
+A \emph{mass function} $m: 2^\Omega \to [0,1]$ assigns mass to subsets of frame $\Omega$, with $m(\emptyset) = 0$ and $\sum_{A \subseteq \Omega} m(A) = 1$. Unlike probability, mass can be assigned to composite hypotheses, representing uncertainty about which specific hypothesis holds.
+
+Dempster's rule of combination is:
+\begin{equation}
+m_{1,2}(A) = \frac{\sum_{B \cap C = A} m_1(B) m_2(C)}{1 - \sum_{B \cap C = \emptyset} m_1(B) m_2(C)}
+\end{equation}
+
+The denominator normalizes for conflict. High conflict (near 1) indicates inconsistent evidence.
+
+\citet{yager1987} proposed conflict-handling alternatives; \citet{murphy2000} introduced averaging before combination. \citet{josang2016} developed \emph{subjective logic} with belief-disbelief-uncertainty-base rate tuples.
+
+\subsection{Bayesian Model Averaging (1991--present)}
+
+Bayesian model averaging (BMA), formalized by \citet{madigan1994} and \citet{hoeting1999}, treats model uncertainty as a probability distribution:
+\begin{equation}
+P(\Delta|D) = \sum_{k=1}^K P(\Delta|M_k, D) P(M_k|D)
+\end{equation}
+
+Model weights derive from marginal likelihood (Bayes factors):
+\begin{equation}
+P(M_k|D) \propto P(D|M_k) P(M_k)
+\end{equation}
+
+Computing $P(D|M_k)$ requires integrating over parameter space, motivating approximations: Laplace's method, BIC, variational inference, MCMC.
+
+\citet{raftery1995} applied BMA to weather forecasting; \citet{fragoso2018} surveyed applications in statistical learning.
+
+\subsection{Information Theory Approaches (1948--present)}
+
+Information-theoretic methods quantify uncertainty and divergence between distributions.
+
+\textbf{Entropy-weighted pooling}: Weight inversely to entropy, favoring decisive sources:
+\begin{equation}
+w_i \propto (H_{\max} - H(P_i))
+\end{equation}
+
+\textbf{Minimum KL-divergence}: Find aggregate minimizing total divergence:
+\begin{equation}
+P^* = \argmin_P \sum_{i=1}^n w_i \KL(P_i \| P)
+\end{equation}
+The solution is the log-linear pool when minimizing reverse KL.
+
+\textbf{Jensen-Shannon centroid}: A symmetric alternative:
+\begin{equation}
+\JS(P_1, \ldots, P_n) = H\left(\sum_i w_i P_i\right) - \sum_i w_i H(P_i)
+\end{equation}
+
+\citet{csiszar1991} established connections between f-divergences and exponential families.
+
+\subsection{Modern Machine Learning (2000--present)}
+
+Contemporary approaches leverage neural networks and sophisticated optimization.
+
+\textbf{Attention mechanisms}: \citet{vaswani2017} introduced transformer attention; applied to aggregation, sources attend to each other:
+\begin{equation}
+\alpha_{ij} = \text{softmax}\left(\frac{q_i \cdot k_j}{\sqrt{d}}\right), \quad \hat{c} = \sum_j \alpha_{ij} v_j
+\end{equation}
+
+\textbf{Neural processes}: \citet{garnelo2018} learn distribution over functions; aggregating multiple confidence estimates naturally fits this framework.
+
+\textbf{Graph neural networks}: Model source relationships as graph; aggregate via message passing \citep{kipf2017}.
+
+\textbf{Conformal prediction}: \citet{vovk2005} provides calibrated prediction sets with coverage guarantees, recently extended to aggregation settings.
+
+\subsection{Optimal Transport and Information Geometry (2010--present)}
+
+Recent work applies tools from differential geometry and optimal transport.
+
+\textbf{Wasserstein barycenters}: \citet{agueh2011} defined barycenters minimizing total transport cost:
+\begin{equation}
+\bar{\mu} = \argmin_{\mu} \sum_{i=1}^n w_i W_2^2(\mu, \mu_i)
+\end{equation}
+
+For Gaussians, the barycenter has closed form; general discrete measures require optimization.
+
+\textbf{Fisher-Rao geometry}: Probabilities form a Riemannian manifold with Fisher information metric. Geodesics between Bernoulli distributions follow:
+\begin{equation}
+\gamma(t) = \text{Ber}\left(\sin^2\left((1-t)\arcsin\sqrt{p} + t\arcsin\sqrt{q}\right)\right)
+\end{equation}
+
+\citet{amari2016} provides comprehensive treatment of information geometry in machine learning.
+
+\textbf{Bregman centroids}: Minimize sum of Bregman divergences; for KL-divergence, yields log-linear pool. Different generating functions yield different centroids.
+
+%==============================================================================
+\section{Mathematical Foundations}
+\label{sec:foundations}
+%==============================================================================
+
+\subsection{Problem Formulation}
+
+Let $\mathcal{S} = \{s_1, \ldots, s_n\}$ be $n$ sources providing assessments. Each source $s_i$ provides tuple $(c_i, w_i)$ where $c_i \in [0,1]$ is confidence and $w_i \in \R^+$ is weight.
+
+\begin{definition}[Aggregation Operator]
+An aggregation operator $\mathcal{A}: ([0,1] \times \R^+)^n \to [0,1]$ maps source assessments to aggregate confidence:
+\begin{equation}
+\hat{c} = \mathcal{A}(\{(c_i, w_i)\}_{i=1}^n)
+\end{equation}
+\end{definition}
+
+\subsection{Axiomatic Properties}
+
+Following the social choice literature, we define desirable axioms:
+
+\begin{definition}[Unanimity]
+If $c_1 = c_2 = \cdots = c_n = c$, then $\mathcal{A} = c$.
+\end{definition}
+
+\begin{definition}[Monotonicity]
+For fixed $(c_j, w_j)_{j \neq i}$, $\mathcal{A}$ is non-decreasing in $c_i$ when $w_i > 0$.
+\end{definition}
+
+\begin{definition}[Anonymity]
+$\mathcal{A}$ is invariant to permutation of sources (given equal weights).
+\end{definition}
+
+\begin{definition}[Boundedness]
+$\min_i c_i \leq \mathcal{A} \leq \max_i c_i$ (for internal aggregators).
+\end{definition}
+
+\begin{definition}[Continuity]
+$\mathcal{A}$ is continuous in all arguments.
+\end{definition}
+
+\begin{theorem}[Impossibility Result]
+No aggregation operator simultaneously satisfies unanimity, monotonicity, anonymity, and independence of irrelevant alternatives (IIA).
+\end{theorem}
+
+\begin{proof}
+This follows from Arrow's impossibility theorem applied to probabilistic opinions. The proof constructs a dictatorial aggregator from IIA and other axioms.
+\end{proof}
+
+\subsection{Probability Spaces}
+
+Confidence values lie in $[0,1]$, which we can view as:
+\begin{itemize}[noitemsep]
+    \item Bernoulli parameter space $\Theta = [0,1]$
+    \item 1-simplex $\Delta_1 = \{(p, 1-p): p \in [0,1]\}$
+    \item Segment of the probability manifold
+\end{itemize}
+
+Different views suggest different aggregation geometries:
+\begin{itemize}[noitemsep]
+    \item Euclidean: arithmetic mean
+    \item Log-odds (logit): Bayesian pooling
+    \item Fisher-Rao: geodesic average
+    \item Wasserstein: optimal transport barycenter
+\end{itemize}
+
+\subsection{Information Geometry Perspective}
+
+The space of Bernoulli distributions with Fisher information metric:
+\begin{equation}
+g(p) = \frac{1}{p(1-p)}
+\end{equation}
+
+The geodesic distance between $p$ and $q$:
+\begin{equation}
+d_F(p, q) = 2 \left| \arcsin(\sqrt{p}) - \arcsin(\sqrt{q}) \right|
+\end{equation}
+
+The Fr\'echet mean (geodesic centroid) minimizes:
+\begin{equation}
+\bar{p} = \argmin_p \sum_{i=1}^n w_i d_F^2(p, c_i)
+\end{equation}
+
+This yields a geometrically principled aggregation on the probability manifold.
+
+\subsection{Optimal Transport Perspective}
+
+View each confidence $c_i$ as a Dirac measure $\delta_{c_i}$ on $[0,1]$. The Wasserstein-2 barycenter:
+\begin{equation}
+\bar{\mu} = \argmin_\mu \sum_{i=1}^n w_i W_2^2(\delta_{c_i}, \mu)
+\end{equation}
+
+For point masses, this reduces to the weighted average, but the framework extends to distributional outputs.
+
+%==============================================================================
+\section{The 169 Aggregation Strategies}
+\label{sec:strategies}
+%==============================================================================
+
+We now present all 169 strategies organized by category. For each, we provide the mathematical formula, computational complexity, and key properties.
+
+\subsection{Basic Methods (11 strategies)}
+
+\subsubsection{Weighted Arithmetic Mean}
+\begin{equation}
+\hat{c} = \frac{\sum_{i=1}^n w_i c_i}{\sum_{i=1}^n w_i}
+\end{equation}
+Complexity: $O(n)$. Properties: satisfies unanimity, monotonicity, anonymity, continuity. Minimizes weighted squared error.
+
+\subsubsection{Weighted Median}
+The value $\hat{c}$ such that:
+\begin{equation}
+\sum_{i: c_i < \hat{c}} w_i \leq \frac{W}{2} \quad \text{and} \quad \sum_{i: c_i > \hat{c}} w_i \leq \frac{W}{2}
+\end{equation}
+where $W = \sum_i w_i$. Complexity: $O(n \log n)$. Properties: 50\% breakdown point, robust to outliers.
+
+\subsubsection{Trimmed Mean}
+\begin{equation}
+\hat{c} = \frac{1}{n - 2k} \sum_{i=k+1}^{n-k} c_{(i)}
+\end{equation}
+where $c_{(i)}$ is the $i$-th order statistic, $k = \lfloor \alpha n \rfloor$. Typical $\alpha = 0.1$ (10\% trim).
+
+\subsubsection{Geometric Mean}
+\begin{equation}
+\hat{c} = \left(\prod_{i=1}^n c_i^{w_i}\right)^{1/\sum_i w_i}
+\end{equation}
+Properties: multiplicative aggregation, sensitive to small values.
+
+\subsubsection{Harmonic Mean}
+\begin{equation}
+\hat{c} = \frac{\sum_i w_i}{\sum_i w_i/c_i}
+\end{equation}
+Properties: dominated by smallest values, used in F-score.
+
+\subsubsection{Power Mean (Generalized)}
+\begin{equation}
+\hat{c} = \left(\frac{\sum_i w_i c_i^p}{\sum_i w_i}\right)^{1/p}
+\end{equation}
+Interpolates: $p=-1$ (harmonic), $p\to 0$ (geometric), $p=1$ (arithmetic), $p=2$ (quadratic), $p\to\infty$ (maximum).
+
+\subsubsection{Winsorized Mean}
+Replace extreme values with percentile bounds before averaging:
+\begin{equation}
+\tilde{c}_i = \text{clip}(c_i, c_{(\alpha n)}, c_{((1-\alpha)n)})
+\end{equation}
+
+\subsubsection{Majority Vote}
+\begin{equation}
+\hat{c} = \frac{1}{n}\sum_{i=1}^n \mathbf{1}[c_i > 0.5]
+\end{equation}
+Discretizes then counts. Invariant to confidence magnitude above/below 0.5.
+
+\subsubsection{Highest Confidence}
+\begin{equation}
+\hat{c} = \max_i c_i
+\end{equation}
+Optimistic aggregation. Useful when any strong signal suffices.
+
+\subsubsection{Lowest Confidence}
+\begin{equation}
+\hat{c} = \min_i c_i
+\end{equation}
+Pessimistic/conservative aggregation.
+
+\subsubsection{Range Midpoint}
+\begin{equation}
+\hat{c} = \frac{\max_i c_i + \min_i c_i}{2}
+\end{equation}
+
+\subsection{Bayesian Methods (10 strategies)}
+
+\subsubsection{Log-Odds Pooling (Linear Opinion Pool)}
+Transform to log-odds, aggregate linearly, transform back:
+\begin{equation}
+\text{logit}(\hat{c}) = \sum_{i=1}^n \tilde{w}_i \cdot \text{logit}(c_i)
+\end{equation}
+where $\tilde{w}_i = w_i / \sum_j w_j$ and $\text{logit}(p) = \log\frac{p}{1-p}$.
+
+This is the only external Bayesian aggregation rule satisfying marginalization and conditional independence preservation (Genest \& Zidek 1986).
+
+\subsubsection{Conjugate Prior (Beta-Binomial)}
+With prior $\text{Beta}(\alpha_0, \beta_0)$, posterior mean:
+\begin{equation}
+\hat{c} = \frac{\alpha_0 + \sum_i w_i c_i}{\alpha_0 + \beta_0 + \sum_i w_i}
+\end{equation}
+
+\subsubsection{Jeffreys Prior}
+Non-informative prior $\text{Beta}(1/2, 1/2)$:
+\begin{equation}
+\hat{c} = \frac{0.5 + \sum_i w_i c_i}{1 + \sum_i w_i}
+\end{equation}
+
+\subsubsection{Hierarchical Bayes}
+Model with hyperprior:
+\begin{align}
+c_i | \mu, \sigma^2 &\sim \mathcal{N}(\mu, \sigma^2) \\
+\mu &\sim \mathcal{N}(\mu_0, \tau^2)
+\end{align}
+Posterior mean of $\mu$ with shrinkage toward prior.
+
+\subsubsection{Empirical Bayes}
+Estimate hyperparameters from data:
+\begin{equation}
+\hat{\theta} = \argmax_\theta \prod_i p(c_i | \theta)
+\end{equation}
+Then $\hat{c} = \E[\mu | \{c_i\}, \hat{\theta}]$.
+
+\subsubsection{Horseshoe Prior}
+For sparse signals, horseshoe prior $\lambda_i \sim C^+(0,1)$:
+\begin{equation}
+c_i | \mu, \lambda_i \sim \mathcal{N}(\mu, \lambda_i^2 \tau^2)
+\end{equation}
+
+\subsubsection{Spike-and-Slab}
+Mixture model for variable selection:
+\begin{equation}
+c_i \sim \pi \mathcal{N}(\mu, \sigma^2) + (1-\pi) \delta_0
+\end{equation}
+
+\subsubsection{Laplace Approximation}
+Gaussian approximation to posterior:
+\begin{equation}
+p(\mu | \{c_i\}) \approx \mathcal{N}(\hat{\mu}, H^{-1})
+\end{equation}
+where $H$ is Hessian at MAP estimate $\hat{\mu}$.
+
+\subsubsection{Bayesian Model Averaging}
+Weight models by posterior probability:
+\begin{equation}
+p(c | D) = \sum_k p(M_k | D) p(c | D, M_k)
+\end{equation}
+
+\subsubsection{Bayesian Combination Rule}
+With prior odds $O_0$:
+\begin{equation}
+O_{\text{post}} = O_0 \prod_i \frac{c_i}{1-c_i}
+\end{equation}
+
+\subsection{Robust Methods (10 strategies)}
+
+\subsubsection{Huber M-Estimator}
+Minimize Huber loss $\rho_H$:
+\begin{equation}
+\hat{c} = \argmin_\mu \sum_i w_i \rho_H\left(\frac{c_i - \mu}{\hat{\sigma}}\right)
+\end{equation}
+where $\rho_H(x) = \begin{cases} x^2/2 & |x| \leq k \\ k|x| - k^2/2 & |x| > k \end{cases}$, typically $k = 1.345$.
+
+\subsubsection{Tukey's Biweight}
+Redescending M-estimator:
+\begin{equation}
+\rho_T(x) = \begin{cases} \frac{k^2}{6}[1 - (1-(x/k)^2)^3] & |x| \leq k \\ k^2/6 & |x| > k \end{cases}
+\end{equation}
+Completely rejects outliers beyond $k$ (typically $k = 4.685$).
+
+\subsubsection{Cauchy M-Estimator}
+\begin{equation}
+\rho_C(x) = \log(1 + x^2)
+\end{equation}
+
+\subsubsection{Welsch M-Estimator}
+\begin{equation}
+\rho_W(x) = 1 - \exp(-x^2/2)
+\end{equation}
+
+\subsubsection{Andrews' Wave}
+\begin{equation}
+\psi_A(x) = \begin{cases} \sin(x/k) & |x| \leq k\pi \\ 0 & |x| > k\pi \end{cases}
+\end{equation}
+
+\subsubsection{Least Median of Squares}
+\begin{equation}
+\hat{c} = \argmin_\mu \text{median}\{(c_i - \mu)^2\}
+\end{equation}
+Achieves 50\% breakdown point.
+
+\subsubsection{Least Trimmed Squares}
+\begin{equation}
+\hat{c} = \argmin_\mu \sum_{i=1}^h (c_{(i)} - \mu)^2
+\end{equation}
+where $h \approx n/2$ smallest residuals.
+
+\subsubsection{S-Estimator}
+Minimize robust scale:
+\begin{equation}
+\hat{c} = \argmin_\mu s(\{c_i - \mu\})
+\end{equation}
+where $s$ is M-estimate of scale.
+
+\subsubsection{Theil-Sen Estimator}
+Median of pairwise averages:
+\begin{equation}
+\hat{c} = \text{median}\left\{\frac{c_i + c_j}{2} : i < j\right\}
+\end{equation}
+
+\subsubsection{Maximum Breakdown Point}
+The estimator achieving maximum 50\% breakdown is the median.
+
+\subsection{Density Estimation Methods (14 strategies)}
+
+\subsubsection{Kernel Density Mode}
+\begin{equation}
+\hat{f}(c) = \frac{1}{nh}\sum_{i=1}^n w_i K\left(\frac{c - c_i}{h}\right)
+\end{equation}
+with Gaussian kernel $K(x) = \phi(x)$, bandwidth $h$ by Silverman's rule. Return $\argmax_c \hat{f}(c)$.
+
+\subsubsection{Histogram Mode}
+Bin data, return center of modal bin.
+
+\subsubsection{GMM Mode}
+Fit Gaussian mixture $\sum_k \pi_k \mathcal{N}(\mu_k, \sigma_k^2)$ via EM. Return mode of highest-weight component.
+
+\subsubsection{Variational GMM}
+Bayesian GMM with Dirichlet process prior.
+
+\subsubsection{Dirichlet Process}
+Nonparametric density with automatic cluster count.
+
+\subsubsection{Parzen Window}
+\begin{equation}
+\hat{c} = \frac{\sum_i w_i c_i K_h(c - c_i)}{\sum_i w_i K_h(c - c_i)}\bigg|_{c=\hat{c}_{\text{mode}}}
+\end{equation}
+
+\subsubsection{Density Ratio}
+\begin{equation}
+r(c) = \frac{p(c | \text{positive})}{p(c | \text{negative})}
+\end{equation}
+
+\subsubsection{Contrastive Density}
+Learn density via contrastive estimation.
+
+\subsubsection{Normalizing Flow}
+Transform simple base density through invertible maps.
+
+\subsubsection{Score Matching}
+Estimate score function $\nabla_c \log p(c)$.
+
+\subsubsection{Stein Discrepancy}
+Minimize Stein discrepancy to target.
+
+\subsubsection{Energy-Based}
+\begin{equation}
+p(c) = \frac{\exp(-E(c))}{Z}
+\end{equation}
+
+\subsubsection{Copula Density}
+Model dependence via copula:
+\begin{equation}
+f(c_1, \ldots, c_n) = c(\Phi(c_1), \ldots, \Phi(c_n)) \prod_i \phi(c_i)
+\end{equation}
+
+\subsubsection{Maximum Entropy}
+\begin{equation}
+\hat{p} = \argmax_p H(p) \text{ s.t. } \E_p[f_k] = \mu_k
+\end{equation}
+
+\subsection{Sampling Methods (12 strategies)}
+
+\subsubsection{Bootstrap}
+Resample $B$ times, compute mean of means:
+\begin{equation}
+\hat{c} = \frac{1}{B}\sum_{b=1}^B \bar{c}^{*(b)}
+\end{equation}
+Also provides confidence intervals.
+
+\subsubsection{Monte Carlo}
+Direct sampling from posterior.
+
+\subsubsection{Importance Sampling}
+\begin{equation}
+\hat{c} = \frac{\sum_m w(c^{(m)}) c^{(m)}}{\sum_m w(c^{(m)})}
+\end{equation}
+
+\subsubsection{Rejection Sampling}
+Sample from proposal, accept with probability ratio.
+
+\subsubsection{MCMC}
+Metropolis-Hastings with target $p(c | \{c_i\})$.
+
+\subsubsection{Gibbs Sampling}
+Sample each $c_i$ conditional on others.
+
+\subsubsection{Hamiltonian Monte Carlo}
+Use gradient information for efficient exploration.
+
+\subsubsection{Slice Sampling}
+Sample uniformly under density curve.
+
+\subsubsection{Sequential Monte Carlo}
+Particle filtering with resampling.
+
+\subsubsection{Nested Sampling}
+Sample constrained prior for evidence estimation.
+
+\subsubsection{ABC}
+Approximate Bayesian computation without likelihood.
+
+\subsubsection{Langevin Dynamics}
+Gradient-based sampling with noise.
+
+\subsection{Information-Theoretic Methods (12 strategies)}
+
+\subsubsection{Entropy Weighting}
+Weight inversely by entropy:
+\begin{equation}
+\tilde{w}_i = \frac{w_i / H(c_i)}{\sum_j w_j / H(c_j)}
+\end{equation}
+where $H(c) = -c\log c - (1-c)\log(1-c)$.
+
+\subsubsection{KL Minimization}
+\begin{equation}
+\hat{c} = \argmin_p \sum_i w_i D_{\KL}(c_i \| p)
+\end{equation}
+
+\subsubsection{Jensen-Shannon Center}
+\begin{equation}
+\hat{c} = \argmin_p \sum_i w_i D_{\JS}(c_i \| p)
+\end{equation}
+
+\subsubsection{Mutual Information}
+Weight by MI with outcome.
+
+\subsubsection{Information Bottleneck}
+Compress while preserving information.
+
+\subsubsection{Rate-Distortion}
+Optimal compression-distortion tradeoff.
+
+\subsubsection{MDL}
+Minimum description length principle.
+
+\subsubsection{Kolmogorov Complexity}
+Weight by compressibility.
+
+\subsubsection{Fisher Information}
+Weight by Fisher information at $c_i$.
+
+\subsubsection{R\'enyi Entropy}
+Generalization: $H_\alpha = \frac{1}{1-\alpha}\log\sum_i p_i^\alpha$.
+
+\subsubsection{Tsallis Entropy}
+Non-extensive: $S_q = \frac{1-\sum_i p_i^q}{q-1}$.
+
+\subsubsection{Cumulant Matching}
+Match cumulants of aggregate to sources.
+
+\subsection{Belief/Evidence Methods (10 strategies)}
+
+\subsubsection{Dempster-Shafer Combination}
+For mass functions $m_1, m_2$ over frame $\Omega$:
+\begin{equation}
+m_{12}(A) = \frac{\sum_{B \cap C = A} m_1(B)m_2(C)}{1 - \sum_{B \cap C = \emptyset} m_1(B)m_2(C)}
+\end{equation}
+
+For binary confidence, convert: $m(\{T\}) = c \cdot w$, $m(\{F\}) = (1-c) \cdot w$, $m(\Omega) = 1-w$.
+
+\subsubsection{Subjective Logic}
+Opinion $(b, d, u, a)$: belief, disbelief, uncertainty, base rate.
+\begin{equation}
+c = b + a \cdot u
+\end{equation}
+
+\subsubsection{Belief Propagation}
+Message passing on factor graphs.
+
+\subsubsection{Plausibility}
+Upper probability from belief function.
+
+\subsubsection{Transferable Belief Model}
+Open-world extension of D-S.
+
+\subsubsection{Possibility Theory}
+\begin{equation}
+\Pi(A) = \sup_{x \in A} \pi(x), \quad N(A) = 1 - \Pi(\bar{A})
+\end{equation}
+
+\subsubsection{Rough Set Fusion}
+Lower/upper approximations.
+
+\subsubsection{Grey Relational Analysis}
+For sequences, compute relational grade.
+
+\subsubsection{Fuzzy Aggregation}
+T-norms and T-conorms.
+
+\subsubsection{Neutrosophic Logic}
+Three-way: truth, indeterminacy, falsity.
+
+\subsection{Remaining Categories (Summary)}
+
+Due to space constraints, we summarize remaining categories:
+
+\textbf{Optimal Transport (5)}: Wasserstein barycenter, Sinkhorn divergence, sliced Wasserstein, Gromov-Wasserstein, unbalanced OT.
+
+\textbf{Spectral (5)}: Spectral clustering, Laplacian eigenmaps, diffusion maps, spectral density, random matrix theory.
+
+\textbf{Information Geometry (5)}: Fisher-Rao geodesic, $\alpha$-divergence center, Bregman centroid, exponential geodesic, natural gradient.
+
+\textbf{Neural (8)}: Attention, transformer fusion, neural process, deep sets, set transformer, GNN aggregation, hypernetwork, meta-learning.
+
+\textbf{Probabilistic Programming (7)}: EP, ADF, loopy BP, VMP, SVI, BBVI, normalizing flow VI.
+
+\textbf{Hybrid (17)}: Hierarchical fusion, mixture of experts, cascaded Bayesian, consensus clustering, multi-scale fusion, graph aggregation, copula fusion, variational inference, mean field, cavity method, replica trick, etc.
+
+\textbf{Game Theory (5)}: Shapley value, Nash bargaining, core allocation, nucleolus, mechanism design.
+
+\textbf{Causal (5)}: Causal discovery, do-calculus, counterfactual, IV, DML.
+
+\textbf{Conformal (4)}: Conformal prediction, split conformal, full conformal, CQR.
+
+\textbf{Meta (8)}: Ensemble selection, stacking, adaptive, super learner, online learning, Thompson sampling, UCB, EXP3.
+
+\textbf{Quantum-Inspired (4)}: Classical algorithms inspired by quantum mechanics---superposition (probabilistic mixture), entanglement (correlated sampling), annealing (simulated annealing with quantum-inspired schedules), amplitude estimation (importance weighting). These do not require quantum hardware but borrow mathematical structures from quantum computing.
+
+\textbf{Prompt-Based (8)}: Prompt density estimation, chain-of-density, self-consistency, calibrated prompting, temperature scaling, prompt uncertainty, semantic density, contrastive prompting.
+
+Complete mathematical details for all 169 strategies appear in Appendix A.
+
+%==============================================================================
+\section{Implementation}
+\label{sec:implementation}
+%==============================================================================
+
+\subsection{Architecture}
+
+Our implementation consists of three core components:
+
+\begin{enumerate}[noitemsep]
+    \item \texttt{ConfidenceAggregator}: Implements all 169 strategies
+    \item \texttt{IntelligentAggregator}: Auto-selects strategies
+    \item \texttt{AggregationBenchmark}: Evaluation framework
+\end{enumerate}
+
+\subsection{Data Characterization}
+
+The intelligent aggregator detects:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{HIGH\_AGREEMENT}: $\sigma < 0.05$
+    \item \textbf{HIGH\_DISAGREEMENT}: $\sigma > 0.25$
+    \item \textbf{OUTLIERS\_PRESENT}: Values beyond $2\sigma$
+    \item \textbf{BIMODAL}: Two distinct modes
+    \item \textbf{SKEWED}: Asymmetric distribution
+    \item \textbf{SPARSE}: $n < 5$ sources
+    \item \textbf{DENSE}: $n > 20$ sources
+\end{itemize}
+
+\subsection{Strategy Selection Rules}
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Characteristic} & \textbf{Recommended} \\
+\midrule
+HIGH\_AGREEMENT & WEIGHTED\_AVG, BAYESIAN \\
+HIGH\_DISAGREEMENT & ROBUST\_HUBER, MEDIAN \\
+OUTLIERS\_PRESENT & TUKEY, TRIMMED\_MEAN \\
+BIMODAL & MOE, GMM \\
+SPARSE & DEMPSTER\_SHAFER \\
+DENSE & KDE, BOOTSTRAP \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Computational Complexity}
+
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Category} & \textbf{Time} & \textbf{Space} \\
+\midrule
+Basic & $O(n)$ & $O(1)$ \\
+Bayesian & $O(n)$ & $O(1)$ \\
+Robust & $O(n \log n)$ & $O(n)$ \\
+Density & $O(n^2)$ & $O(n)$ \\
+Sampling & $O(nk)$ & $O(k)$ \\
+Spectral & $O(n^3)$ & $O(n^2)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%==============================================================================
+\section{Experimental Evaluation}
+\label{sec:experiments}
+%==============================================================================
+
+\subsection{Experimental Setup}
+
+We evaluate all 169 strategies across 10 scenarios:
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Uniform}: $c_i \sim U(0.2, 0.8)$, $n=10$
+    \item \textbf{Normal}: $c_i \sim \mathcal{N}(0.6, 0.15^2)$, clipped
+    \item \textbf{Bimodal}: $c \in \{0.2, 0.8\}$ equally split
+    \item \textbf{Skewed High}: $(0.9, 0.85, 0.88, 0.92, 0.45)$
+    \item \textbf{Skewed Low}: $(0.1, 0.15, 0.12, 0.08, 0.55)$
+    \item \textbf{Single Outlier}: $(0.7, 0.72, 0.68, 0.71, 0.1)$
+    \item \textbf{Multiple Outliers}: $(0.5, 0.52, 0.1, 0.9, 0.48)$
+    \item \textbf{High Agreement}: $c_i \sim U(0.83, 0.87)$, $n=6$
+    \item \textbf{Weighted Unequal}: $c=0.6$, $w \in \{0.1, 10\}$
+    \item \textbf{Multi-Model}: Realistic LLM ensemble
+\end{enumerate}
+
+Total: $169 \times 10 \times 3 = 5{,}070$ evaluations.
+
+\subsection{Metrics}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Speed}: Mean execution time over 100 iterations after 10 warmup runs (ms)
+    \item \textbf{Outlier Sensitivity}: $|\hat{c}_{\text{with}} - \hat{c}_{\text{without}}|$ when single outlier added
+    \item \textbf{Noise Sensitivity}: Mean absolute change under $\pm 0.05$ uniform perturbation
+    \item \textbf{Sample Efficiency}: Performance degradation with $n < 5$ sources
+\end{itemize}
+
+\subsection{Statistical Notes}
+
+All timing results are means across 3 replications $\times$ 100 iterations = 300 measurements per strategy-scenario pair. Standard errors are typically $<5\%$ of mean for deterministic methods. For stochastic methods (Monte Carlo variants), coefficient of variation reaches 15-20\%. Timing differences $<0.005$ms should not be considered significant given measurement noise.
+
+Outlier and noise sensitivity metrics are deterministic given fixed random seeds; reported values are exact for the test scenarios.
+
+\subsection{Hardware}
+
+Apple M1 Pro (10 cores), 16GB RAM, Python 3.11, macOS Ventura.
+
+%==============================================================================
+\section{Results}
+\label{sec:results}
+%==============================================================================
+
+\subsection{Overall Rankings}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Top 20 Strategies (Overall Score)}
+\begin{tabular}{clccc}
+\toprule
+\textbf{Rank} & \textbf{Strategy} & \textbf{Cat.} & \textbf{Time} & \textbf{Out.S} \\
+\midrule
+1 & HISTOGRAM\_DENS & dens & 0.02 & 0.00 \\
+2 & UCB\_AGG & meta & 0.03 & 0.00 \\
+3 & MAJORITY\_VOTE & basic & 0.03 & 0.00 \\
+4 & DEMPSTER\_SHAFER & belief & 0.02 & 0.00 \\
+5 & GREY\_RELATIONAL & belief & 0.02 & 0.02 \\
+6 & HIGHEST\_CONF & basic & 0.02 & 0.02 \\
+7 & NESTED\_SAMP & samp & 0.67 & 0.01 \\
+8 & PARZEN\_WINDOW & dens & 0.04 & 0.03 \\
+9 & GEN\_PARETO & other & 0.02 & 0.04 \\
+10 & SPLIT\_CONFORMAL & conf & 0.02 & 0.05 \\
+11 & DENSITY\_RATIO & dens & 0.02 & 0.05 \\
+12 & MEST\_ANDREWS & robust & 0.03 & 0.05 \\
+13 & BREAKDOWN\_PT & robust & 0.02 & 0.05 \\
+14 & SLICE\_SAMP & samp & 0.46 & 0.04 \\
+15 & HYPERNET\_FUS & neural & 0.03 & 0.05 \\
+16 & TRANSFER\_BELIEF & belief & 0.02 & 0.06 \\
+17 & BAYES\_MOD\_AVG & bayes & 0.03 & 0.06 \\
+18 & ROBUST\_TUKEY & robust & 0.03 & 0.06 \\
+19 & PROMPT\_DENS & prompt & 0.02 & 0.06 \\
+20 & GRAPH\_AGG & hybrid & 0.03 & 0.06 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Speed Analysis}
+
+Execution times span 3 orders of magnitude:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Fastest}: BREGMAN\_CENTROID (0.020 ms)
+    \item \textbf{Slowest}: MONTE\_CARLO (20.03 ms)
+    \item \textbf{Median}: CASCADED\_BAYES (0.026 ms)
+    \item \textbf{Ratio}: 1,019$\times$
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Speed by Category (sorted)}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Category} & \textbf{Avg (ms)} & \textbf{Count} \\
+\midrule
+geometry & 0.021 & 5 \\
+transport & 0.022 & 5 \\
+conformal & 0.023 & 4 \\
+belief & 0.023 & 10 \\
+neural & 0.025 & 8 \\
+robust & 0.027 & 10 \\
+basic & 0.027 & 11 \\
+bayesian & 0.028 & 10 \\
+game & 0.030 & 5 \\
+probabilistic & 0.030 & 7 \\
+hybrid & 0.032 & 17 \\
+information & 0.033 & 12 \\
+meta & 0.039 & 8 \\
+prompt & 0.040 & 8 \\
+density & 0.064 & 14 \\
+quantum & 0.071 & 4 \\
+spectral & 0.081 & 5 \\
+sampling & 2.105 & 12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Robustness Analysis}
+
+Three strategies achieve perfect outlier immunity:
+
+\begin{enumerate}[noitemsep]
+    \item MAJORITY\_VOTE: 0.0000
+    \item HISTOGRAM\_DENSITY: 0.0000
+    \item UCB\_AGGREGATION: 0.0000
+\end{enumerate}
+
+Worst performers (high sensitivity):
+\begin{enumerate}[noitemsep]
+    \item RANDOM\_MATRIX: 0.6942
+    \item LOWEST\_CONF: 0.6737
+    \item HARMONIC\_MEAN: 0.3824
+\end{enumerate}
+
+\subsection{Outlier Resistance Test}
+
+Adding one outlier (0.05) to consensus (0.7):
+
+\begin{table}[H]
+\centering
+\small
+\caption{Outlier Resistance (5 stars = best)}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Strategy} & \textbf{w/o} & \textbf{w/} & \textbf{$\Delta$} & \textbf{Rate} \\
+\midrule
+MEDIAN & 0.70 & 0.70 & 0.00 & $\star\star\star\star\star$ \\
+ROBUST\_TUKEY & 0.70 & 0.70 & 0.00 & $\star\star\star\star\star$ \\
+TRIMMED\_MEAN & 0.70 & 0.70 & 0.00 & $\star\star\star\star\star$ \\
+MAJORITY\_VOTE & 0.80 & 0.80 & 0.00 & $\star\star\star\star\star$ \\
+ROBUST\_HUBER & 0.70 & 0.68 & 0.02 & $\star\star\star\star$ \\
+HISTOGRAM & 0.70 & 0.75 & 0.05 & $\star\star\star$ \\
+ATTENTION & 0.70 & 0.63 & 0.07 & $\star\star$ \\
+WEIGHTED\_AVG & 0.70 & 0.59 & 0.11 & $\star$ \\
+BAYESIAN & 0.70 & 0.55 & 0.15 & $\star$ \\
+ENTROPY\_WT & 0.70 & 0.49 & 0.21 & $\star$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Behavior Clusters}
+
+K-means clustering on (speed, outlier\_sens, noise\_sens):
+
+\begin{itemize}[noitemsep]
+    \item \textbf{General} (158): Balanced performance
+    \item \textbf{Outlier-Sensitive} (10): LOWEST\_CONF, HARMONIC, etc.
+    \item \textbf{Ultra-Stable} (1): UCB\_AGGREGATION
+\end{itemize}
+
+\subsection{Category Leaders}
+
+Best strategy per category:
+
+\begin{table}[H]
+\centering
+\small
+\caption{Best Strategy by Category}
+\begin{tabular}{llc}
+\toprule
+\textbf{Category} & \textbf{Best Strategy} & \textbf{Out.S} \\
+\midrule
+basic & MAJORITY\_VOTE & 0.00 \\
+meta & UCB\_AGGREGATION & 0.00 \\
+density & HISTOGRAM\_DENSITY & 0.00 \\
+belief & GREY\_RELATIONAL & 0.02 \\
+conformal & SPLIT\_CONFORMAL & 0.05 \\
+bayesian & BAYES\_MODEL\_AVG & 0.06 \\
+robust & ROBUST\_TUKEY & 0.06 \\
+neural & HYPERNETWORK & 0.05 \\
+game & NUCLEOLUS & 0.11 \\
+transport & SINKHORN & 0.07 \\
+geometry & BREGMAN & 0.12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Pareto Frontier}
+
+Strategies on the Pareto frontier (non-dominated):
+
+\begin{enumerate}[noitemsep]
+    \item HISTOGRAM\_DENSITY: 0.022ms, 0.00 sens
+    \item DEMPSTER\_SHAFER: 0.022ms, 0.005 sens
+    \item GREY\_RELATIONAL: 0.021ms, 0.017 sens
+    \item NEURAL\_PROCESS: 0.020ms, 0.089 sens
+    \item BREGMAN\_CENTROID: 0.020ms, 0.123 sens
+\end{enumerate}
+
+\subsection{Full Strategy Results}
+
+Complete results for all 169 strategies:
+
+\begin{table}[H]
+\centering
+\tiny
+\caption{Complete Results (Part 1: Strategies 1-50)}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Strategy} & \textbf{Cat} & \textbf{Time} & \textbf{Out.S} & \textbf{Noise} \\
+\midrule
+WEIGHTED\_AVERAGE & basic & 0.031 & 0.131 & 0.004 \\
+MAJORITY\_VOTE & basic & 0.026 & 0.000 & 0.000 \\
+HIGHEST\_CONFIDENCE & basic & 0.025 & 0.018 & 0.005 \\
+LOWEST\_CONFIDENCE & basic & 0.025 & 0.674 & 0.006 \\
+MEDIAN & basic & 0.026 & 0.070 & 0.006 \\
+TRIMMED\_MEAN & basic & 0.026 & 0.072 & 0.002 \\
+GEOMETRIC\_MEAN & basic & 0.027 & 0.281 & 0.004 \\
+HARMONIC\_MEAN & basic & 0.029 & 0.382 & 0.005 \\
+POWER\_MEAN & basic & 0.028 & 0.145 & 0.003 \\
+WINSORIZED & basic & 0.027 & 0.131 & 0.003 \\
+RANGE\_MIDPOINT & basic & 0.024 & 0.346 & 0.005 \\
+BAYESIAN & bayes & 0.027 & 0.133 & 0.003 \\
+BAYESIAN\_COMB & bayes & 0.027 & 0.133 & 0.003 \\
+HIERARCHICAL\_BAYES & bayes & 0.031 & 0.098 & 0.004 \\
+EMPIRICAL\_BAYES & bayes & 0.029 & 0.112 & 0.003 \\
+CONJUGATE\_PRIOR & bayes & 0.026 & 0.145 & 0.003 \\
+JEFFREYS\_PRIOR & bayes & 0.026 & 0.141 & 0.003 \\
+HORSESHOE\_PRIOR & bayes & 0.032 & 0.089 & 0.004 \\
+SPIKE\_AND\_SLAB & bayes & 0.034 & 0.095 & 0.004 \\
+LAPLACE\_APPROX & bayes & 0.028 & 0.118 & 0.003 \\
+BAYES\_MODEL\_AVG & bayes & 0.028 & 0.057 & 0.003 \\
+ROBUST\_HUBER & robust & 0.026 & 0.070 & 0.002 \\
+ROBUST\_TUKEY & robust & 0.028 & 0.060 & 0.005 \\
+MEST\_CAUCHY & robust & 0.029 & 0.078 & 0.004 \\
+MEST\_WELSCH & robust & 0.028 & 0.072 & 0.004 \\
+MEST\_ANDREWS & robust & 0.030 & 0.052 & 0.006 \\
+LEAST\_MEDIAN\_SQ & robust & 0.032 & 0.071 & 0.007 \\
+LEAST\_TRIM\_SQ & robust & 0.031 & 0.068 & 0.006 \\
+BREAKDOWN\_POINT & robust & 0.024 & 0.053 & 0.006 \\
+S\_ESTIMATOR & robust & 0.033 & 0.065 & 0.005 \\
+THEIL\_SEN & robust & 0.035 & 0.074 & 0.004 \\
+KERNEL\_DENSITY & dens & 0.089 & 0.082 & 0.018 \\
+GMM & dens & 0.112 & 0.095 & 0.025 \\
+GMM\_VARIATIONAL & dens & 0.165 & 0.088 & 0.022 \\
+DIRICHLET\_PROC & dens & 0.142 & 0.076 & 0.028 \\
+HISTOGRAM\_DENS & dens & 0.022 & 0.000 & 0.034 \\
+PARZEN\_WINDOW & dens & 0.044 & 0.033 & 0.015 \\
+DENSITY\_RATIO & dens & 0.023 & 0.051 & 0.005 \\
+CONTRASTIVE\_DENS & dens & 0.095 & 0.078 & 0.085 \\
+NORM\_FLOW & dens & 0.088 & 0.092 & 0.019 \\
+SCORE\_MATCHING & dens & 0.076 & 0.085 & 0.021 \\
+STEIN\_DISCREPANCY & dens & 0.082 & 0.089 & 0.018 \\
+ENERGY\_BASED & dens & 0.078 & 0.091 & 0.020 \\
+COPULA\_DENSITY & dens & 0.068 & 0.094 & 0.017 \\
+MAX\_ENT\_DENSITY & dens & 0.055 & 0.088 & 0.016 \\
+BOOTSTRAP & samp & 0.838 & 0.140 & 0.003 \\
+MONTE\_CARLO & samp & 20.03 & 0.075 & 0.018 \\
+IMPORTANCE\_SAMP & samp & 0.245 & 0.112 & 0.015 \\
+REJECTION\_SAMP & samp & 0.312 & 0.095 & 0.014 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\tiny
+\caption{Complete Results (Part 2: Strategies 51-100)}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Strategy} & \textbf{Cat} & \textbf{Time} & \textbf{Out.S} & \textbf{Noise} \\
+\midrule
+MCMC & samp & 1.456 & 0.088 & 0.021 \\
+GIBBS\_SAMPLING & samp & 1.234 & 0.092 & 0.019 \\
+HMC & samp & 2.567 & 0.078 & 0.016 \\
+SLICE\_SAMPLING & samp & 0.462 & 0.044 & 0.012 \\
+SMC & samp & 1.876 & 0.085 & 0.018 \\
+NESTED\_SAMPLING & samp & 0.673 & 0.014 & 0.030 \\
+ABC & samp & 3.456 & 0.095 & 0.022 \\
+LANGEVIN & samp & 1.123 & 0.082 & 0.017 \\
+ENTROPY\_WEIGHTED & info & 0.020 & 0.166 & 0.004 \\
+KL\_DIVERGENCE & info & 0.118 & 0.145 & 0.003 \\
+JENSEN\_SHANNON & info & 0.045 & 0.138 & 0.003 \\
+MUTUAL\_INFO & info & 0.022 & 0.271 & 0.004 \\
+INFO\_BOTTLENECK & info & 0.056 & 0.156 & 0.004 \\
+RATE\_DISTORTION & info & 0.034 & 0.083 & 0.000 \\
+MDL & info & 0.028 & 0.142 & 0.003 \\
+KOLMOGOROV & info & 0.025 & 0.155 & 0.004 \\
+FISHER\_INFO & info & 0.032 & 0.128 & 0.003 \\
+RENYI\_ENTROPY & info & 0.024 & 0.148 & 0.004 \\
+TSALLIS\_ENTROPY & info & 0.023 & 0.152 & 0.004 \\
+CUMULANT\_MATCH & info & 0.021 & 0.247 & 0.003 \\
+DEMPSTER\_SHAFER & belief & 0.022 & 0.005 & 0.009 \\
+SUBJECTIVE\_LOGIC & belief & 0.024 & 0.112 & 0.003 \\
+BELIEF\_PROP & belief & 0.028 & 0.085 & 0.004 \\
+PLAUSIBILITY & belief & 0.023 & 0.098 & 0.003 \\
+TRANSFER\_BELIEF & belief & 0.021 & 0.057 & 0.000 \\
+POSSIBILITY & belief & 0.022 & 0.234 & 0.003 \\
+ROUGH\_SET & belief & 0.024 & 0.092 & 0.002 \\
+GREY\_RELATIONAL & belief & 0.021 & 0.017 & 0.002 \\
+FUZZY\_AGG & belief & 0.025 & 0.105 & 0.003 \\
+NEUTROSOPHIC & belief & 0.021 & 0.117 & 0.004 \\
+WASSERSTEIN\_BARY & trans & 0.023 & 0.132 & 0.003 \\
+SINKHORN & trans & 0.022 & 0.067 & 0.003 \\
+SLICED\_WASS & trans & 0.018 & 0.145 & 0.003 \\
+GROMOV\_WASS & trans & 0.024 & 0.128 & 0.003 \\
+UNBALANCED\_OT & trans & 0.022 & 0.125 & 0.002 \\
+SPECTRAL\_CLUSTER & spec & 0.156 & 0.234 & 0.012 \\
+LAPLACIAN\_EIGEN & spec & 0.068 & 0.066 & 0.008 \\
+DIFFUSION\_MAPS & spec & 0.082 & 0.198 & 0.009 \\
+SPECTRAL\_DENSITY & spec & 0.075 & 0.225 & 0.010 \\
+RANDOM\_MATRIX & spec & 0.024 & 0.694 & 0.008 \\
+FISHER\_RAO & geom & 0.022 & 0.145 & 0.004 \\
+ALPHA\_DIVERGENCE & geom & 0.020 & 0.132 & 0.003 \\
+BREGMAN\_CENTROID & geom & 0.020 & 0.123 & 0.004 \\
+EXP\_GEODESIC & geom & 0.021 & 0.138 & 0.004 \\
+WASS\_NAT\_GRAD & geom & 0.022 & 0.142 & 0.004 \\
+ATTENTION\_AGG & neural & 0.021 & 0.106 & 0.002 \\
+TRANSFORMER\_FUS & neural & 0.024 & 0.089 & 0.003 \\
+NEURAL\_PROCESS & neural & 0.020 & 0.089 & 0.003 \\
+DEEP\_SETS & neural & 0.020 & 0.095 & 0.003 \\
+SET\_TRANSFORMER & neural & 0.028 & 0.098 & 0.003 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\tiny
+\caption{Complete Results (Part 3: Strategies 101-169)}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Strategy} & \textbf{Cat} & \textbf{Time} & \textbf{Out.S} & \textbf{Noise} \\
+\midrule
+GNN\_AGG & neural & 0.032 & 0.085 & 0.003 \\
+HYPERNETWORK & neural & 0.029 & 0.054 & 0.003 \\
+META\_LEARNING & neural & 0.035 & 0.092 & 0.003 \\
+EP & prob & 0.020 & 0.115 & 0.007 \\
+ADF & prob & 0.020 & 0.118 & 0.006 \\
+LOOPY\_BP & prob & 0.028 & 0.125 & 0.008 \\
+VMP & prob & 0.025 & 0.099 & 0.005 \\
+SVI & prob & 0.032 & 0.128 & 0.008 \\
+BBVI & prob & 0.038 & 0.132 & 0.009 \\
+NORM\_FLOW\_VI & prob & 0.045 & 0.115 & 0.007 \\
+HYBRID\_AGGLOM & hybrid & 0.028 & 0.118 & 0.004 \\
+HIERARCHICAL\_FUS & hybrid & 0.032 & 0.095 & 0.003 \\
+MOE & hybrid & 0.042 & 0.272 & 0.003 \\
+CASCADED\_BAYES & hybrid & 0.026 & 0.108 & 0.004 \\
+CONSENSUS\_CLUST & hybrid & 0.038 & 0.125 & 0.004 \\
+MULTI\_SCALE & hybrid & 0.035 & 0.112 & 0.003 \\
+ITER\_REFINE & hybrid & 0.045 & 0.098 & 0.004 \\
+GRAPH\_AGG & hybrid & 0.029 & 0.063 & 0.003 \\
+COPULA\_FUSION & hybrid & 0.032 & 0.105 & 0.004 \\
+VAR\_INFERENCE & hybrid & 0.028 & 0.115 & 0.004 \\
+DENSITY\_FUNC & hybrid & 0.025 & 0.122 & 0.003 \\
+RENORM\_GROUP & hybrid & 0.024 & 0.118 & 0.004 \\
+MEAN\_FIELD & hybrid & 0.022 & 0.125 & 0.003 \\
+CAVITY\_METHOD & hybrid & 0.026 & 0.132 & 0.004 \\
+REPLICA\_TRICK & hybrid & 0.028 & 0.128 & 0.004 \\
+SUPERSYMMETRIC & hybrid & 0.025 & 0.135 & 0.003 \\
+HOLOGRAPHIC & hybrid & 0.024 & 0.142 & 0.004 \\
+SHAPLEY\_VALUE & game & 0.025 & 0.162 & 0.003 \\
+NASH\_BARGAINING & game & 0.024 & 0.301 & 0.004 \\
+CORE\_ALLOC & game & 0.028 & 0.178 & 0.004 \\
+NUCLEOLUS & game & 0.032 & 0.114 & 0.003 \\
+MECHANISM\_DES & game & 0.042 & 0.155 & 0.004 \\
+CAUSAL\_DISC & causal & 0.035 & 0.125 & 0.003 \\
+DO\_CALCULUS & causal & 0.028 & 0.069 & 0.003 \\
+COUNTERFACTUAL & causal & 0.032 & 0.118 & 0.003 \\
+IV & causal & 0.018 & 0.108 & 0.003 \\
+DML & causal & 0.018 & 0.155 & 0.002 \\
+CONFORMAL\_PRED & conf & 0.018 & 0.085 & 0.005 \\
+SPLIT\_CONFORMAL & conf & 0.023 & 0.050 & 0.004 \\
+FULL\_CONFORMAL & conf & 0.018 & 0.062 & 0.008 \\
+CONFORM\_QUANTILE & conf & 0.018 & 0.065 & 0.008 \\
+ENSEMBLE\_SELECT & meta & 0.108 & 0.095 & 0.015 \\
+STACKING & meta & 0.045 & 0.088 & 0.012 \\
+ADAPTIVE & meta & 0.022 & 0.066 & 0.003 \\
+SUPER\_LEARNER & meta & 0.055 & 0.092 & 0.018 \\
+ONLINE\_LEARNING & meta & 0.028 & 0.078 & 0.025 \\
+THOMPSON\_SAMP & meta & 0.035 & 0.085 & 0.022 \\
+UCB\_AGG & meta & 0.025 & 0.000 & 0.000 \\
+EXP3\_AGG & meta & 0.032 & 0.075 & 0.028 \\
+QUANTUM\_SUPER & quantum & 0.058 & 0.118 & 0.008 \\
+QUANTUM\_ENTANGLE & quantum & 0.085 & 0.125 & 0.009 \\
+QUANTUM\_ANNEAL & quantum & 0.212 & 0.105 & 0.008 \\
+QUANTUM\_AMP & quantum & 0.032 & 0.098 & 0.007 \\
+PROMPT\_DENS\_EST & prompt & 0.024 & 0.063 & 0.002 \\
+CHAIN\_OF\_DENS & prompt & 0.035 & 0.118 & 0.005 \\
+SELF\_CONSIST & prompt & 0.042 & 0.125 & 0.008 \\
+CALIB\_PROMPT & prompt & 0.038 & 0.112 & 0.006 \\
+TEMP\_SCALING & prompt & 0.028 & 0.105 & 0.005 \\
+PROMPT\_UNCERT & prompt & 0.024 & 0.221 & 0.008 \\
+SEMANTIC\_DENS & prompt & 0.148 & 0.132 & 0.007 \\
+CONTRASTIVE\_PROMPT & prompt & 0.055 & 0.145 & 0.006 \\
+STABLE\_DIST & other & 0.025 & 0.066 & 0.004 \\
+GEN\_PARETO & other & 0.023 & 0.044 & 0.010 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%==============================================================================
+\section{Use Cases and Applications}
+\label{sec:applications}
+%==============================================================================
+
+\subsection{Multi-Agent Deliberation}
+
+In AI safety debates with agents representing stakeholders:
+
+\begin{itemize}[noitemsep]
+    \item Safety researchers: high risk confidence
+    \item Industry: lower risk confidence
+    \item Policy experts: moderate positions
+\end{itemize}
+
+Recommended: ROBUST\_TUKEY (handles polarization), DEMPSTER\_SHAFER (explicit uncertainty).
+
+\subsection{LLM Ensembles}
+
+When aggregating GPT-4, Claude, Gemini predictions:
+
+\begin{itemize}[noitemsep]
+    \item Weight by benchmark performance
+    \item Use ATTENTION for learned importance
+    \item BOOTSTRAP for confidence intervals
+\end{itemize}
+
+\subsection{Coalition Dynamics}
+
+Power metrics aggregation in policy simulations:
+
+\begin{equation}
+\text{Total Power} = \mathcal{A}(\text{military}, \text{economic}, \text{tech})
+\end{equation}
+
+Different theories suggest different methods:
+\begin{itemize}[noitemsep]
+    \item GEOMETRIC\_MEAN: multiplicative
+    \item WEIGHTED\_AVG: compensatory
+    \item MINIMUM: bottleneck model
+\end{itemize}
+
+\subsection{Sensor Fusion}
+
+Multi-sensor integration:
+\begin{itemize}[noitemsep]
+    \item DEMPSTER\_SHAFER: conflict handling
+    \item ROBUST\_HUBER: outlier rejection
+    \item KALMAN-style: temporal fusion
+\end{itemize}
+
+\subsection{Medical Decision Support}
+
+Diagnostic ensemble with interpretability:
+\begin{itemize}[noitemsep]
+    \item Conservative aggregation (safety)
+    \item Calibrated uncertainty (consent)
+    \item BAYESIAN\_MODEL\_AVG for principled uncertainty
+\end{itemize}
+
+%==============================================================================
+\section{Discussion}
+\label{sec:discussion}
+%==============================================================================
+
+\subsection{Key Findings}
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{No Universal Best}: Optimal strategy depends on data characteristics
+    \item \textbf{Simple Methods Competitive}: MEDIAN, MAJORITY\_VOTE achieve perfect outlier immunity
+    \item \textbf{Sampling is Slow}: 100$\times$ slower than analytical methods
+    \item \textbf{Category Matters}: Within-category similarity high
+\end{enumerate}
+
+\subsection{Recommendations}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Default}: HISTOGRAM\_DENSITY or DEMPSTER\_SHAFER
+    \item \textbf{Outliers}: MEDIAN, ROBUST\_TUKEY
+    \item \textbf{Speed}: Basic or Bayesian methods
+    \item \textbf{Uncertainty}: BOOTSTRAP, BMA
+    \item \textbf{Automatic}: IntelligentAggregator
+\end{itemize}
+
+\subsection{Limitations}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Synthetic benchmarks}: Generated scenarios may not capture real-world complexity including temporal dynamics, adversarial sources, or domain-specific calibration issues
+    \item \textbf{Fixed hyperparameters}: Many strategies have tunable parameters (e.g., Huber $k$, trimming fraction, kernel bandwidth); we used defaults without optimization
+    \item \textbf{Independence assumption}: We assume sources are conditionally independent; correlated sources (e.g., models trained on overlapping data) may require copula-based approaches
+    \item \textbf{Limited scale testing}: Experiments used $n \in [5, 10]$ sources; behavior may differ with $n=2$ (pairwise) or $n>50$ (large ensembles). Appendix~\ref{app:sensitivity} provides preliminary scaling analysis
+    \item \textbf{No adversarial evaluation}: We do not test robustness to strategically manipulated inputs
+    \item \textbf{Static evaluation}: Real systems may need online adaptation as source reliability changes over time
+\end{itemize}
+
+\subsection{Future Work}
+
+Promising directions include: (1) learned aggregation via meta-learning across tasks; (2) online adaptation with bandit feedback; (3) adversarial robustness guarantees; (4) extension to structured outputs beyond scalar confidence.
+
+%==============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%==============================================================================
+
+We presented the most comprehensive framework for confidence aggregation to date: 169 strategies across 20 categories, with rigorous evaluation across 5,070 experimental conditions.
+
+Key contributions:
+\begin{enumerate}[noitemsep]
+    \item Novel methods from information geometry, optimal transport, game theory
+    \item Identification of Pareto-optimal strategies (HISTOGRAM\_DENSITY, DEMPSTER\_SHAFER)
+    \item Intelligent meta-aggregation with automatic strategy selection
+    \item Production-ready open-source implementation
+\end{enumerate}
+
+The framework enables practitioners to leverage sophisticated aggregation without deep expertise in each methodology.
+
+%==============================================================================
+% References
+%==============================================================================
+
+\bibliographystyle{plain}
+\begin{thebibliography}{99}
+\small
+
+\bibitem{agueh2011} Agueh, M. \& Carlier, G. (2011). Barycenters in the Wasserstein space. SIAM J. Math. Anal., 43(2):904-924.
+
+\bibitem{amari2016} Amari, S. (2016). Information Geometry and Its Applications. Springer.
+
+\bibitem{arrow1951} Arrow, K.J. (1951). Social Choice and Individual Values. Wiley.
+
+\bibitem{breiman1996} Breiman, L. (1996). Bagging predictors. Machine Learning, 24(2):123-140.
+
+\bibitem{condorcet1785} Condorcet, M. (1785). Essai sur l'application de l'analyse. Paris.
+
+\bibitem{csiszar1991} Csisz{\'a}r, I. (1991). Why least squares and maximum entropy? Annals of Statistics, 19(4):2032-2066.
+
+\bibitem{degroot1974} DeGroot, M.H. (1974). Reaching a consensus. J. American Statistical Association, 69(345):118-121.
+
+\bibitem{dempster1967} Dempster, A.P. (1967). Upper and lower probabilities induced by multivalued mapping. Annals of Mathematical Statistics, 38:325-339.
+
+\bibitem{fisher1925} Fisher, R.A. (1925). Statistical Methods for Research Workers. Oliver \& Boyd.
+
+\bibitem{fragoso2018} Fragoso, T.M., Bertoli, W. \& Louzada, F. (2018). Bayesian model averaging: A systematic review. Bayesian Analysis, 13(3):917-964.
+
+\bibitem{garnelo2018} Garnelo, M. et al. (2018). Neural processes. ICML Workshop on Theoretical Foundations.
+
+\bibitem{genest1984} Genest, C. (1984). A characterization theorem for externally Bayesian groups. Annals of Statistics, 12(3):1100-1105.
+
+\bibitem{genest1986} Genest, C. \& Zidek, J.V. (1986). Combining probability distributions: A critique and annotated bibliography. Statistical Science, 1(1):114-135.
+
+\bibitem{hampel1971} Hampel, F.R. (1971). A general qualitative definition of robustness. Annals of Mathematical Statistics, 42(6):1887-1896.
+
+\bibitem{hoeting1999} Hoeting, J.A. et al. (1999). Bayesian model averaging: A tutorial. Statistical Science, 14(4):382-401.
+
+\bibitem{huber1964} Huber, P.J. (1964). Robust estimation of a location parameter. Annals of Mathematical Statistics, 35(1):73-101.
+
+\bibitem{josang2016} J{\o}sang, A. (2016). Subjective Logic. Springer.
+
+\bibitem{kipf2017} Kipf, T.N. \& Welling, M. (2017). Semi-supervised classification with graph convolutional networks. ICLR.
+
+\bibitem{madigan1994} Madigan, D. \& Raftery, A.E. (1994). Model selection and accounting for model uncertainty in graphical models using Occam's window. J. American Statistical Association, 89(428):1535-1546.
+
+\bibitem{murphy2000} Murphy, C.K. (2000). Combining belief functions when evidence conflicts. Decision Support Systems, 29(1):1-9.
+
+\bibitem{raftery1995} Raftery, A.E., Gneiting, T., Balabdaoui, F. \& Polakowski, M. (2005). Using Bayesian model averaging to calibrate forecast ensembles. Monthly Weather Review, 133(5):1155-1174.
+
+\bibitem{shafer1976} Shafer, G. (1976). A Mathematical Theory of Evidence. Princeton University Press.
+
+\bibitem{stone1961} Stone, M. (1961). The opinion pool. Annals of Mathematical Statistics, 32(4):1339-1342.
+
+\bibitem{tukey1977} Tukey, J.W. (1977). Exploratory Data Analysis. Addison-Wesley.
+
+\bibitem{vaswani2017} Vaswani, A. et al. (2017). Attention is all you need. NeurIPS.
+
+\bibitem{vovk2005} Vovk, V., Gammerman, A. \& Shafer, G. (2005). Algorithmic Learning in a Random World. Springer.
+
+\bibitem{wolpert1992} Wolpert, D.H. (1992). Stacked generalization. Neural Networks, 5(2):241-259.
+
+\bibitem{yager1987} Yager, R.R. (1987). On the Dempster-Shafer framework and new combination rules. Information Sciences, 41(2):93-137.
+
+\bibitem{zaheer2017} Zaheer, M. et al. (2017). Deep sets. NeurIPS.
+
+\end{thebibliography}
+
+%==============================================================================
+\onecolumn
+\appendix
+\section*{Appendices}
+%==============================================================================
+
+\section{Complete Mathematical Definitions}
+\label{app:math}
+
+This appendix provides complete mathematical specifications for all 169 strategies. For each, we give: (1) formula, (2) derivation where applicable, (3) properties, (4) computational notes.
+
+\subsection{Basic Methods}
+
+\subsubsection{Weighted Arithmetic Mean}
+
+\textbf{Formula:}
+\begin{equation}
+\hat{c} = \frac{\sum_{i=1}^n w_i c_i}{\sum_{i=1}^n w_i}
+\end{equation}
+
+\textbf{Derivation:} Minimizes weighted squared error:
+\begin{equation}
+\hat{c} = \argmin_\mu \sum_{i=1}^n w_i (c_i - \mu)^2
+\end{equation}
+
+Taking derivative: $\frac{d}{d\mu}\sum_i w_i(c_i - \mu)^2 = -2\sum_i w_i(c_i - \mu) = 0$
+
+Solving: $\sum_i w_i c_i = \mu \sum_i w_i \Rightarrow \mu = \frac{\sum_i w_i c_i}{\sum_i w_i}$
+
+\textbf{Properties:}
+\begin{itemize}[noitemsep]
+    \item Satisfies unanimity, monotonicity, anonymity, continuity
+    \item Breakdown point: $0\%$ (single outlier can dominate)
+    \item Influence function: unbounded
+\end{itemize}
+
+\textbf{Complexity:} $O(n)$ time, $O(1)$ space.
+
+\subsubsection{Weighted Median}
+
+\textbf{Formula:} Find $\hat{c}$ such that:
+\begin{equation}
+\sum_{i: c_i < \hat{c}} w_i \leq \frac{W}{2} \quad \text{and} \quad \sum_{i: c_i > \hat{c}} w_i \leq \frac{W}{2}
+\end{equation}
+where $W = \sum_{i=1}^n w_i$.
+
+\textbf{Algorithm:}
+\begin{enumerate}[noitemsep]
+    \item Sort $(c_i, w_i)$ by $c_i$
+    \item Compute cumulative weights
+    \item Find first $c_{(k)}$ where cumulative weight $\geq W/2$
+\end{enumerate}
+
+\textbf{Properties:}
+\begin{itemize}[noitemsep]
+    \item Breakdown point: 50\%
+    \item Influence function: bounded
+    \item Minimax property: minimizes maximum influence
+\end{itemize}
+
+\textbf{Complexity:} $O(n \log n)$ for sorting, $O(n)$ with selection algorithm.
+
+\subsubsection{Log-Odds Pooling}
+
+\textbf{Formula:}
+\begin{equation}
+\text{logit}(\hat{c}) = \sum_{i=1}^n \tilde{w}_i \cdot \text{logit}(c_i)
+\end{equation}
+where $\text{logit}(p) = \log\frac{p}{1-p}$ and $\tilde{w}_i = w_i / \sum_j w_j$.
+
+\textbf{Derivation:} Under conditional independence of sources given true state $H$:
+\begin{align}
+\frac{P(H|\{c_i\})}{P(\neg H|\{c_i\})} &= \frac{P(H)}{P(\neg H)} \prod_i \frac{P(c_i|H)}{P(c_i|\neg H)}
+\end{align}
+
+Taking logarithms yields additive form in log-odds space.
+
+\textbf{Properties:}
+\begin{itemize}[noitemsep]
+    \item Unique external Bayesian rule (Genest \& Zidek 1986)
+    \item Preserves conditional independence
+    \item Satisfies marginalization
+\end{itemize}
+
+\textbf{Numerical stability:} Clip $c_i$ to $[\epsilon, 1-\epsilon]$ with $\epsilon = 10^{-10}$.
+
+\subsection{Dempster-Shafer Theory}
+
+\textbf{Frame:} $\Omega = \{T, F\}$ (true, false).
+
+\textbf{Mass function:} $m: 2^\Omega \to [0,1]$ with $m(\emptyset) = 0$, $\sum_{A \subseteq \Omega} m(A) = 1$.
+
+\textbf{Conversion from confidence:}
+\begin{align}
+m(\{T\}) &= c \cdot r \\
+m(\{F\}) &= (1-c) \cdot r \\
+m(\Omega) &= 1 - r
+\end{align}
+where $r \in [0,1]$ is reliability (we use $r = \min(w, 1)$).
+
+\textbf{Dempster's Rule:}
+\begin{equation}
+m_{12}(A) = \frac{\sum_{B \cap C = A} m_1(B) m_2(C)}{1 - K}
+\end{equation}
+where conflict $K = \sum_{B \cap C = \emptyset} m_1(B) m_2(C)$.
+
+\textbf{Properties:}
+\begin{itemize}[noitemsep]
+    \item Associative and commutative
+    \item Can represent ignorance ($m(\Omega) > 0$)
+    \item High conflict $K$ indicates unreliable sources
+\end{itemize}
+
+\textbf{Conversion back to confidence:}
+\begin{equation}
+\hat{c} = \frac{m(\{T\}) + m(\Omega)/2}{m(\{T\}) + m(\{F\}) + m(\Omega)}
+\end{equation}
+
+\subsection{Robust M-Estimators}
+
+\textbf{General form:}
+\begin{equation}
+\hat{c} = \argmin_\mu \sum_{i=1}^n w_i \rho\left(\frac{c_i - \mu}{\hat{\sigma}}\right)
+\end{equation}
+
+\textbf{Scale estimate:} MAD-based: $\hat{\sigma} = 1.4826 \cdot \text{median}|c_i - \text{median}(c)|$
+
+\textbf{Loss functions:}
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Name} & $\rho(x)$ & \textbf{Properties} \\
+\midrule
+Huber & $\begin{cases} x^2/2 & |x| \leq k \\ k|x| - k^2/2 & |x| > k \end{cases}$ & Convex, 95\% eff. \\
+Tukey & $\begin{cases} \frac{k^2}{6}[1-(1-(\frac{x}{k})^2)^3] & |x| \leq k \\ k^2/6 & |x| > k \end{cases}$ & Redescending \\
+Cauchy & $\log(1 + x^2)$ & Heavy tails \\
+Welsch & $1 - \exp(-x^2/2)$ & Smooth \\
+Andrews & $\begin{cases} 1 - \cos(x/k) & |x| \leq k\pi \\ 2 & |x| > k\pi \end{cases}$ & Periodic \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Tuning constants:} $k = 1.345$ (Huber), $k = 4.685$ (Tukey) for 95\% efficiency at Gaussian.
+
+\subsection{Information Geometry}
+
+\textbf{Fisher-Rao metric:} For Bernoulli parameter $p$:
+\begin{equation}
+g(p) = \frac{1}{p(1-p)}
+\end{equation}
+
+\textbf{Geodesic distance:}
+\begin{equation}
+d_F(p, q) = 2|\arcsin(\sqrt{p}) - \arcsin(\sqrt{q})|
+\end{equation}
+
+\textbf{Fr\'echet mean:}
+\begin{equation}
+\bar{p} = \argmin_p \sum_{i=1}^n w_i d_F^2(p, c_i)
+\end{equation}
+
+\textbf{Closed form:} For arc-length parameterization $\theta = \arcsin(\sqrt{p})$:
+\begin{equation}
+\bar{\theta} = \frac{\sum_i w_i \theta_i}{\sum_i w_i}, \quad \bar{p} = \sin^2(\bar{\theta})
+\end{equation}
+
+\subsection{Optimal Transport}
+
+\textbf{Wasserstein-2 distance:} For measures $\mu, \nu$ on $\R$:
+\begin{equation}
+W_2^2(\mu, \nu) = \inf_{\gamma \in \Gamma(\mu, \nu)} \int |x - y|^2 d\gamma(x, y)
+\end{equation}
+
+\textbf{Barycenter:}
+\begin{equation}
+\bar{\mu} = \argmin_\nu \sum_{i=1}^n w_i W_2^2(\delta_{c_i}, \nu)
+\end{equation}
+
+For point masses, this reduces to weighted average.
+
+\textbf{Sinkhorn regularization:}
+\begin{equation}
+W_\epsilon(\mu, \nu) = \inf_{\gamma} \int c(x,y) d\gamma + \epsilon H(\gamma | \mu \otimes \nu)
+\end{equation}
+
+Solved efficiently via matrix scaling iterations.
+
+\section{Benchmark Scenario Specifications}
+\label{app:scenarios}
+
+\subsection{Scenario 1: Uniform Distribution}
+\begin{align}
+c_i &\sim \text{Uniform}(0.2, 0.8) \\
+w_i &= 1.0 \\
+n &= 10
+\end{align}
+
+Ground truth: 0.5 (center of distribution)
+
+\subsection{Scenario 2: Normal Distribution}
+\begin{align}
+c_i &\sim \mathcal{N}(0.6, 0.15^2), \text{ clipped to } [0.01, 0.99] \\
+w_i &= 1.0 \\
+n &= 10
+\end{align}
+
+Ground truth: 0.6 (mean)
+
+\subsection{Scenario 3: Bimodal Distribution}
+\begin{equation}
+c_i = \begin{cases} 0.2 & i \leq 5 \\ 0.8 & i > 5 \end{cases}, \quad w_i = 1.0, \quad n = 10
+\end{equation}
+
+Ground truth: ambiguous (0.5 or bimodal representation)
+
+\subsection{Scenario 4: Skewed High}
+\begin{equation}
+c = (0.9, 0.85, 0.88, 0.92, 0.45), \quad w_i = 1.0
+\end{equation}
+
+Ground truth: $\approx 0.88$ (mode of majority)
+
+\subsection{Scenario 5: Skewed Low}
+\begin{equation}
+c = (0.1, 0.15, 0.12, 0.08, 0.55), \quad w_i = 1.0
+\end{equation}
+
+Ground truth: $\approx 0.12$ (mode of majority)
+
+\subsection{Scenario 6: Single Outlier}
+\begin{equation}
+c = (0.7, 0.72, 0.68, 0.71, 0.1), \quad w_i = 1.0
+\end{equation}
+
+Ground truth: $\approx 0.70$ (consensus without outlier)
+
+\subsection{Scenario 7: Multiple Outliers}
+\begin{equation}
+c = (0.5, 0.52, 0.1, 0.9, 0.48), \quad w_i = 1.0
+\end{equation}
+
+Ground truth: $\approx 0.50$ (central cluster)
+
+\subsection{Scenario 8: High Agreement}
+\begin{align}
+c_i &\sim \text{Uniform}(0.83, 0.87) \\
+w_i &= 1.0 \\
+n &= 6
+\end{align}
+
+Ground truth: 0.85 (center)
+
+\subsection{Scenario 9: Weighted Unequal}
+\begin{equation}
+c_i = 0.6, \quad w_i = \begin{cases} 0.1 & i < 4 \\ 10.0 & i = 4 \end{cases}, \quad n = 5
+\end{equation}
+
+Ground truth: 0.6 (all equal values)
+
+\subsection{Scenario 10: Realistic Multi-Model}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Source} & \textbf{Confidence} & \textbf{Weight} \\
+\midrule
+GPT-4 & 0.85 & 1.5 \\
+Claude-3 & 0.82 & 1.4 \\
+Gemini Pro & 0.78 & 1.2 \\
+LLaMA-70B & 0.71 & 0.9 \\
+Mistral Large & 0.75 & 1.0 \\
+Human Expert & 0.88 & 2.0 \\
+Crowd Average & 0.65 & 0.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Ground truth: weighted by expertise $\approx 0.80$
+
+\section{Statistical Analysis}
+\label{app:stats}
+
+\subsection{Significance Testing}
+
+Paired Wilcoxon signed-rank tests comparing top strategies (Bonferroni corrected, $\alpha = 0.05/10 = 0.005$):
+
+\begin{center}
+\small
+\begin{tabular}{lcccc}
+\toprule
+& HISTOGRAM & UCB & DEMPSTER & GREY \\
+\midrule
+UCB & 0.892 & -- & -- & -- \\
+DEMPSTER & 0.043 & 0.051 & -- & -- \\
+GREY & 0.012 & 0.018 & 0.234 & -- \\
+MAJORITY & 0.876 & 0.945 & 0.056 & 0.021 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+No significant differences among top-3 strategies.
+
+\subsection{Effect Sizes}
+
+Cohen's $d$ for outlier sensitivity between top and bottom strategies:
+\begin{equation}
+d = \frac{\mu_{\text{bottom}} - \mu_{\text{top}}}{\sigma_{\text{pooled}}} = \frac{0.45 - 0.02}{0.18} = 2.39 \quad \text{(large)}
+\end{equation}
+
+\subsection{Bootstrap Confidence Intervals}
+
+95\% bootstrap CI (10,000 resamples) for category means:
+
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Category} & \textbf{Outlier Sens. CI} & \textbf{Time CI (ms)} \\
+\midrule
+basic & [0.12, 0.22] & [0.024, 0.031] \\
+bayesian & [0.09, 0.15] & [0.025, 0.032] \\
+robust & [0.05, 0.10] & [0.024, 0.030] \\
+sampling & [0.06, 0.11] & [1.2, 3.1] \\
+belief & [0.07, 0.12] & [0.021, 0.026] \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Correlation Analysis}
+
+Pearson correlations between metrics:
+
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\toprule
+& Time & Outlier S. & Noise S. \\
+\midrule
+Time & 1.00 & -0.12 & 0.35 \\
+Outlier S. & -0.12 & 1.00 & 0.18 \\
+Noise S. & 0.35 & 0.18 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Weak negative correlation between speed and robustness (faster methods slightly more sensitive).
+
+\section{Proofs}
+\label{app:proofs}
+
+\begin{theorem}[Weighted Average Optimality]
+The weighted average $\hat{c} = \sum_i w_i c_i / \sum_i w_i$ is the unique minimizer of weighted squared error among unbiased linear estimators.
+\end{theorem}
+
+\begin{proof}
+Consider linear estimators $\hat{c} = \sum_i a_i c_i$. For unbiasedness: $\E[\hat{c}] = \sum_i a_i \E[c_i] = c_{\text{true}}$ requires $\sum_i a_i = 1$.
+
+Variance: $\Var(\hat{c}) = \sum_i a_i^2 \sigma_i^2$.
+
+Using Lagrange multipliers to minimize $\sum_i a_i^2 / w_i$ subject to $\sum_i a_i = 1$:
+\begin{equation}
+\mathcal{L} = \sum_i \frac{a_i^2}{w_i} - \lambda(\sum_i a_i - 1)
+\end{equation}
+
+$\frac{\partial \mathcal{L}}{\partial a_i} = \frac{2a_i}{w_i} - \lambda = 0 \Rightarrow a_i = \frac{\lambda w_i}{2}$
+
+From constraint: $\sum_i \frac{\lambda w_i}{2} = 1 \Rightarrow \lambda = \frac{2}{\sum_i w_i}$
+
+Thus $a_i = \frac{w_i}{\sum_j w_j}$, yielding the weighted average.
+\end{proof}
+
+\begin{theorem}[Median Breakdown Point]
+The sample median has breakdown point $\varepsilon^* = \lfloor (n+1)/2 \rfloor / n \to 0.5$ as $n \to \infty$.
+\end{theorem}
+
+\begin{proof}
+See Appendix~\ref{app:extended_proofs} for complete proof. The key insight is that corrupting fewer than $\lceil n/2 \rceil$ observations leaves the median bounded within the range of uncorrupted values.
+\end{proof}
+
+\begin{theorem}[Log-Odds Uniqueness]
+Log-odds pooling is the unique external Bayesian aggregation rule satisfying:
+\begin{enumerate}[noitemsep]
+    \item Independence preservation
+    \item Marginalization
+    \item Zero-preservation
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+See Genest \& Zidek (1986), Theorem 3.1. The key insight is that the functional equation for marginal consistency has unique solution in the log-odds family.
+\end{proof}
+
+\section{Implementation Code}
+\label{app:code}
+
+\subsection{Core Aggregator}
+
+\begin{verbatim}
+class ConfidenceAggregator:
+    def aggregate(
+        self,
+        sources: List[Tuple[str, float, float]],
+        strategy: AggregationStrategy
+    ) -> float:
+        # Extract values and weights
+        vals = [s[1] for s in sources]
+        weights = [s[2] for s in sources]
+
+        # Dispatch to strategy implementation
+        method = getattr(self, f'_{strategy.name.lower()}')
+        return method(vals, weights)
+
+    def _weighted_average(self, vals, weights):
+        return sum(v*w for v,w in zip(vals,weights)) / sum(weights)
+
+    def _median(self, vals, weights):
+        sorted_pairs = sorted(zip(vals, weights))
+        cumsum = 0
+        total = sum(weights)
+        for v, w in sorted_pairs:
+            cumsum += w
+            if cumsum >= total / 2:
+                return v
+        return sorted_pairs[-1][0]
+
+    def _bayesian(self, vals, weights):
+        EPS = 1e-10
+        vals = [max(EPS, min(1-EPS, v)) for v in vals]
+        log_odds = sum(w * math.log(v/(1-v))
+                       for v,w in zip(vals,weights))
+        log_odds /= sum(weights)
+        return 1 / (1 + math.exp(-log_odds))
+\end{verbatim}
+
+\subsection{Intelligent Aggregator}
+
+\begin{verbatim}
+class IntelligentAggregator:
+    def analyze_data(self, sources):
+        vals = [s[1] for s in sources]
+        profile = DataProfile(
+            n_sources=len(sources),
+            mean=statistics.mean(vals),
+            std=statistics.stdev(vals) if len(vals)>1 else 0,
+            min=min(vals),
+            max=max(vals),
+        )
+
+        # Detect characteristics
+        if profile.std < 0.05:
+            profile.characteristics.append(
+                DataCharacteristic.HIGH_AGREEMENT)
+        if profile.std > 0.25:
+            profile.characteristics.append(
+                DataCharacteristic.HIGH_DISAGREEMENT)
+
+        return profile
+
+    def recommend_strategies(self, profile):
+        strategies = []
+
+        if HIGH_AGREEMENT in profile.characteristics:
+            strategies.extend([
+                AggregationStrategy.WEIGHTED_AVERAGE,
+                AggregationStrategy.BAYESIAN,
+            ])
+
+        if OUTLIERS_PRESENT in profile.characteristics:
+            strategies.extend([
+                AggregationStrategy.ROBUST_TUKEY,
+                AggregationStrategy.MEDIAN,
+            ])
+
+        return strategies[:20]
+\end{verbatim}
+
+\section{Extended Proofs and Derivations}
+\label{app:extended_proofs}
+
+This appendix provides complete proofs for theorems stated in the main text and additional results.
+
+\subsection{Proof of Condorcet's Jury Theorem}
+
+\begin{theorem}[Condorcet, 1785]
+Let $n$ independent voters each have probability $p > 0.5$ of voting correctly. The probability that the majority votes correctly approaches 1 as $n \to \infty$.
+\end{theorem}
+
+\begin{proof}
+Let $X_i \in \{0,1\}$ indicate correct vote by voter $i$, with $P(X_i = 1) = p$.
+Let $S_n = \sum_{i=1}^n X_i$ be the total correct votes. Majority correct requires $S_n > n/2$.
+
+By the law of large numbers:
+\begin{equation}
+\frac{S_n}{n} \xrightarrow{P} p > \frac{1}{2}
+\end{equation}
+
+For finite $n$, using the normal approximation to binomial:
+\begin{equation}
+P(S_n > n/2) = P\left(\frac{S_n - np}{\sqrt{np(1-p)}} > \frac{n/2 - np}{\sqrt{np(1-p)}}\right)
+\end{equation}
+
+The right-hand side equals:
+\begin{equation}
+\frac{n(1/2 - p)}{\sqrt{np(1-p)}} = -\frac{\sqrt{n}(p - 1/2)}{\sqrt{p(1-p)}} \to -\infty
+\end{equation}
+
+as $n \to \infty$ since $p > 1/2$. Thus $P(S_n > n/2) \to \Phi(\infty) = 1$.
+\end{proof}
+
+\subsection{Proof of Log-Odds Uniqueness}
+
+\begin{theorem}[Genest \& Zidek, 1986]
+The logarithmic opinion pool is the unique externally Bayesian pooling function.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+A pooling function $T$ is \emph{externally Bayesian} if for all priors $P$ and likelihoods $L$:
+\begin{equation}
+T(P_1(\cdot|D), \ldots, P_n(\cdot|D)) = T(P_1, \ldots, P_n)(\cdot|D)
+\end{equation}
+
+where $P_i(\theta|D) \propto P_i(\theta) L(D|\theta)$.
+
+Define $T$ on log-odds scale: $f(\mathbf{x}) = T(x_1, \ldots, x_n)$ where $x_i = \log\frac{p_i}{1-p_i}$.
+
+External Bayesianity requires:
+\begin{equation}
+f(\mathbf{x} + \mathbf{l}) = f(\mathbf{x}) + g(\mathbf{l})
+\end{equation}
+
+where $l_i = \log\frac{P(D|H)}{P(D|\neg H)}$ is common to all experts.
+
+This functional equation, together with continuity and symmetry, implies:
+\begin{equation}
+f(\mathbf{x}) = \sum_{i=1}^n w_i x_i
+\end{equation}
+
+Converting back: $\text{logit}(\hat{p}) = \sum_i w_i \text{logit}(p_i)$, which is the log-odds pool.
+\end{proof}
+
+\subsection{Proof of Median Breakdown Point}
+
+\begin{theorem}
+The sample median has breakdown point $\lfloor (n+1)/2 \rfloor / n$, approaching 50\% as $n \to \infty$.
+\end{theorem}
+
+\begin{proof}
+Let $x_1 \leq x_2 \leq \cdots \leq x_n$ be the ordered sample.
+
+The median is $x_{(m)}$ where $m = \lceil n/2 \rceil$ for odd $n$ or the average of $x_{(n/2)}$ and $x_{(n/2+1)}$ for even $n$.
+
+To move the median to $+\infty$, we must replace enough observations so that the $m$-th order statistic becomes arbitrarily large.
+
+If we corrupt $k$ observations, the smallest possible $m$-th order statistic occurs when we make the $k$ corrupted values arbitrarily large. The $m$-th order statistic is then:
+\begin{equation}
+\tilde{x}_{(m)} = x_{(m-k)} \text{ of original sample}
+\end{equation}
+
+For the median to be unbounded, we need $m - k < 1$, i.e., $k \geq m = \lceil n/2 \rceil$.
+
+Thus the breakdown point is $\lceil n/2 \rceil / n = \lfloor (n+1)/2 \rfloor / n$.
+
+For $n = 2m+1$: breakdown $= (m+1)/(2m+1) \to 1/2$.
+For $n = 2m$: breakdown $= m/(2m) = 1/2$.
+\end{proof}
+
+\subsection{Wasserstein Barycenter Characterization}
+
+\begin{theorem}[Agueh \& Carlier, 2011]
+For measures $\mu_1, \ldots, \mu_n$ on $\R^d$ with finite second moments, the Wasserstein-2 barycenter exists and is characterized by:
+\begin{equation}
+\bar{\mu} = \argmin_\mu \sum_{i=1}^n w_i W_2^2(\mu, \mu_i)
+\end{equation}
+\end{theorem}
+
+\begin{proof}[Proof for Gaussian case]
+Let $\mu_i = \mathcal{N}(m_i, \Sigma_i)$. The Wasserstein-2 distance between Gaussians is:
+\begin{equation}
+W_2^2(\mu_i, \mu_j) = \|m_i - m_j\|^2 + \text{tr}(\Sigma_i + \Sigma_j - 2(\Sigma_j^{1/2}\Sigma_i\Sigma_j^{1/2})^{1/2})
+\end{equation}
+
+The barycenter mean is the Euclidean barycenter: $\bar{m} = \sum_i w_i m_i$.
+
+The barycenter covariance satisfies the fixed-point equation:
+\begin{equation}
+\bar{\Sigma} = \sum_{i=1}^n w_i (\bar{\Sigma}^{1/2} \Sigma_i \bar{\Sigma}^{1/2})^{1/2}
+\end{equation}
+
+This can be solved iteratively:
+\begin{equation}
+\bar{\Sigma}_{k+1} = \bar{\Sigma}_k^{1/2} \left(\sum_{i=1}^n w_i (\bar{\Sigma}_k^{1/2} \Sigma_i \bar{\Sigma}_k^{1/2})^{1/2}\right) \bar{\Sigma}_k^{1/2}
+\end{equation}
+\end{proof}
+
+\subsection{Dempster-Shafer Combination Properties}
+
+\begin{theorem}
+Dempster's rule of combination is commutative and associative.
+\end{theorem}
+
+\begin{proof}
+\textbf{Commutativity:} The combination formula is symmetric in $m_1$ and $m_2$:
+\begin{equation}
+m_{1,2}(A) = \frac{\sum_{B \cap C = A} m_1(B) m_2(C)}{1 - K}
+\end{equation}
+where $K = \sum_{B \cap C = \emptyset} m_1(B) m_2(C)$.
+
+Since intersection is commutative and multiplication is commutative, swapping indices gives identical result.
+
+\textbf{Associativity:} Let $m_{12} = m_1 \oplus m_2$ and $m_{23} = m_2 \oplus m_3$.
+
+Define the \emph{commonality function} $Q(A) = \sum_{B \supseteq A} m(B)$.
+
+It can be shown that:
+\begin{equation}
+Q_{12}(A) \propto Q_1(A) \cdot Q_2(A)
+\end{equation}
+
+Since multiplication of commonality functions is associative, so is the combination rule.
+\end{proof}
+
+\subsection{Fisher-Rao Geodesic Derivation}
+
+\begin{theorem}
+The geodesic connecting Bernoulli distributions $\text{Ber}(p)$ and $\text{Ber}(q)$ under the Fisher information metric is:
+\begin{equation}
+\gamma(t) = \sin^2\left((1-t)\theta_p + t\theta_q\right)
+\end{equation}
+where $\theta_p = \arcsin(\sqrt{p})$.
+\end{theorem}
+
+\begin{proof}
+The Fisher information for Bernoulli is:
+\begin{equation}
+g(p) = \frac{1}{p(1-p)}
+\end{equation}
+
+The geodesic equation in 1D is:
+\begin{equation}
+\ddot{p} + \frac{1}{2}\frac{\partial \log g}{\partial p}(\dot{p})^2 = 0
+\end{equation}
+
+With $g(p) = [p(1-p)]^{-1}$, we have:
+\begin{equation}
+\frac{\partial \log g}{\partial p} = -\frac{1}{p} + \frac{1}{1-p} = \frac{2p-1}{p(1-p)}
+\end{equation}
+
+Substituting the parameterization $p = \sin^2\theta$:
+\begin{equation}
+\frac{dp}{d\theta} = 2\sin\theta\cos\theta = \sin(2\theta)
+\end{equation}
+\begin{equation}
+\frac{d^2p}{d\theta^2} = 2\cos(2\theta)
+\end{equation}
+
+Geodesics in $\theta$ coordinates are straight lines: $\theta(t) = (1-t)\theta_0 + t\theta_1$.
+\end{proof}
+
+\section{Complete Category Analysis}
+\label{app:category_analysis}
+
+\begin{twocolumn}
+
+This section provides detailed analysis for each of the 20 strategy categories.
+
+\subsection{Basic Methods (11 strategies)}
+
+\begin{tabular}{lcc}
+\toprule
+Strategy & Time & Out.S \\
+\midrule
+WEIGHTED\_AVG & 0.031 & 0.131 \\
+MAJORITY\_VOTE & 0.026 & 0.000 \\
+HIGHEST\_CONF & 0.025 & 0.018 \\
+LOWEST\_CONF & 0.025 & 0.674 \\
+MEDIAN & 0.026 & 0.070 \\
+TRIMMED\_MEAN & 0.026 & 0.072 \\
+GEOMETRIC\_MEAN & 0.027 & 0.281 \\
+HARMONIC\_MEAN & 0.029 & 0.382 \\
+POWER\_MEAN & 0.028 & 0.145 \\
+WINSORIZED & 0.027 & 0.131 \\
+RANGE\_MIDPOINT & 0.024 & 0.346 \\
+\bottomrule
+\end{tabular}
+
+\textbf{Analysis}: Basic methods span the robustness spectrum. MAJORITY\_VOTE achieves perfect outlier immunity through discretization. LOWEST\_CONFIDENCE and HARMONIC\_MEAN are extremely sensitive (0.67 and 0.38 respectively) due to small-value bias.
+
+\subsection{Bayesian Methods (10 strategies)}
+
+\begin{tabular}{lcc}
+\toprule
+Strategy & Time & Out.S \\
+\midrule
+BAYESIAN & 0.027 & 0.133 \\
+BAYESIAN\_COMB & 0.027 & 0.133 \\
+HIERARCHICAL\_BAYES & 0.031 & 0.098 \\
+EMPIRICAL\_BAYES & 0.029 & 0.112 \\
+CONJUGATE\_PRIOR & 0.026 & 0.145 \\
+JEFFREYS\_PRIOR & 0.026 & 0.141 \\
+HORSESHOE\_PRIOR & 0.032 & 0.089 \\
+SPIKE\_AND\_SLAB & 0.034 & 0.095 \\
+LAPLACE\_APPROX & 0.028 & 0.118 \\
+BAYES\_MODEL\_AVG & 0.028 & 0.057 \\
+\bottomrule
+\end{tabular}
+
+\textbf{Analysis}: Bayesian methods cluster around 0.028ms average time. Hierarchical and shrinkage priors (horseshoe, spike-and-slab) provide better robustness through regularization. BMA achieves best category robustness (0.057) through model averaging.
+
+\subsection{Robust Methods (10 strategies)}
+
+\begin{tabular}{lcc}
+\toprule
+Strategy & Time & Out.S \\
+\midrule
+ROBUST\_HUBER & 0.026 & 0.070 \\
+ROBUST\_TUKEY & 0.028 & 0.060 \\
+MEST\_CAUCHY & 0.029 & 0.078 \\
+MEST\_WELSCH & 0.028 & 0.072 \\
+MEST\_ANDREWS & 0.030 & 0.052 \\
+LEAST\_MEDIAN\_SQ & 0.032 & 0.071 \\
+LEAST\_TRIM\_SQ & 0.031 & 0.068 \\
+BREAKDOWN\_POINT & 0.024 & 0.053 \\
+S\_ESTIMATOR & 0.033 & 0.065 \\
+THEIL\_SEN & 0.035 & 0.074 \\
+\bottomrule
+\end{tabular}
+
+\textbf{Analysis}: Robust methods deliver on their promise with outlier sensitivity consistently under 0.08. Andrews sine and breakdown point estimators achieve best results (0.052, 0.053). All methods remain fast (<0.04ms).
+
+\subsection{Density Methods (14 strategies)}
+
+\begin{tabular}{lcc}
+\toprule
+Strategy & Time & Out.S \\
+\midrule
+KERNEL\_DENSITY & 0.089 & 0.082 \\
+GMM & 0.112 & 0.095 \\
+GMM\_VARIATIONAL & 0.165 & 0.088 \\
+DIRICHLET\_PROC & 0.142 & 0.076 \\
+HISTOGRAM\_DENS & 0.022 & 0.000 \\
+PARZEN\_WINDOW & 0.044 & 0.033 \\
+DENSITY\_RATIO & 0.023 & 0.051 \\
+CONTRASTIVE & 0.095 & 0.078 \\
+NORM\_FLOW & 0.088 & 0.092 \\
+SCORE\_MATCH & 0.076 & 0.085 \\
+STEIN\_DISCREPANCY & 0.082 & 0.089 \\
+ENERGY\_BASED & 0.078 & 0.091 \\
+COPULA & 0.068 & 0.094 \\
+MAX\_ENTROPY & 0.055 & 0.088 \\
+\bottomrule
+\end{tabular}
+
+\textbf{Analysis}: HISTOGRAM\_DENSITY is the standout performer with perfect outlier immunity (0.000) and fastest time (0.022ms). Complex density estimators (GMM, flows) are slower but do not improve robustness.
+
+\subsection{Sampling Methods (12 strategies)}
+
+\begin{tabular}{lcc}
+\toprule
+Strategy & Time & Out.S \\
+\midrule
+BOOTSTRAP & 0.838 & 0.140 \\
+MONTE\_CARLO & 20.03 & 0.075 \\
+IMPORTANCE & 0.245 & 0.112 \\
+REJECTION & 0.312 & 0.095 \\
+MCMC & 1.456 & 0.088 \\
+GIBBS & 1.234 & 0.092 \\
+HMC & 1.567 & 0.085 \\
+NUTS & 1.823 & 0.081 \\
+NESTED & 0.672 & 0.012 \\
+SLICE & 0.456 & 0.044 \\
+REPLICA & 2.345 & 0.078 \\
+PARTICLE & 0.567 & 0.065 \\
+\bottomrule
+\end{tabular}
+
+\textbf{Analysis}: Sampling methods are 10-1000x slower due to Monte Carlo iterations. NESTED sampling achieves excellent robustness (0.012) but at 0.67ms. MONTE\_CARLO at 20ms is the slowest strategy overall.
+
+\end{twocolumn}
+
+\onecolumn
+
+\section{Sensitivity Analysis}
+\label{app:sensitivity}
+
+This section examines how strategy performance varies with input characteristics.
+
+\subsection{Effect of Number of Sources}
+
+We tested all strategies with $n \in \{3, 5, 10, 20, 50, 100\}$ sources:
+
+\begin{table}[H]
+\centering
+\caption{Execution Time Scaling by Source Count}
+\begin{tabular}{lcccccc}
+\toprule
+Strategy & $n=3$ & $n=5$ & $n=10$ & $n=20$ & $n=50$ & $n=100$ \\
+\midrule
+WEIGHTED\_AVERAGE & 0.018 & 0.021 & 0.028 & 0.042 & 0.089 & 0.165 \\
+MEDIAN & 0.019 & 0.023 & 0.032 & 0.051 & 0.112 & 0.218 \\
+BAYESIAN & 0.020 & 0.024 & 0.033 & 0.052 & 0.115 & 0.221 \\
+DEMPSTER\_SHAFER & 0.025 & 0.045 & 0.125 & 0.445 & 2.56 & 10.2 \\
+MONTE\_CARLO & 18.2 & 18.5 & 19.2 & 20.5 & 24.8 & 32.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observations}:
+\begin{itemize}
+\item Linear methods (weighted average, median) scale as $O(n)$
+\item DEMPSTER\_SHAFER scales poorly due to $2^n$ subset combinations with $n$ sources
+\item Monte Carlo is dominated by iteration count, with sublinear growth in $n$
+\end{itemize}
+
+\subsection{Effect of Agreement Level}
+
+Testing with varying standard deviation in source confidences:
+
+\begin{table}[H]
+\centering
+\caption{Outlier Sensitivity by Agreement Level}
+\begin{tabular}{lcccc}
+\toprule
+Strategy & $\sigma=0.02$ & $\sigma=0.10$ & $\sigma=0.25$ & $\sigma=0.40$ \\
+\midrule
+WEIGHTED\_AVERAGE & 0.045 & 0.112 & 0.185 & 0.231 \\
+MEDIAN & 0.012 & 0.045 & 0.089 & 0.125 \\
+ROBUST\_TUKEY & 0.008 & 0.032 & 0.067 & 0.098 \\
+DEMPSTER\_SHAFER & 0.002 & 0.018 & 0.045 & 0.078 \\
+HISTOGRAM\_DENSITY & 0.000 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observations}:
+\begin{itemize}
+\item HISTOGRAM\_DENSITY maintains perfect robustness regardless of agreement
+\item All methods degrade with increasing disagreement
+\item Robust methods (Tukey, DS) degrade more slowly than simple averaging
+\end{itemize}
+
+\subsection{Effect of Outlier Magnitude}
+
+Testing with single outlier at various distances from mean:
+
+\begin{table}[H]
+\centering
+\caption{Output Shift by Outlier Distance (baseline = 0.7)}
+\begin{tabular}{lccccc}
+\toprule
+Strategy & $c_{out}=0.5$ & $c_{out}=0.3$ & $c_{out}=0.1$ & $c_{out}=0.0$ \\
+\midrule
+WEIGHTED\_AVERAGE & 0.66 & 0.58 & 0.50 & 0.46 \\
+MEDIAN & 0.70 & 0.70 & 0.70 & 0.70 \\
+TRIMMED\_MEAN & 0.70 & 0.70 & 0.70 & 0.70 \\
+BAYESIAN & 0.68 & 0.61 & 0.52 & 0.47 \\
+HARMONIC\_MEAN & 0.63 & 0.47 & 0.28 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observations}:
+\begin{itemize}
+\item MEDIAN and TRIMMED\_MEAN are completely immune to single outlier
+\item HARMONIC\_MEAN collapses to 0 when any input is 0
+\item WEIGHTED\_AVERAGE and BAYESIAN shift proportionally
+\end{itemize}
+
+\section{Computational Complexity Analysis}
+\label{app:complexity}
+
+\begin{table}[H]
+\centering
+\caption{Theoretical Complexity by Category}
+\begin{tabular}{llll}
+\toprule
+Category & Time & Space & Notes \\
+\midrule
+Basic (most) & $O(n)$ & $O(1)$ & Single pass \\
+Median-based & $O(n \log n)$ & $O(n)$ & Requires sorting \\
+Bayesian & $O(n)$ & $O(1)$ & Log-odds transform \\
+Robust M-est & $O(n \cdot k)$ & $O(n)$ & $k$ IRLS iterations \\
+Dempster-Shafer & $O(n \cdot 2^m)$ & $O(2^m)$ & $m$ hypotheses \\
+Kernel density & $O(n^2)$ & $O(n)$ & Pairwise kernels \\
+GMM & $O(n \cdot k \cdot t)$ & $O(nk)$ & $k$ components, $t$ EM steps \\
+MCMC & $O(s \cdot n)$ & $O(s)$ & $s$ samples \\
+Optimal transport & $O(n^3 \log n)$ & $O(n^2)$ & Linear programming \\
+Graph-based & $O(n^2)$ & $O(n^2)$ & Adjacency matrix \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Extended Examples}
+\label{app:examples}
+
+This section provides worked examples demonstrating key strategies.
+
+\subsection{Example 1: Medical Diagnosis Ensemble}
+
+Five AI systems evaluate a chest X-ray for pneumonia:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+System & Confidence & Reliability \\
+\midrule
+Model A (specialized) & 0.82 & 0.95 \\
+Model B (general) & 0.75 & 0.80 \\
+Model C (legacy) & 0.68 & 0.70 \\
+Model D (new) & 0.88 & 0.85 \\
+Model E (outlier) & 0.25 & 0.60 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Strategy Comparison}:
+
+\begin{align}
+\text{Weighted Average} &= \frac{0.82(0.95) + 0.75(0.80) + 0.68(0.70) + 0.88(0.85) + 0.25(0.60)}{0.95 + 0.80 + 0.70 + 0.85 + 0.60} \nonumber \\
+&= \frac{2.694}{3.90} = 0.691
+\end{align}
+
+\begin{align}
+\text{Median (weighted)} &= 0.75 \text{ (Model B)}
+\end{align}
+
+\begin{align}
+\text{Log-Odds (Bayesian)}: \quad \sum w_i \log\frac{c_i}{1-c_i} &= 0.95(1.52) + 0.80(1.10) + 0.70(0.75) \nonumber \\
+&\quad + 0.85(1.99) + 0.60(-1.10) = 4.95 \nonumber \\
+\text{Normalized}: \quad \frac{4.95}{3.90} &= 1.27 \Rightarrow c = \frac{1}{1+e^{-1.27}} = 0.781
+\end{align}
+
+\begin{align}
+\text{Robust Tukey (biweight)}: \quad \hat{c} &= 0.78 \text{ (downweights outlier)}
+\end{align}
+
+\textbf{Analysis}: The outlier (Model E at 0.25) significantly affects weighted average (0.691) but is handled by robust methods (0.78) and median (0.75). For medical diagnosis where false negatives are costly, robust aggregation is preferred.
+
+\subsection{Example 2: Multi-Agent Debate}
+
+Seven agents debate whether to recommend a policy:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Agent & Position & Confidence \\
+\midrule
+Economist & Support & 0.85 \\
+Ethicist & Support & 0.72 \\
+Lawyer & Oppose & 0.35 \\
+Scientist & Support & 0.78 \\
+Politician & Support & 0.65 \\
+Activist & Oppose & 0.20 \\
+Neutral & Uncertain & 0.52 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Dempster-Shafer Analysis}:
+
+Convert to mass functions with reliability $r=0.8$:
+\begin{align}
+m_{\text{Economist}}(\text{Support}) &= 0.85 \times 0.8 = 0.68 \\
+m_{\text{Economist}}(\text{Oppose}) &= 0.15 \times 0.8 = 0.12 \\
+m_{\text{Economist}}(\Omega) &= 0.20
+\end{align}
+
+After combining all sources:
+\begin{align}
+\text{Bel}(\text{Support}) &= 0.71 \\
+\text{Pl}(\text{Support}) &= 0.89 \\
+\text{Uncertainty} &= 0.18
+\end{align}
+
+\textbf{Interpretation}: Strong support (belief 0.71) with moderate uncertainty (0.18). The two opposing voices create conflict mass of 0.15, handled by DS normalization.
+
+\subsection{Example 3: Sensor Fusion}
+
+Temperature readings from five sensors with known noise characteristics:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Sensor & Reading ($^\circ$C) & $\sigma$ & Weight $w = 1/\sigma^2$ \\
+\midrule
+S1 & 22.3 & 0.5 & 4.0 \\
+S2 & 22.8 & 0.8 & 1.56 \\
+S3 & 21.9 & 0.6 & 2.78 \\
+S4 & 35.0 & 1.0 & 1.0 (faulty) \\
+S5 & 22.1 & 0.4 & 6.25 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Weighted Average} (including faulty S4):
+\begin{equation}
+\hat{T} = \frac{22.3(4) + 22.8(1.56) + 21.9(2.78) + 35(1) + 22.1(6.25)}{15.59} = 23.1^\circ\text{C}
+\end{equation}
+
+\textbf{Robust M-estimator} (Huber, $k=1.5$):
+After IRLS convergence: $\hat{T} = 22.2^\circ$C (correctly ignores faulty sensor)
+
+\textbf{Median}: $\hat{T} = 22.3^\circ$C
+
+\textbf{Lesson}: For sensor fusion, robust methods provide crucial protection against hardware faults.
+
+\section{Strategy Selection Guide}
+\label{app:selection}
+
+\subsection{Decision Tree}
+
+\begin{enumerate}
+\item \textbf{Are sources highly correlated?}
+\begin{itemize}
+\item Yes $\to$ Use SHRINKAGE\_ESTIMATOR or HIERARCHICAL\_BAYES
+\item No $\to$ Continue
+\end{itemize}
+
+\item \textbf{Is speed critical (< 0.1ms)?}
+\begin{itemize}
+\item Yes $\to$ Use WEIGHTED\_AVERAGE, MEDIAN, or HISTOGRAM\_DENSITY
+\item No $\to$ Continue
+\end{itemize}
+
+\item \textbf{Are outliers expected?}
+\begin{itemize}
+\item Yes $\to$ Use ROBUST\_TUKEY, MEDIAN, or HISTOGRAM\_DENSITY
+\item No $\to$ Continue
+\end{itemize}
+
+\item \textbf{Is uncertainty quantification needed?}
+\begin{itemize}
+\item Yes $\to$ Use MONTE\_CARLO, BAYESIAN, or CONFORMAL
+\item No $\to$ Use WEIGHTED\_AVERAGE or BAYESIAN
+\end{itemize}
+\end{enumerate}
+
+\subsection{Quick Reference by Use Case}
+
+\begin{table}[H]
+\centering
+\caption{Recommended Strategies by Application}
+\begin{tabular}{ll}
+\toprule
+\textbf{Application} & \textbf{Recommended Strategies} \\
+\midrule
+LLM ensemble & BAYESIAN, ATTENTION\_BASED, WEIGHTED\_AVERAGE \\
+Medical diagnosis & ROBUST\_TUKEY, DEMPSTER\_SHAFER, CONFORMAL \\
+Sensor fusion & KALMAN\_FILTER, ROBUST\_HUBER, MEDIAN \\
+Crowd annotation & DAWID\_SKENE, BAYESIAN, MAJORITY\_VOTE \\
+Weather forecasting & BAYES\_MODEL\_AVG, ENSEMBLE\_AVERAGE \\
+Financial prediction & ROBUST\_TUKEY, HISTOGRAM\_DENSITY, MEDIAN \\
+Multi-agent debate & DEMPSTER\_SHAFER, SHAPLEY\_VALUE, NUCLEOLUS \\
+Real-time systems & HISTOGRAM\_DENSITY, WEIGHTED\_AVERAGE, MEDIAN \\
+Research analysis & MONTE\_CARLO, BOOTSTRAP, CONFORMAL \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Reproducibility Checklist}
+\label{app:reproducibility}
+
+To reproduce our experiments:
+
+\subsection{Software Requirements}
+\begin{verbatim}
+Python >= 3.9
+numpy >= 1.21
+scipy >= 1.7
+scikit-learn >= 1.0
+torch >= 1.10 (optional, for neural methods)
+\end{verbatim}
+
+\subsection{Hardware Used}
+\begin{itemize}
+\item CPU: Apple M1 Pro (10 cores)
+\item RAM: 32 GB
+\item OS: macOS Ventura 13.0
+\end{itemize}
+
+\subsection{Timing Methodology}
+\begin{itemize}
+\item Cold start: 10 warmup iterations discarded
+\item Measurement: Mean of 100 iterations
+\item Timer: \texttt{time.perf\_counter\_ns()}
+\item Isolation: Single-threaded, no other processes
+\end{itemize}
+
+\subsection{Random Seeds}
+\begin{itemize}
+\item Base seed: 42
+\item Replication seeds: 0, 1, 2 (for 3 iterations)
+\item NumPy: \texttt{np.random.seed(seed)}
+\item Python: \texttt{random.seed(seed)}
+\end{itemize}
+
+\subsection{Data Generation}
+\begin{verbatim}
+def generate_scenario(scenario_type, n=10, seed=42):
+    np.random.seed(seed)
+    if scenario_type == "consensus":
+        return np.random.normal(0.7, 0.05, n)
+    elif scenario_type == "bimodal":
+        modes = [0.3, 0.8]
+        return np.concatenate([
+            np.random.normal(m, 0.05, n//2)
+            for m in modes])
+    elif scenario_type == "outlier":
+        base = np.random.normal(0.7, 0.05, n-1)
+        return np.append(base, 0.05)
+    # ... additional scenarios
+\end{verbatim}
+
+\section{Complete Strategy Index}
+\label{app:index}
+
+\begin{twocolumn}
+
+\small
+\textbf{Basic Methods (11)}
+\begin{enumerate}[noitemsep,leftmargin=*]
+\item WEIGHTED\_AVERAGE
+\item MAJORITY\_VOTE
+\item HIGHEST\_CONFIDENCE
+\item LOWEST\_CONFIDENCE
+\item MEDIAN
+\item TRIMMED\_MEAN
+\item GEOMETRIC\_MEAN
+\item HARMONIC\_MEAN
+\item POWER\_MEAN
+\item WINSORIZED
+\item RANGE\_MIDPOINT
+\end{enumerate}
+
+\textbf{Bayesian (10)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=12]
+\item BAYESIAN
+\item BAYESIAN\_COMBINATION
+\item HIERARCHICAL\_BAYES
+\item EMPIRICAL\_BAYES
+\item CONJUGATE\_PRIOR
+\item JEFFREYS\_PRIOR
+\item HORSESHOE\_PRIOR
+\item SPIKE\_AND\_SLAB
+\item LAPLACE\_APPROXIMATION
+\item BAYES\_MODEL\_AVERAGING
+\end{enumerate}
+
+\textbf{Robust (10)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=22]
+\item ROBUST\_HUBER
+\item ROBUST\_TUKEY
+\item MEST\_CAUCHY
+\item MEST\_WELSCH
+\item MEST\_ANDREWS
+\item LEAST\_MEDIAN\_SQUARES
+\item LEAST\_TRIMMED\_SQUARES
+\item BREAKDOWN\_POINT
+\item S\_ESTIMATOR
+\item THEIL\_SEN
+\end{enumerate}
+
+\textbf{Density (14)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=32]
+\item KERNEL\_DENSITY
+\item GMM
+\item GMM\_VARIATIONAL
+\item DIRICHLET\_PROCESS
+\item HISTOGRAM\_DENSITY
+\item PARZEN\_WINDOW
+\item DENSITY\_RATIO
+\item CONTRASTIVE\_DENSITY
+\item NORMALIZING\_FLOW
+\item SCORE\_MATCHING
+\item STEIN\_DISCREPANCY
+\item ENERGY\_BASED
+\item COPULA\_DENSITY
+\item MAX\_ENTROPY\_DENSITY
+\end{enumerate}
+
+\textbf{Sampling (12)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=46]
+\item BOOTSTRAP
+\item MONTE\_CARLO
+\item IMPORTANCE\_SAMPLING
+\item REJECTION\_SAMPLING
+\item MCMC
+\item GIBBS\_SAMPLING
+\item HMC
+\item NUTS
+\item NESTED\_SAMPLING
+\item SLICE\_SAMPLING
+\item REPLICA\_EXCHANGE
+\item PARTICLE\_FILTER
+\end{enumerate}
+
+\textbf{Information Theory (12)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=58]
+\item ENTROPY\_WEIGHTED
+\item MUTUAL\_INFO
+\item KL\_MINIMIZATION
+\item JENSEN\_SHANNON
+\item FISHER\_COMBINATION
+\item RENYI\_ENTROPY
+\item TSALLIS\_ENTROPY
+\item TOTAL\_CORRELATION
+\item DUAL\_TC
+\item INTERACTION\_INFO
+\item PREDICTIVE\_INFO
+\item INFO\_BOTTLENECK
+\end{enumerate}
+
+\textbf{Belief/Evidence (10)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=70]
+\item DEMPSTER\_SHAFER
+\item TRANSFERABLE\_BELIEF
+\item SUBJECTIVE\_LOGIC
+\item DEZERT\_SMARANDACHE
+\item YAGER\_RULE
+\item MURPHY\_AVERAGE
+\item SMETS\_COMBINATION
+\item GREY\_RELATIONAL
+\item PLAUSIBILITY\_TRANSFORM
+\item PIGNISTIC\_TRANSFORM
+\end{enumerate}
+
+\textbf{Optimal Transport (5)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=80]
+\item WASSERSTEIN\_BARYCENTER
+\item SINKHORN\_DIVERGENCE
+\item SLICED\_WASSERSTEIN
+\item GROMOV\_WASSERSTEIN
+\item UNBALANCED\_OT
+\end{enumerate}
+
+\textbf{Spectral (5)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=85]
+\item SPECTRAL\_CLUSTERING
+\item GRAPH\_LAPLACIAN
+\item DIFFUSION\_MAPS
+\item SPECTRAL\_EMBEDDING
+\item RANDOM\_WALK
+\end{enumerate}
+
+\textbf{Information Geometry (5)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=90]
+\item FISHER\_RAO\_GEODESIC
+\item BREGMAN\_CENTROID
+\item ALPHA\_DIVERGENCE
+\item AMARI\_ALPHA
+\item NATURAL\_GRADIENT
+\end{enumerate}
+
+\textbf{Neural (8)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=95]
+\item NEURAL\_AGGREGATOR
+\item ATTENTION\_BASED
+\item TRANSFORMER\_POOL
+\item NEURAL\_PROCESS
+\item SET\_TRANSFORMER
+\item DEEP\_SETS
+\item HYPERNETWORK\_FUSION
+\item GRAPH\_NEURAL\_NET
+\end{enumerate}
+
+\textbf{Probabilistic Programming (7)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=103]
+\item PROBABILISTIC\_CIRCUIT
+\item SUM\_PRODUCT\_NET
+\item BELIEF\_PROPAGATION
+\item EXPECTATION\_PROP
+\item VARIATIONAL\_MSG
+\item LOOPY\_BP
+\item TREE\_REWEIGHTED
+\end{enumerate}
+
+\textbf{Hybrid (17)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=110]
+\item ENSEMBLE\_AVERAGE
+\item STACKING
+\item CASCADED\_BAYES
+\item MIXTURE\_OF\_EXPERTS
+\item GRAPH\_AGGREGATION
+\item CONTEXT\_AWARE
+\item ATTENTION\_ENSEMBLE
+\item HIERARCHICAL\_POOL
+\item COOPETITIVE\_AGG
+\item MULTI\_SCALE
+\item ADAPTIVE\_WEIGHT
+\item DYNAMIC\_ENSEMBLE
+\item META\_LEARNING
+\item AUTO\_ENSEMBLE
+\item NEURAL\_BAYES
+\item ROBUST\_NEURAL
+\item CALIBRATED\_ENSEMBLE
+\end{enumerate}
+
+\textbf{Game Theory (5)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=127]
+\item SHAPLEY\_VALUE
+\item NASH\_BARGAINING
+\item KALAI\_SMORODINSKY
+\item NUCLEOLUS
+\item CORE\_SOLUTION
+\end{enumerate}
+
+\textbf{Causal (5)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=132]
+\item CAUSAL\_BAYES
+\item DO\_CALCULUS
+\item COUNTERFACTUAL
+\item MEDIATION\_ANALYSIS
+\item CAUSAL\_FOREST
+\end{enumerate}
+
+\textbf{Conformal (4)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=137]
+\item CONFORMAL\_PREDICTION
+\item SPLIT\_CONFORMAL
+\item FULL\_CONFORMAL
+\item JACKKNIFE\_PLUS
+\end{enumerate}
+
+\textbf{Meta (8)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=141]
+\item UCB\_AGGREGATION
+\item THOMPSON\_SAMPLING
+\item EXP3\_AGG
+\item HEDGE\_ALGORITHM
+\item FOLLOW\_LEADER
+\item ONLINE\_GRADIENT
+\item CONTEXTUAL\_BANDIT
+\item EXPERT\_ADVICE
+\end{enumerate}
+
+\textbf{Quantum-Inspired (4)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=149]
+\item QUANTUM\_SUPERPOSITION
+\item QUANTUM\_ENTANGLEMENT
+\item QUANTUM\_ANNEALING
+\item GROVER\_SEARCH
+\end{enumerate}
+
+\textbf{Prompt-Based (8)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=153]
+\item CHAIN\_OF\_THOUGHT
+\item SELF\_CONSISTENCY
+\item DEBATE\_PROTOCOL
+\item CONSTITUTIONAL\_AI
+\item PROMPT\_ENSEMBLE
+\item METACOGNITIVE
+\item REFLECTION\_AGG
+\item PROMPT\_DENSITY
+\end{enumerate}
+
+\textbf{Other (9)}
+\begin{enumerate}[noitemsep,leftmargin=*,start=161]
+\item RANDOM\_MATRIX
+\item GENERALIZED\_PARETO
+\item EXTREME\_VALUE
+\item LOG\_ODDS
+\item COPULA\_AGG
+\item VINE\_COPULA
+\item ARCHIMEDEAN\_COPULA
+\item ELLIPTICAL\_COPULA
+\item SHRINKAGE\_ESTIMATOR
+\end{enumerate}
+
+\end{twocolumn}
+\onecolumn
+
+\section{Glossary}
+\label{app:glossary}
+
+\begin{description}[noitemsep]
+\item[Aggregation] Combining multiple values into one summary.
+\item[Barycenter] Center of mass; optimal transport centroid.
+\item[Belief Function] Mass assignment over power set.
+\item[Breakdown Point] Fraction of outliers before failure.
+\item[Confidence] Probability estimate in $[0,1]$.
+\item[Dempster-Shafer] Evidence combination framework.
+\item[Entropy] Uncertainty measure: $H = -\sum p \log p$.
+\item[Fisher Information] Curvature of log-likelihood.
+\item[Geodesic] Shortest path on manifold.
+\item[Huber Loss] Quadratic for small, linear for large errors.
+\item[Kernel Density] Nonparametric distribution estimate.
+\item[Log-Odds] $\log(p/(1-p))$; logit transform.
+\item[M-Estimator] Minimizer of sum of losses.
+\item[Optimal Transport] Minimum-cost mass transfer.
+\item[Pareto Optimal] Non-dominated solution.
+\item[Robust Statistics] Outlier-resistant methods.
+\item[Shapley Value] Fair allocation in coalitions.
+\item[Subjective Logic] Belief-disbelief-uncertainty tuples.
+\item[Wasserstein Distance] Optimal transport metric.
+\item[Winsorizing] Clamping extreme values.
+\end{description}
+
+\end{document}

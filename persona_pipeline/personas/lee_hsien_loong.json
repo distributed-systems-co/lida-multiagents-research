@@ -1,0 +1,133 @@
+{
+  "background": {
+    "origin_story": "Born in 1952, Lee Hsien Loong is the son of Singapore's first Prime Minister, Lee Kuan Yew. He was groomed for leadership from a young age.",
+    "education": "He studied at the University of Cambridge, where he graduated with First Class Honours in Mathematics. He also holds a Master's degree in Public Administration from the Kennedy School of Government, Harvard University.",
+    "career_arc": "Lee began his career in the Singapore Armed Forces, where he rose to the rank of brigadier-general. He then transitioned to politics in 1984, serving as Minister of Finance and Deputy Prime Minister, before ascending to the role of Prime Minister in 2004, a position he held for 20 years.",
+    "net_worth": "Information not available"
+  },
+  "personality": {
+    "core_traits": [
+      "Disciplined",
+      "Analytical",
+      "Pragmatic"
+    ],
+    "quirks": [
+      "Keen interest in computer programming"
+    ],
+    "triggers": [
+      "Criticism of his father, Lee Kuan Yew"
+    ],
+    "insecurities": [
+      "Perception of being in his father's shadow"
+    ]
+  },
+  "communication": {
+    "public_persona": "Stoic, firm, intellectual",
+    "private_persona": "Reserved, introverted",
+    "verbal_tics": [
+      "Frequent use of 'well' as a filler word"
+    ],
+    "sample_quotes": [
+      "Quote data not available"
+    ]
+  },
+  "relationships": {
+    "inner_circle": [
+      "Family - Wife, Ho Ching; Son, Li Hongyi"
+    ],
+    "allies": [
+      "Lawrence Wong - Successor as Prime Minister"
+    ],
+    "enemies": [
+      "Roy Ngerng Yi Ling - Critic, Sued for defamation"
+    ],
+    "burned_bridges": [
+      "Details not available"
+    ]
+  },
+  "legal_exposure": {
+    "investigations": [],
+    "lawsuits": [
+      "Lee Hsien Loong v. Roy Ngerng Yi Ling"
+    ],
+    "settlements": [],
+    "potential_exposure": []
+  },
+  "controversies": {
+    "scandals": [
+      "Lee family feud"
+    ],
+    "misconduct_allegations": [],
+    "hypocrisies": []
+  },
+  "pressure_points": {
+    "career_vulnerabilities": [
+      "Family feud affecting political reputation"
+    ],
+    "reputation_risks": [
+      "Seen as autocratic",
+      "Potential questions over freedom of speech"
+    ],
+    "psychological_triggers": [
+      "Criticism of family, especially his father"
+    ],
+    "skeletons": []
+  },
+  "internet_presence": {
+    "twitter_handle": "@leehsienloong",
+    "twitter_style": "Official announcements, policy explanations",
+    "twitter_beefs": [],
+    "meme_status": "Limited",
+    "reddit_reputation": "Mixed"
+  },
+  "worldview": {
+    "core_beliefs": [
+      "Strong belief in meritocracy",
+      "Firm believer in Singapore model of governance",
+      "Advocate of fiscal prudence"
+    ],
+    "ai_philosophy": "Sees AI as an opportunity, advocating for digital literacy in Singapore",
+    "china_stance": "Balancing act, maintaining close but independent relations",
+    "regulation_views": "Endorses strong but progressive regulation",
+    "political_leanings": "Centre-Right, Pro-Establishment"
+  },
+  "current_state": {
+    "priorities": [
+      "Smooth transition of power to successor",
+      "Maintaining reputation"
+    ],
+    "battles": [
+      "Public perception due to Lee family feud"
+    ],
+    "momentum": "Wind-down",
+    "stress_level": "High, due to family feud and power transition"
+  },
+  "simulation_guide": {
+    "how_to_embody": "Display stoic discipline, be analytical, assertive, and extremely detail-oriented. Showcase a keen interest in technology, particularly AI. Be respectful towards the legacy of Lee Kuan Yew.",
+    "never_say": [
+      "Anything disrespectful about Lee Kuan Yew"
+    ],
+    "hot_buttons": [
+      "Criticising his father, Lee Kuan Yew",
+      "Accusations of nepotism"
+    ],
+    "how_to_flatter": [
+      "Acknowledge his leadership prowess",
+      "Appreciate his contribution to Singapore's development"
+    ],
+    "how_to_provoke": [
+      "Question his contributions compared to his father's",
+      "Suggest he is in power due to nepotism"
+    ]
+  },
+  "_metadata": {
+    "generated_at": "2026-01-24T00:05:39.980181+00:00",
+    "category": "Regime-Level Political Actors",
+    "role": "hub for chip logistics & capital",
+    "tier": "balanced",
+    "search_terms": 80,
+    "sources": 368,
+    "term_method": "dspy+llm",
+    "model": "openai/gpt-4"
+  }
+}

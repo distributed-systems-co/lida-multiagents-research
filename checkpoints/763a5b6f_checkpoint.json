@@ -1,0 +1,96 @@
+{
+  "experiment_id": "763a5b6f",
+  "config": {
+    "experiment_id": "763a5b6f",
+    "name": "custom_template-ai_pause-s1",
+    "description": "",
+    "scenario_file": "/Users/arthurcolle/lida-multiagents-research/scenarios/presets/custom_template.yaml",
+    "topic": "ai_pause",
+    "max_rounds": 10,
+    "timeout_seconds": 3600,
+    "checkpoint_interval": 5,
+    "agent_count": 6,
+    "live_mode": false,
+    "model_override": null,
+    "interventions": [],
+    "pre_round_hooks": [],
+    "output_dir": "/tmp/test_real_sweep2/custom_template/ai_pause/seed-1",
+    "save_transcripts": true,
+    "save_metrics": true,
+    "export_latex": false,
+    "random_seed": 1,
+    "replications": 1
+  },
+  "round_number": 10,
+  "debate_state": {
+    "current_round": 10,
+    "topic": "ai_pause",
+    "motion": "ai_pause",
+    "debaters": {
+      "yudkowsky": {
+        "beliefs": {
+          "support_motion": 0.5944743042681936,
+          "urgency": 0.8,
+          "feasibility": 0.6
+        }
+      },
+      "sam_altman": {
+        "beliefs": {
+          "support_motion": 0.5878816281295102,
+          "urgency": 0.5,
+          "feasibility": 0.5
+        }
+      },
+      "yann_lecun": {
+        "beliefs": {
+          "support_motion": 0.5633233724522709,
+          "urgency": 0.3,
+          "feasibility": 0.4
+        }
+      },
+      "dario_amodei": {
+        "beliefs": {
+          "support_motion": 0.5755086640215233,
+          "urgency": 0.5,
+          "feasibility": 0.5
+        }
+      },
+      "stuart_russell": {
+        "beliefs": {
+          "support_motion": 0.5888714939007522,
+          "urgency": 0.8,
+          "feasibility": 0.6
+        }
+      },
+      "geoffrey_hinton": {
+        "beliefs": {
+          "support_motion": 0.5838549944325664,
+          "urgency": 0.5,
+          "feasibility": 0.5
+        }
+      }
+    }
+  },
+  "agent_states": {},
+  "metrics": {
+    "experiment_id": "763a5b6f",
+    "current_round": 10,
+    "total_rounds": 10,
+    "elapsed_seconds": 0.0029540061950683594,
+    "agents_active": 6,
+    "total_messages": 60,
+    "positions": {},
+    "position_changes": 0,
+    "consensus_score": 0.0,
+    "convergence": 0.0,
+    "polarization": 0.0,
+    "llm_calls": 0,
+    "llm_tokens_in": 0,
+    "llm_tokens_out": 0,
+    "llm_cost_usd": 0.0,
+    "started_at": "2026-01-24T18:31:36.011533",
+    "last_update": null
+  },
+  "random_state": null,
+  "created_at": "2026-01-24T18:31:36.016579"
+}
