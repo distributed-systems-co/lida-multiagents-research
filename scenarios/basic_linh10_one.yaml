@@ -1,0 +1,49 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# AI Policy Leaders Scenario - 10 key figures in AI governance
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_imports:
+  - personas/v2/tech_leaders.yaml
+  - personas/v2/ai_researchers.yaml
+
+simulation:
+  num_agents: 10
+  max_rounds_per_agent: 7
+  max_voting_rounds: 7
+  require_all_votes: true  # All agents must vote each round
+  auto_start_topic: "Should we establish international AI governance with binding regulations?"
+
+agents:
+  use_real_personas: true
+  persona_version: "v2"
+  personas:
+    # Political Leaders
+    - donald_trump      # US - deregulation stance
+    - xi_jinping        # China - state-controlled AI
+    - ursula_von_der_leyen  # EU - AI Act architect
+
+    # Tech Industry Leaders
+    - elon_musk         # xAI, Tesla - AI safety advocate
+    - sam_altman        # OpenAI CEO
+    - dario_amodei      # Anthropic CEO - AI safety focus
+    - sundar_pichai     # Google/DeepMind
+
+    # AI Researchers & Policy Experts
+    - yoshua_bengio     # Turing Award, AI safety researcher
+    - stuart_russell    # UC Berkeley, AI alignment
+    - chuck_schumer     # US Senate AI policy leader
+
+  models:
+    #- anthropic/claude-sonnet-4
+    #- openai/gpt-4o-mini
+    #- google/gemini-2.5-flash
+    - google/gemini-2.0-flash-001
+
+      #- anthropic/claude-sonnet-4.5
+      #- openai/gpt-5-mini
+      #- google/gemini-3-flash-preview
+
+  energy_decay: 0.015
+  energy_recovery_on_message: 0.12
+  energy_recovery_on_agreement: 0.08
+  energy_cost_per_argument: 0.05
